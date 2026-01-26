@@ -1,6 +1,7 @@
 import { Effect } from "./Effect";
 
 export class Action {
+    
     constructor(
         public id : String,
         public name : String,
