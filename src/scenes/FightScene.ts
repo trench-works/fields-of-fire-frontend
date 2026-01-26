@@ -1,20 +1,16 @@
 import { Scene } from 'phaser';
-import { Character } from "./Character";
+import { Character } from "../Model/Character";
 
-export class FightSceneModel extends Scene {
+export class FightScene extends Scene {
 
-    constructor(
-        public id: string,
-        public name: string,
-        public backgroundImage: string,
-        public fightMap: string,
-        public characterList: Character[], 
+    public backgroundImage!: string;
+    public fightMap!: string;
+    public characterList!: Character[]; 
 
-    ) {
-        super({ key: id });
+
+    constructor() {
+        super({ key: "fightScene" });
     }
-
-    
 
     preload() {
         this.load.tilemapTiledJSON(this.fightMap, `assets/maps/${this.fightMap}.json`);
@@ -28,6 +24,11 @@ export class FightSceneModel extends Scene {
             );
         }
         
+    }
+
+    create() {
+        this.add.image(400, 300, this.backgroundImage).setDepth(-1);
+        this.generateMap();
     }
 
     generateMap() {
