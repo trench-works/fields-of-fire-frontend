@@ -3,6 +3,7 @@ import { Character } from "./Character";
 import { CharacterClass } from "./CharacterClass";
 import { Stats } from "./Stats";
 
+
 export class PlayableCharacter extends Character {
     constructor(
     id: string,
