@@ -8,9 +8,11 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@types/react": "^19.2.9",
     "vite": "^7.3.1"
   },
   "dependencies": {
-    "phaser": "^3.80.1"
+    "phaser": "^3.80.1",
+    "react": "^19.2.3"
   }
 }
