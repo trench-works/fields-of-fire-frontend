@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { Character } from "./Character";
 
 export class FightSceneModel extends Scene {
 
@@ -7,7 +8,7 @@ export class FightSceneModel extends Scene {
         public name: string,
         public backgroundImage: string,
         public fightMap: string,
-        public characterList: 
+        public characterList: Character[], 
 
     ) {
         super({ key: id });
