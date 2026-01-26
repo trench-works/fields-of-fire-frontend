@@ -1,4 +1,4 @@
-import { Stats } from "./Stats";
+import { Stats } from './Stats';
 
 export class Effect {
     constructor(
