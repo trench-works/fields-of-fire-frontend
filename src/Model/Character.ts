@@ -27,9 +27,9 @@ export class Character {
 
     const stats = new Stats( 
       this.baseStats.life,
-      this.baseStats.precision, 
+      this.baseStats.precision, //boost ranged dammage
       this.baseStats.strengh, 
-      this.baseStats.accuracy, 
+      this.baseStats.accuracy, //chance to hit
       this.baseStats.initiative, 
       this.baseStats.energy, 
       this.baseStats.mouvement  

@@ -3,10 +3,10 @@ import { Stats } from "./Stats";
 
 export class CharacterClass {
     constructor(
-        name: string,
-        sprite : string,
-        stats: Stats,
-        classDescription : string,
-        actionList: Action[],
+        public name: string,
+        public sprite : string,
+        public stats: Stats,
+        public classDescription : string,
+        public actionList: Action[],
     ) {}
 }
