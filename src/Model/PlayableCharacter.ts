@@ -11,7 +11,6 @@ export class PlayableCharacter extends Character {
     sprite: string,
     actionList: Action[],
     stats: Stats,
-    temporaryStats: Stats,
     x: number,
     y: number,
     public characterClass: CharacterClass 
