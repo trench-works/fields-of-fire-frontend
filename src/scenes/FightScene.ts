@@ -1,5 +1,7 @@
 import { Scene } from 'phaser';
 import { Character } from "../Model/Character";
+import { Utils } from '../core/Utils';
+
 
 export class FightScene extends Scene {
 
@@ -41,19 +43,11 @@ export class FightScene extends Scene {
         
         const map = this.make.tilemap({ key: this.fightMap });
         const tileset = map.addTilesetImage(this.tileSetImage, "groundTiles");
+        
+        const centerMap = Utils.scaleAndCenter({parentHeight: this.scale.height, parentWidth: this.scale.width, childHeight: map.heightInPixels, childWidth: map.widthInPixels , isometricVariation: true});
+        const groundLayer = map.createLayer("Ground", tileset!, centerMap.offsetX, centerMap.offsetY);
 
-        const mapHeight = map.heightInPixels;
-
-        const screenWidth = this.scale.width;
-        const screenHeight = this.scale.height;
-
-        const scaleFactor = Math.min(screenWidth / map.widthInPixels, screenHeight / mapHeight)*0.8;
-        const offsetX = (screenWidth) / 2;
-        const offsetY = (screenHeight  -( mapHeight * scaleFactor)) /2 ;
-
-        const groundLayer = map.createLayer("Ground", tileset!, offsetX- (this.tileWidth/2 * scaleFactor), offsetY );
-
-        groundLayer?.setScale(scaleFactor);
+        groundLayer?.setScale(centerMap.scaleFactor);
         groundLayer?.setDepth(0);
     }
 
