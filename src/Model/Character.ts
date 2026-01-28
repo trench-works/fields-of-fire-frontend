@@ -44,6 +44,7 @@ export class Character extends GameObject {
       this.baseStats.life,
       this.baseStats.precision, //boost ranged dammage
       this.baseStats.strength, 
+
       this.baseStats.accuracy, //chance to hit
       this.baseStats.initiative, 
       this.baseStats.energy, 
