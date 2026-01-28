@@ -1,19 +1,19 @@
-import { Action } from "./Action";
-import { Character } from "./Character";
-import { Stats } from "./Stats";
+import { Character, CharactersProps } from "./Character";
+
+export type MobProps = CharactersProps & {
+    mobType: string;
+    mobDesc: string;
+};
 
 export class Mob extends Character {
     constructor(
-        id: string,
-        name: string,
-        sprite: string,
-        actionList: Action[],
-        stats: Stats,
-        x: number,
-        y: number,
+        characterProps: CharactersProps,
         public mobType: string,
         public mobDesc: string
       ) {
-        super(id, name, sprite, actionList, stats, x, y); // appelle le constructeur de Character
+        super(characterProps);
+
+        this.mobType = mobType;
+        this.mobDesc = mobDesc;
       }
 }

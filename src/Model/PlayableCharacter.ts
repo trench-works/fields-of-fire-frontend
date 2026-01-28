@@ -1,21 +1,19 @@
 import { Action } from "./Action";
-import { Character } from "./Character";
+import { Character, CharactersProps } from "./Character";
 import { CharacterClass } from "./CharacterClass";
 import { Stats } from "./Stats";
 
+export type PlayableCharacterProps = CharactersProps & {
+    characterClass:  CharacterClass;
+};
 
 export class PlayableCharacter extends Character {
     constructor(
-    id: string,
-    name: string,
-    sprite: string,
-    actionList: Action[],
-    stats: Stats,
-    x: number,
-    y: number,
+    characterProps: CharactersProps,
     public characterClass: CharacterClass 
   ) {
-    super(id, name, sprite, actionList, stats, x, y); // appelle le constructeur de Character
-  }
+    super(characterProps);
 
+    this.characterClass = characterClass;
+  }
 }

@@ -1,34 +1,49 @@
+import { RenderResult, SceneRenderConfig } from "../scenes/FightScene";
 import { Action } from "./Action";
 import { Effect } from "./Effect";
+import { GameObject, GameObjectProps } from "./GameObject";
+import { Position, PositionUtils } from "./Position";
 import { Stats } from "./Stats";
 
-// interface ICharacter {
-//   id : string;
-//   name : string;
-// }
+export type CharactersProps = GameObjectProps & {
+    position: Position;
+    sprite: string;
+    id: string;
+    name: string;
+    actionList: Action[];
+    baseStats: Stats;
+};
 
-export class Character {
+export class Character extends GameObject {
   public currentEffect: Effect[] = [];
+  protected position: Position;
+  protected sprite: string;
+  public id: string;
+  public name: string;
+  public actionList: Action[];
+  public baseStats: Stats;
 
   constructor(
-    public id: string,
-    public name: string,
-    public sprite: string,
-    public actionList: Action[],
-    public baseStats: Stats,
-    public x: number,
-    public y: number,
-  ) {}
+    
+    { position, sprite, id, name, actionList, baseStats, scene }: CharactersProps
+  ) {
+
+    super({scene});
+
+    this.position = position;
+    this.sprite = sprite;
+    this.id = id;
+    this.name = name;
+    this.actionList = actionList;
+    this.baseStats = baseStats;
+  }
 
   get stats() {
-    // return Object.fromEntries(
-    // (Object.keys(this.baseStats) as (keyof Stats)[]).map((key : keyof Stats) : [string, number] => [key, (this.baseStats[key] || 0) + (statsModif[key] || 0)])
-    // );
 
     const stats = new Stats( 
       this.baseStats.life,
       this.baseStats.precision, //boost ranged dammage
-      this.baseStats.strengh, 
+      this.baseStats.strength, 
       this.baseStats.accuracy, //chance to hit
       this.baseStats.initiative, 
       this.baseStats.energy, 
@@ -48,21 +63,18 @@ export class Character {
     return stats;
   }
 
-  
-}
+  render(renderConfig: SceneRenderConfig): RenderResult {
+      const renderPosition = PositionUtils.getPixelsFromPosition(
+          this.position,
+          renderConfig
+      );
+      return {
+          position: renderPosition,
+          sprite: this.sprite,
+      };
+  }
 
-//   constructor(
-//   ) {}
-//   withId(id : number) : this & Pick<ICharacter, 'id'>{
-//     return Object.assign(this, {id});
-//   }
-//   build(this: ICharacter) {
-//     return new Character(this);
-//   }
-// }
-// export class Character implements ICharacter{
-//   public id : string;
-//   constructor(character: ICharacter) {
-//     Object.assign(this, character);
-//   }
-// }
+  async recalculate(): Promise<void> {
+    return;
+  }
+}
