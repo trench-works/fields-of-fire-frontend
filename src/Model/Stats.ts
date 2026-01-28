@@ -2,7 +2,7 @@ export class Stats{
     constructor(
         public life : number,
         public precision: number,
-        public strengh: number,
+        public strength: number,
         public accuracy: number,
         public initiative: number,
         public energy : number,
@@ -18,7 +18,7 @@ export class Stats{
     }
 
     addStrengh(strengh: number) {
-        this.strengh+=strengh;
+        this.strength+=strengh;
     }
 
     addAccuracy(accuracy: number) {
