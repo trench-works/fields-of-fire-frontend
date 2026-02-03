@@ -14,6 +14,7 @@ interface ScaleAndCenterResult {
 }
 
 export class Utils {
+    
     public static scaleAndCenter({
         parentHeight,
         parentWidth,
