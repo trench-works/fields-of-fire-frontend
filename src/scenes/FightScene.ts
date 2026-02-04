@@ -115,7 +115,6 @@ export class FightScene extends Scene implements Displayable {
 
         groundLayer.setScale(centerMap.scaleFactor);
         groundLayer.setDepth(0);
-        this.gridShower(map, groundLayer);
 
         this.generatePlayGrid(map, groundLayer);
     }
@@ -134,86 +133,31 @@ export class FightScene extends Scene implements Displayable {
                 const worldX = tile.getCenterX();
                 const worldY = tile.getCenterY();
 
-                const zone = this.add.zone(
-                    worldX,
-                    worldY,
-                    tile.width * scale,
-                    tile.height * scale,
-                );
+                const zone = this.add.zone(worldX, worldY, 10, 10);
 
-                const Y_OFFSET = 16 * scale;
+                const Yof = 16;
+                const Xof = 32;
 
                 const diamond = new Phaser.Geom.Polygon([
-                    0,
-                    -(tile.height * scale) / 4 - Y_OFFSET,
-                    (tile.width * scale) / 2,
-                    -Y_OFFSET,
-                    0,
-                    (tile.height * scale) / 4 - Y_OFFSET,
-                    -(tile.width * scale) / 2,
-                    -Y_OFFSET,
+                    // reminder : the 0,0 position here is the bottom angle of the tile.
+                    //poin1 (left corner)
+                    0 - Xof,-(tile.height * scale) / 4,
+                    //point2 (top corner)
+                    0,-tile.height / 2,
+                    //point3 (right corner)
+                    (tile.width * scale) / 2,0 - Yof,
+                    //point4 (bottom corner)
+                    0,0,
                 ]);
 
                 zone.setInteractive(diamond, Phaser.Geom.Polygon.Contains);
                 zone.setDepth(layer.depth + 3);
 
-                // --- overlay graphique bleu ---
-                const overlay = this.add.graphics();
-                overlay.fillStyle(0x0000ff, 0.3); // bleu semi-transparent
-                overlay.beginPath();
-                overlay.moveTo(
-                    worldX,
-                    worldY - (tile.height * scale) / 4 - Y_OFFSET,
-                );
-                overlay.lineTo(
-                    worldX + (tile.width * scale) / 2,
-                    worldY - Y_OFFSET,
-                );
-                overlay.lineTo(
-                    worldX,
-                    worldY + (tile.height * scale) / 4 - Y_OFFSET,
-                );
-                overlay.lineTo(
-                    worldX - (tile.width * scale) / 2,
-                    worldY - Y_OFFSET,
-                );
-                overlay.closePath();
-                overlay.fillPath();
-                overlay.setDepth(layer.depth + 2); // juste sous la zone
+                // --- DEBUG VISUEL ---
+               this.gridShower(diamond, worldX, worldY, layer);
 
-                console.log(
-                    `Tile [${tile.x},${tile.y}] center: (${tile.getCenterX()},${tile.getCenterY()})`,
-                    `overlay center: (${diamond.x},${diamond.y})`,
-                );
-
-                // Stocker l’overlay pour pouvoir le modifier plus tard
-                (tile as any).overlay = overlay;
-
-                // clic
                 zone.on("pointerdown", () => {
                     // Exemple : changer couleur overlay au clic
-                    overlay.clear();
-                    overlay.fillStyle(0x00ff00, 0.5);
-                    overlay.beginPath();
-                    overlay.moveTo(
-                        worldX,
-                        worldY - (tile.height * scale) / 4 - Y_OFFSET,
-                    );
-                    overlay.lineTo(
-                        worldX + (tile.width * scale) / 2,
-                        worldY - Y_OFFSET,
-                    );
-                    overlay.lineTo(
-                        worldX,
-                        worldY + (tile.height * scale) / 4 - Y_OFFSET,
-                    );
-                    overlay.lineTo(
-                        worldX - (tile.width * scale) / 2,
-                        worldY - Y_OFFSET,
-                    );
-                    overlay.closePath();
-                    overlay.fillPath();
-
                     console.log(`Tile clicked: ${x}, ${y}`);
                 });
 
@@ -241,33 +185,15 @@ export class FightScene extends Scene implements Displayable {
         }
     }
     gridShower(
-        map: Phaser.Tilemaps.Tilemap,
+        diamond: Phaser.Geom.Polygon,
+        worldX: number,
+        worldY: number,
         layer: Phaser.Tilemaps.TilemapLayer,
     ) {
-        const scale = layer.scaleX;
         const g = this.add.graphics();
-
-        g.fillStyle(0x0000ff, 0.25);
-        g.setDepth(layer.depth + 1);
-
-        for (let y = 0; y < map.height; y++) {
-            for (let x = 0; x < map.width; x++) {
-                const tile = layer.getTileAt(x, y);
-                if (!tile) continue;
-
-                const cx = tile.getCenterX();
-                const cy = tile.getCenterY();
-
-                g.beginPath();
-                const Y_OFFSET = 16 * scale;
-
-                g.moveTo(cx, cy - (tile.height * scale) / 4 - Y_OFFSET);
-                g.lineTo(cx + (tile.width * scale) / 2, cy - Y_OFFSET);
-                g.lineTo(cx, cy + (tile.height * scale) / 4 - Y_OFFSET);
-                g.lineTo(cx - (tile.width * scale) / 2, cy - Y_OFFSET);
-                g.closePath();
-                g.fillPath();
-            }
-        }
+            g.lineStyle(2, 0xff0000, 1); // contour rouge
+            g.strokePoints(diamond.points, true);
+            g.setPosition(worldX, worldY);
+            g.setDepth(layer.depth + 4);
     }
 }
