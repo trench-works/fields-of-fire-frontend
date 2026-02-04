@@ -59,7 +59,7 @@ export class Button extends Phaser.GameObjects.Container {
             this.buttonText.height + btnPadding
         );
 
-        // Définir la hitbox interactive
+        // Défini la hitbox interactive (le "clicable")
         const hitArea = new Phaser.Geom.Rectangle(
             0,
             0,
@@ -69,10 +69,10 @@ export class Button extends Phaser.GameObjects.Container {
         this.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
         this.setScrollFactor(0);
 
-        // Ajouter les événements
+        // Ajoute l'action
         this.setupEvents();
 
-        // Ajouter le bouton à la scène
+        // Ajoute le bouton à la scène
         scene.add.existing(this);
     }
 
@@ -93,7 +93,6 @@ export class Button extends Phaser.GameObjects.Container {
         });
     }
 
-    // Méthode pour changer le texte
     public setText(newText: string) {
         this.buttonText.setText(newText);
     }
