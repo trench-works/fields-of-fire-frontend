@@ -1,4 +1,5 @@
-import { SceneRenderConfig } from "../scenes/FightScene";
+import { SceneRenderConfig } from "./GameScene";
+
 
 export class Position {
     public x: number;
