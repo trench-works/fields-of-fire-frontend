@@ -139,8 +139,7 @@ export class FightScene extends Scene implements Displayable {
                 const Xof = 32;
 
                 const diamond = new Phaser.Geom.Polygon([
-                    // reminder : the 0,0 position here is the bottom angle of the tile.
-                    //poin1 (left corner)
+                    //point1 (left corner)
                     0 - Xof,-(tile.height * scale) / 4,
                     //point2 (top corner)
                     0,-tile.height / 2,
