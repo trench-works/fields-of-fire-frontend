@@ -4,6 +4,7 @@ import { GameObject } from "../Model/GameObject";
 import { SceneConfig } from "../data/SceneConfig";
 import { Stats } from "../Model/Stats";
 import { Displayable, GameScene, SceneRenderConfig } from "../Model/GameScene";
+
 export class FightScene extends GameScene implements Displayable {
     public backgroundImage = "red_bg";
     public fightMap = "chessmap";
@@ -11,7 +12,7 @@ export class FightScene extends GameScene implements Displayable {
     public tileWidth = 64;
     public gameObjects: GameObject[] = [];
     public displayObjects: Displayable[] = [];
-
+    public characters: Character[] ;
     public renderConfig: SceneRenderConfig;
 
     constructor() {
@@ -25,7 +26,6 @@ export class FightScene extends GameScene implements Displayable {
             renderType: config.render_config.render_type,
             offset: new Position(),
         };
-
         this.renderConfig.offset = PositionUtils.getMapOffset(
             this.renderConfig,
         );
@@ -35,7 +35,7 @@ export class FightScene extends GameScene implements Displayable {
                 config.player_spawn.x,
                 config.player_spawn.y,
             ),
-            sprite: "main_character_sprite",
+            sprite: "target",
             scene: this,
             id: "char1",
             name: "Hero",
@@ -44,6 +44,10 @@ export class FightScene extends GameScene implements Displayable {
         });
 
         this.gameObjects.push(mainCharacter);
+        this.characters = this.gameObjects.filter(
+            (obj) => obj instanceof Character,
+        );
+        console.log("obj : " + this.gameObjects + " char : " + this.characters)
     }
 
     preload() {
@@ -52,6 +56,14 @@ export class FightScene extends GameScene implements Displayable {
             `assets/${this.fightMap}.json`,
         );
         this.load.image("groundTiles", `assets/${this.tileSetImage}.png`);
+
+        //précharge les image des persos de la scène
+        this.characters.forEach((object) => {
+            if(object.sprite){
+                this.load.image(object.sprite, `assets/${object.sprite}.png` )
+            }
+            }
+        )
         this.load.image(
             this.backgroundImage,
             `assets/${this.backgroundImage}.jpg`,
@@ -66,6 +78,7 @@ export class FightScene extends GameScene implements Displayable {
         bg.setDisplaySize(this.scale.width, this.scale.height);
 
         this.generateMap();
+        this.spawnEntities();
     }
 
 }

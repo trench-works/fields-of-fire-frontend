@@ -1,4 +1,4 @@
-import { RenderResult, SceneRenderConfig } from "../scenes/FightScene";
+import { RenderResult, SceneRenderConfig } from "./GameScene";
 import { Action } from "./Action";
 import { Effect } from "./Effect";
 import { GameObject, GameObjectProps } from "./GameObject";
@@ -16,8 +16,8 @@ export type CharactersProps = GameObjectProps & {
 
 export class Character extends GameObject {
   public currentEffect: Effect[] = [];
-  protected position: Position;
-  protected sprite: string;
+  public position: Position;
+  public sprite: string;
   public id: string;
   public name: string;
   public actionList: Action[];

@@ -17,6 +17,12 @@ export type RenderResult = {
     sprite: string;
 };
 
+export type Cell = {
+    gridPosition: Position;
+    pixelPosition: Position;
+    zone: Phaser.GameObjects.Zone;
+};
+
 export interface Displayable {
     render(renderConfig: SceneRenderConfig): RenderResult | RenderResult[];
 }
@@ -29,27 +35,28 @@ export class GameScene extends Scene implements Displayable {
     public renderConfig: SceneRenderConfig | undefined;
     public displayObjects: Displayable[] = [];
     public gameObjects: GameObject[] = [];
+    public characters: Character[] = [];
+    public gridPositions: Cell[][] = [];
+    public scaleFactor: number= 1;
 
-    preload() {
-        this.load.tilemapTiledJSON(
-            this.fightMap,
-            `assets/${this.fightMap}.json`,
-        );
-        this.load.image("groundTiles", `assets/${this.tileSetImage}.png`);
-        this.load.image(
-            this.backgroundImage,
-            `assets/${this.backgroundImage}.jpg`,
-        );
+    spawnEntities() {
+        this.characters.forEach((entity) => {
+            this.spawnCharacter(entity);
+        });
     }
 
-    create() {
-        const bg = this.add
-            .image(0, 0, this.backgroundImage)
-            .setOrigin(0, 0)
-            .setDepth(-1);
-        bg.setDisplaySize(this.scale.width, this.scale.height);
-
-        this.generateMap();
+    spawnCharacter(character: Character) {
+        const { x, y } = character.position;
+        console.log(this.gridPositions)
+        const cell = this.gridPositions[y][x];
+        let sprite = this.physics.add.sprite(
+            cell.pixelPosition.x,
+            cell.pixelPosition.y,
+            character.sprite,
+        );
+        sprite.setDepth(5);
+        sprite.setOrigin(0.5, 1);
+        sprite.setScale(this.scaleFactor/2);
     }
 
     generateMap() {
@@ -83,19 +90,21 @@ export class GameScene extends Scene implements Displayable {
             throw new Error("Ground layer seemingly inexistent");
         }
 
-        groundLayer.setScale(centerMap.scaleFactor);
+        this.scaleFactor = centerMap.scaleFactor
+
+        groundLayer.setScale(this.scaleFactor);
         groundLayer.setDepth(0);
 
-        this.generatePlayGrid(map, groundLayer, centerMap.scaleFactor);
+        this.generatePlayGrid(map, groundLayer);
     }
 
     generatePlayGrid(
         map: Phaser.Tilemaps.Tilemap,
-        layer: Phaser.Tilemaps.TilemapLayer,
-        scaleFactor: number = 1,
+        layer: Phaser.Tilemaps.TilemapLayer
     ) {
         for (let y = 0; y < map.height; y++) {
             for (let x = 0; x < map.width; x++) {
+
                 const tile = layer.getTileAt(x, y);
                 if (!tile) continue;
 
@@ -104,25 +113,33 @@ export class GameScene extends Scene implements Displayable {
 
                 const zone = this.add.zone(worldX, worldY, 10, 10);
 
-                const Yof = 16 ;
-                const Xof = 32 ;
+                const Yof = 16;
+                const Xof = 32;
 
                 const diamond = new Phaser.Geom.Polygon([
                     //point1 (left corner)
-                    0 - Xof * scaleFactor,- tile.height * scaleFactor  / 4 ,
+                    0 - Xof * this.scaleFactor,
+                    (-tile.height * this.scaleFactor) / 4,
                     //point2 (top corner)
-                    0,-tile.height * scaleFactor / 2,
+                    0,
+                    (-tile.height * this.scaleFactor) / 2,
                     //point3 (right corner)
-                    (tile.width * scaleFactor) / 2, 0 - Yof * scaleFactor,
+                    (tile.width * this.scaleFactor) / 2,
+                    0 - Yof * this.scaleFactor,
                     //point4 (bottom corner)
-                    0,0,
+                    0,
+                    0,
                 ]);
 
                 zone.setInteractive(diamond, Phaser.Geom.Polygon.Contains);
                 zone.setDepth(layer.depth + 3);
 
                 // --- DEBUG VISUEL ---
-               this.gridShower(diamond, worldX, worldY, layer);
+                this.gridShower(diamond, worldX, worldY, layer);
+
+                if (!this.gridPositions[y]) { this.gridPositions[y] = []; } 
+
+                this.gridPositions[y][x] = { gridPosition: new Position (x, y ), pixelPosition: new Position(worldX, worldY-Yof*this.scaleFactor), zone }; 
 
                 zone.on("pointerdown", () => {
                     console.log(`Tile clicked: ${x}, ${y}`);
@@ -158,9 +175,10 @@ export class GameScene extends Scene implements Displayable {
         layer: Phaser.Tilemaps.TilemapLayer,
     ) {
         const g = this.add.graphics();
-            g.lineStyle(2, 0xff0000, 1); // contour rouge
-            g.strokePoints(diamond.points, true);
-            g.setPosition(worldX, worldY);
-            g.setDepth(layer.depth + 4);
+        g.lineStyle(2, 0xff0000, 1); // contour rouge
+        g.strokePoints(diamond.points, true);
+        g.setPosition(worldX, worldY);
+        g.setDepth(layer.depth + 4);
     }
 }
+
