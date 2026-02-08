@@ -41,22 +41,9 @@ export class GameScene extends Scene implements Displayable {
 
     spawnEntities() {
         this.characters.forEach((entity) => {
-            this.spawnCharacter(entity);
+            //this.spawnCharacter(entity);
+            entity.spawn(this, this.scaleFactor, this.gridPositions);
         });
-    }
-
-    spawnCharacter(character: Character) {
-        const { x, y } = character.position;
-        console.log(this.gridPositions)
-        const cell = this.gridPositions[y][x];
-        let sprite = this.physics.add.sprite(
-            cell.pixelPosition.x,
-            cell.pixelPosition.y,
-            character.sprite,
-        );
-        sprite.setDepth(5);
-        sprite.setOrigin(0.5, 0.95);
-        sprite.setScale(this.scaleFactor/1.5);
     }
 
     generateMap() {

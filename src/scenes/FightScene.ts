@@ -30,26 +30,12 @@ export class FightScene extends GameScene implements Displayable {
         this.renderConfig.offset = PositionUtils.getMapOffset(
             this.renderConfig,
         );
-
-        const mainCharacter = new Character({
-            position: new Position(
-                config.player_spawn.x,
-                config.player_spawn.y,
-            ),
-            sprite: "target2",
-            scene: this,
-            id: "char1",
-            name: "Hero",
-            actionList: [],
-            baseStats: new Stats(100, 10, 15, 80, 20, 50, 5),
-        });
-
         const secondaryCharacter = new Character({
             position: new Position(
                 7,
                 7,
             ),
-            sprite: "entente_fantassin",
+            sprite: "entente_fantassin_spritesheet",
             scene: this,
             id: "char1",
             name: "Hero",
@@ -57,22 +43,7 @@ export class FightScene extends GameScene implements Displayable {
             baseStats: new Stats(100, 10, 15, 80, 20, 50, 5),
         });
 
-        const tertioCharacter = new Character({
-            position: new Position(
-                1,
-                7,
-            ),
-            sprite: "target",
-            scene: this,
-            id: "char1",
-            name: "Hero",
-            actionList: [],
-            baseStats: new Stats(100, 10, 15, 80, 20, 50, 5),
-        });
-
-        this.gameObjects.push(mainCharacter);
         this.gameObjects.push(secondaryCharacter);
-        this.gameObjects.push(tertioCharacter);
 
         this.characters = this.gameObjects.filter(
             (obj) => obj instanceof Character,
@@ -89,8 +60,8 @@ export class FightScene extends GameScene implements Displayable {
 
         //précharge les image des persos de la scène
         this.characters.forEach((object) => {
-            if(object.sprite){
-                this.load.image(object.sprite, `assets/Sprites/${object.sprite}.png` )
+            if(object.spriteKey){
+                this.load.spritesheet(object.spriteKey, `assets/Sprites/${object.spriteKey}.png`, {frameWidth: 96, frameHeight: 128})
             }
             }
         )
