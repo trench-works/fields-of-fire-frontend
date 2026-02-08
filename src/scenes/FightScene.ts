@@ -1,4 +1,5 @@
 import { Character } from "../Model/Character";
+import { Mob } from "../Model/Mob";
 import { Position, PositionUtils } from "../Model/Position";
 import { GameObject } from "../Model/GameObject";
 import { SceneConfig } from "../data/SceneConfig";
@@ -35,6 +36,32 @@ export class FightScene extends GameScene implements Displayable {
                 config.player_spawn.x,
                 config.player_spawn.y,
             ),
+            sprite: "target2",
+            scene: this,
+            id: "char1",
+            name: "Hero",
+            actionList: [],
+            baseStats: new Stats(100, 10, 15, 80, 20, 50, 5),
+        });
+
+        const secondaryCharacter = new Character({
+            position: new Position(
+                7,
+                7,
+            ),
+            sprite: "entente_fantassin",
+            scene: this,
+            id: "char1",
+            name: "Hero",
+            actionList: [],
+            baseStats: new Stats(100, 10, 15, 80, 20, 50, 5),
+        });
+
+        const tertioCharacter = new Character({
+            position: new Position(
+                1,
+                7,
+            ),
             sprite: "target",
             scene: this,
             id: "char1",
@@ -44,6 +71,9 @@ export class FightScene extends GameScene implements Displayable {
         });
 
         this.gameObjects.push(mainCharacter);
+        this.gameObjects.push(secondaryCharacter);
+        this.gameObjects.push(tertioCharacter);
+
         this.characters = this.gameObjects.filter(
             (obj) => obj instanceof Character,
         );
@@ -60,7 +90,7 @@ export class FightScene extends GameScene implements Displayable {
         //précharge les image des persos de la scène
         this.characters.forEach((object) => {
             if(object.sprite){
-                this.load.image(object.sprite, `assets/${object.sprite}.png` )
+                this.load.image(object.sprite, `assets/Sprites/${object.sprite}.png` )
             }
             }
         )

@@ -55,8 +55,8 @@ export class GameScene extends Scene implements Displayable {
             character.sprite,
         );
         sprite.setDepth(5);
-        sprite.setOrigin(0.5, 1);
-        sprite.setScale(this.scaleFactor/2);
+        sprite.setOrigin(0.5, 0.95);
+        sprite.setScale(this.scaleFactor/1.5);
     }
 
     generateMap() {
