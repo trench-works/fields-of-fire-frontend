@@ -1,4 +1,4 @@
-import { Game } from 'phaser';
+import { Game} from 'phaser';
 import { MainMenu } from './scenes/MainMenu';
 import { FightScene } from './scenes/FightScene';
 
@@ -10,6 +10,10 @@ const config = {
     scale: {
         mode: Phaser.Scale.RESIZE,   // <— ajuste le canvas automatiquement
         autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+    physics : {
+        default: 'arcade',
+        arcade: { debug: false}
     },
     scene: [
         FightScene,

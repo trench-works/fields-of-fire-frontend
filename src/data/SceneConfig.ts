@@ -13,7 +13,7 @@ export class SceneConfig {
                 "name": "scene_1",
                 "player_spawn": {
                     "x": 0,
-                    "y": 0
+                    "y": 9
                 },
                 "render_config": {
                     "tile_size": 64,
