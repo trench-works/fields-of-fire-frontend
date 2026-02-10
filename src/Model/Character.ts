@@ -4,6 +4,7 @@ import { Effect } from "./Effect";
 import { GameObject, GameObjectProps } from "./GameObject";
 import { Position, PositionUtils } from "./Position";
 import { Stats } from "./Stats";
+import { computeScaleFactor } from "../core/Utils";
 
 export type CharactersProps = GameObjectProps & {
     position: Position;
@@ -69,7 +70,7 @@ export class Character extends GameObject {
     }
 
     //Spawne le personnage sur la scène, en créant son sprite et en le positionnant correctement sur la grille  
-    spawn(scene: Phaser.Scene, scaleFactor: number, gridPositions: any[][]) {
+    spawn(scene: Phaser.Scene,scaleFactor: number, gridPositions: any[][]) {
         this.scene = scene;
 
         const { x, y } = this.position;
@@ -83,7 +84,7 @@ export class Character extends GameObject {
 
         this.sprite.setDepth(5);
         this.sprite.setOrigin(0.5, 0.95);
-        this.sprite.setScale(scaleFactor / 1.5);
+        this.sprite.setScale(scaleFactor/1.5); ;
 
         this.createAnimations(this.spriteKey);
     }

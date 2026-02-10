@@ -17,9 +17,9 @@ export class CustomContainer extends Phaser.GameObjects.Container {
 
     constructor(scene: Phaser.Scene, config: ContainerConfig) {
         const {
-            title,
+            title = "",
             bgColor = 0xffffff,
-            titleColor = "#000000",
+            titleColor = "#FFFFFF",
             x = scene.scale.width / 2,
             y = scene.scale.height / 2,
             height = 300,
@@ -31,7 +31,8 @@ export class CustomContainer extends Phaser.GameObjects.Container {
 
         // Fond
         this.background = scene.add.graphics();
-        this.background.fillStyle(bgColor, 0.8);
+        this.add(this.background);
+        this.background.fillStyle(bgColor);
 
         // Texte pour mesure
         this.titleText = scene.add.text(0, 0, title, {
