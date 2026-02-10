@@ -32,8 +32,8 @@ export class FightScene extends GameScene implements Displayable {
         );
         const secondaryCharacter = new Character({
             position: new Position(
-                7,
-                7,
+                5,
+                8,
             ),
             sprite: "entente_fantassin_spritesheet",
             scene: this,

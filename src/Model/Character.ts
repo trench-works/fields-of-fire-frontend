@@ -68,6 +68,7 @@ export class Character extends GameObject {
         return stats;
     }
 
+    //Spawne le personnage sur la scène, en créant son sprite et en le positionnant correctement sur la grille  
     spawn(scene: Phaser.Scene, scaleFactor: number, gridPositions: any[][]) {
         this.scene = scene;
 
@@ -84,11 +85,10 @@ export class Character extends GameObject {
         this.sprite.setOrigin(0.5, 0.95);
         this.sprite.setScale(scaleFactor / 1.5);
 
-        // Maintenant que this.scene existe → OK
         this.createAnimations(this.spriteKey);
-        //this.playAnimation();
     }
 
+    //Joue l'animation d'idle par défaut du personnage, ou une animation spécifique si une clé est fournie
     playAnimation(key: string = this.spriteKey + "-idle-DR") {
         if (!this.sprite) return;
         if (this.sprite.anims.currentAnim?.key === key) return;
@@ -111,10 +111,13 @@ export class Character extends GameObject {
         this.playAnimation();
     }
 
+    //Créé une animation d'idle à partir d'une spritesheet, en précisant les frames de début et de fin de l'animation
     loadIdleAnimation(
         animationName: string,
         startFrame: number,
         endFrame: number,
+        frameRate: number = 2,
+        repeat: number = -1,
     ) {
         this.scene.anims.create({
             key: `${animationName}`,
@@ -122,8 +125,8 @@ export class Character extends GameObject {
                 start: startFrame,
                 end: endFrame,
             }),
-            frameRate: 2,
-            repeat: -1,
+            frameRate: frameRate,
+            repeat: repeat,
         });
     }
     render(renderConfig: SceneRenderConfig): RenderResult {
