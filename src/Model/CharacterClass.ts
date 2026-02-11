@@ -4,7 +4,8 @@ import { Stats } from "./Stats";
 export class CharacterClass {
     constructor(
         public name: string,
-        public sprite : string,
+        public imageKey: string,
+        public spriteKey: string,
         public stats: Stats,
         public classDescription : string,
         public actionList: Action[],

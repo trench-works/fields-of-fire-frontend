@@ -8,11 +8,14 @@ interface ContainerConfig {
     y?: number;
     height?: number;
     width?: number;
+    borderWidth?: number;
     borderColor?: number;
+    backgroundImage?: string;
+    onClick?: () => void;
 }
 
 export class CustomContainer extends Phaser.GameObjects.Container {
-    private background: Phaser.GameObjects.Graphics;
+    private background: Phaser.GameObjects.Graphics | Phaser.GameObjects.Image;
     private titleText: Phaser.GameObjects.Text;
 
     constructor(scene: Phaser.Scene, config: ContainerConfig) {
@@ -24,78 +27,135 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             y = scene.scale.height / 2,
             height = 300,
             width = 200,
+            borderWidth = 0,
             borderColor = 0xff0000,
+            backgroundImage,
+            onClick,
         } = config;
 
         super(scene, x, y);
 
-        // Fond
-        this.background = scene.add.graphics();
-        this.add(this.background);
-        this.background.fillStyle(bgColor);
+        // --- TEXTE (créé dans la scène, c’est OK) ---
+        this.titleText = scene.add
+            .text(0, 0, title, {
+                font: "24px Arial",
+                color: titleColor,
+            })
+            .setOrigin(0.5);
 
-        // Texte pour mesure
-        this.titleText = scene.add.text(0, 0, title, {
-            font: "24px Arial",
-            color: titleColor,
-        }).setOrigin(0.5);
-
-        // Calcul largeur/hauteur minimales
         const minWidth = this.titleText.width + 60;
         const minHeight = this.titleText.height + 100;
 
         const finalWidth = Math.max(width, minWidth);
         const finalHeight = Math.max(height, minHeight);
 
-        // Dessiner le fond
-        this.background.fillRoundedRect(
-            -finalWidth / 2,
-            -finalHeight / 2,
-            finalWidth,
-            finalHeight,
-            10
-        );
+        // --- FOND : IMAGE OU GRAPHICS ---
+        if (backgroundImage) {
+            // IMPORTANT : make.image => créé dans le container, pas dans la scène
+            const img = scene.make.image(
+                { x: 0, y: 0, key: backgroundImage },
+                false,
+            );
+            img.setDisplaySize(finalWidth, finalHeight);
+            img.setOrigin(0.5);
 
-        // Bordure
-        if (borderColor) {
-            this.background.lineStyle(4, borderColor, 1);
-            this.background.strokeRoundedRect(
+            this.background = img;
+            this.add(img);
+
+            // Bordure autour de l'image
+            if (borderColor && borderWidth > 0) {
+                const border = scene.make.graphics({}, false);
+                this.manageBorder(
+                    border,
+                    borderColor,
+                    borderWidth,
+                    finalWidth,
+                    finalHeight,
+                );
+                this.add(border);
+            }
+        } else {
+            // Fond couleur
+            const bg = scene.make.graphics({}, false);
+            bg.fillStyle(bgColor);
+            bg.fillRoundedRect(
                 -finalWidth / 2,
                 -finalHeight / 2,
                 finalWidth,
                 finalHeight,
-                10
+                10,
             );
+
+            this.manageBorder(
+                bg,
+                borderColor,
+                borderWidth,
+                finalWidth,
+                finalHeight,
+            );
+
+            this.background = bg;
+            this.add(bg);
         }
 
-        // Positionner le texte
+        // Position du titre
         this.titleText.setPosition(0, -finalHeight / 2 + 30);
+        this.add(this.titleText);
 
-        // Ajouter les éléments au container
-        this.add([this.background, this.titleText]);
-
-        // Taille du container pour interaction
+        // Taille du container
         this.setSize(finalWidth, finalHeight);
-
-        // Rendre fixe à la caméra si nécessaire
         this.setScrollFactor(0);
 
-        // Ajouter le container à la scène
+        if (onClick) {
+                this.setInteractive(
+                    new Phaser.Geom.Rectangle(
+                        -finalWidth / 2,
+                        -finalHeight / 2,
+                        finalWidth,
+                        finalHeight,
+                    ),
+                    Phaser.Geom.Rectangle.Contains,
+                );
+                this.on("pointerdown", () => {
+                    onClick();
+                    console.log("Container clicked!");
+                });
+            }
+
         scene.add.existing(this);
     }
 
-    // Méthode pour changer le titre
     public setTitle(newTitle: string) {
         this.titleText.setText(newTitle);
     }
 
-    // Méthode pour changer la couleur du fond
-    public setBackgroundColor(color: number, alpha = 0.8) {
-        const width = this.width;
-        const height = this.height;
+    public manageBorder(
+        g: Phaser.GameObjects.Graphics,
+        borderColor: number,
+        borderWidth: number,
+        width: number,
+        height: number,
+    ) {
+        if (borderColor && borderWidth > 0) {
+            g.lineStyle(borderWidth, borderColor, 1);
+            g.strokeRoundedRect(-width / 2, -height / 2, width, height, 10);
+        }
+    }
 
-        this.background.clear();
-        this.background.fillStyle(color, alpha);
-        this.background.fillRoundedRect(-width / 2, -height / 2, width, height, 10);
+    public setBackgroundColor(color: number, alpha = 0.8) {
+        if (this.background instanceof Phaser.GameObjects.Graphics) {
+            const width = this.width;
+            const height = this.height;
+
+            this.background.clear();
+            this.background.fillStyle(color, alpha);
+            this.background.fillRoundedRect(
+                -width / 2,
+                -height / 2,
+                width,
+                height,
+                10,
+            );
+        }
     }
 }

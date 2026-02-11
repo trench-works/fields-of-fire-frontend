@@ -8,13 +8,15 @@ export type PlayableCharacterProps = CharactersProps & {
 };
 
 export class PlayableCharacter extends Character {
+
     constructor(
     characterProps: CharactersProps,
 
     public characterClass: CharacterClass 
   ) {
     super(characterProps);
-
+    this.baseStats = characterClass.stats;
+    this.spriteKey = characterClass.spriteKey;
     this.characterClass = characterClass;
   }
 }

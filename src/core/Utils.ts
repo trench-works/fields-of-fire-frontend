@@ -24,7 +24,7 @@ export class Utils {
     }: ScaleAndCenterParams): ScaleAndCenterResult {
         // Calcul du scaleFactor si non fourni : 80% de la taille du parent
         const finalScale =
-            scaleFactor ?? computeScaleFactor(childWidth, childHeight, 0.8);
+            scaleFactor ?? computeScaleFactor(childWidth, childHeight, 0.7);
 
         // Décalage horizontal pour centrer
         const tileWidth = 64;

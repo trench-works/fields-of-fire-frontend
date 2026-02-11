@@ -8,7 +8,7 @@ import { computeScaleFactor } from "../core/Utils";
 
 export type CharactersProps = GameObjectProps & {
     position: Position;
-    sprite: string;
+    spriteKey: string;
     id: string;
     name: string;
     actionList: Action[];
@@ -27,7 +27,7 @@ export class Character extends GameObject {
 
     constructor({
         position,
-        sprite,
+        spriteKey,
         id,
         name,
         actionList,
@@ -37,7 +37,7 @@ export class Character extends GameObject {
         super({ scene });
 
         this.position = position;
-        this.spriteKey = sprite;
+        this.spriteKey = spriteKey;
         this.id = id;
         this.name = name;
         this.actionList = actionList;

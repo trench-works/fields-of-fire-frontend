@@ -1,5 +1,6 @@
 import { uiGrid } from "../Utils";
 import { Button } from "./Button";
+import { CustomContainer } from "./Container";
 
 export type TabConfig = {
     label: string;
@@ -19,57 +20,79 @@ export class TabManager extends Phaser.GameObjects.Container {
         this.contents = [];
         this.activeTab = null;
 
-        scene.add.existing(this)
-        
+        scene.add.existing(this);
+
         this.createTabs(tabsConfig);
     }
 
     private createTabs(tabsConfig: TabConfig[]) {
-    let x = 50;
+        const grid = uiGrid(0, 0);
+        const barWidth = grid.cellW * 6;
+        const barHeight = 40;
 
-    const grid = uiGrid(0, 0); 
-    const barWidth = grid.cellW * 6; // 6 cases de large 
-    const barHeight = 40;
+        const bar = this.scene.add.container(0, 0);
+        this.add(bar);
 
-    const bar = this.scene.add.container(0, 0); this.add(bar);
+        const btnWidth = barWidth / tabsConfig.length;
+        const btnHeight = barHeight;
 
-    // --- BOUTONS --- 
-     const btnWidth = barWidth / tabsConfig.length; 
-     const btnHeight = barHeight;
-    
-    tabsConfig.forEach((tab, index) => {
-        const btn = new Button(this.scene, {
-            x: index * btnWidth,
-            y: 0,
-            width: btnWidth,
-            height: btnHeight,
-            text: tab.label,
-            borderWidth: 2,
-            borderColor: "#2A4237",
-            colorOnOver: "#2A4237",
-            onClick: () => this.switchTo(index),
+        tabsConfig.forEach((tab, index) => {
+            const btn = new Button(this.scene, {
+                x: index * btnWidth,
+                y: 0,
+                width: btnWidth,
+                height: btnHeight,
+                text: tab.label,
+                borderWidth: 5,
+                borderColor: "#2A4237",
+                colorOnOver: "#2A4237",
+                onClick: () => this.switchTo(index),
+            });
+
+            bar.add(btn);
+
+
+            const contentArea = uiGrid(
+                0, 
+                0, 
+            ).getArea(0, 0, 6, 8); // <-- 6 colonnes × 7 lignes
+
+            // Container de contenu
+            const offsetX = -btnWidth / 2;
+            const offsetY = btnHeight / 2;
+            const content = this.scene.add.container(
+                contentArea.x + offsetX,
+                contentArea.y + offsetY,
+            );
+            console.log("Content position offset:", offsetX, offsetY);
+
+            content.setSize(contentArea.width, contentArea.height);
+            console.log("Content area dimensions:", contentArea.width, contentArea.height);
+            content.setVisible(false);
+
+            // --- DEBUG VISUEL : CustomContainer en fond ---
+            const debugBg = new CustomContainer(this.scene, {
+                title: "",
+                x: contentArea.width / 2,
+                y: contentArea.height / 2,
+                width: contentArea.width,
+                height: contentArea.height,
+                bgColor: 0x2a4237,
+            });
+
+            content.add(debugBg);
+
+            // Construire le contenu réel
+            tab.build(content);
+
+            this.add(content);
+
+            this.tabs.push(btn);
+            this.contents.push(content);
         });
 
-        // AJOUTER LE BOUTON AU CONTAINER
-         bar.add(btn);
-
-        const content = this.scene.add.container(0, 80);
-        content.setVisible(false);
-
-        tab.build(content);
-
-        // AJOUTER LE CONTENU AU CONTAINER
-        this.add(content);
-
-        this.tabs.push(btn);
-        this.contents.push(content);
-
-        x += 140;
-    });
-
-    this.switchTo(0);
-}
-
+        this.switchTo(0);
+    }
 
     switchTo(index: number) {
         if (this.activeTab === index) return;

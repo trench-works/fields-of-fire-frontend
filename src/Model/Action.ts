@@ -1,16 +1,29 @@
 import { Effect } from "./Effect";
+import { Position } from "./Position";
+
+export type ActionProps = {
+    id: string;
+    iconSpriteKey: string;
+    animationSpriteKey?: string;
+    animationSpriteConfig?: { frameWidth: number; frameHeight: number };
+    animationSprite?: Phaser.GameObjects.Sprite;
+    Key?: string;
+    name: string;
+    description?: string;
+    dammage?: number;
+    effectList?: Effect[];
+    range?: number;
+    zoneType?: string;
+    zoneSize?: number;
+    mooveToTarget?: Position;
+    pushValue?: number;
+    cost: number;
+    isWalkAction?: boolean;
+};
 
 export class Action {
-    
-    constructor(
-        public id : String,
-        public name : String,
-        public description : string,
-        public dammage : number,
-        public effectList : Effect[],
-        public range : number,
-        public zoneType: string,
-        public zoneSize: number,
-    ){}
-    
+    private pushValue: number = 0;
+    constructor(public props: ActionProps) {
+        this.pushValue = props.pushValue || 0;
+    }
 }
