@@ -16,6 +16,7 @@ interface ContainerConfig {
 
 export class CustomContainer extends Phaser.GameObjects.Container {
     private background: Phaser.GameObjects.Graphics | Phaser.GameObjects.Image;
+    private borderGraphics?: Phaser.GameObjects.Graphics;
     private titleText: Phaser.GameObjects.Text;
 
     constructor(scene: Phaser.Scene, config: ContainerConfig) {
@@ -35,13 +36,11 @@ export class CustomContainer extends Phaser.GameObjects.Container {
 
         super(scene, x, y);
 
-        // --- TEXTE (créé dans la scène, c’est OK) ---
-        this.titleText = scene.add
-            .text(0, 0, title, {
-                font: "24px Arial",
-                color: titleColor,
-            })
-            .setOrigin(0.5);
+        // --- TEXTE ---
+        this.titleText = scene.add.text(0, 0, title, {
+            font: "24px Arial",
+            color: titleColor,
+        }).setOrigin(0.5);
 
         const minWidth = this.titleText.width + 60;
         const minHeight = this.titleText.height + 100;
@@ -49,84 +48,45 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         const finalWidth = Math.max(width, minWidth);
         const finalHeight = Math.max(height, minHeight);
 
-        // --- FOND : IMAGE OU GRAPHICS ---
+        // --- FOND ---
         if (backgroundImage) {
-            // IMPORTANT : make.image => créé dans le container, pas dans la scène
-            const img = scene.make.image(
-                { x: 0, y: 0, key: backgroundImage },
-                false,
-            );
+            const img = scene.make.image({ x: 0, y: 0, key: backgroundImage }, false);
             img.setDisplaySize(finalWidth, finalHeight);
             img.setOrigin(0.5);
-
             this.background = img;
             this.add(img);
-
-            // Bordure autour de l'image
-            if (borderColor && borderWidth > 0) {
-                const border = scene.make.graphics({}, false);
-                this.manageBorder(
-                    border,
-                    borderColor,
-                    borderWidth,
-                    finalWidth,
-                    finalHeight,
-                );
-                this.add(border);
-            }
         } else {
-            // Fond couleur
             const bg = scene.make.graphics({}, false);
             bg.fillStyle(bgColor);
-            bg.fillRoundedRect(
-                -finalWidth / 2,
-                -finalHeight / 2,
-                finalWidth,
-                finalHeight,
-                10,
-            );
-
-            this.manageBorder(
-                bg,
-                borderColor,
-                borderWidth,
-                finalWidth,
-                finalHeight,
-            );
-
+            bg.fillRoundedRect(-finalWidth / 2, -finalHeight / 2, finalWidth, finalHeight, 10);
             this.background = bg;
             this.add(bg);
         }
 
-        // Position du titre
+        // --- BORDURE ---
+        if (borderColor && borderWidth > 0) {
+            this.borderGraphics = scene.make.graphics({}, false);
+            this.manageBorder(this.borderGraphics, borderColor, borderWidth, finalWidth, finalHeight);
+            this.add(this.borderGraphics);
+        }
+
+        // --- TITRE ---
         this.titleText.setPosition(0, -finalHeight / 2 + 30);
         this.add(this.titleText);
 
-        // Taille du container
+        // --- TAILLE DU CONTAINER ---
         this.setSize(finalWidth, finalHeight);
-        this.setScrollFactor(0);
 
+        // --- INTERACTIVITÉ (correcte et alignée) ---
         if (onClick) {
-                this.setInteractive(
-                    new Phaser.Geom.Rectangle(
-                        -finalWidth / 2,
-                        -finalHeight / 2,
-                        finalWidth,
-                        finalHeight,
-                    ),
-                    Phaser.Geom.Rectangle.Contains,
-                );
-                this.on("pointerdown", () => {
-                    onClick();
-                    console.log("Container clicked!");
-                });
-            }
+            this.setInteractive(); // <-- LA SOLUTION
+            this.on("pointerdown", () => {
+                console.log("Container clicked!");
+                onClick();
+            });
+        }
 
         scene.add.existing(this);
-    }
-
-    public setTitle(newTitle: string) {
-        this.titleText.setText(newTitle);
     }
 
     public manageBorder(
@@ -134,12 +94,11 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         borderColor: number,
         borderWidth: number,
         width: number,
-        height: number,
+        height: number
     ) {
-        if (borderColor && borderWidth > 0) {
-            g.lineStyle(borderWidth, borderColor, 1);
-            g.strokeRoundedRect(-width / 2, -height / 2, width, height, 10);
-        }
+        g.clear();
+        g.lineStyle(borderWidth, borderColor, 1);
+        g.strokeRoundedRect(-width / 2, -height / 2, width, height, 10);
     }
 
     public setBackgroundColor(color: number, alpha = 0.8) {
@@ -154,7 +113,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
                 -height / 2,
                 width,
                 height,
-                10,
+                10
             );
         }
     }

@@ -143,7 +143,7 @@ export class LobbyScene extends Phaser.Scene {
         tabManager.setPosition(tabArea.x + this.tabWidth / 2, tabArea.y + 20);
 
         this.events.on("class-selected", (charClass: CharacterClass) => {
-    this.SelectedClass = charClass;
+        this.SelectedClass = charClass;
 
         // Rafraîchir l'image du playerPanel
         this.updatePlayerImage();
