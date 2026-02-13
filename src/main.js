@@ -1,6 +1,7 @@
 import { Game} from 'phaser';
 import { MainMenu } from './scenes/MainMenu';
 import { FightScene } from './scenes/FightScene';
+import { LobbyScene } from './scenes/LobbyScene';
 
 //  Find out more information about the Game Config at: https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
 const config = {
@@ -16,7 +17,9 @@ const config = {
         arcade: { debug: false}
     },
     scene: [
+        LobbyScene,
         FightScene,
+        
     ]
 };
 

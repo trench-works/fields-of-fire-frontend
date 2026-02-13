@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { Color } from "../../data/ColorConfig";
 
 interface ButtonPadding {
     left: number;
@@ -16,28 +17,40 @@ interface ButtonConfig {
     fontSize?: string;
     textColor?: string;
     padding?: ButtonPadding;
+    height?: number;
+    width?: number;
+    borderWidth?: number;
+    borderColor?: string;
+    colorOnOver?: string;
 }
 
 export class Button extends Phaser.GameObjects.Container {
     private buttonText: Phaser.GameObjects.Text;
     private color: string;
+    private hoverColor: string | null;
     private onClick: () => void;
+    private bg: Phaser.GameObjects.Rectangle;
 
     constructor(scene: Phaser.Scene, config: ButtonConfig) {
         const {
             x = 0,
             y = 0,
             text,
-            color = "#000000",
+            color = Color.btnBg,
             onClick,
             fontSize = "20px",
             textColor = "#FFFFFF",
-            padding = { left: 15, right: 15, top: 10, bottom: 10 },
+            borderWidth = 0,
+            borderColor = Color.btnBorder,
+            colorOnOver = "#4a7eb0",
+            //padding = { left: 15, right: 15, top: 10, bottom: 10 },
         } = config;
 
         super(scene, x, y);
 
+        this;
         this.color = color;
+        this.hoverColor = colorOnOver;
         this.onClick = onClick;
 
         // Créer le texte du bouton
@@ -45,26 +58,47 @@ export class Button extends Phaser.GameObjects.Container {
             .text(0, 0, text, {
                 font: `${fontSize} Arial`,
                 color: textColor,
-                backgroundColor: color,
-                padding: padding,
             })
             .setOrigin(0.5);
 
         this.add(this.buttonText);
 
         // Ajuster la taille du conteneur par rapport au texte
-        const btnPadding = 20;
-        this.setSize(
-            this.buttonText.width + btnPadding * 2,
-            this.buttonText.height + btnPadding
+        if (!config.width || !config.height) {
+            const btnPadding = 20;
+            this.setSize(
+                this.buttonText.width + btnPadding * 2,
+                this.buttonText.height + btnPadding,
+            );
+        } else {
+            this.setSize(config.width, config.height);
+        }
+
+        const bg = scene.add.rectangle(
+            0,
+            0,
+            this.width,
+            this.height,
+            Phaser.Display.Color.HexStringToColor(color).color,
         );
 
+        if (borderWidth > 0) {
+            bg.setStrokeStyle(
+                borderWidth,
+                Phaser.Display.Color.HexStringToColor(borderColor).color,
+            );
+        }
+
+        this.bg = bg;
+        this.add(bg);
+        bg.setOrigin(0.5);
+        this.sendToBack(bg);
         // Défini la hitbox interactive (le "clicable")
         const hitArea = new Phaser.Geom.Rectangle(
             0,
             0,
             this.width,
-            this.height
+            this.height,
         );
         this.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
         this.setScrollFactor(0);
@@ -76,6 +110,13 @@ export class Button extends Phaser.GameObjects.Container {
         scene.add.existing(this);
     }
 
+    public setBackgroundColor(color: string) {
+        this.color = color;
+        this.bg.setFillStyle(
+            Phaser.Display.Color.HexStringToColor(color).color,
+        );
+    }
+
     private setupEvents() {
         this.on("pointerdown", () => {
             console.log("Button clicked!");
@@ -84,12 +125,19 @@ export class Button extends Phaser.GameObjects.Container {
 
         this.on("pointerover", () => {
             console.log("Hover over button");
-            this.buttonText.setStyle({ backgroundColor: "#cc0000" });
+            if (this.hoverColor) {
+                this.bg.setFillStyle(
+                    Phaser.Display.Color.HexStringToColor(this.hoverColor)
+                        .color,
+                );
+            }
         });
 
         this.on("pointerout", () => {
             console.log("Hover out button");
-            this.buttonText.setStyle({ backgroundColor: this.color });
+            this.bg.setFillStyle(
+                Phaser.Display.Color.HexStringToColor(this.color).color,
+            );
         });
     }
 

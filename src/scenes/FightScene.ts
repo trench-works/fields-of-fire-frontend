@@ -1,10 +1,10 @@
 import { Character } from "../Model/Character";
-import { Mob } from "../Model/Mob";
+import { PlayableCharacter } from "../Model/PlayableCharacter";
 import { Position, PositionUtils } from "../Model/Position";
 import { GameObject } from "../Model/GameObject";
 import { SceneConfig } from "../data/SceneConfig";
-import { Stats } from "../Model/Stats";
 import { Displayable, GameScene, SceneRenderConfig } from "../Model/GameScene";
+import { CharacterClass } from "../Model/CharacterClass";
 
 export class FightScene extends GameScene implements Displayable {
     public backgroundImage = "red_bg";
@@ -13,8 +13,10 @@ export class FightScene extends GameScene implements Displayable {
     public tileWidth = 64;
     public gameObjects: GameObject[] = [];
     public displayObjects: Displayable[] = [];
-    public characters: Character[] ;
+    public characters: Character[];
+    private otherPlayers: PlayableCharacter[] = [];
     public renderConfig: SceneRenderConfig;
+    public myPlayer: PlayableCharacter | undefined;
 
     constructor() {
         super({ key: "fightScene" });
@@ -30,25 +32,25 @@ export class FightScene extends GameScene implements Displayable {
         this.renderConfig.offset = PositionUtils.getMapOffset(
             this.renderConfig,
         );
-        const secondaryCharacter = new Character({
-            position: new Position(
-                5,
-                8,
-            ),
-            sprite: "entente_fantassin_spritesheet",
-            scene: this,
-            id: "char1",
-            name: "Hero",
-            actionList: [],
-            baseStats: new Stats(100, 10, 15, 80, 20, 50, 5),
-        });
-
-        this.gameObjects.push(secondaryCharacter);
 
         this.characters = this.gameObjects.filter(
             (obj) => obj instanceof Character,
         );
-        console.log("obj : " + this.gameObjects + " char : " + this.characters)
+        this.otherPlayers = this.characters.filter(
+            (char) => char.id !== "player_1",
+        ) as PlayableCharacter[];
+    }
+
+    init(data: { spawnPos: Position, class : CharacterClass, id: string }) {
+        this.myPlayer = new PlayableCharacter({
+            position: data.spawnPos,
+            id: data.id,
+            spriteKey: data.class.spriteKey,
+            name: data.class.name,
+            baseStats: data.class.stats,
+            actionList: data.class.actionList,
+            scene: this,         
+        }, data.class);
     }
 
     preload() {
@@ -58,13 +60,25 @@ export class FightScene extends GameScene implements Displayable {
         );
         this.load.image("groundTiles", `assets/${this.tileSetImage}.png`);
 
+        this.characters.push(this.myPlayer!);
         //précharge les image des persos de la scène
         this.characters.forEach((object) => {
-            if(object.spriteKey){
-                this.load.spritesheet(object.spriteKey, `assets/Sprites/${object.spriteKey}.png`, {frameWidth: 96, frameHeight: 128})
+            if (object.spriteKey) {
+                this.load.spritesheet(
+                    object.spriteKey,
+                    `assets/Sprites/${object.spriteKey}.png`,
+                    { frameWidth: 96, frameHeight: 128 },
+                );
+                object.actionList.forEach((action) => {
+                    if (action.props.iconSpriteKey) {
+                        this.load.image(
+                            action.props.iconSpriteKey,
+                            `assets/Sprites/${action.props.iconSpriteKey}.png`,
+                        );
+                    }
+                });
             }
-            }
-        )
+        });
         this.load.image(
             this.backgroundImage,
             `assets/${this.backgroundImage}.jpg`,
@@ -72,6 +86,9 @@ export class FightScene extends GameScene implements Displayable {
     }
 
     create() {
+        const num = this.otherPlayers.length;
+        this.myPlayer!.name = ` Player ${num + 1}`;
+
         const bg = this.add
             .image(0, 0, this.backgroundImage)
             .setOrigin(0, 0)
@@ -81,5 +98,4 @@ export class FightScene extends GameScene implements Displayable {
         this.generateMap();
         this.spawnEntities();
     }
-
 }

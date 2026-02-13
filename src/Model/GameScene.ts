@@ -1,6 +1,6 @@
 import { Scene } from "phaser";
 import { Character } from "../Model/Character";
-import { Utils } from "../core/Utils";
+import { computeScaleFactor, Utils } from "../core/Utils";
 import { Position, PositionUtils } from "../Model/Position";
 import { GameObject } from "../Model/GameObject";
 import { SceneConfig } from "../data/SceneConfig";
@@ -37,7 +37,7 @@ export class GameScene extends Scene implements Displayable {
     public gameObjects: GameObject[] = [];
     public characters: Character[] = [];
     public gridPositions: Cell[][] = [];
-    public scaleFactor: number= 1;
+    public scaleFactor : number = 1;
 
     spawnEntities() {
         this.characters.forEach((entity) => {
@@ -77,9 +77,9 @@ export class GameScene extends Scene implements Displayable {
             throw new Error("Ground layer seemingly inexistent");
         }
 
-        this.scaleFactor = centerMap.scaleFactor
+        this.scaleFactor = centerMap.scaleFactor;
 
-        groundLayer.setScale(this.scaleFactor);
+        groundLayer.setScale(centerMap.scaleFactor);
         groundLayer.setDepth(0);
 
         this.generatePlayGrid(map, groundLayer);
