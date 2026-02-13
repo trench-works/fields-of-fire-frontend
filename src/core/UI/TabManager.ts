@@ -77,7 +77,6 @@ export class TabManager extends Phaser.GameObjects.Container {
                 y: contentArea.height / 2,
                 width: contentArea.width,
                 height: contentArea.height,
-                bgColor: 0x2a4237,
             });
 
             content.add(debugBg);

@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { Color } from "../../data/ColorConfig";
 
 interface ButtonPadding {
     left: number;
@@ -35,12 +36,12 @@ export class Button extends Phaser.GameObjects.Container {
             x = 0,
             y = 0,
             text,
-            color = "#000000",
+            color = Color.btnBg,
             onClick,
             fontSize = "20px",
             textColor = "#FFFFFF",
             borderWidth = 0,
-            borderColor = "#000000",
+            borderColor = Color.btnBorder,
             colorOnOver = "#4a7eb0",
             //padding = { left: 15, right: 15, top: 10, bottom: 10 },
         } = config;

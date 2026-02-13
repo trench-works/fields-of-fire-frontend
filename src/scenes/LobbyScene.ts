@@ -164,9 +164,7 @@ export class LobbyScene extends Phaser.Scene {
             y: currentPlayerInfoPosition.y,
             width: playerPanelWidth,
             height: playerPanelHeight,
-            bgColor: 0xd4d2b8,
             borderWidth: 5,
-            borderColor: 0x2a4237,
         });
 
         const playerpanelgrid = uiGrid(
@@ -186,7 +184,6 @@ export class LobbyScene extends Phaser.Scene {
             height: imgArea.height,
             backgroundImage: this.SelectedClass!.imageKey,
             borderWidth: 5,
-            borderColor: 0x2a4237,
         });
         playerPanel.add(playerImageContainer);
 
@@ -214,6 +211,10 @@ export class LobbyScene extends Phaser.Scene {
         });
         playerPanel.add(fightButton);
     }
+
+    //  --- ATTENTION !!! 
+    // cette fonction c'est du bricolage et nécessite un rework futur
+    // ne jamais lui donner + de 3 classes sinon EXPLOSION
 
     private buildClassesTab(container: Phaser.GameObjects.Container) {
         const classes = this.allExistingClass;
@@ -248,15 +249,11 @@ export class LobbyScene extends Phaser.Scene {
             const classContainer = new CustomContainer(this, {
                 title: "",
                 x: x,
-                y: y,
+                y: y + 10,
                 width: grid.cellW * 2,
                 height: area.height / 2,
                 backgroundImage: charClass.imageKey,
-                borderWidth: 3,
-                borderColor:
-                    this.SelectedClass?.imageKey === charClass.imageKey
-                        ? 0xffff00
-                        : 0x2a4237,
+                borderWidth: 7,
                 onClick: () => {
                     this.events.emit("class-selected", charClass);
                 },
@@ -268,7 +265,7 @@ export class LobbyScene extends Phaser.Scene {
 updatePlayerImage() {
     if (!this.SelectedClass) return;
 
-    this.playerImageContainer.setBackgroundColor(0x000000, 0); // reset
+    this.playerImageContainer.setBackgroundColor("#000000", 0); // reset
     if (this.playerImageContainer["background"] instanceof Phaser.GameObjects.Image) {
         this.playerImageContainer["background"].setTexture(this.SelectedClass.imageKey);
     }
