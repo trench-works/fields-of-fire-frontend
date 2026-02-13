@@ -13,6 +13,8 @@ interface ContainerConfig {
     borderWidth?: number;
     borderColor?: string;
     backgroundImage?: string;
+    opacity?: number;
+    fontsize?: number;
     onClick?: () => void;
 }
 
@@ -33,15 +35,18 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             borderWidth = 0,
             borderColor = Color.containerBorder,
             backgroundImage,
+            opacity = 1,
+            fontsize = 24,
             onClick,
         } = config;
 
         super(scene, x, y);
 
+        console.log("!!! " +  fontsize + " " + `${fontsize }px Arial` )
         // --- TEXTE ---
         this.titleText = scene.add
             .text(0, 0, title, {
-                font: "24px Arial",
+                font: `${fontsize}px Arial`,
                 color: titleColor,
             })
             .setOrigin(0.5);
@@ -64,7 +69,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             this.add(img);
         } else {
             const bg = scene.make.graphics({}, false);
-            bg.fillStyle(parseColor(bgColor));
+            bg.fillStyle(parseColor(bgColor), opacity);
             bg.fillRoundedRect(
                 -finalWidth / 2,
                 -finalHeight / 2,
@@ -90,7 +95,8 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         }
 
         // --- TITRE ---
-        this.titleText.setPosition(0, -finalHeight / 2 + 30);
+        // correction à faire gap en dur !!!
+        this.titleText.setPosition(0, -finalHeight / 2+ 15);
         this.add(this.titleText);
 
         // --- TAILLE DU CONTAINER ---

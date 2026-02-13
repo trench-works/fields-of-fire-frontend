@@ -58,28 +58,45 @@ export function uiGrid(
     componentHeight: number = -1,
     cols = 9,
     rows = 9,
+    parent?: { x: number; y: number; width: number; height: number }
 ) {
+    // Mode plein écran
     if (componentWidth === -1 || componentHeight === -1) {
         componentWidth = window.innerWidth;
         componentHeight = window.innerHeight;
     }
+
+    // Offset automatique
+    let offsetX = 0;
+    let offsetY = 0;
+
+    if (parent) {
+        offsetX = parent.x - parent.width / 2;
+        offsetY = parent.y - parent.height / 2;
+    }
+
     const cellW = componentWidth / cols;
     const cellH = componentHeight / rows;
+
+    const gridX = offsetX + col * cellW;
+    const gridY = offsetY + row * cellH;
+
     return {
-        x: col * cellW,
-        y: row * cellH,
+        x: gridX,
+        y: gridY,
         cellW,
         cellH,
         getArea: (c: number, r: number, w: number, h: number) => ({
-            x: c * cellW,
-            y: r * cellH,
+            x: gridX + c * cellW,
+            y: gridY + r * cellH,
             width: w * cellW,
             height: h * cellH,
-            centerX: c * cellW + (w * cellW) / 2,
-            centerY: r * cellH + (h * cellH) / 2,
+            centerX: gridX + c * cellW + (w * cellW) / 2,
+            centerY: gridY + r * cellH + (h * cellH) / 2,
         }),
     };
 }
+
 
 export function parseColor(color?: string): number {
     if (!color) return 0xffffff;

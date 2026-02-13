@@ -26,6 +26,7 @@ export class LobbyScene extends Phaser.Scene {
             "Fantassin",
             "entente_fantassin",
             "entente_fantassin_spritesheet",
+            "entente_fantassin_closeup",
             new Stats(100, 10, 20, 80, 50, 100, 3),
             "Un soldat polyvalent, capable de s'adapter à différentes situations sur le champ de bataille. Il est équipé d'une armure légère et d'une épée, ce qui lui permet de se déplacer rapidement et d'attaquer efficacement à courte portée. Le Fantassin est également capable d'utiliser des compétences de soutien pour renforcer ses alliés ou affaiblir ses ennemis.",
             this.actions,
@@ -34,6 +35,7 @@ export class LobbyScene extends Phaser.Scene {
             "Medic",
             "entente_medic",
             "entente_medic_spritesheet",
+            "entente_medic_closeup",
             new Stats(80, 5, 10, 60, 30, 120, 2),
             "Un soigneur spécialisé dans le soutien de ses alliés. Le Medic est équipé d'une armure légère et d'un pistolet, ce qui lui permet de se déplacer rapidement et d'attaquer à distance. Sa principale force réside dans sa capacité à soigner les blessures de ses alliés et à fournir des buffs pour améliorer leurs performances au combat.",
             this.actions,
@@ -42,6 +44,7 @@ export class LobbyScene extends Phaser.Scene {
             "Caporal",
             "entente_caporal",
             "entente_caporal_spritesheet",
+            "entente_caporal_closeup",
             new Stats(120, 15, 30, 70, 40, 80, 4),
             "Un combattant robuste et discipliné, le Caporal est équipé d'une armure lourde et d'une hache, ce qui lui permet de résister aux attaques ennemies et de causer des dégâts importants à courte portée. Il excelle dans les combats rapprochés et peut utiliser des compétences pour augmenter sa défense ou infliger des dégâts supplémentaires à ses adversaires.",
             this.actions,
@@ -178,7 +181,7 @@ export class LobbyScene extends Phaser.Scene {
 
         const imgArea = playerpanelgrid.getArea(0, 0, 5, 5);
 
-        const classNameArea = playerpanelgrid.getArea(0,5,9,1);
+        const classNameArea = playerpanelgrid.getArea(0,5,9,0.5);
 
         const playerNameContainer = new CustomContainer(this, {
             title: this.SelectedClass!.name,

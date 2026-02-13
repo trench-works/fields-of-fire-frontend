@@ -6,6 +6,7 @@ export class CharacterClass {
         public name: string,
         public imageKey: string,
         public spriteKey: string,
+        public iconImageKey: string,
         public stats: Stats,
         public classDescription : string,
         public actionList: Action[],
