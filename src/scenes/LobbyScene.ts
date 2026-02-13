@@ -2,6 +2,7 @@ import { Button } from "../core/UI/Button";
 import { CustomContainer } from "../core/UI/Container";
 import { TabManager } from "../core/UI/TabManager";
 import { uiGrid } from "../core/Utils";
+import { Color } from "../data/ColorConfig";
 import { Action } from "../Model/Action";
 import { CharacterClass } from "../Model/CharacterClass";
 import { PlayableCharacter } from "../Model/PlayableCharacter";
@@ -54,6 +55,7 @@ export class LobbyScene extends Phaser.Scene {
     private tabWidth!: number;
     private tabHeight!: number;
     private playerImageContainer!: CustomContainer;
+    private playerClassName!: CustomContainer;
 
 
 
@@ -176,6 +178,21 @@ export class LobbyScene extends Phaser.Scene {
 
         const imgArea = playerpanelgrid.getArea(0, 0, 5, 5);
 
+        const classNameArea = playerpanelgrid.getArea(0,5,9,1);
+
+        const playerNameContainer = new CustomContainer(this, {
+            title: this.SelectedClass!.name,
+            x: classNameArea.centerX - playerPanelWidth / 2 ,
+            y: classNameArea.centerY - playerPanelHeight / 2+10,
+            width: classNameArea.width,
+            height: classNameArea.height,
+            bgColor : Color.containerBorder,
+            borderWidth: 5,
+        });
+
+        playerPanel.add(playerNameContainer);
+        this.playerClassName = playerNameContainer;
+
         const playerImageContainer = new CustomContainer(this, {
             title: "",
             x: imgArea.centerX - playerPanelWidth / 2 + 10,
@@ -269,6 +286,8 @@ updatePlayerImage() {
     if (this.playerImageContainer["background"] instanceof Phaser.GameObjects.Image) {
         this.playerImageContainer["background"].setTexture(this.SelectedClass.imageKey);
     }
+
+    this.playerClassName.setTitle(this.SelectedClass.name);
 }
 
 

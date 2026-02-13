@@ -136,4 +136,10 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             );
         }
     }
+
+    public setTitle(newTitle: string) {
+    this.titleText.setText(newTitle);
+    this.titleText.setPosition(0, -this.height / 2 + 30);
+}
+
 }
