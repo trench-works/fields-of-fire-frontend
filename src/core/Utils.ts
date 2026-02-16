@@ -6,12 +6,29 @@ interface ScaleAndCenterParams {
     scaleFactor?: number;
     isometricVariation?: boolean;
 }
-
 interface ScaleAndCenterResult {
     offsetX: number;
     offsetY: number;
     scaleFactor: number;
 }
+
+export interface UiGridArea {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    centerX: number;
+    centerY: number;
+}
+
+export interface UiGrid {
+    x: number;
+    y: number;
+    cellW: number;
+    cellH: number;
+    getArea: (c: number, r: number, w: number, h: number) => UiGridArea;
+}
+
 
 export class Utils {
     public static scaleAndCenter({
@@ -58,8 +75,7 @@ export function uiGrid(
     componentHeight: number = -1,
     cols = 9,
     rows = 9,
-    parent?: { x: number; y: number; width: number; height: number }
-) {
+) : UiGrid {
     // Mode plein écran
     if (componentWidth === -1 || componentHeight === -1) {
         componentWidth = window.innerWidth;
@@ -69,11 +85,6 @@ export function uiGrid(
     // Offset automatique
     let offsetX = 0;
     let offsetY = 0;
-
-    if (parent) {
-        offsetX = parent.x - parent.width / 2;
-        offsetY = parent.y - parent.height / 2;
-    }
 
     const cellW = componentWidth / cols;
     const cellH = componentHeight / rows;

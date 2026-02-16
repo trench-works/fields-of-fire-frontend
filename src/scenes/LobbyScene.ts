@@ -20,6 +20,20 @@ export class LobbyScene extends Phaser.Scene {
             cost: 0,
             isWalkAction: true,
         }),
+        new Action({
+            id: "shoot",
+            name: "Attaquer",
+            description: "Attaquer un ennemi à portée",
+            iconSpriteKey: "action_image_shoot",
+            cost: 2,
+        }),
+        new Action({
+            id: "arrowup",
+            name: "Soigner",
+            description: "buff un allié",
+            iconSpriteKey: "action_image_arrowup",
+            cost: 1,
+        }),
     ];
     private allExistingClass: CharacterClass[] = [
         new CharacterClass(
@@ -27,7 +41,7 @@ export class LobbyScene extends Phaser.Scene {
             "entente_fantassin",
             "entente_fantassin_spritesheet",
             "entente_fantassin_closeup",
-            new Stats(100, 10, 20, 80, 50, 100, 3),
+            new Stats({life: 24, precision: 10, strength: 20, accuracy: 100, initiative: 80, dodging: 0, energy: 4, mouvement: 3}),
             "Un soldat polyvalent, capable de s'adapter à différentes situations sur le champ de bataille. Il est équipé d'une armure légère et d'une épée, ce qui lui permet de se déplacer rapidement et d'attaquer efficacement à courte portée. Le Fantassin est également capable d'utiliser des compétences de soutien pour renforcer ses alliés ou affaiblir ses ennemis.",
             this.actions,
         ),
@@ -36,7 +50,7 @@ export class LobbyScene extends Phaser.Scene {
             "entente_medic",
             "entente_medic_spritesheet",
             "entente_medic_closeup",
-            new Stats(80, 5, 10, 60, 30, 120, 2),
+            new Stats({life: 16, precision: 5, strength: 10, accuracy: 100, initiative: 70, dodging: 5, energy: 4, mouvement: 2}),
             "Un soigneur spécialisé dans le soutien de ses alliés. Le Medic est équipé d'une armure légère et d'un pistolet, ce qui lui permet de se déplacer rapidement et d'attaquer à distance. Sa principale force réside dans sa capacité à soigner les blessures de ses alliés et à fournir des buffs pour améliorer leurs performances au combat.",
             this.actions,
         ),
@@ -45,7 +59,7 @@ export class LobbyScene extends Phaser.Scene {
             "entente_caporal",
             "entente_caporal_spritesheet",
             "entente_caporal_closeup",
-            new Stats(120, 15, 30, 70, 40, 80, 4),
+            new Stats({life: 20, precision: 15, strength: 30, accuracy: 100, initiative: 90, dodging: 5, energy: 4, mouvement: 4}),
             "Un combattant robuste et discipliné, le Caporal est équipé d'une armure lourde et d'une hache, ce qui lui permet de résister aux attaques ennemies et de causer des dégâts importants à courte portée. Il excelle dans les combats rapprochés et peut utiliser des compétences pour augmenter sa défense ou infliger des dégâts supplémentaires à ses adversaires.",
             this.actions,
         ),
@@ -59,8 +73,6 @@ export class LobbyScene extends Phaser.Scene {
     private tabHeight!: number;
     private playerImageContainer!: CustomContainer;
     private playerClassName!: CustomContainer;
-
-
 
     constructor() {
         super({ key: "lobbyScene" });
@@ -129,31 +141,37 @@ export class LobbyScene extends Phaser.Scene {
                 build: (container) => {
                     //container.add(this.add.text(50, 0, "not implemented yet"));
                     this.buildClassesTab(container);
-                    
                 },
             },
             {
                 label: "Maitrises",
                 build: (container) => {
-                    container.add(this.add.text(50, 0, "not implemented yet"));
+                    container.add(
+                        this.add.text(50, 0, "not implemented yet", {
+                            fontSize: "48px",
+                            color: "#ffffff",
+                        }),
+                    );
                 },
             },
             {
                 label: "Equipements",
                 build: (container) => {
-                    container.add(this.add.text(50, 0, "not implemented yet"));
+                    container.add(this.add.text(50, 0, "not implemented yet", {
+                        fontSize: "48px",
+                        color: "#ffffff",
+                    }));
                 },
             },
         ]);
         tabManager.setPosition(tabArea.x + this.tabWidth / 2, tabArea.y + 20);
 
         this.events.on("class-selected", (charClass: CharacterClass) => {
-        this.SelectedClass = charClass;
+            this.SelectedClass = charClass;
 
-        // Rafraîchir l'image du playerPanel
-        this.updatePlayerImage();
-});
-
+            // Rafraîchir l'image du playerPanel
+            this.updatePlayerImage();
+        });
 
         //Selected character info BOX
         const area = uiGrid(6, 1);
@@ -181,15 +199,15 @@ export class LobbyScene extends Phaser.Scene {
 
         const imgArea = playerpanelgrid.getArea(0, 0, 5, 5);
 
-        const classNameArea = playerpanelgrid.getArea(0,5,9,0.5);
+        const classNameArea = playerpanelgrid.getArea(0, 5, 9, 0.5);
 
         const playerNameContainer = new CustomContainer(this, {
             title: this.SelectedClass!.name,
-            x: classNameArea.centerX - playerPanelWidth / 2 ,
-            y: classNameArea.centerY - playerPanelHeight / 2+10,
+            x: classNameArea.centerX - playerPanelWidth / 2,
+            y: classNameArea.centerY - playerPanelHeight / 2 + 10,
             width: classNameArea.width,
             height: classNameArea.height,
-            bgColor : Color.containerBorder,
+            bgColor: Color.containerBorder,
             borderWidth: 5,
         });
 
@@ -207,8 +225,7 @@ export class LobbyScene extends Phaser.Scene {
         });
         playerPanel.add(playerImageContainer);
 
-        this.playerImageContainer = playerImageContainer; 
-        
+        this.playerImageContainer = playerImageContainer;
 
         const buttonArea = playerpanelgrid.getArea(0, 8, 4, 1);
 
@@ -232,7 +249,7 @@ export class LobbyScene extends Phaser.Scene {
         playerPanel.add(fightButton);
     }
 
-    //  --- ATTENTION !!! 
+    //  --- ATTENTION !!!
     // cette fonction c'est du bricolage et nécessite un rework futur
     // ne jamais lui donner + de 3 classes sinon EXPLOSION
 
@@ -282,16 +299,15 @@ export class LobbyScene extends Phaser.Scene {
         });
     }
 
-updatePlayerImage() {
-    if (!this.SelectedClass) return;
+    updatePlayerImage() {
+        if (!this.SelectedClass) return;
 
-    this.playerImageContainer.setBackgroundColor("#000000", 0); // reset
-    if (this.playerImageContainer["background"] instanceof Phaser.GameObjects.Image) {
-        this.playerImageContainer["background"].setTexture(this.SelectedClass.imageKey);
+        // Met directement la nouvelle image
+        this.playerImageContainer.setBackgroundImage(
+            this.SelectedClass.imageKey,
+        );
+
+        // Met à jour le nom
+        this.playerClassName.setTitle(this.SelectedClass.name);
     }
-
-    this.playerClassName.setTitle(this.SelectedClass.name);
-}
-
-
 }

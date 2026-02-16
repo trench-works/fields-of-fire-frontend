@@ -8,6 +8,7 @@ import { CharacterClass } from "../Model/CharacterClass";
 import { uiGrid } from "../core/Utils";
 import { CustomContainer } from "../core/UI/Container";
 import { Color } from "../data/ColorConfig";
+import { DataDisplayer } from "../core/UI/DataDisplayer";
 
 export class FightScene extends GameScene implements Displayable {
     public backgroundImage = "red_bg";
@@ -21,6 +22,16 @@ export class FightScene extends GameScene implements Displayable {
     public renderConfig: SceneRenderConfig;
     public myPlayer: PlayableCharacter | undefined;
     private sceneGrid = uiGrid(0, 0);
+    private allExistingStats: string[] = [
+        "life",
+        "initiative",
+        "strength",
+        "precision",
+        "accuracy",
+        "dodging",
+        "energy",
+        "mouvement",
+    ];
 
     constructor() {
         super({ key: "fightScene" });
@@ -68,6 +79,10 @@ export class FightScene extends GameScene implements Displayable {
         );
         this.load.image("groundTiles", `assets/${this.tileSetImage}.png`);
 
+        this.allExistingStats.forEach((stat) =>
+            this.load.image(stat, `assets/icon/icon_${stat}.png`),
+        );
+
         this.characters.push(this.myPlayer!);
         //précharge les image des persos de la scène
         this.characters.forEach((object) => {
@@ -88,10 +103,14 @@ export class FightScene extends GameScene implements Displayable {
                             action.props.iconSpriteKey,
                             `assets/action/${action.props.iconSpriteKey}.png`,
                         );
+                        console.log(
+                            `assets/action/${action.props.iconSpriteKey}.png`,
+                        );
                     }
                 });
             }
         });
+
         this.load.image(
             this.backgroundImage,
             `assets/${this.backgroundImage}.jpg`,
@@ -122,70 +141,120 @@ export class FightScene extends GameScene implements Displayable {
             opacity: 0.5,
         });
 
+        const actionGrid = uiGrid(0, 0, actionPanel.width, actionPanel.height,);
+        const actionListArea = actionGrid.getArea(0, 1, 9, 7);
+
+        const statsTable = new DataDisplayer(this, {
+            position: new Position(
+                actionPanel.x - actionPanel.width / 2 + actionListArea.centerX,
+                actionPanel.y - actionPanel.height / 2 + actionListArea.centerY,
+            ),
+            width: actionListArea.width,
+            height: actionListArea.height,
+            cols: 9,
+            rows: 1,
+        });
+
+        // --- Placement des icônes ---
+        this.myPlayer?.actionList.forEach((actionIcon, index) => {
+            statsTable.placeContent(index, 0, { icon: actionIcon.props.iconSpriteKey }, 64);
+        });
+
+
+
+
+
+
         this.createCharacterStatsUi(this.myPlayer!);
     }
 
-  createCharacterStatsUi(perso: Character) {
-    // 1) Tu récupères la zone du panel dans la grille globale
-    const statsArea = this.sceneGrid.getArea(0, 6, 2, 3);
+    createCharacterStatsUi(perso: Character) {
+        // 1) Tu récupères la zone du panel dans la grille globale
+        const statsArea = this.sceneGrid.getArea(0, 6, 2, 3);
 
-    // 2) Tu crées le panel
-    const statsPanel = new CustomContainer(this, {
-        title: "",
-        x: statsArea.x + statsArea.width / 2,
-        y: statsArea.y + statsArea.height / 2,
-        width: statsArea.width,
-        height: statsArea.height,
-        borderWidth: 6,
-        opacity: 0.5,
-    });
+        // 2) Tu crées le panel
+        const statsPanel = new CustomContainer(this, {
+            title: "",
+            x: statsArea.x + statsArea.width / 2,
+            y: statsArea.y + statsArea.height / 2,
+            width: statsArea.width,
+            height: statsArea.height,
+            borderWidth: 6,
+            opacity: 0.5,
+        });
 
-    // 3) Tu crées une grille *interne* au panel
-    const statsGrid = uiGrid(
-        0,
-        0,
-        statsPanel.width,
-        statsPanel.height
-    );
+        // 3) Tu crées une grille *interne* au panel
+        const statsGrid = uiGrid(0, 0, statsPanel.width, statsPanel.height);
 
-    const imgArea = statsGrid.getArea(0, 0, 3, 4);
+        const imgArea = statsGrid.getArea(0, 0, 3, 4);
 
-    const statsImage = new CustomContainer(this, {
-        title: "",
-        x: statsPanel.x - statsPanel.width / 2 + imgArea.centerX,
-        y: statsPanel.y - statsPanel.height / 2 + imgArea.centerY,
-        width: imgArea.width,
-        height: imgArea.height,
-        borderWidth: 7,
-        backgroundImage: perso.iconImageKey,
-    });
+        const statsImage = new CustomContainer(this, {
+            title: "",
+            x: statsPanel.x - statsPanel.width / 2 + imgArea.centerX,
+            y: statsPanel.y - statsPanel.height / 2 + imgArea.centerY,
+            width: imgArea.width,
+            height: imgArea.height,
+            borderWidth: 7,
+            backgroundImage: perso.iconImageKey,
+        });
 
-    const classNameArea = statsGrid.getArea(3,0,6,1);
+        const classNameArea = statsGrid.getArea(3, 0, 6, 1);
 
-    const statsClassName = new CustomContainer(this, {
-        title: this.myPlayer!.characterClass.name,
-        x: statsPanel.x - statsPanel.width / 2 + classNameArea.centerX,
-        y: statsPanel.y - statsPanel.height / 2 + classNameArea.centerY,
-        width: classNameArea.width,
-        height: classNameArea.height,
-        borderWidth: 2,
-        bgColor: Color.containerBorder,
-        fontsize: 18
-    });
+        const statsClassName = new CustomContainer(this, {
+            title: this.myPlayer!.characterClass.name,
+            x: statsPanel.x - statsPanel.width / 2 + classNameArea.centerX,
+            y: statsPanel.y - statsPanel.height / 2 + classNameArea.centerY,
+            width: classNameArea.width,
+            height: classNameArea.height,
+            borderWidth: 2,
+            bgColor: Color.containerBorder,
+            fontsize: 18,
+        });
+        const playerNameArea = statsGrid.getArea(0, 4, 3, 1);
 
-    const playerNameArea = statsGrid.getArea(0,4,3,1);
+        const statsName = new CustomContainer(this, {
+            title: this.myPlayer!.name,
+            x: statsPanel.x - statsPanel.width / 2 + playerNameArea.centerX,
+            y: statsPanel.y - statsPanel.height / 2 + playerNameArea.centerY,
+            width: playerNameArea.width,
+            height: playerNameArea.height,
+            borderWidth: 2,
+            bgColor: Color.containerBorder,
+            fontsize: 18,
+        });
 
-    const statsName = new CustomContainer(this, {
-        title: this.myPlayer!.name,
-        x: statsPanel.x - statsPanel.width / 2 + playerNameArea.centerX,
-        y: statsPanel.y - statsPanel.height / 2 + playerNameArea.centerY,
-        width: playerNameArea.width,
-        height: playerNameArea.height,
-        borderWidth: 2,
-        bgColor: Color.containerBorder,
-        fontsize: 18
-    });
+        const statValuesArea = statsGrid.getArea(3, 1, 6, 8);
 
-}
+        const statsTable = new DataDisplayer(this, {
+            position: new Position(
+                statsPanel.x - statsPanel.width / 2 + statValuesArea.centerX,
+                statsPanel.y - statsPanel.height / 2 + statValuesArea.centerY,
+            ),
+            width: statValuesArea.width,
+            height: statValuesArea.height,
+            cols: 4,
+            rows: 4,
+        });
 
+        // --- Placement des icônes ---
+        this.allExistingStats.forEach((icon, index) => {
+            const row = Math.floor(index / 2);
+            const col = (index % 2) * 2;
+
+            statsTable.placeContent(col, row, { icon });
+        });
+
+        statsTable.placeContent(1, 0, this.myPlayer!.baseStats.life);
+        statsTable.placeContent(3, 0, this.myPlayer!.baseStats.initiative);
+        statsTable.placeContent(1, 2, this.myPlayer!.baseStats.accuracy);
+
+        
+        statsTable.placeContent(3, 3, this.myPlayer!.baseStats.mouvement);
+        statsTable.placeContent(3, 1, this.myPlayer!.baseStats.precision);
+
+        statsTable.placeContent(1, 1, this.myPlayer!.baseStats.strength);
+        
+        statsTable.placeContent(1, 3, this.myPlayer!.baseStats.energy);
+        statsTable.placeContent(3, 2, this.myPlayer!.baseStats.dodging);
+    }
 }
