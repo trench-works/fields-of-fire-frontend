@@ -1,3 +1,4 @@
+import { Socket } from "../core/Socket";
 import { Button } from "../core/UI/Button";
 import { CustomContainer } from "../core/UI/Container";
 import { TabManager } from "../core/UI/TabManager";
@@ -8,6 +9,7 @@ import { CharacterClass } from "../Model/CharacterClass";
 import { PlayableCharacter } from "../Model/PlayableCharacter";
 import { Position } from "../Model/Position";
 import { Stats } from "../Model/Stats";
+import { GameSocket, GamesSocket } from "../repositories/GameRepository";
 
 export class LobbyScene extends Phaser.Scene {
     private backgroundImage = "red_bg";
@@ -100,7 +102,7 @@ export class LobbyScene extends Phaser.Scene {
     private tabHeight!: number;
     private playerImageContainer!: CustomContainer;
     private playerClassName!: CustomContainer;
-    public socket!: WebSocket;
+    public gameSocket!: GamesSocket;
 
     constructor() {
         super({ key: "lobbyScene" });
@@ -126,15 +128,19 @@ export class LobbyScene extends Phaser.Scene {
     }
 
     create() {
-        this.socket = new WebSocket("ws://localhost:3000");
 
-        this.socket.onopen = () => {
-            console.log("Connecté au serveur WebSocket");
-        };
+        this.gameSocket = new GamesSocket();
 
-        this.socket.onmessage = (event) => {
-            console.log("Message reçu :", event.data);
-        };
+        console.log(" LobbyScene: ", this.gameSocket);
+
+        this.gameSocket.on("joined", ({ gameId, playerId }) => {
+            console.log(`Rejoint le jeu ${gameId} en tant que joueur ${playerId}`);
+            this.scene.start("fightScene", {
+                spawnPos: { x: 0, y: 0 },
+                class: this.SelectedClass!,
+                id: playerId,
+            });
+        });
 
         //title BOX
         const titleBox = uiGrid(0, 0);
@@ -270,20 +276,7 @@ export class LobbyScene extends Phaser.Scene {
             borderWidth: 2,
             borderColor: "#ffffff",
             onClick: () => {
-                if (this.socket.readyState !== WebSocket.OPEN) { console.warn("Socket pas encore ouvert"); return; }
-                this.socket.send(
-                    JSON.stringify({
-                        topic: "game",
-                        action: "subscribe",
-                        key: { gameId: "3630", userId : "arthur" },
-                    }),
-                );
-                console.log("Demande d'abonnement envoyée !");
-                this.scene.start("fightScene", {
-                    spawnPos: { x: 0, y: 0 },
-                    class: this.SelectedClass!,
-                    id: "player_1",
-                });
+                this.gameSocket.joinGame({gameId : "3630"});
             },
         });
         playerPanel.add(fightButton);
