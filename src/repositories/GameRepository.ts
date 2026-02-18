@@ -1,7 +1,8 @@
 import { Socket } from "../core/Socket";
 
 const GAME_TOPIC = "game";
-export type JoinGame = {
+
+type JoinGame = {
     gameId: string;
 };
 
@@ -23,7 +24,7 @@ export class GamesSocket extends Socket {
  * Current Game
  */
 
-export type GameKey = {
+type GameKey = {
     gameId: string;
 };
 
@@ -41,12 +42,12 @@ enum GamePlayerActions {
     MOVE = "move",
 }
 
-export type GamePlayerKey = {
+type GamePlayerKey = {
     gameId: string;
     playerId: string;
 };
 
-export type MovePlayer = {
+type MovePlayer = {
     x: number;
     y: number;
 };
