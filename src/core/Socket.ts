@@ -25,7 +25,7 @@ export class Socket<RessourceKey extends { [key: string]: any } = {}> {
         this.send("subscribe", { user: { id: this.userId }, key: this.key });
     }
 
-    send(action: string, payload: any): void {
+    send<PayloadType = any>(action: string, payload: PayloadType): void {
         this.socket.send(JSON.stringify({ actionId: action, payload }));
     }
 
