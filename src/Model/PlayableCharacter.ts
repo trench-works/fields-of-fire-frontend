@@ -17,6 +17,7 @@ export class PlayableCharacter extends Character {
     super(characterProps);
     this.baseStats = characterClass.stats;
     this.spriteKey = characterClass.spriteKey;
+    this.iconImageKey = characterClass.iconImageKey;
     this.characterClass = characterClass;
   }
 }

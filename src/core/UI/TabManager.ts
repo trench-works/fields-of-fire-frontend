@@ -64,10 +64,10 @@ export class TabManager extends Phaser.GameObjects.Container {
                 contentArea.x + offsetX,
                 contentArea.y + offsetY,
             );
-            console.log("Content position offset:", offsetX, offsetY);
+            //console.log("Content position offset:", offsetX, offsetY);
 
             content.setSize(contentArea.width, contentArea.height);
-            console.log("Content area dimensions:", contentArea.width, contentArea.height);
+            //console.log("Content area dimensions:", contentArea.width, contentArea.height);
             content.setVisible(false);
 
             // --- DEBUG VISUEL : CustomContainer en fond ---

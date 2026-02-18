@@ -9,6 +9,7 @@ import { computeScaleFactor } from "../core/Utils";
 export type CharactersProps = GameObjectProps & {
     position: Position;
     spriteKey: string;
+    iconImageKey : string;
     id: string;
     name: string;
     actionList: Action[];
@@ -21,6 +22,7 @@ export class Character extends GameObject {
     public spriteKey: string;
     protected sprite: Phaser.GameObjects.Sprite | undefined;
     public id: string;
+    public iconImageKey: string;
     public name: string;
     public actionList: Action[];
     public baseStats: Stats;
@@ -28,6 +30,7 @@ export class Character extends GameObject {
     constructor({
         position,
         spriteKey,
+        iconImageKey,
         id,
         name,
         actionList,
@@ -38,6 +41,7 @@ export class Character extends GameObject {
 
         this.position = position;
         this.spriteKey = spriteKey;
+        this.iconImageKey = iconImageKey;
         this.id = id;
         this.name = name;
         this.actionList = actionList;
