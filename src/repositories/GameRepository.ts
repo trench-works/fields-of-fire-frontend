@@ -42,7 +42,7 @@ type PlayerMove = {
     x: number;
     y: number;
 };
-export class GameSocket extends Socket<GameKey, GameActions, GameEvents> {
+export class GameSocket extends Socket<GameKey, GameActions, string> {
     constructor(gameId: string) {
         super(GAME_TOPIC);
         super.open(USER_ID, { gameId });
