@@ -10,16 +10,18 @@ export class Socket<
     RessourceKey extends { [key: string]: any } = {},
     Actions = string
 > {
-    private socket: WebSocket;
-
+    private socket: WebSocket | undefined = undefined;
     private listeners: Map<Actions, Listener[]> = new Map();
 
-    constructor(
-        topic: string,
-        private readonly userId: string,
-        private readonly key: RessourceKey
-    ) {
-        this.socket = new WebSocket(`${SOCKET_SERVER_URL}/${topic}`);
+    private userId: string | undefined;
+    private key: RessourceKey | undefined;
+
+    constructor(private readonly topic: string) {}
+
+    protected open(userId: string, key?: RessourceKey) {
+        this.userId = userId;
+        this.key = key;
+        this.socket = new WebSocket(`${SOCKET_SERVER_URL}/${this.topic}`);
         this.socket.addEventListener("open", this.onOpen.bind(this));
         this.socket.addEventListener("message", this.handleMessage.bind(this));
     }
@@ -31,8 +33,14 @@ export class Socket<
         });
     }
 
-    send<PayloadType = any>(action: Actions, payload: PayloadType): void {
-        this.socket.send(JSON.stringify({ actionId: action, payload }));
+    send<PayloadType = any>(
+        action: Actions,
+        payload: PayloadType
+    ): Error | void {
+        if (!this.socket) {
+            return new Error("Socket is not connected yet...");
+        }
+        this.socket?.send(JSON.stringify({ actionId: action, payload }));
     }
 
     private handleMessage({
@@ -55,7 +63,10 @@ export class Socket<
         }
     }
 
-    onClose(listener: (event: CloseEvent) => any) {
+    onClose(listener: (event: CloseEvent) => any): Error | void {
+        if (!this.socket) {
+            return new Error("Socket is not connected yet...");
+        }
         this.socket.addEventListener("close", listener);
     }
 }

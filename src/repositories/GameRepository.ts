@@ -1,5 +1,5 @@
-import { Socket } from "../core/Socket";
-
+import { Socket } from "../core/web/Socket";
+const USER_ID = "dev";
 const GAME_TOPIC = "game";
 
 type JoinGame = {
@@ -11,12 +11,13 @@ type JoinGame = {
  */
 
 export class GamesSocket extends Socket {
-    constructor(userId: string) {
-        super(GAME_TOPIC, userId, {});
+    constructor() {
+        super(GAME_TOPIC);
+        super.open(USER_ID);
     }
 
     joinGame(joinGame: JoinGame) {
-        this.send<JoinGame>("join", joinGame);
+        return this.send<JoinGame>("join", joinGame);
     }
 }
 
@@ -29,8 +30,9 @@ type GameKey = {
 };
 
 export class GameSocket extends Socket<GameKey> {
-    constructor(userId: string, gameId: string) {
-        super(GAME_TOPIC, userId, { gameId });
+    constructor(gameId: string) {
+        super(GAME_TOPIC);
+        super.open(USER_ID, { gameId });
     }
 }
 
@@ -53,12 +55,13 @@ type MovePlayer = {
 };
 
 export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
-    constructor(userId: string, gameId: string, playerId: string) {
-        super(GAME_TOPIC, userId, { gameId, playerId });
+    constructor(gameId: string, playerId: string) {
+        super(GAME_TOPIC);
+        super.open(USER_ID, { gameId, playerId });
     }
 
     move(movePlayer: MovePlayer) {
-        this.send<MovePlayer>(GamePlayerActions.MOVE, movePlayer);
+        return this.send<MovePlayer>(GamePlayerActions.MOVE, movePlayer);
     }
 }
 
