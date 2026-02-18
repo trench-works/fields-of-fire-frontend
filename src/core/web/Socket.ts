@@ -39,12 +39,12 @@ export class Socket<
         if (!this.socket) {
             return new Error("Socket is not connected yet...");
         }
-        this.socket?.send(JSON.stringify({ actionId: action, payload }));
+        this.socket.send(JSON.stringify({ actionId: action, payload }));
     }
 
-    private handleMessage({
-        data: { actionId, payload },
-    }: MessageEvent<InputAction<OutputActions>>) {
+    private handleMessage({ data }: MessageEvent) {
+        const { payload, actionId }: InputAction<OutputActions> =
+            JSON.parse(data);
         const listeners = this.listeners.get(actionId);
         if (listeners) {
             for (const listener of listeners) {
