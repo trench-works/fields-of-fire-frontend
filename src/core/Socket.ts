@@ -9,7 +9,7 @@ type Listener<PayloadType = any, ResponseType = any> = (
 export class Socket<RessourceKey extends { [key: string]: any } = {}> {
     private socket: WebSocket;
 
-    private listeners: Map<string, Listener[]>;
+    private listeners: Map<string, Listener[]> = new Map();
 
     constructor(
         topic: string,
