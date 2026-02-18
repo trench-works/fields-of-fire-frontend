@@ -1,15 +1,18 @@
 const SOCKET_SERVER_URL = "http://localhost:3000";
 
-type InputAction = { actionId: string; payload: any };
+type InputAction<Actions> = { actionId: Actions; payload: any };
 
 type Listener<PayloadType = any, ResponseType = any> = (
     payload: PayloadType
 ) => ResponseType;
 
-export class Socket<RessourceKey extends { [key: string]: any } = {}> {
+export class Socket<
+    RessourceKey extends { [key: string]: any } = {},
+    Actions = string
+> {
     private socket: WebSocket;
 
-    private listeners: Map<string, Listener[]> = new Map();
+    private listeners: Map<Actions, Listener[]> = new Map();
 
     constructor(
         topic: string,
@@ -22,16 +25,19 @@ export class Socket<RessourceKey extends { [key: string]: any } = {}> {
     }
 
     private onOpen() {
-        this.send("subscribe", { user: { id: this.userId }, key: this.key });
+        this.send("subscribe" as Actions, {
+            user: { id: this.userId },
+            key: this.key,
+        });
     }
 
-    send<PayloadType = any>(action: string, payload: PayloadType): void {
+    send<PayloadType = any>(action: Actions, payload: PayloadType): void {
         this.socket.send(JSON.stringify({ actionId: action, payload }));
     }
 
     private handleMessage({
         data: { actionId, payload },
-    }: MessageEvent<InputAction>) {
+    }: MessageEvent<InputAction<Actions>>) {
         const listeners = this.listeners.get(actionId);
         if (listeners) {
             for (const listener of listeners) {
@@ -40,7 +46,7 @@ export class Socket<RessourceKey extends { [key: string]: any } = {}> {
         }
     }
 
-    on<PayloadType = any>(action: string, listener: Listener<PayloadType>) {
+    on<PayloadType = any>(action: Actions, listener: Listener<PayloadType>) {
         const currentListeners = this.listeners.get(action);
         if (currentListeners) {
             currentListeners.push(listener);

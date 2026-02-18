@@ -37,6 +37,10 @@ export class GameSocket extends Socket<GameKey> {
  * Game Player
  */
 
+enum GamePlayerActions {
+    MOVE = "move",
+}
+
 export type GamePlayerKey = {
     gameId: string;
     playerId: string;
@@ -47,13 +51,13 @@ export type MovePlayer = {
     y: number;
 };
 
-export class GamePlayerSocket extends Socket<GamePlayerKey> {
+export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
     constructor(userId: string, gameId: string, playerId: string) {
         super(GAME_TOPIC, userId, { gameId, playerId });
     }
 
     move(movePlayer: MovePlayer) {
-        this.send<MovePlayer>("move", movePlayer);
+        this.send<MovePlayer>(GamePlayerActions.MOVE, movePlayer);
     }
 }
 
