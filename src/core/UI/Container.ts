@@ -58,12 +58,9 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             })
             .setOrigin(0.5);
 
-        const minWidth = this.titleText.width + 60;
-        const finalWidth = Math.max(width, minWidth);
-        const finalHeight = height;
 
         // IMPORTANT : définir la taille AVANT le fond
-        this.setSize(finalWidth, finalHeight);
+        this.setSize(width, height);
 
         // --- FOND (refactorisé) ---
         this.setBackgroundImage(backgroundImage ?? null);
@@ -75,14 +72,14 @@ export class CustomContainer extends Phaser.GameObjects.Container {
                 this.borderGraphics,
                 parseColor(borderColor),
                 borderWidth,
-                finalWidth,
-                finalHeight,
+                width,
+                height,
             );
             this.add(this.borderGraphics);
         }
 
         // --- TITRE ---
-        this.titleText.setPosition(0, -finalHeight / 2 + 15);
+        this.titleText.setPosition(0, -height / 2 + 15);
         this.add(this.titleText);
 
         // --- INTERACTIVITÉ ---
