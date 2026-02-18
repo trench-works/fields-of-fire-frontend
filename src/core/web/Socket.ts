@@ -69,5 +69,12 @@ export class Socket<
         }
         this.socket.addEventListener("close", listener);
     }
+
+    close(): Error | void {
+        if (!this.socket) {
+            return new Error("Socket is not connected yet...");
+        }
+        this.socket.close();
+    }
 }
 
