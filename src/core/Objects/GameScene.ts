@@ -1,10 +1,8 @@
 import { Scene } from "phaser";
-import { Character } from "../Model/Character";
-import { computeScaleFactor, Utils } from "../core/Utils";
-import { Position, PositionUtils } from "../Model/Position";
-import { GameObject } from "../Model/GameObject";
-import { SceneConfig } from "../data/SceneConfig";
-import { Stats } from "../Model/Stats";
+import { Character } from "../../Model/Character";
+import { GameObject } from "./GameObject";
+import { scaleAndCenter } from "../Utils/Scale";
+import { Position } from "../Types/Position";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -37,7 +35,7 @@ export class GameScene extends Scene implements Displayable {
     public gameObjects: GameObject[] = [];
     public characters: Character[] = [];
     public gridPositions: Cell[][] = [];
-    public scaleFactor : number = 1;
+    public scaleFactor: number = 1;
 
     spawnEntities() {
         this.characters.forEach((entity) => {
@@ -50,7 +48,7 @@ export class GameScene extends Scene implements Displayable {
         const map = this.make.tilemap({ key: this.fightMap });
         const tileset = map.addTilesetImage(this.tileSetImage, "groundTiles");
 
-        const centerMap = Utils.scaleAndCenter({
+        const centerMap = scaleAndCenter({
             parentHeight: this.scale.height,
             parentWidth: this.scale.width,
             childHeight: map.heightInPixels,
@@ -63,14 +61,14 @@ export class GameScene extends Scene implements Displayable {
         }
 
         this.renderConfig.offset.add(
-            new Position(centerMap.offsetX, centerMap.offsetY),
+            new Position(centerMap.offsetX, centerMap.offsetY)
         );
 
         const groundLayer = map.createLayer(
             "Ground",
             tileset!,
             centerMap.offsetX,
-            centerMap.offsetY,
+            centerMap.offsetY
         );
 
         if (!groundLayer) {
@@ -91,7 +89,6 @@ export class GameScene extends Scene implements Displayable {
     ) {
         for (let y = 0; y < map.height; y++) {
             for (let x = 0; x < map.width; x++) {
-
                 const tile = layer.getTileAt(x, y);
                 if (!tile) continue;
 
@@ -124,9 +121,18 @@ export class GameScene extends Scene implements Displayable {
                 // --- DEBUG VISUEL ---
                 this.gridShower(diamond, worldX, worldY, layer);
 
-                if (!this.gridPositions[y]) { this.gridPositions[y] = []; } 
+                if (!this.gridPositions[y]) {
+                    this.gridPositions[y] = [];
+                }
 
-                this.gridPositions[y][x] = { gridPosition: new Position (x, y ), pixelPosition: new Position(worldX, worldY-Yof*this.scaleFactor), zone }; 
+                this.gridPositions[y][x] = {
+                    gridPosition: new Position(x, y),
+                    pixelPosition: new Position(
+                        worldX,
+                        worldY - Yof * this.scaleFactor
+                    ),
+                    zone,
+                };
 
                 zone.on("pointerdown", () => {
                     console.log(`Tile clicked: ${x}, ${y}`);
@@ -144,7 +150,7 @@ export class GameScene extends Scene implements Displayable {
             result.push(
                 ...(Array.isArray(renderedElement)
                     ? renderedElement
-                    : [renderedElement]),
+                    : [renderedElement])
             );
         }
         return result;
@@ -159,7 +165,7 @@ export class GameScene extends Scene implements Displayable {
         diamond: Phaser.Geom.Polygon,
         worldX: number,
         worldY: number,
-        layer: Phaser.Tilemaps.TilemapLayer,
+        layer: Phaser.Tilemaps.TilemapLayer
     ) {
         const g = this.add.graphics();
         g.lineStyle(2, 0xff0000, 1); // contour rouge

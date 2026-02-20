@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { Color } from "../../data/ColorConfig";
+import { Color } from "../../config/ColorConfig";
 import { parseColor } from "../Utils";
 
 interface ContainerConfig {
@@ -76,7 +76,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
                 parseColor(borderColor),
                 borderWidth,
                 finalWidth,
-                finalHeight,
+                finalHeight
             );
             this.add(this.borderGraphics);
         }
@@ -99,7 +99,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         borderColor: number,
         borderWidth: number,
         width: number,
-        height: number,
+        height: number
     ) {
         g.clear();
         g.lineStyle(borderWidth, borderColor, 1);
@@ -125,7 +125,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
                 -height / 2,
                 width,
                 height,
-                10,
+                10
             );
         }
     }
@@ -141,7 +141,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         if (imageKey) {
             const img = this.scene.make.image(
                 { x: 0, y: 0, key: imageKey },
-                false,
+                false
             );
             img.setDisplaySize(width, height);
             img.setOrigin(0.5);
@@ -163,3 +163,4 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         this.titleText.setPosition(0, -this.height / 2 + 15);
     }
 }
+

@@ -1,13 +1,15 @@
-import { Button } from "../core/UI/Button";
-import { CustomContainer } from "../core/UI/Container";
-import { TabManager } from "../core/UI/TabManager";
-import { uiGrid } from "../core/Utils";
-import { Color } from "../data/ColorConfig";
-import { Action } from "../Model/Action";
-import { CharacterClass } from "../Model/CharacterClass";
-import { Position } from "../Model/Position";
-import { Stats } from "../Model/Stats";
-import { LobbySocket } from "../repositories/GameRepository";
+import {
+    Button,
+    CustomContainer,
+    TabManager,
+    GridUtils,
+    Position,
+} from "../../core";
+import { Color } from "../../config/ColorConfig";
+import { Action } from "../../Model/Action";
+import { CharacterClass } from "../../Model/CharacterClass";
+import { Stats } from "../../Model/Stats";
+import { LobbySocket } from "./repositories/lobby.socket";
 
 export class LobbyScene extends Phaser.Scene {
     private backgroundImage = "red_bg";
@@ -100,7 +102,7 @@ export class LobbyScene extends Phaser.Scene {
     private tabHeight!: number;
     private playerImageContainer!: CustomContainer;
     private playerClassName!: CustomContainer;
-    public gameSocket!: LobbySocket;
+    public lobbySocket!: LobbySocket;
 
     constructor() {
         super({ key: "lobbyScene" });
@@ -126,11 +128,11 @@ export class LobbyScene extends Phaser.Scene {
     }
 
     create() {
-        this.gameSocket = new LobbySocket();
+        this.lobbySocket = new LobbySocket();
 
-        console.log(" LobbyScene: ", this.gameSocket);
+        console.log(" LobbyScene: ", this.lobbySocket);
 
-        this.gameSocket.onJoin(({ game, player }) => {
+        this.lobbySocket.onJoin(({ game, player }) => {
             console.log(
                 `Rejoint le jeu ${game.id} en tant que joueur ${player.id}`
             );
@@ -142,7 +144,7 @@ export class LobbyScene extends Phaser.Scene {
         });
 
         //title BOX
-        const titleBox = uiGrid(0, 0);
+        const titleBox = GridUtils.uiGrid(0, 0);
         const bg = this.add
             .image(0, 0, this.backgroundImage)
             .setOrigin(0, 0)
@@ -156,7 +158,7 @@ export class LobbyScene extends Phaser.Scene {
             .setOrigin(0.5, 0);
 
         //tab BOX
-        const tabArea = uiGrid(0, 1);
+        const tabArea = GridUtils.uiGrid(0, 1);
         const tabPanelWidth = tabArea.cellW * 3;
         const tabPanelHeight = this.scale.height - tabArea.cellH;
         const currenttabPosition = new Position(
@@ -209,7 +211,7 @@ export class LobbyScene extends Phaser.Scene {
         });
 
         //Selected character info BOX
-        const area = uiGrid(6, 1);
+        const area = GridUtils.uiGrid(6, 1);
         const playerPanelWidth = area.cellW * 3;
         const playerPanelHeight = this.scale.height - area.cellH;
         const currentPlayerInfoPosition = new Position(
@@ -225,7 +227,7 @@ export class LobbyScene extends Phaser.Scene {
             borderWidth: 5,
         });
 
-        const playerpanelgrid = uiGrid(
+        const playerpanelgrid = GridUtils.uiGrid(
             0,
             0,
             playerPanelWidth,
@@ -276,7 +278,7 @@ export class LobbyScene extends Phaser.Scene {
             borderColor: "#ffffff",
             onClick: () => {
                 console.log("will join game 3630 ");
-                this.gameSocket.joinGame({ gameId: "3630" });
+                this.lobbySocket.joinGame({ gameId: "3630" });
             },
         });
         playerPanel.add(fightButton);
@@ -290,7 +292,7 @@ export class LobbyScene extends Phaser.Scene {
         const classes = this.allExistingClass;
         const classesPerRow = 3;
         const contentwidth: number = container.width;
-        const grid = uiGrid(
+        const grid = GridUtils.uiGrid(
             0,
             0,
             contentwidth,

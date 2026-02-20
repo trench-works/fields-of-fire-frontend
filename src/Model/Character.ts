@@ -1,15 +1,19 @@
-import { RenderResult, SceneRenderConfig } from "./GameScene";
+import {
+    RenderResult,
+    SceneRenderConfig,
+    GameObject,
+    GameObjectProps,
+    Position,
+    PositionUtils,
+} from "../core";
 import { Action } from "./Action";
 import { Effect } from "./Effect";
-import { GameObject, GameObjectProps } from "./GameObject";
-import { Position, PositionUtils } from "./Position";
 import { Stats } from "./Stats";
-import { computeScaleFactor } from "../core/Utils";
 
 export type CharactersProps = GameObjectProps & {
     position: Position;
     spriteKey: string;
-    iconImageKey : string;
+    iconImageKey: string;
     id: string;
     name: string;
     actionList: Action[];
@@ -49,16 +53,16 @@ export class Character extends GameObject {
     }
 
     get stats() {
-        const stats = new Stats(
-            this.baseStats.life,
-            this.baseStats.precision, //boost ranged dammage
-            this.baseStats.strength,
-
-            this.baseStats.accuracy, //chance to hit
-            this.baseStats.initiative,
-            this.baseStats.energy,
-            this.baseStats.mouvement,
-        );
+        const stats = new Stats({
+            life: this.baseStats.life,
+            precision: this.baseStats.precision, //boost ranged dammage
+            strength: this.baseStats.strength,
+            accuracy: this.baseStats.accuracy, //chance to hit
+            initiative: this.baseStats.initiative,
+            energy: this.baseStats.energy,
+            mouvement: this.baseStats.mouvement,
+            dodging: 0, // TODO: change this value
+        });
 
         this.currentEffect.forEach((effect) => {
             stats.addLife(effect.statModification.life);
@@ -73,8 +77,8 @@ export class Character extends GameObject {
         return stats;
     }
 
-    //Spawne le personnage sur la scène, en créant son sprite et en le positionnant correctement sur la grille  
-    spawn(scene: Phaser.Scene,scaleFactor: number, gridPositions: any[][]) {
+    //Spawne le personnage sur la scène, en créant son sprite et en le positionnant correctement sur la grille
+    spawn(scene: Phaser.Scene, scaleFactor: number, gridPositions: any[][]) {
         this.scene = scene;
 
         const { x, y } = this.position;
@@ -83,12 +87,12 @@ export class Character extends GameObject {
         this.sprite = scene.physics.add.sprite(
             cell.pixelPosition.x,
             cell.pixelPosition.y,
-            this.spriteKey,
+            this.spriteKey
         );
 
         this.sprite.setDepth(5);
         this.sprite.setOrigin(0.5, 0.95);
-        this.sprite.setScale(scaleFactor/1.5); ;
+        this.sprite.setScale(scaleFactor / 1.5);
 
         this.createAnimations(this.spriteKey);
     }
@@ -122,7 +126,7 @@ export class Character extends GameObject {
         startFrame: number,
         endFrame: number,
         frameRate: number = 2,
-        repeat: number = -1,
+        repeat: number = -1
     ) {
         this.scene.anims.create({
             key: `${animationName}`,
@@ -137,7 +141,7 @@ export class Character extends GameObject {
     render(renderConfig: SceneRenderConfig): RenderResult {
         const renderPosition = PositionUtils.getPixelsFromPosition(
             this.position,
-            renderConfig,
+            renderConfig
         );
         return {
             position: renderPosition,
@@ -149,3 +153,4 @@ export class Character extends GameObject {
         return;
     }
 }
+
