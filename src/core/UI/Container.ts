@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { Color } from "../../config/ColorConfig";
-import { parseColor } from "../Utils";
+import { ColorUtils } from "../Utils";
 
 interface ContainerConfig {
     title: string;
@@ -73,7 +73,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             this.borderGraphics = scene.make.graphics({}, false);
             this.manageBorder(
                 this.borderGraphics,
-                parseColor(borderColor),
+                ColorUtils.parseColor(borderColor),
                 borderWidth,
                 finalWidth,
                 finalHeight
@@ -119,7 +119,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             const height = this.height;
 
             this.background.clear();
-            this.background.fillStyle(parseColor(color), alpha);
+            this.background.fillStyle(ColorUtils.parseColor(color), alpha);
             this.background.fillRoundedRect(
                 -width / 2,
                 -height / 2,
@@ -150,7 +150,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             this.addAt(img, 0);
         } else {
             const bg = this.scene.make.graphics({}, false);
-            bg.fillStyle(parseColor(this.bgColor), this.bgOpacity);
+            bg.fillStyle(ColorUtils.parseColor(this.bgColor), this.bgOpacity);
             bg.fillRoundedRect(-width / 2, -height / 2, width, height, 10);
 
             this.background = bg;
