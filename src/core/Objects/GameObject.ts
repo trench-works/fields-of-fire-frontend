@@ -1,5 +1,5 @@
 import { Scene } from "phaser";
-import { Position } from "./Position";
+import { Position } from "../Types/Position";
 
 export type GameObjectProps = {
     //input: Input;
@@ -15,16 +15,16 @@ export type Input = {
     };
 };
 
-
 export abstract class GameObject {
     //protected input: Input;
 
     protected scene: Scene;
 
-    constructor({scene }: GameObjectProps) {
+    constructor({ scene }: GameObjectProps) {
         //this.input = input;
         this.scene = scene;
     }
 
     abstract recalculate(): Promise<void>;
 }
+

@@ -1,6 +1,5 @@
+import { Position } from "../core";
 import { Effect } from "./Effect";
-import { Position } from "./Position";
-
 export type ActionProps = {
     id: string;
     iconSpriteKey: string;
@@ -27,3 +26,4 @@ export class Action {
         this.pushValue = props.pushValue || 0;
     }
 }
+

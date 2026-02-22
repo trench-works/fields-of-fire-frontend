@@ -1,25 +1,6 @@
-import { Socket } from "../core/web/Socket";
+import { Socket } from "../../../core";
 const USER_ID = "dev";
 const GAME_TOPIC = "game";
-
-type JoinGame = {
-    gameId: string;
-};
-
-/**
- * Game Defautl Socket (only for testing purpose, should be removed later)
- */
-
-export class GamesSocket extends Socket {
-    constructor() {
-        super(GAME_TOPIC);
-        super.open(USER_ID);
-    }
-
-    joinGame(joinGame: JoinGame) {
-        return this.send<JoinGame>("join", joinGame);
-    }
-}
 
 /**
  * Current Game

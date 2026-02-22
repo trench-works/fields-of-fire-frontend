@@ -1,5 +1,5 @@
-import { Position } from "../../Model/Position";
-import { uiGrid, UiGrid } from "../Utils";
+import { Position, UiGrid } from "../Types";
+import { GridUtils } from "../Utils";
 import { CustomContainer } from "./Container";
 
 export type CellValue = string | number | { icon: string };
@@ -34,13 +34,12 @@ export class DataDisplayer extends CustomContainer {
             width: config.width,
             height: config.height,
             title: "",
-            opacity: 0
-
+            opacity: 0,
         });
 
         const { cols, rows } = config;
 
-        this.grid = uiGrid(0, 0, this.width, this.height, cols, rows);
+        this.grid = GridUtils.uiGrid(0, 0, this.width, this.height, cols, rows);
 
         for (let r = 0; r < rows; r++) {
             this.cellAreas[r] = [];
@@ -64,16 +63,18 @@ export class DataDisplayer extends CustomContainer {
         col: number,
         row: number,
         value: string | number | { icon: string },
-        iconSize?: number,
+        iconSize?: number
     ) {
         const area = this.cellAreas[row]?.[col];
         if (!area) return;
         let obj: UiObject;
         if (typeof value === "string" || typeof value === "number") {
-            obj = this.scene.add.text(0, 0, value.toString(), {
-                fontSize: "20px",
-                color: "#fff"
-            }).setOrigin(0.5);
+            obj = this.scene.add
+                .text(0, 0, value.toString(), {
+                    fontSize: "20px",
+                    color: "#fff",
+                })
+                .setOrigin(0.5);
         } else if (value.icon) {
             obj = this.scene.add.image(0, 0, value.icon);
             obj.setDisplaySize(iconSize || 32, iconSize || 32);
@@ -84,3 +85,4 @@ export class DataDisplayer extends CustomContainer {
         this.add(obj);
     }
 }
+

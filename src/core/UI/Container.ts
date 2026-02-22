@@ -1,6 +1,6 @@
 import Phaser from "phaser";
-import { Color } from "../../data/ColorConfig";
-import { parseColor } from "../Utils";
+import { Color } from "../../config/ColorConfig";
+import { ColorUtils } from "../Utils";
 
 interface ContainerConfig {
     title: string;
@@ -70,7 +70,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             this.borderGraphics = scene.make.graphics({}, false);
             this.manageBorder(
                 this.borderGraphics,
-                parseColor(borderColor),
+                ColorUtils.parseColor(borderColor),
                 borderWidth,
                 width,
                 height,
@@ -96,7 +96,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         borderColor: number,
         borderWidth: number,
         width: number,
-        height: number,
+        height: number
     ) {
         g.clear();
         g.lineStyle(borderWidth, borderColor, 1);
@@ -116,13 +116,13 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             const height = this.height;
 
             this.background.clear();
-            this.background.fillStyle(parseColor(color), alpha);
+            this.background.fillStyle(ColorUtils.parseColor(color), alpha);
             this.background.fillRoundedRect(
                 -width / 2,
                 -height / 2,
                 width,
                 height,
-                10,
+                10
             );
         }
     }
@@ -138,7 +138,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         if (imageKey) {
             const img = this.scene.make.image(
                 { x: 0, y: 0, key: imageKey },
-                false,
+                false
             );
             img.setDisplaySize(width, height);
             img.setOrigin(0.5);
@@ -147,7 +147,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             this.addAt(img, 0);
         } else {
             const bg = this.scene.make.graphics({}, false);
-            bg.fillStyle(parseColor(this.bgColor), this.bgOpacity);
+            bg.fillStyle(ColorUtils.parseColor(this.bgColor), this.bgOpacity);
             bg.fillRoundedRect(-width / 2, -height / 2, width, height, 10);
 
             this.background = bg;
@@ -160,3 +160,4 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         this.titleText.setPosition(0, -this.height / 2 + 15);
     }
 }
+

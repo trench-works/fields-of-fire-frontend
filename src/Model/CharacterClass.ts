@@ -8,7 +8,8 @@ export class CharacterClass {
         public spriteKey: string,
         public iconImageKey: string,
         public stats: Stats,
-        public classDescription : string,
-        public actionList: Action[],
+        public classDescription: string,
+        public actionList: Action[]
     ) {}
 }
+
