@@ -8,9 +8,9 @@ export function scaleAndCenter({
     scaleFactor,
     isometricVariation = false,
 }: ScaleAndCenterParams): ScaleAndCenterResult {
-    // Calcul du scaleFactor si non fourni : 80% de la taille du parent
+    // Calcul du scaleFactor si non fourni : 60% de la taille du parent
     const finalScale =
-        scaleFactor ?? computeScaleFactor(childWidth, childHeight, 0.7);
+        scaleFactor ?? computeScaleFactor(childWidth, childHeight, 0.6);
 
     // Décalage horizontal pour centrer
     const tileWidth = 64;
