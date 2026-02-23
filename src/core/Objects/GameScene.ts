@@ -6,6 +6,7 @@ import { Position } from "../Types/Position";
 import { Action } from "../../Model/Action";
 import { PlayableCharacter } from "../../Model/PlayableCharacter";
 import { RangeVisualizer } from "../../scenes/Fight/objects/RangeVisualizer";
+import { ActionManager } from "../../scenes/Fight/objects/ActionManager";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -39,10 +40,11 @@ export class GameScene extends Scene {
     public gameObjects: GameObject[] = [];
     public characters: Character[] = [];
     public otherPlayers: PlayableCharacter[] = [];
-    public myPlayer: PlayableCharacter | undefined;
+    public myPlayer!: PlayableCharacter;
     public gridPositions: Cell[][] = [];
     public scaleFactor: number = 1;
-    public rangeVisualizer : RangeVisualizer = new RangeVisualizer(this);;
+    public rangeVisualizer : RangeVisualizer = new RangeVisualizer(this);
+    public actionManager : ActionManager = new ActionManager;
 
     spawnEntities() {
         this.characters.forEach((entity) => {
@@ -133,7 +135,7 @@ export class GameScene extends Scene {
                 zone.setDepth(layer.depth + 3);
 
                 // --- DEBUG VISUEL ---
-                this.gridShower(diamond, worldX, worldY, layer);
+                //this.gridShower(diamond, worldX, worldY, layer);
 
                 if (!this.gridPositions[y]) {
                     this.gridPositions[y] = [];
@@ -152,6 +154,10 @@ export class GameScene extends Scene {
                 zone.on("pointerdown", () => {
                     console.log(`Tile clicked: ${x}, ${y}`);
                     this.rangeVisualizer.clearRange();
+                    this.actionManager.clearCurentAction();
+                    if(this.rangeVisualizer.isItInRange(this.myPlayer.position, this.actionManager.currentAction!.props.range!, new Position(x, y))){
+                        this.actionManager.launchAction();
+                    }
                 });
                 zone.on("pointerover", () => {
                     hoverGraphics.setVisible(true);

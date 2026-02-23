@@ -66,18 +66,21 @@ export class RangeVisualizer {
     onActionSelected(origin: Position, range: number | undefined) {
         this.clearRange();
 
-        if (!range) {
+        if (!range && range !== 0) {
             console.log("this action don't have any range");
             return;
         }
+        
         const cells = this.getCellsInRange(origin, range);
 
         this.showRange(cells);
     }
 
     isItInRange(origin: Position, range: number, target: Position): boolean {
-        const dist = Math.abs(origin.x - target.x) + Math.abs(origin.y - target.y);
+        const dist =
+            Math.abs(origin.x - target.x) + Math.abs(origin.y - target.y);
 
         return dist <= range;
     }
 }
+

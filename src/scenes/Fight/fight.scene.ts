@@ -45,14 +45,14 @@ export class FightScene extends GameScene {
             offset: new Position(),
         };
         this.renderConfig.offset = PositionUtils.getMapOffset(
-            this.renderConfig
+            this.renderConfig,
         );
 
         this.characters = this.gameObjects.filter(
-            (obj) => obj instanceof Character
+            (obj) => obj instanceof Character,
         );
         this.otherPlayers = this.characters.filter(
-            (char) => char.id !== "player_1"
+            (char) => char.id !== "player_1",
         ) as PlayableCharacter[];
     }
 
@@ -68,34 +68,34 @@ export class FightScene extends GameScene {
                 actionList: data.class.actionList,
                 scene: this,
             },
-            data.class
+            data.class,
         );
     }
 
     preload() {
         this.load.tilemapTiledJSON(
             this.fightMap,
-            `assets/${this.fightMap}.json`
+            `assets/${this.fightMap}.json`,
         );
         this.load.image("groundTiles", `assets/${this.tileSetImage}.png`);
 
         this.allExistingStats.forEach((stat) =>
-            this.load.image(stat, `assets/icon/icon_${stat}.png`)
+            this.load.image(stat, `assets/icon/icon_${stat}.png`),
         );
 
-        this.characters.push(this.myPlayer!);
+        this.characters.push(this.myPlayer);
         //précharge les image des persos de la scène
         this.characters.forEach((object) => object.preload(this.load));
 
         this.load.image(
             this.backgroundImage,
-            `assets/${this.backgroundImage}.jpg`
+            `assets/${this.backgroundImage}.jpg`,
         );
     }
 
     create() {
         const num = this.otherPlayers.length;
-        this.myPlayer!.name = ` Player ${num + 1}`;
+        this.myPlayer.name = ` Player ${num + 1}`;
 
         const bg = this.add
             .image(0, 0, this.backgroundImage)
@@ -121,14 +121,14 @@ export class FightScene extends GameScene {
             0,
             0,
             actionPanel.width,
-            actionPanel.height
+            actionPanel.height,
         );
         const actionListArea = actionGrid.getArea(0, 1, 9, 7);
 
         const statsTable = new DataDisplayer(this, {
             position: new Position(
                 actionPanel.x - actionPanel.width / 2 + actionListArea.centerX,
-                actionPanel.y - actionPanel.height / 2 + actionListArea.centerY
+                actionPanel.y - actionPanel.height / 2 + actionListArea.centerY,
             ),
             width: actionListArea.width,
             height: actionListArea.height,
@@ -137,15 +137,26 @@ export class FightScene extends GameScene {
         });
 
         // --- Placement des icônes ---
-        this.myPlayer?.actionList.forEach((actionIcon, index) => {
+        this.myPlayer.actionList.forEach((action, index) => {
+            const rangeManager: number | undefined =
+                action.props.id === "walk"
+                    ? this.myPlayer.baseStats.mouvement
+                    : action.props.range;
+
+            this.actionManager.currentAction = action;
+
             statsTable.placeContent(
                 index,
                 0,
-                { 
-                    icon: actionIcon.props.iconSpriteKey,
-                    onClick: () => this.rangeVisualizer.onActionSelected(this.myPlayer!.position, actionIcon.props.range)
+                {
+                    icon: action.props.iconSpriteKey,
+                    onClick: () =>
+                        this.rangeVisualizer.onActionSelected(
+                            this.myPlayer!.position,
+                            rangeManager,
+                        ),
                 },
-                64
+                64,
             );
         });
 
@@ -172,7 +183,7 @@ export class FightScene extends GameScene {
             0,
             0,
             statsPanel.width,
-            statsPanel.height
+            statsPanel.height,
         );
 
         const imgArea = statsGrid.getArea(0, 0, 3, 4);
@@ -217,7 +228,7 @@ export class FightScene extends GameScene {
         const statsTable = new DataDisplayer(this, {
             position: new Position(
                 statsPanel.x - statsPanel.width / 2 + statValuesArea.centerX,
-                statsPanel.y - statsPanel.height / 2 + statValuesArea.centerY
+                statsPanel.y - statsPanel.height / 2 + statValuesArea.centerY,
             ),
             width: statValuesArea.width,
             height: statValuesArea.height,
