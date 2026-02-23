@@ -21,13 +21,14 @@ export type Cell = {
     gridPosition: Position;
     pixelPosition: Position;
     zone: Phaser.GameObjects.Zone;
+    hoverGraphics?: Phaser.GameObjects.Graphics;
 };
 
 export interface Displayable {
     render(renderConfig: SceneRenderConfig): RenderResult | RenderResult[];
 }
 
-export class GameScene extends Scene  {
+export class GameScene extends Scene {
     public backgroundImage = "red_bg";
     public fightMap = "chessmap";
     public tileSetImage = "damier";
@@ -65,14 +66,14 @@ export class GameScene extends Scene  {
         }
 
         this.renderConfig.offset.add(
-            new Position(centerMap.offsetX, centerMap.offsetY)
+            new Position(centerMap.offsetX, centerMap.offsetY),
         );
 
         const groundLayer = map.createLayer(
             "Ground",
             tileset!,
             centerMap.offsetX,
-            centerMap.offsetY
+            centerMap.offsetY,
         );
 
         if (!groundLayer) {
@@ -89,7 +90,7 @@ export class GameScene extends Scene  {
 
     generatePlayGrid(
         map: Phaser.Tilemaps.Tilemap,
-        layer: Phaser.Tilemaps.TilemapLayer
+        layer: Phaser.Tilemaps.TilemapLayer,
     ) {
         for (let y = 0; y < map.height; y++) {
             for (let x = 0; x < map.width; x++) {
@@ -119,6 +120,13 @@ export class GameScene extends Scene  {
                     0,
                 ]);
 
+                const hoverGraphics = this.add.graphics();
+                hoverGraphics.lineStyle(2, 0xffffff, 1); // contour blanc
+                hoverGraphics.strokePoints(diamond.points, true);
+                hoverGraphics.setPosition(worldX, worldY);
+                hoverGraphics.setDepth(layer.depth + 5);
+                hoverGraphics.setVisible(false);
+
                 zone.setInteractive(diamond, Phaser.Geom.Polygon.Contains);
                 zone.setDepth(layer.depth + 3);
 
@@ -133,13 +141,20 @@ export class GameScene extends Scene  {
                     gridPosition: new Position(x, y),
                     pixelPosition: new Position(
                         worldX,
-                        worldY - Yof * this.scaleFactor
+                        worldY - Yof * this.scaleFactor,
                     ),
                     zone,
+                    hoverGraphics,
                 };
 
                 zone.on("pointerdown", () => {
                     console.log(`Tile clicked: ${x}, ${y}`);
+                });
+                zone.on("pointerover", () => {
+                    hoverGraphics.setVisible(true);
+                });
+                zone.on("pointerout", () => {
+                    hoverGraphics.setVisible(false);
                 });
 
                 (tile as any).zone = zone;
@@ -150,7 +165,7 @@ export class GameScene extends Scene  {
         diamond: Phaser.Geom.Polygon,
         worldX: number,
         worldY: number,
-        layer: Phaser.Tilemaps.TilemapLayer
+        layer: Phaser.Tilemaps.TilemapLayer,
     ) {
         const g = this.add.graphics();
         g.lineStyle(2, 0xff0000, 1); // contour rouge
