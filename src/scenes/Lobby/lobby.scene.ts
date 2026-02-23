@@ -28,6 +28,7 @@ export class LobbyScene extends Phaser.Scene {
             description: "Attaquer un ennemi à portée",
             iconSpriteKey: "action_image_shoot",
             cost: 2,
+            range: 4
         }),
         new Action({
             id: "arrowup",
@@ -35,6 +36,7 @@ export class LobbyScene extends Phaser.Scene {
             description: "buff un allié",
             iconSpriteKey: "action_image_arrowup",
             cost: 1,
+            range : 0
         }),
     ];
     private allExistingClass: CharacterClass[] = [

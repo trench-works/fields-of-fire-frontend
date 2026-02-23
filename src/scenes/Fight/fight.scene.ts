@@ -1,4 +1,4 @@
-import { Character } from "../../Model/Character";
+import { Character } from "./objects/Character";
 import { PlayableCharacter } from "../../Model/PlayableCharacter";
 import {
     Displayable,
@@ -13,15 +13,14 @@ import {
 import { CharacterClass } from "../../Model/CharacterClass";
 import { SceneConfig } from "../../config/SceneConfig";
 import { Color } from "../../config/ColorConfig";
+import { RangeVisualizer } from "./objects/RangeVisualizer";
 
-export class FightScene extends GameScene implements Displayable {
+export class FightScene extends GameScene {
     public backgroundImage = "red_bg";
     public fightMap = "chessmap";
     public tileSetImage = "damier";
     public tileWidth = 64;
-    private otherPlayers: PlayableCharacter[] = [];
     public renderConfig: SceneRenderConfig;
-    public myPlayer: PlayableCharacter | undefined;
     private sceneGrid = GridUtils.uiGrid(0, 0);
     private allExistingStats: string[] = [
         "life",
@@ -33,6 +32,7 @@ export class FightScene extends GameScene implements Displayable {
         "energy",
         "mouvement",
     ];
+    private rangeVisualizer : RangeVisualizer;
 
     constructor() {
         super({ key: "fightScene" });
@@ -55,6 +55,8 @@ export class FightScene extends GameScene implements Displayable {
         this.otherPlayers = this.characters.filter(
             (char) => char.id !== "player_1"
         ) as PlayableCharacter[];
+
+        this.rangeVisualizer = new RangeVisualizer(this);
     }
 
     init(data: { spawnPos: Position; class: CharacterClass; id: string }) {
@@ -86,31 +88,7 @@ export class FightScene extends GameScene implements Displayable {
 
         this.characters.push(this.myPlayer!);
         //précharge les image des persos de la scène
-        this.characters.forEach((object) => {
-            if (object.spriteKey) {
-                this.load.spritesheet(
-                    object.spriteKey,
-                    `assets/Sprites/${object.spriteKey}.png`,
-                    { frameWidth: 96, frameHeight: 128 }
-                );
-                this.load.image(
-                    this.myPlayer!.iconImageKey,
-                    `assets/${this.myPlayer!.iconImageKey}.png`
-                );
-
-                object.actionList.forEach((action) => {
-                    if (action.props.iconSpriteKey) {
-                        this.load.image(
-                            action.props.iconSpriteKey,
-                            `assets/action/${action.props.iconSpriteKey}.png`
-                        );
-                        console.log(
-                            `assets/action/${action.props.iconSpriteKey}.png`
-                        );
-                    }
-                });
-            }
-        });
+        this.characters.forEach((object) => object.preload(this.load));
 
         this.load.image(
             this.backgroundImage,
@@ -166,7 +144,10 @@ export class FightScene extends GameScene implements Displayable {
             statsTable.placeContent(
                 index,
                 0,
-                { icon: actionIcon.props.iconSpriteKey },
+                { 
+                    icon: actionIcon.props.iconSpriteKey,
+                    onClick: () => this.rangeVisualizer.onActionSelected(this.myPlayer!.position, actionIcon.props.range)
+                },
                 64
             );
         });

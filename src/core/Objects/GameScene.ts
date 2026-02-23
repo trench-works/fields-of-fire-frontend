@@ -1,8 +1,10 @@
 import { Scene } from "phaser";
-import { Character } from "../../Model/Character";
+import { Character } from "../../scenes/Fight/objects/Character";
 import { GameObject } from "./GameObject";
 import { scaleAndCenter } from "../Utils/Scale";
 import { Position } from "../Types/Position";
+import { Action } from "../../Model/Action";
+import { PlayableCharacter } from "../../Model/PlayableCharacter";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -25,7 +27,7 @@ export interface Displayable {
     render(renderConfig: SceneRenderConfig): RenderResult | RenderResult[];
 }
 
-export class GameScene extends Scene implements Displayable {
+export class GameScene extends Scene  {
     public backgroundImage = "red_bg";
     public fightMap = "chessmap";
     public tileSetImage = "damier";
@@ -34,6 +36,8 @@ export class GameScene extends Scene implements Displayable {
     public displayObjects: Displayable[] = [];
     public gameObjects: GameObject[] = [];
     public characters: Character[] = [];
+    public otherPlayers: PlayableCharacter[] = [];
+    public myPlayer: PlayableCharacter | undefined;
     public gridPositions: Cell[][] = [];
     public scaleFactor: number = 1;
 
@@ -140,25 +144,6 @@ export class GameScene extends Scene implements Displayable {
 
                 (tile as any).zone = zone;
             }
-        }
-    }
-
-    render(): RenderResult[] {
-        const result: RenderResult[] = [];
-        for (const displayable of this.displayObjects) {
-            const renderedElement = displayable.render(this.renderConfig!);
-            result.push(
-                ...(Array.isArray(renderedElement)
-                    ? renderedElement
-                    : [renderedElement])
-            );
-        }
-        return result;
-    }
-
-    async recalculate(): Promise<void> {
-        for (const gameObject of this.gameObjects) {
-            await gameObject.recalculate();
         }
     }
     gridShower(
