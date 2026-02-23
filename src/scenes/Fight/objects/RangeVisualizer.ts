@@ -1,11 +1,9 @@
 import { Cell, GameScene, Position } from "../../../core";
 
-export class RangeVisualizer{
+export class RangeVisualizer {
+    public scene: GameScene;
 
-    public scene : GameScene;
-    
-
-    constructor(scene : GameScene){
+    constructor(scene: GameScene) {
         this.scene = scene;
     }
 
@@ -14,12 +12,18 @@ export class RangeVisualizer{
         g.fillStyle(0x00aaff, 0.6); // bleu transparent
         g.fillPoints(
             [
-            new Phaser.Geom.Point(-32 * this.scene.scaleFactor, 0 * this.scene.scaleFactor),
-            new Phaser.Geom.Point(0, -16 * this.scene.scaleFactor),
-            new Phaser.Geom.Point(32 * this.scene.scaleFactor, 0 * this.scene.scaleFactor),
-            new Phaser.Geom.Point(0, 16 * this.scene.scaleFactor),
+                new Phaser.Geom.Point(
+                    -32 * this.scene.scaleFactor,
+                    0 * this.scene.scaleFactor,
+                ),
+                new Phaser.Geom.Point(0, -16 * this.scene.scaleFactor),
+                new Phaser.Geom.Point(
+                    32 * this.scene.scaleFactor,
+                    0 * this.scene.scaleFactor,
+                ),
+                new Phaser.Geom.Point(0, 16 * this.scene.scaleFactor),
             ],
-            true
+            true,
         );
 
         g.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
@@ -30,7 +34,7 @@ export class RangeVisualizer{
     }
 
     showRange(cells: Cell[]) {
-        cells.forEach(cell => this.highlightCell(cell));
+        cells.forEach((cell) => this.highlightCell(cell));
     }
 
     clearRange() {
@@ -59,17 +63,21 @@ export class RangeVisualizer{
         return result;
     }
 
+    onActionSelected(origin: Position, range: number | undefined) {
+        this.clearRange();
 
-    onActionSelected(origin : Position, range : number | undefined) {
-    this.clearRange();
+        if (!range) {
+            console.log("this action don't have any range");
+            return;
+        }
+        const cells = this.getCellsInRange(origin, range);
 
-    if (!range){
-        console.log("this action don't have any range");
-        return
+        this.showRange(cells);
     }
-    const cells = this.getCellsInRange(origin, range);
 
-    this.showRange(cells);
-}
+    isItInRange(origin: Position, range: number, target: Position): boolean {
+        const dist = Math.abs(origin.x - target.x) + Math.abs(origin.y - target.y);
 
+        return dist <= range;
+    }
 }

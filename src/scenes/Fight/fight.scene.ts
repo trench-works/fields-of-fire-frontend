@@ -32,7 +32,6 @@ export class FightScene extends GameScene {
         "energy",
         "mouvement",
     ];
-    private rangeVisualizer : RangeVisualizer;
 
     constructor() {
         super({ key: "fightScene" });
@@ -55,8 +54,6 @@ export class FightScene extends GameScene {
         this.otherPlayers = this.characters.filter(
             (char) => char.id !== "player_1"
         ) as PlayableCharacter[];
-
-        this.rangeVisualizer = new RangeVisualizer(this);
     }
 
     init(data: { spawnPos: Position; class: CharacterClass; id: string }) {

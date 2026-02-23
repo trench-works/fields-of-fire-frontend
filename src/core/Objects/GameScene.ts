@@ -5,6 +5,7 @@ import { scaleAndCenter } from "../Utils/Scale";
 import { Position } from "../Types/Position";
 import { Action } from "../../Model/Action";
 import { PlayableCharacter } from "../../Model/PlayableCharacter";
+import { RangeVisualizer } from "../../scenes/Fight/objects/RangeVisualizer";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -41,6 +42,7 @@ export class GameScene extends Scene {
     public myPlayer: PlayableCharacter | undefined;
     public gridPositions: Cell[][] = [];
     public scaleFactor: number = 1;
+    public rangeVisualizer : RangeVisualizer = new RangeVisualizer(this);;
 
     spawnEntities() {
         this.characters.forEach((entity) => {
@@ -149,6 +151,7 @@ export class GameScene extends Scene {
 
                 zone.on("pointerdown", () => {
                     console.log(`Tile clicked: ${x}, ${y}`);
+                    this.rangeVisualizer.clearRange();
                 });
                 zone.on("pointerover", () => {
                     hoverGraphics.setVisible(true);
