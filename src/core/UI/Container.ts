@@ -16,6 +16,7 @@ interface ContainerConfig {
     opacity?: number;
     fontsize?: number;
     onClick?: () => void;
+    textPosition?: { x: number; y: number };
 }
 
 export class CustomContainer extends Phaser.GameObjects.Container {
@@ -25,6 +26,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         | null = null;
     private borderGraphics?: Phaser.GameObjects.Graphics;
     private titleText: Phaser.GameObjects.Text;
+    private onClick: (() => void) | undefined;
     private bgColor: string;
     private bgOpacity: number;
 
@@ -43,12 +45,14 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             opacity = 1,
             fontsize = 24,
             onClick,
+            textPosition = { x: 0, y: -height / 2 + 15 },
         } = config;
 
         super(scene, x, y);
 
         this.bgColor = bgColor; // <--- IMPORTANT
         this.bgOpacity = opacity;
+        this.onClick = onClick;
 
         // --- TEXTE ---
         this.titleText = scene.add
@@ -79,7 +83,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         }
 
         // --- TITRE ---
-        this.titleText.setPosition(0, -height / 2 + 15);
+        this.titleText.setPosition(textPosition.x, textPosition.y);
         this.add(this.titleText);
 
         // --- INTERACTIVITÉ ---
@@ -87,6 +91,10 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             this.setInteractive();
             this.on("pointerdown", () => onClick());
         }
+
+        // --- AJOUT DE L'ACTION ---
+        this.setupEvents();
+
 
         scene.add.existing(this);
     }
@@ -154,6 +162,27 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             this.addAt(bg, 0);
         }
     }
+
+    private setupEvents() {
+            this.on("pointerdown", () => {
+                console.log("Button clicked!");
+                this.onClick?.();
+            });
+    
+            this.on("pointerover", () => {
+                console.log("Hover over button");
+                if (this.background instanceof Phaser.GameObjects.Image) {
+                    this.background.setTint(0xcccccc);
+                }
+            });
+    
+            this.on("pointerout", () => {
+                console.log("Hover out button");
+                if (this.background instanceof Phaser.GameObjects.Image) {
+                    this.background.clearTint();
+                }
+            });
+        }
 
     public setTitle(newTitle: string) {
         this.titleText.setText(newTitle);

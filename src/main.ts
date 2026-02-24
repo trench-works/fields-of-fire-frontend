@@ -1,4 +1,5 @@
 import { Game } from "phaser";
+import { MainMenu } from "./scenes/MainMenu/main-menu.scene";
 import { FightScene } from "./scenes/Fight/fight.scene";
 import { LobbyScene } from "./scenes/Lobby/lobby.scene";
 
@@ -15,7 +16,7 @@ const config = {
         default: "arcade",
         arcade: { debug: false },
     },
-    scene: [LobbyScene, FightScene],
+    scene: [MainMenu, LobbyScene, FightScene],
 };
 
 export default new Game(config);
