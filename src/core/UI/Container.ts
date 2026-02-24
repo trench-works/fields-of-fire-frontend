@@ -17,6 +17,7 @@ interface ContainerConfig {
     fontsize?: number;
     onClick?: () => void;
     textPosition?: { x: number; y: number };
+    hoverTint?: number;
 }
 
 export class CustomContainer extends Phaser.GameObjects.Container {
@@ -29,6 +30,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
     private onClick: (() => void) | undefined;
     private bgColor: string;
     private bgOpacity: number;
+    private hoverTint: number | undefined;
 
     constructor(scene: Phaser.Scene, config: ContainerConfig) {
         const {
@@ -46,6 +48,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             fontsize = 24,
             onClick,
             textPosition = { x: 0, y: -height / 2 + 15 },
+            hoverTint,
         } = config;
 
         super(scene, x, y);
@@ -53,6 +56,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         this.bgColor = bgColor; // <--- IMPORTANT
         this.bgOpacity = opacity;
         this.onClick = onClick;
+        this.hoverTint = hoverTint;
 
         // --- TEXTE ---
         this.titleText = scene.add
@@ -171,8 +175,8 @@ export class CustomContainer extends Phaser.GameObjects.Container {
     
             this.on("pointerover", () => {
                 console.log("Hover over button");
-                if (this.background instanceof Phaser.GameObjects.Image) {
-                    this.background.setTint(0xcccccc);
+                if (this.hoverTint !== undefined && this.background instanceof Phaser.GameObjects.Image) {
+                    this.background.setTint(this.hoverTint);
                 }
             });
     

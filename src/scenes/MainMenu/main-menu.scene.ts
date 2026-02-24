@@ -60,6 +60,7 @@ export class MainMenu extends Phaser.Scene {
             titleColor: "#FFFFFF",
             fontsize: 50,
             textPosition: { x: -130, y: -10 },
+            hoverTint: 0xcccccc,
             onClick: () => {
                 this.scene.start("lobbyScene");
             },
@@ -77,6 +78,7 @@ export class MainMenu extends Phaser.Scene {
             titleColor: "#FFFFFF",
             fontsize: 50,
             textPosition: { x: -70, y: -10 },
+            hoverTint: 0xcccccc,
             onClick: () => {
                 console.log("Paramètres - À implémenter");
             },
@@ -94,6 +96,7 @@ export class MainMenu extends Phaser.Scene {
             titleColor: "#FFFFFF",
             fontsize: 50,
             textPosition: { x: -130, y: -10 },
+            hoverTint: 0xcccccc,
             onClick: () => {
                 this.scene.start("lobbyScene");
             },
