@@ -1,7 +1,6 @@
-import { Character } from "../../Model/Character";
+import { Character } from "./objects/Character";
 import { PlayableCharacter } from "../../Model/PlayableCharacter";
 import {
-    Displayable,
     GameScene,
     SceneRenderConfig,
     DataDisplayer,
@@ -13,15 +12,16 @@ import {
 import { CharacterClass } from "../../Model/CharacterClass";
 import { SceneConfig } from "../../config/SceneConfig";
 import { Color } from "../../config/ColorConfig";
+import { RangeVisualizer } from "./objects/RangeVisualizer";
+import { GamePlayerSocket } from "./repositories/player.repository";
+import { ActionManager } from "./objects/ActionManager";
 
-export class FightScene extends GameScene implements Displayable {
+export class FightScene extends GameScene {
     public backgroundImage = "red_bg";
     public fightMap = "chessmap";
     public tileSetImage = "damier";
     public tileWidth = 64;
-    private otherPlayers: PlayableCharacter[] = [];
     public renderConfig: SceneRenderConfig;
-    public myPlayer: PlayableCharacter | undefined;
     private sceneGrid = GridUtils.uiGrid(0, 0);
     private allExistingStats: string[] = [
         "life",
@@ -33,6 +33,9 @@ export class FightScene extends GameScene implements Displayable {
         "energy",
         "mouvement",
     ];
+    public playerSocket!: GamePlayerSocket;
+    public actionManager: ActionManager = new ActionManager(this);
+    public rangeVisualizer: RangeVisualizer = new RangeVisualizer(this);
 
     constructor() {
         super({ key: "fightScene" });
@@ -46,14 +49,14 @@ export class FightScene extends GameScene implements Displayable {
             offset: new Position(),
         };
         this.renderConfig.offset = PositionUtils.getMapOffset(
-            this.renderConfig
+            this.renderConfig,
         );
 
         this.characters = this.gameObjects.filter(
-            (obj) => obj instanceof Character
+            (obj) => obj instanceof Character,
         );
         this.otherPlayers = this.characters.filter(
-            (char) => char.id !== "player_1"
+            (char) => char.id !== "player_1",
         ) as PlayableCharacter[];
     }
 
@@ -69,58 +72,36 @@ export class FightScene extends GameScene implements Displayable {
                 actionList: data.class.actionList,
                 scene: this,
             },
-            data.class
+            data.class,
         );
     }
 
     preload() {
         this.load.tilemapTiledJSON(
             this.fightMap,
-            `assets/${this.fightMap}.json`
+            `assets/${this.fightMap}.json`,
         );
         this.load.image("groundTiles", `assets/${this.tileSetImage}.png`);
 
         this.allExistingStats.forEach((stat) =>
-            this.load.image(stat, `assets/icon/icon_${stat}.png`)
+            this.load.image(stat, `assets/icon/icon_${stat}.png`),
         );
 
-        this.characters.push(this.myPlayer!);
+        this.characters.push(this.myPlayer);
         //précharge les image des persos de la scène
-        this.characters.forEach((object) => {
-            if (object.spriteKey) {
-                this.load.spritesheet(
-                    object.spriteKey,
-                    `assets/Sprites/${object.spriteKey}.png`,
-                    { frameWidth: 96, frameHeight: 128 }
-                );
-                this.load.image(
-                    this.myPlayer!.iconImageKey,
-                    `assets/${this.myPlayer!.iconImageKey}.png`
-                );
-
-                object.actionList.forEach((action) => {
-                    if (action.props.iconSpriteKey) {
-                        this.load.image(
-                            action.props.iconSpriteKey,
-                            `assets/action/${action.props.iconSpriteKey}.png`
-                        );
-                        console.log(
-                            `assets/action/${action.props.iconSpriteKey}.png`
-                        );
-                    }
-                });
-            }
-        });
+        this.characters.forEach((object) => object.preload(this.load));
 
         this.load.image(
             this.backgroundImage,
-            `assets/${this.backgroundImage}.jpg`
+            `assets/${this.backgroundImage}.jpg`,
         );
     }
 
     create() {
+        this.playerSocket = new GamePlayerSocket("3630", this.myPlayer.id);   
+
         const num = this.otherPlayers.length;
-        this.myPlayer!.name = ` Player ${num + 1}`;
+        this.myPlayer.name = ` Player ${num + 1}`;
 
         const bg = this.add
             .image(0, 0, this.backgroundImage)
@@ -128,7 +109,7 @@ export class FightScene extends GameScene implements Displayable {
             .setDepth(-1);
         bg.setDisplaySize(this.scale.width, this.scale.height);
 
-        this.generateMap();
+        this.generateMap(this.actionManager, this.rangeVisualizer);
         this.spawnEntities();
 
         const actionArea = this.sceneGrid.getArea(2, 8, 5, 1);
@@ -146,14 +127,14 @@ export class FightScene extends GameScene implements Displayable {
             0,
             0,
             actionPanel.width,
-            actionPanel.height
+            actionPanel.height,
         );
         const actionListArea = actionGrid.getArea(0, 1, 9, 7);
 
         const statsTable = new DataDisplayer(this, {
             position: new Position(
                 actionPanel.x - actionPanel.width / 2 + actionListArea.centerX,
-                actionPanel.y - actionPanel.height / 2 + actionListArea.centerY
+                actionPanel.y - actionPanel.height / 2 + actionListArea.centerY,
             ),
             width: actionListArea.width,
             height: actionListArea.height,
@@ -162,12 +143,26 @@ export class FightScene extends GameScene implements Displayable {
         });
 
         // --- Placement des icônes ---
-        this.myPlayer?.actionList.forEach((actionIcon, index) => {
+        this.myPlayer.actionList.forEach((action, index) => {
+            const rangeManager: number | undefined =
+                action.props.id === "walk"
+                    ? this.myPlayer.baseStats.mouvement
+                    : action.props.range;
+
             statsTable.placeContent(
                 index,
                 0,
-                { icon: actionIcon.props.iconSpriteKey },
-                64
+                {
+                    icon: action.props.iconSpriteKey,
+                    onClick: () => {
+                        this.rangeVisualizer.onActionSelected(
+                            this.myPlayer!.position,
+                            rangeManager,
+                        );
+                        this.actionManager.currentAction = action;
+                    },
+                },
+                64,
             );
         });
 
@@ -194,7 +189,7 @@ export class FightScene extends GameScene implements Displayable {
             0,
             0,
             statsPanel.width,
-            statsPanel.height
+            statsPanel.height,
         );
 
         const imgArea = statsGrid.getArea(0, 0, 3, 4);
@@ -239,7 +234,7 @@ export class FightScene extends GameScene implements Displayable {
         const statsTable = new DataDisplayer(this, {
             position: new Position(
                 statsPanel.x - statsPanel.width / 2 + statValuesArea.centerX,
-                statsPanel.y - statsPanel.height / 2 + statValuesArea.centerY
+                statsPanel.y - statsPanel.height / 2 + statValuesArea.centerY,
             ),
             width: statValuesArea.width,
             height: statValuesArea.height,
@@ -268,4 +263,3 @@ export class FightScene extends GameScene implements Displayable {
         statsTable.placeContent(3, 2, this.myPlayer!.baseStats.dodging);
     }
 }
-

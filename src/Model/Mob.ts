@@ -1,4 +1,4 @@
-import { Character, CharactersProps } from "./Character";
+import { Character, CharactersProps } from "../scenes/Fight/objects/Character";
 
 export type MobProps = CharactersProps & {
     mobType: string;

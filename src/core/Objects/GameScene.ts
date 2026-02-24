@@ -1,8 +1,12 @@
 import { Scene } from "phaser";
-import { Character } from "../../Model/Character";
+import { Character } from "../../scenes/Fight/objects/Character";
 import { GameObject } from "./GameObject";
 import { scaleAndCenter } from "../Utils/Scale";
 import { Position } from "../Types/Position";
+import { Action } from "../../Model/Action";
+import { PlayableCharacter } from "../../Model/PlayableCharacter";
+import { RangeVisualizer } from "../../scenes/Fight/objects/RangeVisualizer";
+import { ActionManager } from "../../scenes/Fight/objects/ActionManager";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -19,13 +23,14 @@ export type Cell = {
     gridPosition: Position;
     pixelPosition: Position;
     zone: Phaser.GameObjects.Zone;
+    hoverGraphics?: Phaser.GameObjects.Graphics;
 };
 
 export interface Displayable {
     render(renderConfig: SceneRenderConfig): RenderResult | RenderResult[];
 }
 
-export class GameScene extends Scene implements Displayable {
+export class GameScene extends Scene {
     public backgroundImage = "red_bg";
     public fightMap = "chessmap";
     public tileSetImage = "damier";
@@ -34,6 +39,8 @@ export class GameScene extends Scene implements Displayable {
     public displayObjects: Displayable[] = [];
     public gameObjects: GameObject[] = [];
     public characters: Character[] = [];
+    public otherPlayers: PlayableCharacter[] = [];
+    public myPlayer!: PlayableCharacter;
     public gridPositions: Cell[][] = [];
     public scaleFactor: number = 1;
 
@@ -44,7 +51,10 @@ export class GameScene extends Scene implements Displayable {
         });
     }
 
-    generateMap() {
+    generateMap(
+        actionManager: ActionManager,
+        rangeVisualizer: RangeVisualizer,
+    ) {
         const map = this.make.tilemap({ key: this.fightMap });
         const tileset = map.addTilesetImage(this.tileSetImage, "groundTiles");
 
@@ -61,14 +71,14 @@ export class GameScene extends Scene implements Displayable {
         }
 
         this.renderConfig.offset.add(
-            new Position(centerMap.offsetX, centerMap.offsetY)
+            new Position(centerMap.offsetX, centerMap.offsetY),
         );
 
         const groundLayer = map.createLayer(
             "Ground",
             tileset!,
             centerMap.offsetX,
-            centerMap.offsetY
+            centerMap.offsetY,
         );
 
         if (!groundLayer) {
@@ -80,12 +90,14 @@ export class GameScene extends Scene implements Displayable {
         groundLayer.setScale(centerMap.scaleFactor);
         groundLayer.setDepth(0);
 
-        this.generatePlayGrid(map, groundLayer);
+        this.generatePlayGrid(map, groundLayer, actionManager, rangeVisualizer);
     }
 
     generatePlayGrid(
         map: Phaser.Tilemaps.Tilemap,
-        layer: Phaser.Tilemaps.TilemapLayer
+        layer: Phaser.Tilemaps.TilemapLayer,
+        actionManager: ActionManager,
+        rangeVisualizer: RangeVisualizer,
     ) {
         for (let y = 0; y < map.height; y++) {
             for (let x = 0; x < map.width; x++) {
@@ -115,11 +127,18 @@ export class GameScene extends Scene implements Displayable {
                     0,
                 ]);
 
+                const hoverGraphics = this.add.graphics();
+                hoverGraphics.lineStyle(2, 0xffffff, 1); // contour blanc
+                hoverGraphics.strokePoints(diamond.points, true);
+                hoverGraphics.setPosition(worldX, worldY);
+                hoverGraphics.setDepth(layer.depth + 5);
+                hoverGraphics.setVisible(false);
+
                 zone.setInteractive(diamond, Phaser.Geom.Polygon.Contains);
                 zone.setDepth(layer.depth + 3);
 
                 // --- DEBUG VISUEL ---
-                this.gridShower(diamond, worldX, worldY, layer);
+                //this.gridShower(diamond, worldX, worldY, layer);
 
                 if (!this.gridPositions[y]) {
                     this.gridPositions[y] = [];
@@ -129,43 +148,49 @@ export class GameScene extends Scene implements Displayable {
                     gridPosition: new Position(x, y),
                     pixelPosition: new Position(
                         worldX,
-                        worldY - Yof * this.scaleFactor
+                        worldY - Yof * this.scaleFactor,
                     ),
                     zone,
+                    hoverGraphics,
                 };
 
                 zone.on("pointerdown", () => {
                     console.log(`Tile clicked: ${x}, ${y}`);
+
+                   
+                    const rangeManager: number | undefined =
+                        actionManager.currentAction?.props.id === "walk"
+                            ? this.myPlayer.baseStats.mouvement
+                            : actionManager.currentAction?.props.range;
+
+                    if (
+                        rangeVisualizer.isItInRange(
+                            this.myPlayer.position,
+                            rangeManager!,
+                            new Position(x, y),
+                        )
+                    ) {
+                        actionManager.launchAction(new Position(x, y));
+                    }
+
+                    rangeVisualizer.clearRange();
+                });
+                zone.on("pointerover", () => {
+                    hoverGraphics.setVisible(true);
+                });
+                zone.on("pointerout", () => {
+                    hoverGraphics.setVisible(false);
                 });
 
                 (tile as any).zone = zone;
             }
         }
     }
-
-    render(): RenderResult[] {
-        const result: RenderResult[] = [];
-        for (const displayable of this.displayObjects) {
-            const renderedElement = displayable.render(this.renderConfig!);
-            result.push(
-                ...(Array.isArray(renderedElement)
-                    ? renderedElement
-                    : [renderedElement])
-            );
-        }
-        return result;
-    }
-
-    async recalculate(): Promise<void> {
-        for (const gameObject of this.gameObjects) {
-            await gameObject.recalculate();
-        }
-    }
     gridShower(
         diamond: Phaser.Geom.Polygon,
         worldX: number,
         worldY: number,
-        layer: Phaser.Tilemaps.TilemapLayer
+        layer: Phaser.Tilemaps.TilemapLayer,
     ) {
         const g = this.add.graphics();
         g.lineStyle(2, 0xff0000, 1); // contour rouge
@@ -174,4 +199,3 @@ export class GameScene extends Scene implements Displayable {
         g.setDepth(layer.depth + 4);
     }
 }
-
