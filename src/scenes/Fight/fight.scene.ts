@@ -1,7 +1,6 @@
 import { Character } from "./objects/Character";
 import { PlayableCharacter } from "../../Model/PlayableCharacter";
 import {
-    Displayable,
     GameScene,
     SceneRenderConfig,
     DataDisplayer,
@@ -14,6 +13,8 @@ import { CharacterClass } from "../../Model/CharacterClass";
 import { SceneConfig } from "../../config/SceneConfig";
 import { Color } from "../../config/ColorConfig";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
+import { GamePlayerSocket } from "./repositories/player.repository";
+import { ActionManager } from "./objects/ActionManager";
 
 export class FightScene extends GameScene {
     public backgroundImage = "red_bg";
@@ -32,6 +33,9 @@ export class FightScene extends GameScene {
         "energy",
         "mouvement",
     ];
+    public playerSocket!: GamePlayerSocket;
+    public actionManager: ActionManager = new ActionManager(this);
+    public rangeVisualizer: RangeVisualizer = new RangeVisualizer(this);
 
     constructor() {
         super({ key: "fightScene" });
@@ -94,6 +98,8 @@ export class FightScene extends GameScene {
     }
 
     create() {
+        this.playerSocket = new GamePlayerSocket("3630", this.myPlayer.id);   
+
         const num = this.otherPlayers.length;
         this.myPlayer.name = ` Player ${num + 1}`;
 
@@ -103,7 +109,7 @@ export class FightScene extends GameScene {
             .setDepth(-1);
         bg.setDisplaySize(this.scale.width, this.scale.height);
 
-        this.generateMap();
+        this.generateMap(this.actionManager, this.rangeVisualizer);
         this.spawnEntities();
 
         const actionArea = this.sceneGrid.getArea(2, 8, 5, 1);
@@ -143,18 +149,18 @@ export class FightScene extends GameScene {
                     ? this.myPlayer.baseStats.mouvement
                     : action.props.range;
 
-            this.actionManager.currentAction = action;
-
             statsTable.placeContent(
                 index,
                 0,
                 {
                     icon: action.props.iconSpriteKey,
-                    onClick: () =>
+                    onClick: () => {
                         this.rangeVisualizer.onActionSelected(
                             this.myPlayer!.position,
                             rangeManager,
-                        ),
+                        );
+                        this.actionManager.currentAction = action;
+                    },
                 },
                 64,
             );
@@ -257,4 +263,3 @@ export class FightScene extends GameScene {
         statsTable.placeContent(3, 2, this.myPlayer!.baseStats.dodging);
     }
 }
-

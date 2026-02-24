@@ -43,8 +43,6 @@ export class GameScene extends Scene {
     public myPlayer!: PlayableCharacter;
     public gridPositions: Cell[][] = [];
     public scaleFactor: number = 1;
-    public rangeVisualizer : RangeVisualizer = new RangeVisualizer(this);
-    public actionManager : ActionManager = new ActionManager;
 
     spawnEntities() {
         this.characters.forEach((entity) => {
@@ -53,7 +51,10 @@ export class GameScene extends Scene {
         });
     }
 
-    generateMap() {
+    generateMap(
+        actionManager: ActionManager,
+        rangeVisualizer: RangeVisualizer,
+    ) {
         const map = this.make.tilemap({ key: this.fightMap });
         const tileset = map.addTilesetImage(this.tileSetImage, "groundTiles");
 
@@ -89,12 +90,14 @@ export class GameScene extends Scene {
         groundLayer.setScale(centerMap.scaleFactor);
         groundLayer.setDepth(0);
 
-        this.generatePlayGrid(map, groundLayer);
+        this.generatePlayGrid(map, groundLayer, actionManager, rangeVisualizer);
     }
 
     generatePlayGrid(
         map: Phaser.Tilemaps.Tilemap,
         layer: Phaser.Tilemaps.TilemapLayer,
+        actionManager: ActionManager,
+        rangeVisualizer: RangeVisualizer,
     ) {
         for (let y = 0; y < map.height; y++) {
             for (let x = 0; x < map.width; x++) {
@@ -153,11 +156,24 @@ export class GameScene extends Scene {
 
                 zone.on("pointerdown", () => {
                     console.log(`Tile clicked: ${x}, ${y}`);
-                    this.rangeVisualizer.clearRange();
-                    this.actionManager.clearCurentAction();
-                    if(this.rangeVisualizer.isItInRange(this.myPlayer.position, this.actionManager.currentAction!.props.range!, new Position(x, y))){
-                        this.actionManager.launchAction();
+
+                   
+                    const rangeManager: number | undefined =
+                        actionManager.currentAction?.props.id === "walk"
+                            ? this.myPlayer.baseStats.mouvement
+                            : actionManager.currentAction?.props.range;
+
+                    if (
+                        rangeVisualizer.isItInRange(
+                            this.myPlayer.position,
+                            rangeManager!,
+                            new Position(x, y),
+                        )
+                    ) {
+                        actionManager.launchAction(new Position(x, y));
                     }
+
+                    rangeVisualizer.clearRange();
                 });
                 zone.on("pointerover", () => {
                     hoverGraphics.setVisible(true);
@@ -183,4 +199,3 @@ export class GameScene extends Scene {
         g.setDepth(layer.depth + 4);
     }
 }
-
