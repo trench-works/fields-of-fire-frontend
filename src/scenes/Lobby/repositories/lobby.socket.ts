@@ -1,7 +1,11 @@
 import { Socket } from "../../../core";
 
 const USER_ID = "dev";
-const GAME_TOPIC = "game";
+const LOBBY_TOPIC = "game";
+
+type LobbyKey = {
+    gameId: string;
+};
 
 type JoinGame = {
     gameId: string;
@@ -23,10 +27,10 @@ enum LobbyEvents {
  * Game Defautl Socket (only for testing purpose, should be removed later)
  */
 
-export class LobbySocket extends Socket<{}, LobbyActions, LobbyEvents> {
-    constructor() {
-        super(GAME_TOPIC);
-        super.open(USER_ID);
+export class LobbySocket extends Socket<LobbyKey, LobbyActions, LobbyEvents> {
+    constructor(gameId: string) {
+        super(LOBBY_TOPIC);
+        super.open(USER_ID, { gameId });
     }
 
     onJoin(listener: (joinedGame: JoinedGame) => void) {
