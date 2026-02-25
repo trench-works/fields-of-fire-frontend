@@ -128,7 +128,7 @@ export class LobbyScene extends Phaser.Scene {
     }
 
     create() {
-        this.lobbySocket = new LobbySocket();
+        this.lobbySocket = new LobbySocket("3630");
 
         console.log(" LobbyScene: ", this.lobbySocket);
 
