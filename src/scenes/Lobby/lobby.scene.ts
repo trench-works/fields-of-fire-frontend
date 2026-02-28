@@ -4,95 +4,15 @@ import {
     TabManager,
     GridUtils,
     Position,
+    Http,
 } from "../../core";
 import { Color } from "../../config/ColorConfig";
-import { Action } from "../../Model/Action";
 import { CharacterClass } from "../../Model/CharacterClass";
-import { Stats } from "../../Model/Stats";
 import { LobbySocket } from "./repositories/lobby.socket";
 
 export class LobbyScene extends Phaser.Scene {
     private backgroundImage = "red_bg";
-    private actions: Action[] = [
-        new Action({
-            id: "walk",
-            name: "Marcher",
-            description: "Se déplacer vers une position ciblée",
-            iconSpriteKey: "action_image_moove",
-            cost: 0,
-            isWalkAction: true,
-        }),
-        new Action({
-            id: "shoot",
-            name: "Attaquer",
-            description: "Attaquer un ennemi à portée",
-            iconSpriteKey: "action_image_shoot",
-            cost: 2,
-        }),
-        new Action({
-            id: "arrowup",
-            name: "Soigner",
-            description: "buff un allié",
-            iconSpriteKey: "action_image_arrowup",
-            cost: 1,
-        }),
-    ];
-    private allExistingClass: CharacterClass[] = [
-        new CharacterClass(
-            "Fantassin",
-            "entente_fantassin",
-            "entente_fantassin_spritesheet",
-            "entente_fantassin_closeup",
-            new Stats({
-                life: 24,
-                precision: 10,
-                strength: 20,
-                accuracy: 100,
-                initiative: 80,
-                dodging: 0,
-                energy: 4,
-                mouvement: 3,
-            }),
-            "Un soldat polyvalent, capable de s'adapter à différentes situations sur le champ de bataille. Il est équipé d'une armure légère et d'une épée, ce qui lui permet de se déplacer rapidement et d'attaquer efficacement à courte portée. Le Fantassin est également capable d'utiliser des compétences de soutien pour renforcer ses alliés ou affaiblir ses ennemis.",
-            this.actions
-        ),
-        new CharacterClass(
-            "Medic",
-            "entente_medic",
-            "entente_medic_spritesheet",
-            "entente_medic_closeup",
-            new Stats({
-                life: 16,
-                precision: 5,
-                strength: 10,
-                accuracy: 100,
-                initiative: 70,
-                dodging: 5,
-                energy: 4,
-                mouvement: 2,
-            }),
-            "Un soigneur spécialisé dans le soutien de ses alliés. Le Medic est équipé d'une armure légère et d'un pistolet, ce qui lui permet de se déplacer rapidement et d'attaquer à distance. Sa principale force réside dans sa capacité à soigner les blessures de ses alliés et à fournir des buffs pour améliorer leurs performances au combat.",
-            this.actions
-        ),
-        new CharacterClass(
-            "Caporal",
-            "entente_caporal",
-            "entente_caporal_spritesheet",
-            "entente_caporal_closeup",
-            new Stats({
-                life: 20,
-                precision: 15,
-                strength: 30,
-                accuracy: 100,
-                initiative: 90,
-                dodging: 5,
-                energy: 4,
-                mouvement: 4,
-            }),
-            "Un combattant robuste et discipliné, le Caporal est équipé d'une armure lourde et d'une hache, ce qui lui permet de résister aux attaques ennemies et de causer des dégâts importants à courte portée. Il excelle dans les combats rapprochés et peut utiliser des compétences pour augmenter sa défense ou infliger des dégâts supplémentaires à ses adversaires.",
-            this.actions
-        ),
-    ];
+    private allExistingClass: CharacterClass[] = [];
     private currentSelectedClassKey: string | null = "entente_medic";
     private SelectedClass: CharacterClass | null =
         this.allExistingClass.find(
@@ -106,6 +26,9 @@ export class LobbyScene extends Phaser.Scene {
 
     constructor() {
         super({ key: "lobbyScene" });
+        Http.fetch<CharacterClass>("/class").then((data) => {
+            this.allExistingClass = data;
+        });
     }
 
     preload() {
