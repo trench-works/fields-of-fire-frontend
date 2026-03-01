@@ -11,8 +11,8 @@ class ActionAssetManager extends ImageAssetManager<ActionAssetId, string> {
         return Object.values(ActionAssetId);
     }
 
-    protected getAssetFileLink(asset: string): string {
-        return `assets/action/${asset}.png`;
+    protected getAssetFileLink(assetKey: string, asset: string): string {
+        return `assets/${assetKey}/${asset}.png`;
     }
 
     constructor() {

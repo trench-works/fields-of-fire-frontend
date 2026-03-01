@@ -14,7 +14,7 @@ class BackgroundAssetManager extends ImageAssetManager<
         return Object.values(BackgroundAssetId);
     }
 
-    protected getAssetFileLink(asset: string): string {
+    protected getAssetFileLink(assetKey: string, asset: string): string {
         return `assets/${asset}.png`;
     }
 
