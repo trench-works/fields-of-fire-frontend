@@ -119,12 +119,12 @@ export class Button extends Phaser.GameObjects.Container {
 
     private setupEvents() {
         this.on("pointerdown", () => {
-            console.log("Button clicked!");
+            //console.log("Button clicked!");
             this.onClick();
         });
 
         this.on("pointerover", () => {
-            console.log("Hover over button");
+            //console.log("Hover over button");
             if (this.hoverColor) {
                 this.bg.setFillStyle(
                     Phaser.Display.Color.HexStringToColor(this.hoverColor).color
@@ -133,7 +133,7 @@ export class Button extends Phaser.GameObjects.Container {
         });
 
         this.on("pointerout", () => {
-            console.log("Hover out button");
+            //console.log("Hover out button");
             this.bg.setFillStyle(
                 Phaser.Display.Color.HexStringToColor(this.color).color
             );

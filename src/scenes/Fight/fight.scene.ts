@@ -13,6 +13,7 @@ import {
 import { CharacterClass } from "../../Model/CharacterClass";
 import { SceneConfig } from "../../config/SceneConfig";
 import { Color } from "../../config/ColorConfig";
+import { ActionAsset } from "../../assets";
 
 export class FightScene extends GameScene implements Displayable {
     public backgroundImage = "red_bg";
@@ -85,6 +86,7 @@ export class FightScene extends GameScene implements Displayable {
         );
 
         this.characters.push(this.myPlayer!);
+        ActionAsset.loadAll(this.load);
         //précharge les image des persos de la scène
         this.characters.forEach((object) => {
             if (object.spriteKey) {
@@ -97,18 +99,6 @@ export class FightScene extends GameScene implements Displayable {
                     this.myPlayer!.iconImageKey,
                     `assets/${this.myPlayer!.iconImageKey}.png`
                 );
-
-                object.actionList.forEach((action) => {
-                    if (action.props.iconSpriteKey) {
-                        this.load.image(
-                            action.props.iconSpriteKey,
-                            `assets/action/${action.props.iconSpriteKey}.png`
-                        );
-                        console.log(
-                            `assets/action/${action.props.iconSpriteKey}.png`
-                        );
-                    }
-                });
             }
         });
 
@@ -162,11 +152,11 @@ export class FightScene extends GameScene implements Displayable {
         });
 
         // --- Placement des icônes ---
-        this.myPlayer?.actionList.forEach((actionIcon, index) => {
+        this.myPlayer?.actionList.forEach((action, index) => {
             statsTable.placeContent(
                 index,
                 0,
-                { icon: actionIcon.props.iconSpriteKey },
+                { icon: ActionAsset.getAssetKey(action.id) },
                 64
             );
         });

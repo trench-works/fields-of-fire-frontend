@@ -1,4 +1,5 @@
-const SOCKET_SERVER_URL = "http://localhost:3000";
+const SOCKET_SERVER_URL = "localhost";
+const SOCKET_SERVER_PORT = 3000;
 
 type InputAction<Actions> = { actionId: Actions; payload: any };
 
@@ -20,7 +21,9 @@ export class Socket<
     protected open(userId: string, key?: RessourceKey) {
         this.userId = userId;
         this.key = key;
-        this.socket = new WebSocket(`${SOCKET_SERVER_URL}/${this.topic}`);
+        this.socket = new WebSocket(
+            `ws://${SOCKET_SERVER_URL}:${SOCKET_SERVER_PORT}/${this.topic}`
+        );
         this.socket.addEventListener("open", this.onOpen.bind(this));
         this.socket.addEventListener("message", this.handleMessage.bind(this));
     }

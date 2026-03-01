@@ -1,5 +1,9 @@
 import Phaser from "phaser";
 import { CustomContainer, GridUtils } from "../../core";
+import {
+    BackgroundAsset,
+    BackgroundAssetId,
+} from "../../assets/BackgroundAsset";
 
 export class MainMenu extends Phaser.Scene {
     private readonly BUTTON_WIDTH = 500;
@@ -12,7 +16,7 @@ export class MainMenu extends Phaser.Scene {
 
     preload() {
         // Charger les images nécessaires
-        this.load.image("mainMenuBackGround", "assets/mainMenuBackGround.png");
+        BackgroundAsset.load(this.load, BackgroundAssetId.MAIN_MENU);
         this.load.image("menuBalle", "assets/menuBalle.png");
     }
 
@@ -21,21 +25,18 @@ export class MainMenu extends Phaser.Scene {
         const bgImage = this.add.image(
             this.scale.width / 2,
             this.scale.height / 2,
-            "mainMenuBackGround"
+            BackgroundAsset.getAssetKey(BackgroundAssetId.MAIN_MENU)
         );
         bgImage.setDisplaySize(this.scale.width, this.scale.height);
         bgImage.setOrigin(0.5);
 
         // Créer un titre du menu
-        this.add.text(
-            this.scale.width / 2,
-            200,
-            "Les Mémoires Oubliées",
-            {
+        this.add
+            .text(this.scale.width / 2, 200, "Les Mémoires Oubliées", {
                 font: "72px Arial",
                 color: "#FFFFFF",
-            }
-        ).setOrigin(0.5);
+            })
+            .setOrigin(0.5);
 
         // Zone des boutons (centrer verticalement: colonne 2-7, ligne 3-6)
         const buttonsArea = this.sceneGrid.getArea(4.5, 3, 0, 15);

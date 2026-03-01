@@ -9,15 +9,12 @@ import {
 import { Color } from "../../config/ColorConfig";
 import { CharacterClass } from "../../Model/CharacterClass";
 import { LobbySocket } from "./repositories/lobby.socket";
+import { ActionAsset } from "../../assets";
 
 export class LobbyScene extends Phaser.Scene {
     private backgroundImage = "red_bg";
     private allExistingClass: CharacterClass[] = [];
-    private currentSelectedClassKey: string | null = "entente_medic";
-    private SelectedClass: CharacterClass | null =
-        this.allExistingClass.find(
-            (charClass) => charClass.imageKey === this.currentSelectedClassKey
-        ) || null;
+    private selectClassId: string | null = "entente_medic";
     private tabWidth!: number;
     private tabHeight!: number;
     private playerImageContainer!: CustomContainer;
@@ -41,12 +38,9 @@ export class LobbyScene extends Phaser.Scene {
                 charClass.imageKey,
                 `assets/${charClass.imageKey}.png`
             );
-            charClass.actionList.forEach((action) => {
-                this.load.image(
-                    action.props.iconSpriteKey,
-                    `assets/${action.props.iconSpriteKey}.png`
-                );
-            });
+            charClass.actionList.forEach(({ id }) =>
+                ActionAsset.load(this.load, id)
+            );
         });
     }
 
@@ -61,7 +55,9 @@ export class LobbyScene extends Phaser.Scene {
             );
             this.scene.start("fightScene", {
                 spawnPos: { x: 0, y: 0 },
-                class: this.SelectedClass!,
+                class: this.allExistingClass.find(
+                    ({ id }) => id === this.selectClassId
+                ),
                 id: player.id,
             });
         });
@@ -127,7 +123,7 @@ export class LobbyScene extends Phaser.Scene {
         tabManager.setPosition(tabArea.x + this.tabWidth / 2, tabArea.y + 20);
 
         this.events.on("class-selected", (charClass: CharacterClass) => {
-            this.SelectedClass = charClass;
+            this.selectClassId = charClass.id;
 
             // Rafraîchir l'image du playerPanel
             this.updatePlayerImage();
@@ -162,7 +158,10 @@ export class LobbyScene extends Phaser.Scene {
         const classNameArea = playerpanelgrid.getArea(0, 5, 9, 0.5);
 
         const playerNameContainer = new CustomContainer(this, {
-            title: this.SelectedClass!.name,
+            title:
+                this.allExistingClass.find(
+                    ({ id }) => id === this.selectClassId
+                )?.name ?? "",
             x: classNameArea.centerX - playerPanelWidth / 2,
             y: classNameArea.centerY - playerPanelHeight / 2 + 10,
             width: classNameArea.width,
@@ -180,7 +179,9 @@ export class LobbyScene extends Phaser.Scene {
             y: imgArea.centerY - playerPanelHeight / 2 + 10,
             width: imgArea.width,
             height: imgArea.height,
-            backgroundImage: this.SelectedClass!.imageKey,
+            backgroundImage: this.allExistingClass.find(
+                ({ id }) => id === this.selectClassId
+            )?.imageKey,
             borderWidth: 5,
         });
         playerPanel.add(playerImageContainer);
@@ -250,15 +251,19 @@ export class LobbyScene extends Phaser.Scene {
     }
 
     updatePlayerImage() {
-        if (!this.SelectedClass) return;
+        if (!this.selectClassId) return;
 
         // Met directement la nouvelle image
         this.playerImageContainer.setBackgroundImage(
-            this.SelectedClass.imageKey
+            this.allExistingClass.find(({ id }) => id === this.selectClassId)
+                ?.imageKey ?? ""
         );
 
         // Met à jour le nom
-        this.playerClassName.setTitle(this.SelectedClass.name);
+        this.playerClassName.setTitle(
+            this.allExistingClass.find(({ id }) => id === this.selectClassId)
+                ?.name ?? ""
+        );
     }
 }
 
