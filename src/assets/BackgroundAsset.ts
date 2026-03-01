@@ -10,27 +10,20 @@ class BackgroundAssetManager extends ImageAssetManager<
     BackgroundAssetId,
     string
 > {
-    getIds(): BackgroundAssetId[] {
+    protected getIds(): BackgroundAssetId[] {
         return Object.values(BackgroundAssetId);
     }
 
-    getAssetFileLink(asset: string): string {
+    protected getAssetFileLink(asset: string): string {
         return `assets/${asset}.png`;
     }
 
     constructor() {
-        super(
-            {
-                [BackgroundAssetId.MAIN_MENU]: "mainMenuBackGround",
-                [BackgroundAssetId.LOBBY]: "red_bg",
-                [BackgroundAssetId.FIGHT]: "red_bg",
-            },
-            {
-                [BackgroundAssetId.MAIN_MENU]: "bkgd_main_menu",
-                [BackgroundAssetId.LOBBY]: "bkgd_lobby",
-                [BackgroundAssetId.FIGHT]: "bkgd_fight",
-            }
-        );
+        super("bkgd", {
+            [BackgroundAssetId.MAIN_MENU]: "mainMenuBackGround",
+            [BackgroundAssetId.LOBBY]: "red_bg",
+            [BackgroundAssetId.FIGHT]: "red_bg",
+        });
     }
 }
 
