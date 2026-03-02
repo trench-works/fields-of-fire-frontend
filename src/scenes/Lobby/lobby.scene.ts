@@ -24,7 +24,7 @@ export class LobbyScene extends Phaser.Scene {
         }),
         new Action({
             id: "shoot",
-            name: "Attaquer",
+            name: "Tirer",
             description: "Attaquer un ennemi à portée",
             iconSpriteKey: "action_image_shoot",
             cost: 2,

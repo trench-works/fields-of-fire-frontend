@@ -15,6 +15,7 @@ import { Color } from "../../config/ColorConfig";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
 import { GamePlayerSocket } from "./repositories/player.repository";
 import { ActionManager } from "./objects/ActionManager";
+import { Tooltip } from "../../core/UI/Tooltip";
 
 export class FightScene extends GameScene {
     public backgroundImage = "red_bg";
@@ -36,6 +37,7 @@ export class FightScene extends GameScene {
     public playerSocket!: GamePlayerSocket;
     public actionManager: ActionManager = new ActionManager(this);
     public rangeVisualizer: RangeVisualizer = new RangeVisualizer(this);
+    public tooltip! : Tooltip; 
 
     constructor() {
         super({ key: "fightScene" });
@@ -98,7 +100,13 @@ export class FightScene extends GameScene {
     }
 
     create() {
-        this.playerSocket = new GamePlayerSocket("3630", this.myPlayer.id);   
+        this.playerSocket = new GamePlayerSocket("3630", this.myPlayer.id);
+
+        this.tooltip = Tooltip.getInstance(this, {
+            textColor: "#000000",
+            fontSize: 14,
+            delay: 750,
+        });
 
         const num = this.otherPlayers.length;
         this.myPlayer.name = ` Player ${num + 1}`;
@@ -149,7 +157,7 @@ export class FightScene extends GameScene {
                     ? this.myPlayer.baseStats.mouvement
                     : action.props.range;
 
-            statsTable.placeContent(
+            const iconObj = statsTable.placeContent(
                 index,
                 0,
                 {
@@ -164,6 +172,10 @@ export class FightScene extends GameScene {
                 },
                 64,
             );
+            if (iconObj) {
+            iconObj.setInteractive();
+            this.tooltip.attachTo(iconObj, action.props.name ?? action.props.id);
+        }
         });
 
         this.createCharacterStatsUi(this.myPlayer!);
@@ -247,7 +259,12 @@ export class FightScene extends GameScene {
             const row = Math.floor(index / 2);
             const col = (index % 2) * 2;
 
-            statsTable.placeContent(col, row, { icon });
+            const iconObj = statsTable.placeContent(col, row, { icon });
+
+            if (iconObj) {
+                iconObj.setInteractive();
+                this.tooltip.attachTo(iconObj, icon); // ex: "life", "strength" …
+            }
         });
 
         statsTable.placeContent(1, 0, this.myPlayer!.baseStats.life);
