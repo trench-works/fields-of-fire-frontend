@@ -25,10 +25,11 @@ export class LobbyScene extends Phaser.Scene {
         }),
         new Action({
             id: "shoot",
-            name: "Attaquer",
+            name: "Tirer",
             description: "Attaquer un ennemi à portée",
             iconSpriteKey: "action_image_shoot",
             cost: 2,
+            range: 4
         }),
         new Action({
             id: "arrowup",
@@ -36,6 +37,7 @@ export class LobbyScene extends Phaser.Scene {
             description: "buff un allié",
             iconSpriteKey: "action_image_arrowup",
             cost: 1,
+            range : 0
         }),
     ];
     private allExistingClass: CharacterClass[] = [
@@ -130,7 +132,7 @@ export class LobbyScene extends Phaser.Scene {
     }
 
     create() {
-        this.lobbySocket = new LobbySocket();
+        this.lobbySocket = new LobbySocket("3630");
 
         console.log(" LobbyScene: ", this.lobbySocket);
 
