@@ -7,6 +7,7 @@ import { Action } from "../../Model/Action";
 import { PlayableCharacter } from "../../Model/PlayableCharacter";
 import { RangeVisualizer } from "../../scenes/Fight/objects/RangeVisualizer";
 import { ActionManager } from "../../scenes/Fight/objects/ActionManager";
+import { ActionAssetId } from "../../assets";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -159,9 +160,9 @@ export class GameScene extends Scene {
 
                    
                     const rangeManager: number | undefined =
-                        actionManager.currentAction?.props.id === "walk"
+                        actionManager.currentAction?.id === ActionAssetId.WALK
                             ? this.myPlayer.baseStats.mouvement
-                            : actionManager.currentAction?.props.range;
+                            : actionManager.currentAction?.range;
 
                     if (
                         rangeVisualizer.isItInRange(
