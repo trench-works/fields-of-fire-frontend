@@ -5,102 +5,17 @@ import {
     GridUtils,
     Position,
     MenuButton,
+    Http,
 } from "../../core";
 import { Color } from "../../config/ColorConfig";
-import { Action } from "../../Model/Action";
 import { CharacterClass } from "../../Model/CharacterClass";
-import { Stats } from "../../Model/Stats";
 import { LobbySocket } from "./repositories/lobby.socket";
+import { ActionAsset } from "../../assets";
 
 export class LobbyScene extends Phaser.Scene {
     private backgroundImage = "red_bg";
-    private actions: Action[] = [
-        new Action({
-            id: "walk",
-            name: "Marcher",
-            description: "Se déplacer vers une position ciblée",
-            iconSpriteKey: "action_image_moove",
-            cost: 0,
-            isWalkAction: true,
-        }),
-        new Action({
-            id: "shoot",
-            name: "Tirer",
-            description: "Attaquer un ennemi à portée",
-            iconSpriteKey: "action_image_shoot",
-            cost: 2,
-            range: 4
-        }),
-        new Action({
-            id: "arrowup",
-            name: "Soigner",
-            description: "buff un allié",
-            iconSpriteKey: "action_image_arrowup",
-            cost: 1,
-            range : 0
-        }),
-    ];
-    private allExistingClass: CharacterClass[] = [
-        new CharacterClass(
-            "Fantassin",
-            "entente_fantassin",
-            "entente_fantassin_spritesheet",
-            "entente_fantassin_closeup",
-            new Stats({
-                life: 24,
-                precision: 10,
-                strength: 20,
-                accuracy: 100,
-                initiative: 80,
-                dodging: 0,
-                energy: 4,
-                mouvement: 3,
-            }),
-            "Un soldat polyvalent, capable de s'adapter à différentes situations sur le champ de bataille. Il est équipé d'une armure légère et d'une épée, ce qui lui permet de se déplacer rapidement et d'attaquer efficacement à courte portée. Le Fantassin est également capable d'utiliser des compétences de soutien pour renforcer ses alliés ou affaiblir ses ennemis.",
-            this.actions
-        ),
-        new CharacterClass(
-            "Medic",
-            "entente_medic",
-            "entente_medic_spritesheet",
-            "entente_medic_closeup",
-            new Stats({
-                life: 16,
-                precision: 5,
-                strength: 10,
-                accuracy: 100,
-                initiative: 70,
-                dodging: 5,
-                energy: 4,
-                mouvement: 2,
-            }),
-            "Un soigneur spécialisé dans le soutien de ses alliés. Le Medic est équipé d'une armure légère et d'un pistolet, ce qui lui permet de se déplacer rapidement et d'attaquer à distance. Sa principale force réside dans sa capacité à soigner les blessures de ses alliés et à fournir des buffs pour améliorer leurs performances au combat.",
-            this.actions
-        ),
-        new CharacterClass(
-            "Caporal",
-            "entente_caporal",
-            "entente_caporal_spritesheet",
-            "entente_caporal_closeup",
-            new Stats({
-                life: 20,
-                precision: 15,
-                strength: 30,
-                accuracy: 100,
-                initiative: 90,
-                dodging: 5,
-                energy: 4,
-                mouvement: 4,
-            }),
-            "Un combattant robuste et discipliné, le Caporal est équipé d'une armure lourde et d'une hache, ce qui lui permet de résister aux attaques ennemies et de causer des dégâts importants à courte portée. Il excelle dans les combats rapprochés et peut utiliser des compétences pour augmenter sa défense ou infliger des dégâts supplémentaires à ses adversaires.",
-            this.actions
-        ),
-    ];
-    private currentSelectedClassKey: string | null = "entente_medic";
-    private SelectedClass: CharacterClass | null =
-        this.allExistingClass.find(
-            (charClass) => charClass.imageKey === this.currentSelectedClassKey
-        ) || null;
+    private allExistingClass: CharacterClass[] = [];
+    private selectClassId: string | null = "entente_medic";
     private tabWidth!: number;
     private tabHeight!: number;
     private playerImageContainer!: CustomContainer;
@@ -110,6 +25,9 @@ export class LobbyScene extends Phaser.Scene {
 
     constructor() {
         super({ key: "lobbyScene" });
+        Http.fetch<CharacterClass>("/class").then((data) => {
+            this.allExistingClass = data;
+        });
     }
 
     preload() {
@@ -122,12 +40,9 @@ export class LobbyScene extends Phaser.Scene {
                 charClass.imageKey,
                 `assets/${charClass.imageKey}.png`
             );
-            charClass.actionList.forEach((action) => {
-                this.load.image(
-                    action.props.iconSpriteKey,
-                    `assets/${action.props.iconSpriteKey}.png`
-                );
-            });
+            charClass.actionList.forEach(({ id }) =>
+                ActionAsset.load(this.load, id)
+            );
         });
     }
 
@@ -142,7 +57,9 @@ export class LobbyScene extends Phaser.Scene {
             );
             this.scene.start("fightScene", {
                 spawnPos: { x: 0, y: 0 },
-                class: this.SelectedClass!,
+                class: this.allExistingClass.find(
+                    ({ id }) => id === this.selectClassId
+                ),
                 id: player.id,
             });
         });
@@ -208,7 +125,7 @@ export class LobbyScene extends Phaser.Scene {
         tabManager.setPosition(tabArea.x + this.tabWidth / 2, tabArea.y + 20);
 
         this.events.on("class-selected", (charClass: CharacterClass) => {
-            this.SelectedClass = charClass;
+            this.selectClassId = charClass.id;
 
             // Rafraîchir l'image du playerPanel
             this.updatePlayerImage();
@@ -243,7 +160,10 @@ export class LobbyScene extends Phaser.Scene {
         const classNameArea = playerpanelgrid.getArea(0, 5, 9, 0.5);
 
         const playerNameContainer = new CustomContainer(this, {
-            title: this.SelectedClass!.name,
+            title:
+                this.allExistingClass.find(
+                    ({ id }) => id === this.selectClassId
+                )?.name ?? "",
             x: classNameArea.centerX - playerPanelWidth / 2,
             y: classNameArea.centerY - playerPanelHeight / 2 + 10,
             width: classNameArea.width,
@@ -261,7 +181,9 @@ export class LobbyScene extends Phaser.Scene {
             y: imgArea.centerY - playerPanelHeight / 2 + 10,
             width: imgArea.width,
             height: imgArea.height,
-            backgroundImage: this.SelectedClass!.imageKey,
+            backgroundImage: this.allExistingClass.find(
+                ({ id }) => id === this.selectClassId
+            )?.imageKey,
             borderWidth: 5,
         });
         playerPanel.add(playerImageContainer);
@@ -345,15 +267,19 @@ export class LobbyScene extends Phaser.Scene {
     }
 
     updatePlayerImage() {
-        if (!this.SelectedClass) return;
+        if (!this.selectClassId) return;
 
         // Met directement la nouvelle image
         this.playerImageContainer.setBackgroundImage(
-            this.SelectedClass.imageKey
+            this.allExistingClass.find(({ id }) => id === this.selectClassId)
+                ?.imageKey ?? ""
         );
 
         // Met à jour le nom
-        this.playerClassName.setTitle(this.SelectedClass.name);
+        this.playerClassName.setTitle(
+            this.allExistingClass.find(({ id }) => id === this.selectClassId)
+                ?.name ?? ""
+        );
     }
 }
 
