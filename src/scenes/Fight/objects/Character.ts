@@ -5,10 +5,10 @@ import {
     GameObjectProps,
     Position,
     PositionUtils,
-} from "../core";
-import { Action } from "./Action";
-import { Effect } from "./Effect";
-import { Stats } from "./Stats";
+} from "../../../core";
+import { Action } from "../../../Model/Action";
+import { Effect } from "../../../Model/Effect";
+import { Stats } from "../../../Model/Stats";
 
 export type CharactersProps = GameObjectProps & {
     position: Position;
@@ -75,6 +75,32 @@ export class Character extends GameObject {
         });
 
         return stats;
+    }
+
+    preload(loader: Phaser.Loader.LoaderPlugin) {
+        if (this.spriteKey) {
+                loader.spritesheet(
+                    this.spriteKey,
+                    `assets/Sprites/${this.spriteKey}.png`,
+                    { frameWidth: 96, frameHeight: 128 }
+                );
+                loader.image(
+                    this.iconImageKey,
+                    `assets/${this.iconImageKey}.png`
+                );
+
+                this.actionList.forEach((action) => {
+                    if (action.props.iconSpriteKey) {
+                        loader.image(
+                            action.props.iconSpriteKey,
+                            `assets/action/${action.props.iconSpriteKey}.png`
+                        );
+                        console.log(
+                            `assets/action/${action.props.iconSpriteKey}.png`
+                        );
+                    }
+                });
+            }
     }
 
     //Spawne le personnage sur la scène, en créant son sprite et en le positionnant correctement sur la grille

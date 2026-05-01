@@ -1,4 +1,4 @@
-import { Character, CharactersProps } from "./Character";
+import { Character, CharactersProps } from "../scenes/Fight/objects/Character";
 import { CharacterClass } from "./CharacterClass";
 
 export type PlayableCharacterProps = CharactersProps & {
