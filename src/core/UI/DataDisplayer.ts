@@ -62,12 +62,14 @@ export class DataDisplayer extends CustomContainer {
     public placeContent(
         col: number,
         row: number,
-        value: string | number | { icon: string },
+        value: string | number | { icon: string; onClick?: () => void },
         iconSize?: number
     ) {
         const area = this.cellAreas[row]?.[col];
         if (!area) return;
+
         let obj: UiObject;
+
         if (typeof value === "string" || typeof value === "number") {
             obj = this.scene.add
                 .text(0, 0, value.toString(), {
@@ -78,11 +80,21 @@ export class DataDisplayer extends CustomContainer {
         } else if (value.icon) {
             obj = this.scene.add.image(0, 0, value.icon);
             obj.setDisplaySize(iconSize || 32, iconSize || 32);
+
+            // --- AJOUT : rendre l’icône interactive si onClick existe ---
+            if (value.onClick) {
+                obj.setInteractive({ useHandCursor: true });
+                obj.on("pointerdown", () => value.onClick!());
+            }
         } else {
             throw new Error("Invalid value type");
         }
+
         obj.setPosition(area.position.x, area.position.y);
         this.add(obj);
+
+        return obj;
     }
+
 }
 

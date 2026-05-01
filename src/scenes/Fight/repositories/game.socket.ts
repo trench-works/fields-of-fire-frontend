@@ -19,7 +19,7 @@ enum GameEvents {
 }
 
 type PlayerMove = {
-    plyerId: string;
+    playerId: string;
     x: number;
     y: number;
 };
@@ -37,33 +37,3 @@ export class GameSocket extends Socket<GameKey, GameActions, string> {
         this.on(GameEvents.MOVE, listener);
     }
 }
-
-/**
- * Game Player
- */
-
-enum GamePlayerActions {
-    MOVE = "move",
-}
-
-type GamePlayerKey = {
-    gameId: string;
-    playerId: string;
-};
-
-type MovePlayer = {
-    x: number;
-    y: number;
-};
-
-export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
-    constructor(gameId: string, playerId: string) {
-        super(GAME_TOPIC);
-        super.open(USER_ID, { gameId, playerId });
-    }
-
-    move(movePlayer: MovePlayer) {
-        return this.send<MovePlayer>(GamePlayerActions.MOVE, movePlayer);
-    }
-}
-
