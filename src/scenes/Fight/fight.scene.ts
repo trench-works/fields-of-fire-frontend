@@ -12,6 +12,7 @@ import {
 import { CharacterClass } from "../../Model/CharacterClass";
 import { SceneConfig } from "../../config/SceneConfig";
 import { Color } from "../../config/ColorConfig";
+import { ActionAsset } from "../../assets";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
 import { GamePlayerSocket } from "./repositories/player.repository";
 import { ActionManager } from "./objects/ActionManager";
