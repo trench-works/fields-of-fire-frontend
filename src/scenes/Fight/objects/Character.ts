@@ -90,13 +90,13 @@ export class Character extends GameObject {
                 );
 
                 this.actionList.forEach((action) => {
-                    if (action.props.iconSpriteKey) {
+                    if (action.id) {
                         loader.image(
-                            action.props.iconSpriteKey,
-                            `assets/action/${action.props.iconSpriteKey}.png`
+                            action.id,
+                            `assets/action/${action.id}.png`
                         );
                         console.log(
-                            `assets/action/${action.props.iconSpriteKey}.png`
+                            `assets/action/${action.id}.png`
                         );
                     }
                 });

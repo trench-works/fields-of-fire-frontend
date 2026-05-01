@@ -80,6 +80,7 @@ export class FightScene extends GameScene {
     }
 
     preload() {
+        ActionAsset.loadAll(this.load);
         this.load.tilemapTiledJSON(
             this.fightMap,
             `assets/${this.fightMap}.json`,
@@ -154,15 +155,15 @@ export class FightScene extends GameScene {
         // --- Placement des icônes ---
         this.myPlayer.actionList.forEach((action, index) => {
             const rangeManager: number | undefined =
-                action.props.id === "walk"
+                action.id === "walk"
                     ? this.myPlayer.baseStats.mouvement
-                    : action.props.range;
+                    : action.range;
 
             const iconObj = statsTable.placeContent(
                 index,
                 0,
                 {
-                    icon: action.props.iconSpriteKey,
+                    icon: ActionAsset.getAssetKey(action.id),
                     onClick: () => {
                         this.rangeVisualizer.onActionSelected(
                             this.myPlayer!.position,
@@ -175,7 +176,7 @@ export class FightScene extends GameScene {
             );
             if (iconObj) {
             iconObj.setInteractive();
-            this.tooltip.attachTo(iconObj, action.props.name ?? action.props.id);
+            this.tooltip.attachTo(iconObj, action.name ?? action.id);
         }
         });
 
