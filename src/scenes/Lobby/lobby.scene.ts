@@ -4,6 +4,7 @@ import {
     TabManager,
     GridUtils,
     Position,
+    MenuButton,
     Http,
 } from "../../core";
 import { Color } from "../../config/ColorConfig";
@@ -20,6 +21,7 @@ export class LobbyScene extends Phaser.Scene {
     private playerImageContainer!: CustomContainer;
     private playerClassName!: CustomContainer;
     public lobbySocket!: LobbySocket;
+    private menuButton!: MenuButton;
 
     constructor() {
         super({ key: "lobbyScene" });
@@ -206,6 +208,20 @@ export class LobbyScene extends Phaser.Scene {
             },
         });
         playerPanel.add(fightButton);
+
+        // Créer le bouton Menu
+        this.menuButton = new MenuButton(this, {
+            position: "topRight",
+            onResumeClick: () => {
+                // Reprendre le jeu (le menu se ferme automatiquement)
+            },
+            onSettingsClick: () => {
+                console.log("Options - À implémenter");
+            },
+            onMainMenuClick: () => {
+                this.scene.start("mainMenuScene");
+            },
+        });
     }
 
     //  --- ATTENTION !!!

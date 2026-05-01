@@ -8,6 +8,7 @@ import {
     GridUtils,
     Position,
     PositionUtils,
+    MenuButton,
 } from "../../core";
 import { CharacterClass } from "../../Model/CharacterClass";
 import { SceneConfig } from "../../config/SceneConfig";
@@ -35,10 +36,7 @@ export class FightScene extends GameScene {
         "energy",
         "mouvement",
     ];
-    public playerSocket!: GamePlayerSocket;
-    public actionManager: ActionManager = new ActionManager(this);
-    public rangeVisualizer: RangeVisualizer = new RangeVisualizer(this);
-    public tooltip! : Tooltip; 
+    private menuButton!: MenuButton;
 
     constructor() {
         super({ key: "fightScene" });
@@ -121,6 +119,20 @@ export class FightScene extends GameScene {
 
         this.generateMap(this.actionManager, this.rangeVisualizer);
         this.spawnEntities();
+
+        // Créer le bouton Menu
+        this.menuButton = new MenuButton(this, {
+            position: "topRight",
+            onResumeClick: () => {
+                // Reprendre le jeu (le menu se ferme automatiquement)
+            },
+            onSettingsClick: () => {
+                console.log("Options - À implémenter");
+            },
+            onMainMenuClick: () => {
+                this.scene.start("mainMenuScene");
+            },
+        });
 
         const actionArea = this.sceneGrid.getArea(2, 8, 5, 1);
         const actionPanel = new CustomContainer(this, {
