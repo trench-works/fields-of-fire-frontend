@@ -36,6 +36,10 @@ export class FightScene extends GameScene {
         "energy",
         "mouvement",
     ];
+    public playerSocket!: GamePlayerSocket;
+    public actionManager: ActionManager = new ActionManager(this);
+    public rangeVisualizer: RangeVisualizer = new RangeVisualizer(this);
+    public tooltip! : Tooltip; 
     private menuButton!: MenuButton;
 
     constructor() {
