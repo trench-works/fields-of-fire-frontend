@@ -1,4 +1,4 @@
-import { Socket } from "../../../core";
+import { Position, Socket } from "../../../core";
 
 const USER_ID = "dev";
 const LOBBY_TOPIC = "game";
@@ -13,7 +13,8 @@ type JoinGame = {
 
 type JoinedGame = {
     game: { id: string };
-    player: { id: string };
+    player: { id: string};
+    entity: { position: Position };
 };
 
 enum LobbyActions {

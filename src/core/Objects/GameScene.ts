@@ -47,7 +47,6 @@ export class GameScene extends Scene {
 
     spawnEntities() {
         this.characters.forEach((entity) => {
-            //this.spawnCharacter(entity);
             entity.spawn(this, this.scaleFactor, this.gridPositions);
         });
     }

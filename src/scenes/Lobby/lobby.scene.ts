@@ -51,12 +51,12 @@ export class LobbyScene extends Phaser.Scene {
 
         console.log(" LobbyScene: ", this.lobbySocket);
 
-        this.lobbySocket.onJoin(({ game, player }) => {
+        this.lobbySocket.onJoin(({ game, player, entity }) => {
             console.log(
                 `Rejoint le jeu ${game.id} en tant que joueur ${player.id}`
             );
             this.scene.start("fightScene", {
-                spawnPos: { x: 0, y: 0 },
+                spawnPos: entity.position,
                 class: this.allExistingClass.find(
                     ({ id }) => id === this.selectClassId
                 ),

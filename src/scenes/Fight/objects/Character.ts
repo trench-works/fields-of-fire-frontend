@@ -175,6 +175,17 @@ export class Character extends GameObject {
         };
     }
 
+    move(newPosition: Position, gridPositions: any[][]) {
+        this.position = newPosition;
+
+        if (!this.sprite) return;
+
+        const { x, y } = newPosition;
+        const cell = gridPositions[y][x];
+
+        this.sprite.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
+    }
+
     async recalculate(): Promise<void> {
         return;
     }

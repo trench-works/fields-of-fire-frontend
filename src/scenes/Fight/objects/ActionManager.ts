@@ -20,7 +20,12 @@ export class ActionManager {
             actionId: this.currentAction?.id || "",
             target: pos,
         });
-
         this.clearCurentAction();
+    }
+
+    listenEntityMoved() {
+        this.scene.playerSocket.on('action', ({ entityId, position}) => {
+            this.scene.myPlayer.move(position, this.scene.gridPositions)
+        });
     }
 }
