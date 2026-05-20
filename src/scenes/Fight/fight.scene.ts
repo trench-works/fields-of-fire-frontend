@@ -104,8 +104,9 @@ export class FightScene extends GameScene {
             },
             playerClass
         );
-        this.characters = [
-            ...game.entities.map((entity) => {
+        this.characters = game.entities
+            .filter((entity) => entity.entityId !== playerEntity.entityId)
+            .map((entity) => {
                 const entityClass = classes.find(
                     (charClass) => charClass.id === entity.characterClassId
                 )!;
@@ -119,9 +120,7 @@ export class FightScene extends GameScene {
                     actionList: entityClass.actionList,
                     scene: this,
                 });
-            }),
-            this.myPlayer,
-        ];
+            });
     }
 
     preload() {
