@@ -12,6 +12,7 @@ import { CharacterClass } from "../../Model/CharacterClass";
 import { LobbySocket } from "./repositories/lobby.socket";
 import { ActionAsset } from "../../assets";
 import { CharactersProps } from "../Fight/objects/Character";
+import { FightSceneInit } from "../Fight/fight.scene";
 
 export class LobbyScene extends Phaser.Scene {
     private backgroundImage = "red_bg";
@@ -37,43 +38,33 @@ export class LobbyScene extends Phaser.Scene {
             `assets/${this.backgroundImage}.jpg`
         );
         this.allExistingClass.forEach((charClass) => {
-            this.load.image(
-                charClass.imageKey,
-                `assets/${charClass.imageKey}.png`
-            );
-            charClass.actionList.forEach(({ id }) =>
-                ActionAsset.load(this.load, id)
-            );
+            if (charClass.playable === true) {
+                this.load.image(
+                    charClass.imageKey,
+                    `assets/${charClass.imageKey}.png`
+                );
+                charClass.actionList.forEach(({ id }) =>
+                    ActionAsset.load(this.load, id)
+                );
+            }
         });
     }
 
-    startFightScene(
-        data: { 
-            playerSpawnPos: Position; entities:{
-            entityId: string;
-            position: Position;
-            }[]; class: CharacterClass; id: string 
-        }) {
+    startFightScene(data: FightSceneInit) {
         this.scene.start("fightScene", data);
     }
-
 
     create() {
         this.lobbySocket = new LobbySocket("3630");
 
-        console.log(" LobbyScene: ", this.lobbySocket);
-
-        this.lobbySocket.onJoin(({ game, player, playerEntity }) => {
+        this.lobbySocket.onJoin(({ game, player }) => {
             console.log(
                 `Rejoint le jeu ${game.id} en tant que joueur ${player.playerId}`
             );
             this.startFightScene({
-                playerSpawnPos: playerEntity.position,
-                entities: game.entities.map(e => ({ entityId: e.entityId, position: e.position })),
-                class: this.allExistingClass.find(
-                    ({ id }) => id === this.selectClassId
-                )!,
-                id: player.playerId,
+                classes: this.allExistingClass,
+                game,
+                player,
             });
         });
 
@@ -242,7 +233,9 @@ export class LobbyScene extends Phaser.Scene {
     // ne jamais lui donner + de 3 classes sinon EXPLOSION
 
     private buildClassesTab(container: Phaser.GameObjects.Container) {
-        const classes = this.allExistingClass;
+        const classes = this.allExistingClass.filter(
+            (charClass) => charClass.playable
+        );
         const classesPerRow = 3;
         const contentwidth: number = container.width;
         const grid = GridUtils.uiGrid(

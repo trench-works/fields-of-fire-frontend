@@ -27,7 +27,7 @@ export class Character extends GameObject {
     protected sprite: Phaser.GameObjects.Sprite | undefined;
     public id: string;
     public iconImageKey: string;
-    public name?: string;
+    public name: string;
     public actionList: Action[];
     public baseStats: Stats;
 
@@ -79,28 +79,20 @@ export class Character extends GameObject {
 
     preload(loader: Phaser.Loader.LoaderPlugin) {
         if (this.spriteKey) {
-                loader.spritesheet(
-                    this.spriteKey,
-                    `assets/Sprites/${this.spriteKey}.png`,
-                    { frameWidth: 96, frameHeight: 128 }
-                );
-                loader.image(
-                    this.iconImageKey,
-                    `assets/${this.iconImageKey}.png`
-                );
+            loader.spritesheet(
+                this.spriteKey,
+                `assets/Sprites/${this.spriteKey}.png`,
+                { frameWidth: 96, frameHeight: 128 }
+            );
+            loader.image(this.iconImageKey, `assets/${this.iconImageKey}.png`);
 
-                this.actionList.forEach((action) => {
-                    if (action.id) {
-                        loader.image(
-                            action.id,
-                            `assets/action/${action.id}.png`
-                        );
-                        console.log(
-                            `assets/action/${action.id}.png`
-                        );
-                    }
-                });
-            }
+            this.actionList.forEach((action) => {
+                if (action.id) {
+                    loader.image(action.id, `assets/action/${action.id}.png`);
+                    console.log(`assets/action/${action.id}.png`);
+                }
+            });
+        }
     }
 
     //Spawne le personnage sur la scène, en créant son sprite et en le positionnant correctement sur la grille

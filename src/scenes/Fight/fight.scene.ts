@@ -19,6 +19,25 @@ import { GamePlayerSocket } from "./repositories/player.repository";
 import { ActionManager } from "./objects/ActionManager";
 import { Tooltip } from "../../core/UI/Tooltip";
 
+export type FightSceneInit = {
+    classes: CharacterClass[];
+    game: {
+        id: string;
+        players: {
+            playerId: string;
+            userId: string;
+            entityId: string;
+            gameId: string;
+        }[];
+        entities: {
+            entityId: string;
+            characterClassId: string;
+            position: Position;
+        }[];
+    };
+    player: { playerId: string };
+};
+
 export class FightScene extends GameScene {
     public backgroundImage = "red_bg";
     public fightMap = "chessmap";
@@ -39,7 +58,7 @@ export class FightScene extends GameScene {
     public playerSocket!: GamePlayerSocket;
     public actionManager: ActionManager = new ActionManager(this);
     public rangeVisualizer: RangeVisualizer = new RangeVisualizer(this);
-    public tooltip! : Tooltip; 
+    public tooltip!: Tooltip;
     private menuButton!: MenuButton;
 
     constructor() {
@@ -54,46 +73,67 @@ export class FightScene extends GameScene {
             offset: new Position(),
         };
         this.renderConfig.offset = PositionUtils.getMapOffset(
-            this.renderConfig,
+            this.renderConfig
         );
 
         this.characters = this.gameObjects.filter(
-            (obj) => obj instanceof Character,
+            (obj) => obj instanceof Character
         );
     }
 
-    init(data: { 
-            playerSpawnPos: Position; entities:{
-            entityId: string;
-            position: Position;
-            }[]; class: CharacterClass; id: string 
-        }) {
+    init({ classes, game, player: { playerId } }: FightSceneInit) {
+        const player = game.players.find(
+            (player) => player.playerId === playerId
+        )!;
+        const playerEntity = game.entities.find(
+            (entity) => entity.entityId === player.entityId
+        )!;
+        const playerClass = classes.find(
+            (charClass) => charClass.id === playerEntity.characterClassId
+        )!;
         this.myPlayer = new PlayableCharacter(
             {
-                position: data.playerSpawnPos,
-                id: data.id,
-                spriteKey: data.class.spriteKey,
-                iconImageKey: data.class.iconImageKey,
-                name: data.class.name,
-                baseStats: data.class.stats,
-                actionList: data.class.actionList,
+                position: playerEntity.position,
+                id: playerId,
+                spriteKey: playerClass.spriteKey,
+                iconImageKey: playerClass.iconImageKey,
+                name: playerClass.name,
+                baseStats: playerClass.stats,
+                actionList: playerClass.actionList,
                 scene: this,
             },
-            data.class,
+            playerClass
         );
-        this.characters = [...data.entities.map(entity => new Character({...entity, scene: this, id: entity.entityId})), this.myPlayer];
+        this.characters = [
+            ...game.entities.map((entity) => {
+                const entityClass = classes.find(
+                    (charClass) => charClass.id === entity.characterClassId
+                )!;
+                return new Character({
+                    position: entity.position,
+                    id: playerId,
+                    spriteKey: entityClass.spriteKey,
+                    iconImageKey: entityClass.iconImageKey,
+                    name: entityClass.name,
+                    baseStats: entityClass.stats,
+                    actionList: entityClass.actionList,
+                    scene: this,
+                });
+            }),
+            this.myPlayer,
+        ];
     }
 
     preload() {
         ActionAsset.loadAll(this.load);
         this.load.tilemapTiledJSON(
             this.fightMap,
-            `assets/${this.fightMap}.json`,
+            `assets/${this.fightMap}.json`
         );
         this.load.image("groundTiles", `assets/${this.tileSetImage}.png`);
 
         this.allExistingStats.forEach((stat) =>
-            this.load.image(stat, `assets/icon/icon_${stat}.png`),
+            this.load.image(stat, `assets/icon/icon_${stat}.png`)
         );
 
         this.characters.push(this.myPlayer);
@@ -102,7 +142,7 @@ export class FightScene extends GameScene {
 
         this.load.image(
             this.backgroundImage,
-            `assets/${this.backgroundImage}.jpg`,
+            `assets/${this.backgroundImage}.jpg`
         );
     }
 
@@ -155,14 +195,14 @@ export class FightScene extends GameScene {
             0,
             0,
             actionPanel.width,
-            actionPanel.height,
+            actionPanel.height
         );
         const actionListArea = actionGrid.getArea(0, 1, 9, 7);
 
         const statsTable = new DataDisplayer(this, {
             position: new Position(
                 actionPanel.x - actionPanel.width / 2 + actionListArea.centerX,
-                actionPanel.y - actionPanel.height / 2 + actionListArea.centerY,
+                actionPanel.y - actionPanel.height / 2 + actionListArea.centerY
             ),
             width: actionListArea.width,
             height: actionListArea.height,
@@ -185,17 +225,17 @@ export class FightScene extends GameScene {
                     onClick: () => {
                         this.rangeVisualizer.onActionSelected(
                             this.myPlayer!.position,
-                            rangeManager,
+                            rangeManager
                         );
                         this.actionManager.currentAction = action;
                     },
                 },
-                64,
+                64
             );
             if (iconObj) {
-            iconObj.setInteractive();
-            this.tooltip.attachTo(iconObj, action.name ?? action.id);
-        }
+                iconObj.setInteractive();
+                this.tooltip.attachTo(iconObj, action.name ?? action.id);
+            }
         });
 
         this.createCharacterStatsUi(this.myPlayer!);
@@ -221,7 +261,7 @@ export class FightScene extends GameScene {
             0,
             0,
             statsPanel.width,
-            statsPanel.height,
+            statsPanel.height
         );
 
         const imgArea = statsGrid.getArea(0, 0, 3, 4);
@@ -251,7 +291,7 @@ export class FightScene extends GameScene {
         const playerNameArea = statsGrid.getArea(0, 4, 3, 1);
 
         const statsName = new CustomContainer(this, {
-            title: this.myPlayer!.name,
+            title: this.myPlayer.name,
             x: statsPanel.x - statsPanel.width / 2 + playerNameArea.centerX,
             y: statsPanel.y - statsPanel.height / 2 + playerNameArea.centerY,
             width: playerNameArea.width,
@@ -266,7 +306,7 @@ export class FightScene extends GameScene {
         const statsTable = new DataDisplayer(this, {
             position: new Position(
                 statsPanel.x - statsPanel.width / 2 + statValuesArea.centerX,
-                statsPanel.y - statsPanel.height / 2 + statValuesArea.centerY,
+                statsPanel.y - statsPanel.height / 2 + statValuesArea.centerY
             ),
             width: statValuesArea.width,
             height: statValuesArea.height,
@@ -300,3 +340,4 @@ export class FightScene extends GameScene {
         statsTable.placeContent(3, 2, this.myPlayer!.baseStats.dodging);
     }
 }
+

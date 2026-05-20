@@ -12,9 +12,21 @@ type JoinGame = {
 };
 
 type JoinedGame = {
-    game: { id: string; entities: { entityId: string; position: Position }[] };
-    player: { playerId: string};
-    playerEntity: { position: Position };
+    game: {
+        id: string;
+        players: {
+            playerId: string;
+            userId: string;
+            entityId: string;
+            gameId: string;
+        }[];
+        entities: {
+            entityId: string;
+            characterClassId: string;
+            position: Position;
+        }[];
+    };
+    player: { playerId: string };
 };
 
 enum LobbyActions {
