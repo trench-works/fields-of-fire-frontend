@@ -17,7 +17,7 @@ import { FightSceneInit } from "../Fight/fight.scene";
 export class LobbyScene extends Phaser.Scene {
     private backgroundImage = "red_bg";
     private allExistingClass: CharacterClass[] = [];
-    private selectClassId: string | null = "entente_medic";
+    private selectClassId: string = "entente_medic";
     private tabWidth!: number;
     private tabHeight!: number;
     private playerImageContainer!: CustomContainer;
@@ -207,8 +207,13 @@ export class LobbyScene extends Phaser.Scene {
             borderWidth: 2,
             borderColor: "#ffffff",
             onClick: () => {
-                console.log("will join game 3630 ");
-                this.lobbySocket.joinGame({ gameId: "3630" });
+                if (this.selectClassId) {
+                    console.log("will join game 3630 ");
+                    this.lobbySocket.joinGame({
+                        gameId: "3630",
+                        characterClassId: this.selectClassId,
+                    });
+                }
             },
         });
         playerPanel.add(fightButton);

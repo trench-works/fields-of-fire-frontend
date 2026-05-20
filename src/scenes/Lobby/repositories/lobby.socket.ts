@@ -9,6 +9,7 @@ type LobbyKey = {
 
 type JoinGame = {
     gameId: string;
+    characterClassId: string;
 };
 
 type JoinedGame = {
