@@ -17,7 +17,7 @@ export class ActionManager{
     launchAction(pos : Position){
         //to implement
         this.scene.playerSocket.action({
-            actionId : this.currentAction?.props.id || "",
+            actionId : this.currentAction?.id || "",
             target : pos
         })
 
