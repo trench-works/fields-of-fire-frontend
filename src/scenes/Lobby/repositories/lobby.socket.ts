@@ -1,3 +1,4 @@
+import { Game } from "phaser";
 import { Position, Socket } from "../../../core";
 
 const USER_ID = "dev";
@@ -13,20 +14,7 @@ type JoinGame = {
 };
 
 type JoinedGame = {
-    game: {
-        id: string;
-        players: {
-            playerId: string;
-            userId: string;
-            entityId: string;
-            gameId: string;
-        }[];
-        entities: {
-            entityId: string;
-            characterClassId: string;
-            position: Position;
-        }[];
-    };
+    game: Game;
     player: { playerId: string };
 };
 

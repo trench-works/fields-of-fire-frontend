@@ -18,23 +18,11 @@ import { RangeVisualizer } from "./objects/RangeVisualizer";
 import { GamePlayerSocket } from "./repositories/player.repository";
 import { ActionManager } from "./objects/ActionManager";
 import { Tooltip } from "../../core/UI/Tooltip";
+import { Game } from "../../Model/Game";
 
 export type FightSceneInit = {
     classes: CharacterClass[];
-    game: {
-        id: string;
-        players: {
-            playerId: string;
-            userId: string;
-            entityId: string;
-            gameId: string;
-        }[];
-        entities: {
-            entityId: string;
-            characterClassId: string;
-            position: Position;
-        }[];
-    };
+    game: Game;
     player: { playerId: string };
 };
 
@@ -60,6 +48,7 @@ export class FightScene extends GameScene {
     public rangeVisualizer: RangeVisualizer = new RangeVisualizer(this);
     public tooltip!: Tooltip;
     private menuButton!: MenuButton;
+    private gamePayload!: Game;
 
     constructor() {
         super({ key: "fightScene" });
@@ -78,6 +67,7 @@ export class FightScene extends GameScene {
     }
 
     init({ classes, game, player: { playerId } }: FightSceneInit) {
+        this.gamePayload = game;
         const player = game.players.find(
             (player) => player.playerId === playerId
         )!;
@@ -158,7 +148,11 @@ export class FightScene extends GameScene {
             .setDepth(-1);
         bg.setDisplaySize(this.scale.width, this.scale.height);
 
-        this.generateMap(this.actionManager, this.rangeVisualizer);
+        this.generateMap(
+            this.actionManager,
+            this.rangeVisualizer,
+            this.gamePayload.plateau
+        );
         this.spawnEntities();
 
         // Créer le bouton Menu
