@@ -11,6 +11,7 @@ import { Color } from "../../config/ColorConfig";
 import { CharacterClass } from "../../Model/CharacterClass";
 import { LobbySocket } from "./repositories/lobby.socket";
 import { ActionAsset } from "../../assets";
+import { CharactersProps } from "../Fight/objects/Character";
 
 export class LobbyScene extends Phaser.Scene {
     private backgroundImage = "red_bg";
@@ -46,21 +47,33 @@ export class LobbyScene extends Phaser.Scene {
         });
     }
 
+    startFightScene(
+        data: { 
+            playerSpawnPos: Position; entities:{
+            entityId: string;
+            position: Position;
+            }[]; class: CharacterClass; id: string 
+        }) {
+        this.scene.start("fightScene", data);
+    }
+
+
     create() {
         this.lobbySocket = new LobbySocket("3630");
 
         console.log(" LobbyScene: ", this.lobbySocket);
 
-        this.lobbySocket.onJoin(({ game, player, entity }) => {
+        this.lobbySocket.onJoin(({ game, player, playerEntity }) => {
             console.log(
-                `Rejoint le jeu ${game.id} en tant que joueur ${player.id}`
+                `Rejoint le jeu ${game.id} en tant que joueur ${player.playerId}`
             );
-            this.scene.start("fightScene", {
-                spawnPos: entity.position,
+            this.startFightScene({
+                playerSpawnPos: playerEntity.position,
+                entities: game.entities.map(e => ({ entityId: e.entityId, position: e.position })),
                 class: this.allExistingClass.find(
                     ({ id }) => id === this.selectClassId
-                ),
-                id: player.id,
+                )!,
+                id: player.playerId,
             });
         });
 

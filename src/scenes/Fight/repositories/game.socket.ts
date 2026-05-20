@@ -1,4 +1,4 @@
-import { Socket } from "../../../core";
+import { Position, Socket } from "../../../core";
 const USER_ID = "dev";
 const GAME_TOPIC = "game";
 
@@ -18,10 +18,11 @@ enum GameEvents {
     MOVE = "move",
 }
 
-type PlayerMove = {
-    playerId: string;
-    x: number;
-    y: number;
+type EntityMove = {
+    entity: {
+        entityId: string;
+        position: Position;
+    };
 };
 export class GameSocket extends Socket<GameKey, GameActions, string> {
     constructor(gameId: string) {
@@ -33,7 +34,7 @@ export class GameSocket extends Socket<GameKey, GameActions, string> {
         return this.send(GameActions.LEAVE, {});
     }
 
-    onMove(listener: (playerMove: PlayerMove) => void): void {
+    onMove(listener: (entityMove: EntityMove) => void): void {
         this.on(GameEvents.MOVE, listener);
     }
 }

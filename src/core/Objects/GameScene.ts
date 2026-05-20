@@ -3,7 +3,6 @@ import { Character } from "../../scenes/Fight/objects/Character";
 import { GameObject } from "./GameObject";
 import { scaleAndCenter } from "../Utils/Scale";
 import { Position } from "../Types/Position";
-import { Action } from "../../Model/Action";
 import { PlayableCharacter } from "../../Model/PlayableCharacter";
 import { RangeVisualizer } from "../../scenes/Fight/objects/RangeVisualizer";
 import { ActionManager } from "../../scenes/Fight/objects/ActionManager";
@@ -40,7 +39,6 @@ export class GameScene extends Scene {
     public displayObjects: Displayable[] = [];
     public gameObjects: GameObject[] = [];
     public characters: Character[] = [];
-    public otherPlayers: PlayableCharacter[] = [];
     public myPlayer!: PlayableCharacter;
     public gridPositions: Cell[][] = [];
     public scaleFactor: number = 1;

@@ -1,4 +1,4 @@
-import { Character } from "./objects/Character";
+import { Character, CharactersProps } from "./objects/Character";
 import { PlayableCharacter } from "../../Model/PlayableCharacter";
 import {
     GameScene,
@@ -60,15 +60,17 @@ export class FightScene extends GameScene {
         this.characters = this.gameObjects.filter(
             (obj) => obj instanceof Character,
         );
-        this.otherPlayers = this.characters.filter(
-            (char) => char.id !== "player_1",
-        ) as PlayableCharacter[];
     }
 
-    init(data: { spawnPos: Position; class: CharacterClass; id: string }) {
+    init(data: { 
+            playerSpawnPos: Position; entities:{
+            entityId: string;
+            position: Position;
+            }[]; class: CharacterClass; id: string 
+        }) {
         this.myPlayer = new PlayableCharacter(
             {
-                position: data.spawnPos,
+                position: data.playerSpawnPos,
                 id: data.id,
                 spriteKey: data.class.spriteKey,
                 iconImageKey: data.class.iconImageKey,
@@ -79,6 +81,7 @@ export class FightScene extends GameScene {
             },
             data.class,
         );
+        this.characters = [...data.entities.map(entity => new Character({...entity, scene: this, id: entity.entityId})), this.myPlayer];
     }
 
     preload() {
@@ -106,14 +109,13 @@ export class FightScene extends GameScene {
     create() {
         this.playerSocket = new GamePlayerSocket("3630", this.myPlayer.id);
 
+        this.actionManager.bindListener();
+
         this.tooltip = Tooltip.getInstance(this, {
             textColor: "#000000",
             fontSize: 14,
             delay: 750,
         });
-
-        const num = this.otherPlayers.length;
-        this.myPlayer.name = ` Player ${num + 1}`;
 
         const bg = this.add
             .image(0, 0, this.backgroundImage)

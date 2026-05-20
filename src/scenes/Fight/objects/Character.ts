@@ -27,7 +27,7 @@ export class Character extends GameObject {
     protected sprite: Phaser.GameObjects.Sprite | undefined;
     public id: string;
     public iconImageKey: string;
-    public name: string;
+    public name?: string;
     public actionList: Action[];
     public baseStats: Stats;
 
