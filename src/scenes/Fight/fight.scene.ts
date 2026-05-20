@@ -75,10 +75,6 @@ export class FightScene extends GameScene {
         this.renderConfig.offset = PositionUtils.getMapOffset(
             this.renderConfig
         );
-
-        this.characters = this.gameObjects.filter(
-            (obj) => obj instanceof Character
-        );
     }
 
     init({ classes, game, player: { playerId } }: FightSceneInit) {

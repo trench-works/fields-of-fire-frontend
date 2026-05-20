@@ -6,6 +6,7 @@ import {
     Position,
     PositionUtils,
 } from "../../../core";
+import { Tooltip } from "../../../core/UI/Tooltip";
 import { Action } from "../../../Model/Action";
 import { Effect } from "../../../Model/Effect";
 import { Stats } from "../../../Model/Stats";
@@ -102,11 +103,19 @@ export class Character extends GameObject {
         const { x, y } = this.position;
         const cell = gridPositions[y][x];
 
+        const tooltip = Tooltip.getInstance(scene, {
+            textColor: "#000000",
+            fontSize: 14,
+            delay: 750,
+        });
+
         this.sprite = scene.physics.add.sprite(
             cell.pixelPosition.x,
             cell.pixelPosition.y,
             this.spriteKey
         );
+        this.sprite.setInteractive();
+        tooltip.attachTo(this.sprite, this.name);
 
         this.sprite.setDepth(5);
         this.sprite.setOrigin(0.5, 0.95);
