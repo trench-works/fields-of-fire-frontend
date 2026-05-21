@@ -40,7 +40,7 @@ export class RangeVisualizer {
     clearRange() {
         for (const row of this.scene.gridPositions) {
             for (const cell of row) {
-                if ((cell as any).highlight) {
+                if ((cell as any)?.highlight) {
                     (cell as any).highlight.destroy();
                     delete (cell as any).highlight;
                 }

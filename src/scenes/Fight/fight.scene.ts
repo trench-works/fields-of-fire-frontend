@@ -29,7 +29,7 @@ export type FightSceneInit = {
 export class FightScene extends GameScene {
     public backgroundImage = "red_bg";
     public fightMap = "chessmap";
-    public tileSetImage = "damier";
+    public tileSetImage = "ground";
     public tileWidth = 64;
     public renderConfig: SceneRenderConfig;
     private sceneGrid = GridUtils.uiGrid(0, 0);
@@ -127,7 +127,7 @@ export class FightScene extends GameScene {
 
         this.load.image(
             this.backgroundImage,
-            `assets/${this.backgroundImage}.jpg`
+            `assets/${this.backgroundImage}.png`
         );
     }
 

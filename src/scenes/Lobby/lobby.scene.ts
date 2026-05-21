@@ -35,7 +35,7 @@ export class LobbyScene extends Phaser.Scene {
     preload() {
         this.load.image(
             this.backgroundImage,
-            `assets/${this.backgroundImage}.jpg`
+            `assets/${this.backgroundImage}.png`
         );
         this.allExistingClass.forEach((charClass) => {
             if (charClass.playable === true) {

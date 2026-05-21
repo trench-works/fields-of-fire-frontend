@@ -34,7 +34,7 @@ export interface Displayable {
 export class GameScene extends Scene {
     public backgroundImage = "red_bg";
     public fightMap = "chessmap";
-    public tileSetImage = "damier";
+    public tileSetImage = "ground";
     public tileWidth = 64;
     public renderConfig: SceneRenderConfig | undefined;
     public displayObjects: Displayable[] = [];
