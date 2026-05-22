@@ -104,19 +104,11 @@ export class Character extends GameObject {
         const cell = gridPositions[y][x];
 
         if (cell) {
-            const tooltip = Tooltip.getInstance(scene, {
-                textColor: "#000000",
-                fontSize: 14,
-                delay: 750,
-            });
-
             this.sprite = scene.physics.add.sprite(
                 cell.pixelPosition.x,
                 cell.pixelPosition.y,
                 this.spriteKey
             );
-            this.sprite.setInteractive();
-            tooltip.attachTo(this.sprite, this.name);
 
             this.sprite.setDepth(5);
             this.sprite.setOrigin(0.5, 0.95);
