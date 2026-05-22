@@ -14,16 +14,16 @@ export class RangeVisualizer {
             [
                 new Phaser.Geom.Point(
                     -32 * this.scene.scaleFactor,
-                    0 * this.scene.scaleFactor,
+                    0 * this.scene.scaleFactor
                 ),
                 new Phaser.Geom.Point(0, -16 * this.scene.scaleFactor),
                 new Phaser.Geom.Point(
                     32 * this.scene.scaleFactor,
-                    0 * this.scene.scaleFactor,
+                    0 * this.scene.scaleFactor
                 ),
                 new Phaser.Geom.Point(0, 16 * this.scene.scaleFactor),
             ],
-            true,
+            true
         );
 
         g.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
@@ -34,7 +34,11 @@ export class RangeVisualizer {
     }
 
     showRange(cells: Cell[]) {
-        cells.forEach((cell) => this.highlightCell(cell));
+        cells.forEach((cell) => {
+            if (cell) {
+                this.highlightCell(cell);
+            }
+        });
     }
 
     clearRange() {
@@ -70,7 +74,7 @@ export class RangeVisualizer {
             console.log("this action don't have any range");
             return;
         }
-        
+
         const cells = this.getCellsInRange(origin, range);
 
         this.showRange(cells);

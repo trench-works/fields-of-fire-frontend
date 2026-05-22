@@ -1,8 +1,14 @@
-const BASE_URL = "localhost:3000";
+import { AppConfigLoader } from "../../config/AppConfig";
 
 export class Http {
     static async fetch<Ressource>(endpoint: string): Promise<Ressource[]> {
-        const rep = await fetch("http://" + BASE_URL + endpoint);
+        if (!global.config) {
+            await new AppConfigLoader().loadConfig().then((appConfig) => {
+                global.config = appConfig.getConfig();
+            });
+        }
+        const url = `${global.config.server.protocol}://${global.config.server.url}${endpoint}`;
+        const rep = await fetch(url);
         const data: Ressource[] = await rep.json();
         return data;
     }

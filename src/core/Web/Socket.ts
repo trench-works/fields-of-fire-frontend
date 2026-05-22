@@ -1,5 +1,5 @@
-const SOCKET_SERVER_URL = "localhost";
-const SOCKET_SERVER_PORT = 3000;
+const SOCKET_SERVER_URL = "31.38.199.220";
+const SOCKET_SERVER_PORT = 80;
 
 type InputAction<Actions> = { actionId: Actions; payload: any };
 
@@ -22,7 +22,7 @@ export class Socket<
         this.userId = userId;
         this.key = key;
         this.socket = new WebSocket(
-            `ws://${SOCKET_SERVER_URL}:${SOCKET_SERVER_PORT}/${this.topic}`
+            `ws://${global.config.server.url}:${global.config.server.port}/${this.topic}`
         );
         this.socket.addEventListener("open", this.onOpen.bind(this));
         this.socket.addEventListener("message", this.handleMessage.bind(this));

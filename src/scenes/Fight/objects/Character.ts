@@ -103,25 +103,27 @@ export class Character extends GameObject {
         const { x, y } = this.position;
         const cell = gridPositions[y][x];
 
-        const tooltip = Tooltip.getInstance(scene, {
-            textColor: "#000000",
-            fontSize: 14,
-            delay: 750,
-        });
+        if (cell) {
+            const tooltip = Tooltip.getInstance(scene, {
+                textColor: "#000000",
+                fontSize: 14,
+                delay: 750,
+            });
 
-        this.sprite = scene.physics.add.sprite(
-            cell.pixelPosition.x,
-            cell.pixelPosition.y,
-            this.spriteKey
-        );
-        this.sprite.setInteractive();
-        tooltip.attachTo(this.sprite, this.name);
+            this.sprite = scene.physics.add.sprite(
+                cell.pixelPosition.x,
+                cell.pixelPosition.y,
+                this.spriteKey
+            );
+            this.sprite.setInteractive();
+            tooltip.attachTo(this.sprite, this.name);
 
-        this.sprite.setDepth(5);
-        this.sprite.setOrigin(0.5, 0.95);
-        this.sprite.setScale(scaleFactor / 1.5);
+            this.sprite.setDepth(5);
+            this.sprite.setOrigin(0.5, 0.95);
+            this.sprite.setScale(scaleFactor / 1.5);
 
-        this.createAnimations(this.spriteKey);
+            this.createAnimations(this.spriteKey);
+        }
     }
 
     //Joue l'animation d'idle par défaut du personnage, ou une animation spécifique si une clé est fournie
