@@ -15,6 +15,10 @@ export class MainMenu extends Phaser.Scene {
         super({ key: "mainMenuScene" });
     }
 
+    static start(scene: Phaser.Scene) {
+        scene.scene.start("mainMenuScene");
+    }
+
     preload() {
         // Charger les images nécessaires
         BackgroundAsset.load(this.load, BackgroundAssetId.MAIN_MENU);

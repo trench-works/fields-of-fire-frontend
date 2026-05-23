@@ -20,6 +20,7 @@ import { ActionManager } from "./objects/ActionManager";
 import { Tooltip } from "../../core/UI/Tooltip";
 import { Game } from "../../Model/Game";
 import { ClassesRepository } from "../Lobby/repositories/classes.repository";
+import { MainMenu } from "../MainMenu/main-menu.scene";
 
 export type FightSceneInit = {
     game: Game;
@@ -77,6 +78,7 @@ export class FightScene extends GameScene {
 
     init({ game, player: { playerId } }: FightSceneInit) {
         this.playerSocket = new GamePlayerSocket(game.id, playerId);
+        this.playerSocket.onClose(() => MainMenu.start(this));
         this.actionManager.bindListener();
 
         this.gamePayload = game;

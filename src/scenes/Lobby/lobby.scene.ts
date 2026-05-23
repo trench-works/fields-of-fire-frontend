@@ -12,6 +12,7 @@ import { LobbySocket } from "./repositories/lobby.socket";
 import { ActionAsset } from "../../assets";
 import { FightScene } from "../Fight/fight.scene";
 import { ClassesRepository } from "./repositories/classes.repository";
+import { MainMenu } from "../MainMenu/main-menu.scene";
 
 export type LobbySceneInit = {
     lobbyId: string;
@@ -68,6 +69,7 @@ export class LobbyScene extends Phaser.Scene {
 
     create() {
         this.lobbySocket = new LobbySocket(this.lobbyId);
+        this.lobbySocket.onClose(() => MainMenu.start(this));
 
         this.lobbySocket.onLobbyUpdate(console.log); //TODO: handle lobby infos update + display
 

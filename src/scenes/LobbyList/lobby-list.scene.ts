@@ -10,6 +10,7 @@ import {
 } from "../../core";
 import { Color } from "../../config/ColorConfig";
 import { FightScene } from "../Fight/fight.scene";
+import { MainMenu } from "../MainMenu/main-menu.scene";
 
 export class LobbyListScene extends Phaser.Scene {
     private backgroundImage = "red_bg";
@@ -37,6 +38,7 @@ export class LobbyListScene extends Phaser.Scene {
 
     create() {
         this.menuSocket = new MenuSocket();
+        this.menuSocket.onClose(() => MainMenu.start(this));
 
         this.menuSocket.onJoin(({ lobbyId, playerId }) => {
             console.log(
