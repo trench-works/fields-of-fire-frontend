@@ -76,6 +76,9 @@ export class FightScene extends GameScene {
     }
 
     init({ game, player: { playerId } }: FightSceneInit) {
+        this.playerSocket = new GamePlayerSocket(game.id, playerId);
+        this.actionManager.bindListener();
+
         this.gamePayload = game;
         const player = game.players.find(
             (player) => player.playerId === playerId,
@@ -84,7 +87,7 @@ export class FightScene extends GameScene {
             (entity) => entity.entityId === player.entityId,
         )!;
         const playerClass = this.classes.find(
-            (charClass) => charClass.id === playerEntity.characterClassId,
+            (charClass) => charClass.id === playerEntity.classId,
         )!;
         this.myPlayer = new PlayableCharacter(
             {
@@ -103,7 +106,7 @@ export class FightScene extends GameScene {
             .filter((entity) => entity.entityId !== playerEntity.entityId)
             .map((entity) => {
                 const entityClass = this.classes.find(
-                    (charClass) => charClass.id === entity.characterClassId,
+                    (charClass) => charClass.id === entity.classId,
                 )!;
                 return new Character({
                     position: entity.position,
@@ -141,10 +144,6 @@ export class FightScene extends GameScene {
     }
 
     create() {
-        this.playerSocket = new GamePlayerSocket("3630", this.myPlayer.id);
-
-        this.actionManager.bindListener();
-
         this.tooltip = Tooltip.getInstance(this, {
             textColor: "#000000",
             fontSize: 14,

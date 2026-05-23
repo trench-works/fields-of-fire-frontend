@@ -1,7 +1,6 @@
-import { GameScene, Position } from "../../../core";
+import { Position } from "../../../core";
 import { Action } from "../../../Model/Action";
 import { FightScene } from "../fight.scene";
-import { GamePlayerSocket } from "../repositories/player.socket";
 
 export class ActionManager {
     public currentAction: Action | undefined;

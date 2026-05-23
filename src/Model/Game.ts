@@ -1,6 +1,12 @@
 import { Position } from "../core";
 import { Case } from "./Case";
 
+export enum EntityType {
+    ALLY = "ALLY",
+    ENEMY = "ENEMY",
+    NEUTRAL = "NEUTRAL",
+}
+
 export type Game = {
     id: string;
     plateau: Case[][];
@@ -12,8 +18,9 @@ export type Game = {
     }[];
     entities: {
         entityId: string;
-        characterClassId: string;
+        classId: string;
         position: Position;
+        entityType: EntityType;
     }[];
 };
 

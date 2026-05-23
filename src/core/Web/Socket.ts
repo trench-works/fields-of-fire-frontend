@@ -16,19 +16,36 @@ export class Socket<
     private userId: string | undefined;
     private key: RessourceKey | undefined;
 
-    constructor(private readonly topic: string) {}
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private onCloseListeners: ((event: CloseEvent) => any)[];
+
+    constructor(private readonly topic: string) {
+        this.onCloseListeners = [];
+    }
 
     protected open(key: RessourceKey) {
         this.userId = global.config.user.id;
         this.key = key;
+        this.createSocket();
+    }
+
+    private createSocket() {
         this.socket = new WebSocket(
             `ws://${global.config.server.url}:${global.config.server.port}/${this.topic}`,
         );
-        this.socket.addEventListener("open", this.onOpen.bind(this));
+        this.socket.addEventListener("open", this.handleOpen.bind(this));
         this.socket.addEventListener("message", this.handleMessage.bind(this));
+        this.socket.addEventListener("close", this.handleClose.bind(this));
+        this.socket.addEventListener("error", console.log); //TODO: handle properly error and try rebuild new socket
     }
 
-    private onOpen() {
+    private handleClose(event: CloseEvent) {
+        //TODO: try recreate socket
+        // if recreate failed again -> trigger all onCloselListeners;
+        this.onCloseListeners.forEach((listener) => listener(event));
+    }
+
+    private handleOpen() {
         this.send("subscribe" as InputActions, {
             user: { id: this.userId },
             key: this.key,
@@ -40,7 +57,8 @@ export class Socket<
         action: InputActions,
         payload: PayloadType,
     ): Error | void {
-        if (!this.socket) {
+        if (this.socket?.readyState !== WebSocket.OPEN) {
+            console.error("Socket is not connected yet...");
             return new Error("Socket is not connected yet...");
         }
         this.socket.send(JSON.stringify({ actionId: action, payload }));
@@ -72,10 +90,7 @@ export class Socket<
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onClose(listener: (event: CloseEvent) => any): Error | void {
-        if (!this.socket) {
-            return new Error("Socket is not connected yet...");
-        }
-        this.socket.addEventListener("close", listener);
+        this.onCloseListeners.push(listener);
     }
 
     close(): Error | void {
