@@ -10,16 +10,18 @@ export class Socket<
     InputActions = string,
     OutputActions = string,
 > {
+    public isError: boolean;
+
     private socket: WebSocket | undefined = undefined;
     private listeners: Map<OutputActions, SocketListener[]> = new Map();
 
     private userId: string | undefined;
     private key: RessourceKey | undefined;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private onCloseListeners: ((event: CloseEvent) => any)[];
+    private onCloseListeners: (() => void)[];
 
     constructor(private readonly topic: string) {
+        this.isError = false;
         this.onCloseListeners = [];
     }
 
@@ -36,16 +38,26 @@ export class Socket<
         this.socket.addEventListener("open", this.handleOpen.bind(this));
         this.socket.addEventListener("message", this.handleMessage.bind(this));
         this.socket.addEventListener("close", this.handleClose.bind(this));
-        this.socket.addEventListener("error", console.log); //TODO: handle properly error and try rebuild new socket
+        this.socket.addEventListener("error", this.handleError.bind(this));
     }
 
-    private handleClose(event: CloseEvent) {
-        //TODO: try recreate socket
-        // if recreate failed again -> trigger all onCloselListeners;
-        this.onCloseListeners.forEach((listener) => listener(event));
+    private handleError() {
+        if (this.isError === false) {
+            this.isError = true;
+            this.createSocket();
+        } else {
+            this.onCloseListeners.forEach((listener) => listener());
+        }
+    }
+
+    private handleClose() {
+        if (this.isError === false) {
+            this.onCloseListeners.forEach((listener) => listener());
+        }
     }
 
     private handleOpen() {
+        this.isError = false;
         this.send("subscribe" as InputActions, {
             user: { id: this.userId },
             key: this.key,
@@ -88,8 +100,7 @@ export class Socket<
         }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onClose(listener: (event: CloseEvent) => any): Error | void {
+    onClose(listener: () => void): Error | void {
         this.onCloseListeners.push(listener);
     }
 
