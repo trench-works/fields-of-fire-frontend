@@ -17,10 +17,7 @@ type LobbyUpdated = {
     players: { playerId: string; classId: string; userId: string }[];
 };
 
-type GameStarted = {
-    game: Game;
-    player: { playerId: string };
-};
+type GameStarted = Game;
 
 enum LobbyActions {
     START = "start",

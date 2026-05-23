@@ -25,7 +25,7 @@ export class MainMenu extends Phaser.Scene {
         const bgImage = this.add.image(
             this.scale.width / 2,
             this.scale.height / 2,
-            BackgroundAsset.getAssetKey(BackgroundAssetId.MAIN_MENU)
+            BackgroundAsset.getAssetKey(BackgroundAssetId.MAIN_MENU),
         );
         bgImage.setDisplaySize(this.scale.width, this.scale.height);
         bgImage.setOrigin(0.5);
@@ -46,7 +46,7 @@ export class MainMenu extends Phaser.Scene {
             0,
             0,
             buttonsArea.width,
-            buttonsArea.height
+            buttonsArea.height,
         );
 
         // Bouton Jouer (ligne 0)
@@ -63,7 +63,7 @@ export class MainMenu extends Phaser.Scene {
             textPosition: { x: -130, y: -10 },
             hoverTint: 0xcccccc,
             onClick: () => {
-                this.scene.start("lobbyScene");
+                this.scene.start("lobbyListScene");
             },
         });
 

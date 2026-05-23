@@ -11,7 +11,6 @@ import { Color } from "../../config/ColorConfig";
 import { CharacterClass } from "../../Model/CharacterClass";
 import { LobbySocket } from "./repositories/lobby.socket";
 import { ActionAsset } from "../../assets";
-import { CharactersProps } from "../Fight/objects/Character";
 import { FightSceneInit } from "../Fight/fight.scene";
 
 export type LobbySceneInit = {
@@ -72,7 +71,10 @@ export class LobbyScene extends Phaser.Scene {
 
         this.lobbySocket.onLobbyUpdate(console.log); //TODO: handle lobby infos update + display
 
-        this.lobbySocket.onStart(({ game, player }) => {
+        this.lobbySocket.onStart((game) => {
+            const player = game.players.find(
+                (player) => player.userId === "dev",
+            )!; //TODO: enleve cette valeur en dur
             console.log(
                 `Rejoint la partie ${game.id} en tant que joueur ${player.playerId}`,
             );

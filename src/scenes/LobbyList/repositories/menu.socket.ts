@@ -1,8 +1,7 @@
 import { Socket, SocketListener } from "../../../core";
-import { Lobby } from "../interfaces/Lobby";
 
 const USER_ID = "dev";
-const MENU_TOPIC = "game";
+const MENU_TOPIC = "menu";
 
 type JoinLobby = {
     lobbyId: string;
@@ -31,7 +30,7 @@ enum LobbyEvents {
  * Game Defautl Socket (only for testing purpose, should be removed later)
  */
 
-export class MenuSocket extends Socket<{}, LobbyActions, LobbyEvents> {
+export class MenuSocket extends Socket<object, LobbyActions, LobbyEvents> {
     constructor() {
         super(MENU_TOPIC);
         super.open(USER_ID, {});

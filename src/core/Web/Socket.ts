@@ -1,12 +1,12 @@
-const SOCKET_SERVER_URL = "31.38.199.220";
-const SOCKET_SERVER_PORT = 80;
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type InputAction<Actions> = { actionId: Actions; payload: any };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type SocketListener<PayloadType = any> = (payload: PayloadType) => void;
 
 export class Socket<
-    RessourceKey extends { [key: string]: any } = {},
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    RessourceKey extends { [key: string]: any } = any,
     InputActions = string,
     OutputActions = string,
 > {
@@ -18,7 +18,7 @@ export class Socket<
 
     constructor(private readonly topic: string) {}
 
-    protected open(userId: string, key?: RessourceKey) {
+    protected open(userId: string, key: RessourceKey) {
         this.userId = userId;
         this.key = key;
         this.socket = new WebSocket(
@@ -35,6 +35,7 @@ export class Socket<
         });
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     send<PayloadType = any>(
         action: InputActions,
         payload: PayloadType,
@@ -56,6 +57,7 @@ export class Socket<
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     on<PayloadType = any>(
         action: OutputActions,
         listener: SocketListener<PayloadType>,
@@ -68,6 +70,7 @@ export class Socket<
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onClose(listener: (event: CloseEvent) => any): Error | void {
         if (!this.socket) {
             return new Error("Socket is not connected yet...");
