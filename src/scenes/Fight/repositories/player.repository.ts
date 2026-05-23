@@ -1,4 +1,4 @@
-import { Position, Socket } from "../../../core";
+import { Position, Socket, SocketListener } from "../../../core";
 const USER_ID = "dev";
 const GAME_TOPIC = "game";
 /**
@@ -37,10 +37,10 @@ export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
     }
 
     action(actionPlayer: ActionPlayer) {
-        return this.send<ActionPlayer>(GamePlayerActions.ACTION, actionPlayer);
+        return this.send(GamePlayerActions.ACTION, actionPlayer);
     }
 
-    onMove(listener: (entityMove: EntityMove) => void): void {
+    onMove(listener: SocketListener<EntityMove>): void {
         this.on(GamePlayerEvents.MOVE, listener);
     }
 }

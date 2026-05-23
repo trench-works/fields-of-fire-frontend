@@ -3,15 +3,15 @@ const SOCKET_SERVER_PORT = 80;
 
 type InputAction<Actions> = { actionId: Actions; payload: any };
 
-type Listener<PayloadType = any> = (payload: PayloadType) => void;
+export type SocketListener<PayloadType = any> = (payload: PayloadType) => void;
 
 export class Socket<
     RessourceKey extends { [key: string]: any } = {},
     InputActions = string,
-    OutputActions = string
+    OutputActions = string,
 > {
     private socket: WebSocket | undefined = undefined;
-    private listeners: Map<OutputActions, Listener[]> = new Map();
+    private listeners: Map<OutputActions, SocketListener[]> = new Map();
 
     private userId: string | undefined;
     private key: RessourceKey | undefined;
@@ -22,7 +22,7 @@ export class Socket<
         this.userId = userId;
         this.key = key;
         this.socket = new WebSocket(
-            `ws://${global.config.server.url}:${global.config.server.port}/${this.topic}`
+            `ws://${global.config.server.url}:${global.config.server.port}/${this.topic}`,
         );
         this.socket.addEventListener("open", this.onOpen.bind(this));
         this.socket.addEventListener("message", this.handleMessage.bind(this));
@@ -37,7 +37,7 @@ export class Socket<
 
     send<PayloadType = any>(
         action: InputActions,
-        payload: PayloadType
+        payload: PayloadType,
     ): Error | void {
         if (!this.socket) {
             return new Error("Socket is not connected yet...");
@@ -58,7 +58,7 @@ export class Socket<
 
     on<PayloadType = any>(
         action: OutputActions,
-        listener: Listener<PayloadType>
+        listener: SocketListener<PayloadType>,
     ) {
         const currentListeners = this.listeners.get(action);
         if (currentListeners) {

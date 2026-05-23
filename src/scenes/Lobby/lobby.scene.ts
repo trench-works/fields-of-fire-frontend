@@ -14,16 +14,24 @@ import { ActionAsset } from "../../assets";
 import { CharactersProps } from "../Fight/objects/Character";
 import { FightSceneInit } from "../Fight/fight.scene";
 
+export type LobbySceneInit = {
+    lobbyId: string;
+    playerId: string;
+};
+
 export class LobbyScene extends Phaser.Scene {
     private backgroundImage = "red_bg";
     private allExistingClass: CharacterClass[] = [];
-    private selectClassId: string = "entente_medic";
+    private selectClassId: string = "entente_fantassin";
     private tabWidth!: number;
     private tabHeight!: number;
     private playerImageContainer!: CustomContainer;
     private playerClassName!: CustomContainer;
     public lobbySocket!: LobbySocket;
     private menuButton!: MenuButton;
+
+    protected lobbyId!: string;
+    protected playerId!: string;
 
     constructor() {
         super({ key: "lobbyScene" });
@@ -32,19 +40,24 @@ export class LobbyScene extends Phaser.Scene {
         });
     }
 
+    init({ lobbyId, playerId }: LobbySceneInit) {
+        this.lobbyId = lobbyId;
+        this.playerId = playerId;
+    }
+
     preload() {
         this.load.image(
             this.backgroundImage,
-            `assets/${this.backgroundImage}.png`
+            `assets/${this.backgroundImage}.png`,
         );
         this.allExistingClass.forEach((charClass) => {
             if (charClass.playable === true) {
                 this.load.image(
                     charClass.imageKey,
-                    `assets/${charClass.imageKey}.png`
+                    `assets/${charClass.imageKey}.png`,
                 );
                 charClass.actionList.forEach(({ id }) =>
-                    ActionAsset.load(this.load, id)
+                    ActionAsset.load(this.load, id),
                 );
             }
         });
@@ -55,11 +68,13 @@ export class LobbyScene extends Phaser.Scene {
     }
 
     create() {
-        this.lobbySocket = new LobbySocket("3630");
+        this.lobbySocket = new LobbySocket(this.lobbyId);
 
-        this.lobbySocket.onJoin(({ game, player }) => {
+        this.lobbySocket.onLobbyUpdate(console.log); //TODO: handle lobby infos update + display
+
+        this.lobbySocket.onStart(({ game, player }) => {
             console.log(
-                `Rejoint le jeu ${game.id} en tant que joueur ${player.playerId}`
+                `Rejoint la partie ${game.id} en tant que joueur ${player.playerId}`,
             );
             this.startFightScene({
                 classes: this.allExistingClass,
@@ -88,7 +103,7 @@ export class LobbyScene extends Phaser.Scene {
         const tabPanelHeight = this.scale.height - tabArea.cellH;
         const currenttabPosition = new Position(
             tabArea.x + tabPanelWidth / 2,
-            tabArea.y + tabPanelHeight / 2
+            tabArea.y + tabPanelHeight / 2,
         );
         //console.log("TabArea dimensions:", tabArea.cellH, tabArea.cellW, " window, " , window.innerWidth, window.innerHeight);
 
@@ -110,7 +125,7 @@ export class LobbyScene extends Phaser.Scene {
                         this.add.text(50, 0, "not implemented yet", {
                             fontSize: "48px",
                             color: "#ffffff",
-                        })
+                        }),
                     );
                 },
             },
@@ -121,7 +136,7 @@ export class LobbyScene extends Phaser.Scene {
                         this.add.text(50, 0, "not implemented yet", {
                             fontSize: "48px",
                             color: "#ffffff",
-                        })
+                        }),
                     );
                 },
             },
@@ -141,7 +156,7 @@ export class LobbyScene extends Phaser.Scene {
         const playerPanelHeight = this.scale.height - area.cellH;
         const currentPlayerInfoPosition = new Position(
             area.x + playerPanelWidth / 2,
-            area.y + playerPanelHeight / 2
+            area.y + playerPanelHeight / 2,
         );
         const playerPanel = new CustomContainer(this, {
             title: "",
@@ -156,7 +171,7 @@ export class LobbyScene extends Phaser.Scene {
             0,
             0,
             playerPanelWidth,
-            playerPanelHeight
+            playerPanelHeight,
         );
 
         const imgArea = playerpanelgrid.getArea(0, 0, 5, 5);
@@ -166,7 +181,7 @@ export class LobbyScene extends Phaser.Scene {
         const playerNameContainer = new CustomContainer(this, {
             title:
                 this.allExistingClass.find(
-                    ({ id }) => id === this.selectClassId
+                    ({ id }) => id === this.selectClassId,
                 )?.name ?? "",
             x: classNameArea.centerX - playerPanelWidth / 2,
             y: classNameArea.centerY - playerPanelHeight / 2 + 10,
@@ -186,7 +201,7 @@ export class LobbyScene extends Phaser.Scene {
             width: imgArea.width,
             height: imgArea.height,
             backgroundImage: this.allExistingClass.find(
-                ({ id }) => id === this.selectClassId
+                ({ id }) => id === this.selectClassId,
             )?.imageKey,
             borderWidth: 5,
         });
@@ -208,11 +223,8 @@ export class LobbyScene extends Phaser.Scene {
             borderColor: "#ffffff",
             onClick: () => {
                 if (this.selectClassId) {
-                    console.log("will join game 3630 ");
-                    this.lobbySocket.joinGame({
-                        gameId: "3630",
-                        characterClassId: this.selectClassId,
-                    });
+                    console.log("will start game");
+                    this.lobbySocket.startGame();
                 }
             },
         });
@@ -239,7 +251,7 @@ export class LobbyScene extends Phaser.Scene {
 
     private buildClassesTab(container: Phaser.GameObjects.Container) {
         const classes = this.allExistingClass.filter(
-            (charClass) => charClass.playable
+            (charClass) => charClass.playable,
         );
         const classesPerRow = 3;
         const contentwidth: number = container.width;
@@ -249,7 +261,7 @@ export class LobbyScene extends Phaser.Scene {
             contentwidth,
             this.tabHeight,
             9,
-            Math.ceil(classes.length / classesPerRow)
+            Math.ceil(classes.length / classesPerRow),
         );
 
         classes.forEach((charClass, index) => {
@@ -280,16 +292,20 @@ export class LobbyScene extends Phaser.Scene {
     updatePlayerImage() {
         if (!this.selectClassId) return;
 
+        this.lobbySocket.changeClass({
+            classId: this.selectClassId,
+        });
+
         // Met directement la nouvelle image
         this.playerImageContainer.setBackgroundImage(
             this.allExistingClass.find(({ id }) => id === this.selectClassId)
-                ?.imageKey ?? ""
+                ?.imageKey ?? "",
         );
 
         // Met à jour le nom
         this.playerClassName.setTitle(
             this.allExistingClass.find(({ id }) => id === this.selectClassId)
-                ?.name ?? ""
+                ?.name ?? "",
         );
     }
 }

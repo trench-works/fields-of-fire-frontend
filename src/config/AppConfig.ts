@@ -1,6 +1,9 @@
-import { ConfigLoader } from "../core/config/config";
+import { ConfigLoader } from "../core/config/Config";
 
 export type App = {
+    user: {
+        id: string;
+    };
     server: {
         url: string;
         port: string;

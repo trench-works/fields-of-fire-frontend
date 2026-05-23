@@ -1,4 +1,7 @@
 {
+    "user": {
+        "id": "dev"
+    },
     "server": {
         "url": "localhost",
         "port": "80",
