@@ -1,7 +1,6 @@
 import { Socket, SocketListener } from "../../../core";
 import { Game } from "../../../Model/Game";
 
-const USER_ID = "dev";
 const LOBBY_TOPIC = "lobby";
 
 type LobbyKey = {
@@ -36,7 +35,7 @@ enum LobbyEvents {
 export class LobbySocket extends Socket<LobbyKey, LobbyActions, LobbyEvents> {
     constructor(lobbyId: string) {
         super(LOBBY_TOPIC);
-        super.open(USER_ID, { lobbyId });
+        super.open({ lobbyId });
     }
 
     onStart(listener: SocketListener<GameStarted>) {

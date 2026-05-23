@@ -73,8 +73,8 @@ export class LobbyScene extends Phaser.Scene {
 
         this.lobbySocket.onStart((game) => {
             const player = game.players.find(
-                (player) => player.userId === "dev",
-            )!; //TODO: enleve cette valeur en dur
+                (player) => player.userId === global.config.user.id,
+            )!;
             console.log(
                 `Rejoint la partie ${game.id} en tant que joueur ${player.playerId}`,
             );

@@ -18,8 +18,8 @@ export class Socket<
 
     constructor(private readonly topic: string) {}
 
-    protected open(userId: string, key: RessourceKey) {
-        this.userId = userId;
+    protected open(key: RessourceKey) {
+        this.userId = global.config.user.id;
         this.key = key;
         this.socket = new WebSocket(
             `ws://${global.config.server.url}:${global.config.server.port}/${this.topic}`,

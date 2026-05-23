@@ -1,6 +1,5 @@
 import { Socket, SocketListener } from "../../../core";
 
-const USER_ID = "dev";
 const MENU_TOPIC = "menu";
 
 type JoinLobby = {
@@ -33,7 +32,7 @@ enum LobbyEvents {
 export class MenuSocket extends Socket<object, LobbyActions, LobbyEvents> {
     constructor() {
         super(MENU_TOPIC);
-        super.open(USER_ID, {});
+        super.open({});
     }
 
     onJoin(listener: SocketListener<JoinedLobby>) {

@@ -1,5 +1,5 @@
 import { Position, Socket, SocketListener } from "../../../core";
-const USER_ID = "dev";
+
 const GAME_TOPIC = "game";
 
 /**
@@ -27,7 +27,7 @@ type EntityMove = {
 export class GameSocket extends Socket<GameKey, GameActions, string> {
     constructor(gameId: string) {
         super(GAME_TOPIC);
-        super.open(USER_ID, { gameId });
+        super.open({ gameId });
     }
 
     leave(): void | Error {
@@ -38,3 +38,4 @@ export class GameSocket extends Socket<GameKey, GameActions, string> {
         this.on(GameEvents.MOVE, listener);
     }
 }
+

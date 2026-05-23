@@ -1,5 +1,4 @@
 import { Position, Socket, SocketListener } from "../../../core";
-const USER_ID = "dev";
 const GAME_TOPIC = "game";
 /**
  * Game Player
@@ -33,7 +32,7 @@ type EntityMove = {
 export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
     constructor(gameId: string, playerId: string) {
         super(GAME_TOPIC);
-        super.open(USER_ID, { gameId, playerId });
+        super.open({ gameId, playerId });
     }
 
     action(actionPlayer: ActionPlayer) {
