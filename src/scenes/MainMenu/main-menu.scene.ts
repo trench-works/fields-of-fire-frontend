@@ -4,6 +4,7 @@ import {
     BackgroundAsset,
     BackgroundAssetId,
 } from "../../assets/BackgroundAsset";
+import { LobbyListScene } from "../LobbyList/lobby-list.scene";
 
 export class MainMenu extends Phaser.Scene {
     private readonly BUTTON_WIDTH = 500;
@@ -63,7 +64,7 @@ export class MainMenu extends Phaser.Scene {
             textPosition: { x: -130, y: -10 },
             hoverTint: 0xcccccc,
             onClick: () => {
-                this.scene.start("lobbyListScene");
+                LobbyListScene.start(this);
             },
         });
 

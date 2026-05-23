@@ -1,4 +1,5 @@
 import { Socket, SocketListener } from "../../../core";
+import { Game } from "../../../Model/Game";
 
 const MENU_TOPIC = "menu";
 
@@ -12,8 +13,8 @@ type JoinedLobby = {
 };
 
 type Reconnect = {
-    lobbyId?: string;
-    gameId?: string;
+    game: Game;
+    player: { playerId: string; classId: string };
 };
 
 enum LobbyActions {

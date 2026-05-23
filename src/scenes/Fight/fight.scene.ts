@@ -1,4 +1,4 @@
-import { Character, CharactersProps } from "./objects/Character";
+import { Character } from "./objects/Character";
 import { PlayableCharacter } from "../../Model/PlayableCharacter";
 import {
     GameScene,
@@ -15,13 +15,13 @@ import { SceneConfig } from "../../config/SceneConfig";
 import { Color } from "../../config/ColorConfig";
 import { ActionAsset } from "../../assets";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
-import { GamePlayerSocket } from "./repositories/player.repository";
+import { GamePlayerSocket } from "./repositories/player.socket";
 import { ActionManager } from "./objects/ActionManager";
 import { Tooltip } from "../../core/UI/Tooltip";
 import { Game } from "../../Model/Game";
+import { ClassesRepository } from "../Lobby/repositories/classes.repository";
 
 export type FightSceneInit = {
-    classes: CharacterClass[];
     game: Game;
     player: { playerId: string };
 };
@@ -49,6 +49,7 @@ export class FightScene extends GameScene {
     public tooltip!: Tooltip;
     private menuButton!: MenuButton;
     private gamePayload!: Game;
+    private classes: CharacterClass[] = [];
 
     constructor() {
         super({ key: "fightScene" });
@@ -56,26 +57,34 @@ export class FightScene extends GameScene {
         if (!config) {
             throw new Error("Config doesnt exist");
         }
+
+        new ClassesRepository().getClasses().then((data) => {
+            this.classes = data;
+        });
         this.renderConfig = {
             tileSize: config.render_config.tile_size,
             renderType: config.render_config.render_type,
             offset: new Position(),
         };
         this.renderConfig.offset = PositionUtils.getMapOffset(
-            this.renderConfig
+            this.renderConfig,
         );
     }
 
-    init({ classes, game, player: { playerId } }: FightSceneInit) {
+    static start(scene: Phaser.Scene, data: FightSceneInit) {
+        scene.scene.start("fightScene", data);
+    }
+
+    init({ game, player: { playerId } }: FightSceneInit) {
         this.gamePayload = game;
         const player = game.players.find(
-            (player) => player.playerId === playerId
+            (player) => player.playerId === playerId,
         )!;
         const playerEntity = game.entities.find(
-            (entity) => entity.entityId === player.entityId
+            (entity) => entity.entityId === player.entityId,
         )!;
-        const playerClass = classes.find(
-            (charClass) => charClass.id === playerEntity.characterClassId
+        const playerClass = this.classes.find(
+            (charClass) => charClass.id === playerEntity.characterClassId,
         )!;
         this.myPlayer = new PlayableCharacter(
             {
@@ -88,13 +97,13 @@ export class FightScene extends GameScene {
                 actionList: playerClass.actionList,
                 scene: this,
             },
-            playerClass
+            playerClass,
         );
         this.characters = game.entities
             .filter((entity) => entity.entityId !== playerEntity.entityId)
             .map((entity) => {
-                const entityClass = classes.find(
-                    (charClass) => charClass.id === entity.characterClassId
+                const entityClass = this.classes.find(
+                    (charClass) => charClass.id === entity.characterClassId,
                 )!;
                 return new Character({
                     position: entity.position,
@@ -113,12 +122,12 @@ export class FightScene extends GameScene {
         ActionAsset.loadAll(this.load);
         this.load.tilemapTiledJSON(
             this.fightMap,
-            `assets/${this.fightMap}.json`
+            `assets/${this.fightMap}.json`,
         );
         this.load.image("groundTiles", `assets/${this.tileSetImage}.png`);
 
         this.allExistingStats.forEach((stat) =>
-            this.load.image(stat, `assets/icon/icon_${stat}.png`)
+            this.load.image(stat, `assets/icon/icon_${stat}.png`),
         );
 
         this.characters.push(this.myPlayer);
@@ -127,7 +136,7 @@ export class FightScene extends GameScene {
 
         this.load.image(
             this.backgroundImage,
-            `assets/${this.backgroundImage}.png`
+            `assets/${this.backgroundImage}.png`,
         );
     }
 
@@ -151,7 +160,7 @@ export class FightScene extends GameScene {
         this.generateMap(
             this.actionManager,
             this.rangeVisualizer,
-            this.gamePayload.plateau
+            this.gamePayload.plateau,
         );
         this.spawnEntities();
 
@@ -184,14 +193,14 @@ export class FightScene extends GameScene {
             0,
             0,
             actionPanel.width,
-            actionPanel.height
+            actionPanel.height,
         );
         const actionListArea = actionGrid.getArea(0, 1, 9, 7);
 
         const statsTable = new DataDisplayer(this, {
             position: new Position(
                 actionPanel.x - actionPanel.width / 2 + actionListArea.centerX,
-                actionPanel.y - actionPanel.height / 2 + actionListArea.centerY
+                actionPanel.y - actionPanel.height / 2 + actionListArea.centerY,
             ),
             width: actionListArea.width,
             height: actionListArea.height,
@@ -214,12 +223,12 @@ export class FightScene extends GameScene {
                     onClick: () => {
                         this.rangeVisualizer.onActionSelected(
                             this.myPlayer!.position,
-                            rangeManager
+                            rangeManager,
                         );
                         this.actionManager.currentAction = action;
                     },
                 },
-                64
+                64,
             );
             if (iconObj) {
                 iconObj.setInteractive();
@@ -250,7 +259,7 @@ export class FightScene extends GameScene {
             0,
             0,
             statsPanel.width,
-            statsPanel.height
+            statsPanel.height,
         );
 
         const imgArea = statsGrid.getArea(0, 0, 3, 4);
@@ -295,7 +304,7 @@ export class FightScene extends GameScene {
         const statsTable = new DataDisplayer(this, {
             position: new Position(
                 statsPanel.x - statsPanel.width / 2 + statValuesArea.centerX,
-                statsPanel.y - statsPanel.height / 2 + statValuesArea.centerY
+                statsPanel.y - statsPanel.height / 2 + statValuesArea.centerY,
             ),
             width: statValuesArea.width,
             height: statValuesArea.height,

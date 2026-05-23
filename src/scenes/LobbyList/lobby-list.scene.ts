@@ -1,5 +1,5 @@
 import { MenuSocket } from "./repositories/menu.socket";
-import { LobbySceneInit } from "../Lobby/lobby.scene";
+import { LobbyScene } from "../Lobby/lobby.scene";
 import {
     Button,
     CustomContainer,
@@ -9,6 +9,7 @@ import {
     TabManager,
 } from "../../core";
 import { Color } from "../../config/ColorConfig";
+import { FightScene } from "../Fight/fight.scene";
 
 export class LobbyListScene extends Phaser.Scene {
     private backgroundImage = "red_bg";
@@ -18,6 +19,10 @@ export class LobbyListScene extends Phaser.Scene {
     private playerImageContainer!: CustomContainer;
     private playerClassName!: CustomContainer;
     private menuButton!: MenuButton;
+
+    static start(scene: Phaser.Scene) {
+        scene.scene.start("lobbyListScene");
+    }
 
     constructor() {
         super({ key: "lobbyListScene" });
@@ -30,10 +35,6 @@ export class LobbyListScene extends Phaser.Scene {
         );
     }
 
-    startLobbyScene(data: LobbySceneInit) {
-        this.scene.start("lobbyScene", data);
-    }
-
     create() {
         this.menuSocket = new MenuSocket();
 
@@ -41,9 +42,20 @@ export class LobbyListScene extends Phaser.Scene {
             console.log(
                 `Rejoint le lobby ${lobbyId} en tant que joueur ${playerId}`,
             );
-            this.startLobbyScene({
+            LobbyScene.start(this, {
                 lobbyId,
                 playerId,
+            });
+        });
+
+        this.menuSocket.onReconnect(({ game, player }) => {
+            console.log(
+                `Rejoint la game ${game.id} en tant que joueur ${player.playerId}`,
+            );
+
+            FightScene.start(this, {
+                game,
+                player,
             });
         });
         this.createDisplay();

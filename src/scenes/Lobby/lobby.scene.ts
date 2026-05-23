@@ -5,13 +5,13 @@ import {
     GridUtils,
     Position,
     MenuButton,
-    Http,
 } from "../../core";
 import { Color } from "../../config/ColorConfig";
 import { CharacterClass } from "../../Model/CharacterClass";
 import { LobbySocket } from "./repositories/lobby.socket";
 import { ActionAsset } from "../../assets";
-import { FightSceneInit } from "../Fight/fight.scene";
+import { FightScene } from "../Fight/fight.scene";
+import { ClassesRepository } from "./repositories/classes.repository";
 
 export type LobbySceneInit = {
     lobbyId: string;
@@ -20,7 +20,7 @@ export type LobbySceneInit = {
 
 export class LobbyScene extends Phaser.Scene {
     private backgroundImage = "red_bg";
-    private allExistingClass: CharacterClass[] = [];
+    private classes: CharacterClass[] = [];
     private selectClassId: string = "entente_fantassin";
     private tabWidth!: number;
     private tabHeight!: number;
@@ -34,9 +34,13 @@ export class LobbyScene extends Phaser.Scene {
 
     constructor() {
         super({ key: "lobbyScene" });
-        Http.fetch<CharacterClass>("/class").then((data) => {
-            this.allExistingClass = data;
+        new ClassesRepository().getClasses().then((data) => {
+            this.classes = data;
         });
+    }
+
+    static start(scene: Phaser.Scene, data: LobbySceneInit) {
+        scene.scene.start("lobbyScene", data);
     }
 
     init({ lobbyId, playerId }: LobbySceneInit) {
@@ -49,7 +53,7 @@ export class LobbyScene extends Phaser.Scene {
             this.backgroundImage,
             `assets/${this.backgroundImage}.png`,
         );
-        this.allExistingClass.forEach((charClass) => {
+        this.classes.forEach((charClass) => {
             if (charClass.playable === true) {
                 this.load.image(
                     charClass.imageKey,
@@ -60,10 +64,6 @@ export class LobbyScene extends Phaser.Scene {
                 );
             }
         });
-    }
-
-    startFightScene(data: FightSceneInit) {
-        this.scene.start("fightScene", data);
     }
 
     create() {
@@ -78,8 +78,7 @@ export class LobbyScene extends Phaser.Scene {
             console.log(
                 `Rejoint la partie ${game.id} en tant que joueur ${player.playerId}`,
             );
-            this.startFightScene({
-                classes: this.allExistingClass,
+            FightScene.start(this, {
                 game,
                 player,
             });
@@ -182,9 +181,8 @@ export class LobbyScene extends Phaser.Scene {
 
         const playerNameContainer = new CustomContainer(this, {
             title:
-                this.allExistingClass.find(
-                    ({ id }) => id === this.selectClassId,
-                )?.name ?? "",
+                this.classes.find(({ id }) => id === this.selectClassId)
+                    ?.name ?? "",
             x: classNameArea.centerX - playerPanelWidth / 2,
             y: classNameArea.centerY - playerPanelHeight / 2 + 10,
             width: classNameArea.width,
@@ -202,7 +200,7 @@ export class LobbyScene extends Phaser.Scene {
             y: imgArea.centerY - playerPanelHeight / 2 + 10,
             width: imgArea.width,
             height: imgArea.height,
-            backgroundImage: this.allExistingClass.find(
+            backgroundImage: this.classes.find(
                 ({ id }) => id === this.selectClassId,
             )?.imageKey,
             borderWidth: 5,
@@ -252,9 +250,7 @@ export class LobbyScene extends Phaser.Scene {
     // ne jamais lui donner + de 3 classes sinon EXPLOSION
 
     private buildClassesTab(container: Phaser.GameObjects.Container) {
-        const classes = this.allExistingClass.filter(
-            (charClass) => charClass.playable,
-        );
+        const classes = this.classes.filter((charClass) => charClass.playable);
         const classesPerRow = 3;
         const contentwidth: number = container.width;
         const grid = GridUtils.uiGrid(
@@ -300,14 +296,14 @@ export class LobbyScene extends Phaser.Scene {
 
         // Met directement la nouvelle image
         this.playerImageContainer.setBackgroundImage(
-            this.allExistingClass.find(({ id }) => id === this.selectClassId)
+            this.classes.find(({ id }) => id === this.selectClassId)
                 ?.imageKey ?? "",
         );
 
         // Met à jour le nom
         this.playerClassName.setTitle(
-            this.allExistingClass.find(({ id }) => id === this.selectClassId)
-                ?.name ?? "",
+            this.classes.find(({ id }) => id === this.selectClassId)?.name ??
+                "",
         );
     }
 }
