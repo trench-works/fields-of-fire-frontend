@@ -159,7 +159,7 @@ export class FightScene extends GameScene {
         this.generateMap(
             this.actionManager,
             this.rangeVisualizer,
-            this.gamePayload.plateau,
+            this.gamePayload,
         );
         this.spawnEntities();
 

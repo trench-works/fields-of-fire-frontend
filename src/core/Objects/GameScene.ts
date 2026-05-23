@@ -7,7 +7,7 @@ import { PlayableCharacter } from "../../Model/PlayableCharacter";
 import { RangeVisualizer } from "../../scenes/Fight/objects/RangeVisualizer";
 import { ActionManager } from "../../scenes/Fight/objects/ActionManager";
 import { ActionAssetId } from "../../assets";
-import { Case } from "../../Model/Case";
+import { EntityType, Game } from "../../Model/Game";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -53,9 +53,11 @@ export class GameScene extends Scene {
     generateMap(
         actionManager: ActionManager,
         rangeVisualizer: RangeVisualizer,
-        plateau: Case[][]
+        game: Game,
     ) {
-        const map = this.make.tilemap({ key: this.fightMap });
+        const map = this.make.tilemap({
+            key: this.fightMap,
+        });
         const tileset = map.addTilesetImage(this.tileSetImage, "groundTiles");
 
         const centerMap = scaleAndCenter({
@@ -71,14 +73,14 @@ export class GameScene extends Scene {
         }
 
         this.renderConfig.offset.add(
-            new Position(centerMap.offsetX, centerMap.offsetY)
+            new Position(centerMap.offsetX, centerMap.offsetY),
         );
 
         const groundLayer = map.createLayer(
             "Ground",
             tileset!,
             centerMap.offsetX,
-            centerMap.offsetY
+            centerMap.offsetY,
         );
 
         if (!groundLayer) {
@@ -91,39 +93,31 @@ export class GameScene extends Scene {
         groundLayer.setDepth(0);
 
         this.generatePlayGrid(
-            map,
             groundLayer,
             actionManager,
             rangeVisualizer,
-            plateau
+            game,
         );
     }
 
     generatePlayGrid(
-        map: Phaser.Tilemaps.Tilemap,
         layer: Phaser.Tilemaps.TilemapLayer,
         actionManager: ActionManager,
         rangeVisualizer: RangeVisualizer,
-        plateau: Case[][]
+        game: Game,
     ) {
-        for (let y = 0; y < map.height; y++) {
-            for (let x = 0; x < map.width; x++) {
+        for (let x = 0; x < game.plateau.length; x++) {
+            for (let y = 0; y < game.plateau.length; y++) {
                 const tile = layer.getTileAt(x, y);
-                const caseTile = plateau[x][y];
+                const caseTile = game.plateau[x][y];
                 if (caseTile.isHole || caseTile.isWall) {
                     tile.setVisible(false);
                     continue;
                 }
                 if (!tile) continue;
 
-                const worldX = tile.getCenterX();
-                const worldY = tile.getCenterY();
-
-                const zone = this.add.zone(worldX, worldY, 10, 10);
-
                 const Yof = 16;
                 const Xof = 32;
-
                 const diamond = new Phaser.Geom.Polygon([
                     //point1 (left corner)
                     0 - Xof * this.scaleFactor,
@@ -138,6 +132,35 @@ export class GameScene extends Scene {
                     0,
                     0,
                 ]);
+                const worldX = tile.getCenterX();
+                const worldY = tile.getCenterY();
+
+                if (caseTile.entityId) {
+                    const entity = game.entities.find(
+                        (entity) => entity.entityId === caseTile.entityId,
+                    );
+                    if (entity) {
+                        const hoverGraphics = this.add.graphics();
+                        hoverGraphics.lineStyle(
+                            2,
+                            entity.entityType === EntityType.ALLY
+                                ? 0x00ff00
+                                : 0xff0000,
+                            1,
+                        ); // contour blanc
+                        hoverGraphics.strokePoints(diamond.points, true);
+                        hoverGraphics.setPosition(worldX, worldY);
+                        hoverGraphics.setDepth(layer.depth + 5);
+                        hoverGraphics.setVisible(true);
+                    }
+                }
+
+                const zone = this.add.zone(
+                    worldX,
+                    worldY,
+                    game.plateau.length,
+                    game.plateau.length,
+                );
 
                 const hoverGraphics = this.add.graphics();
                 hoverGraphics.lineStyle(2, 0xffffff, 1); // contour blanc
@@ -160,7 +183,7 @@ export class GameScene extends Scene {
                     gridPosition: new Position(x, y),
                     pixelPosition: new Position(
                         worldX,
-                        worldY - Yof * this.scaleFactor
+                        worldY - Yof * this.scaleFactor,
                     ),
                     zone,
                     hoverGraphics,
@@ -178,7 +201,7 @@ export class GameScene extends Scene {
                         rangeVisualizer.isItInRange(
                             this.myPlayer.position,
                             rangeManager!,
-                            new Position(x, y)
+                            new Position(x, y),
                         )
                     ) {
                         actionManager.launchAction(new Position(x, y));
@@ -201,7 +224,7 @@ export class GameScene extends Scene {
         diamond: Phaser.Geom.Polygon,
         worldX: number,
         worldY: number,
-        layer: Phaser.Tilemaps.TilemapLayer
+        layer: Phaser.Tilemaps.TilemapLayer,
     ) {
         const g = this.add.graphics();
         g.lineStyle(2, 0xff0000, 1); // contour rouge
