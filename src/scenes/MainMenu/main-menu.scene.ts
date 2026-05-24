@@ -89,24 +89,6 @@ export class MainMenu extends Phaser.Scene {
                 console.log("Paramètres - À implémenter");
             },
         });
-
-        // Bouton Lobby (ligne 2)
-        const lobbyArea = buttonsGrid.getArea(0, 2, 1, 1);
-        new CustomContainer(this, {
-            title: "Lobby",
-            x: buttonsArea.x + lobbyArea.centerX,
-            y: buttonsArea.y + lobbyArea.centerY,
-            width: this.BUTTON_WIDTH,
-            height: this.BUTTON_HEIGHT,
-            backgroundImage: "menuBalle",
-            titleColor: "#FFFFFF",
-            fontsize: 50,
-            textPosition: { x: -130, y: -10 },
-            hoverTint: 0xcccccc,
-            onClick: () => {
-                this.scene.start("lobbyScene");
-            },
-        });
     }
 }
 

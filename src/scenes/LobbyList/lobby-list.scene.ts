@@ -1,28 +1,22 @@
 import { MenuSocket } from "./repositories/menu.socket";
 import { LobbyScene } from "../Lobby/lobby.scene";
-import {
-    Button,
-    CustomContainer,
-    GridUtils,
-    MenuButton,
-    Position,
-    TabManager,
-} from "../../core";
-import { Color } from "../../config/ColorConfig";
+import { Button, CustomContainer, GridUtils, MenuButton } from "../../core";
 import { FightScene } from "../Fight/fight.scene";
 import { MainMenu } from "../MainMenu/main-menu.scene";
 import { uiGrid } from "../../core/Utils/Grid";
 import { LobbyRow } from "./objects/LobbyRow";
-import { LobbyData, LobbyStatus } from "./interfaces/LobbyData";
+import { LobbyData } from "./interfaces/LobbyData";
+import { LobbiesRepository } from "./repositories/lobbies.repository";
 
 export class LobbyListScene extends Phaser.Scene {
     private backgroundImage = "red_bg";
     public menuSocket!: MenuSocket;
     private menuButton!: MenuButton;
     private sceneGrid = GridUtils.uiGrid(0, 0);
-    private lobbyData : LobbyData[] = [];
+    private lobbyData: LobbyData[] = [];
     private selectedLobby: LobbyData | null = null;
     private selectedRow: LobbyRow | null = null;
+    private lobbyRows: LobbyRow[] = [];
 
     static start(scene: Phaser.Scene) {
         scene.scene.start("lobbyListScene");
@@ -39,15 +33,18 @@ export class LobbyListScene extends Phaser.Scene {
         );
     }
 
+    init() {
+        this.resetLobbies();
+    }
+
+    resetLobbies() {
+        new LobbiesRepository().getLobbies().then((lobbies) => {
+            this.lobbyData = lobbies;
+            this.displayLobbyList();
+        });
+    }
+
     create() {
-
-        //to remove when the lobby list will be sent from the back
-            this.lobbyData = [
-                { lobbyId: "lobby1", lobbyName: "Lobby 1", players: 1, maxPlayers: 4, creator: "player1", status: LobbyStatus.IN_GAME },
-                { lobbyId: "lobby2", lobbyName: "Lobby 2", players: 2, maxPlayers: 4, creator: "player2", status: LobbyStatus.OPEN },
-                { lobbyId: "lobby3", lobbyName: "Lobby 3", players: 3, maxPlayers: 4, creator: "player3", status: LobbyStatus.OPEN },
-            ];
-
         this.menuSocket = new MenuSocket();
         this.menuSocket.onClose(() => MainMenu.start(this));
 
@@ -65,13 +62,41 @@ export class LobbyListScene extends Phaser.Scene {
             console.log(
                 `Rejoint la game ${game.id} en tant que joueur ${player.playerId}`,
             );
-
             FightScene.start(this, {
                 game,
                 player,
             });
         });
         this.createDisplay();
+    }
+
+    displayLobbyList() {
+        this.selectedLobby = null;
+        this.selectedRow = null;
+        this.lobbyRows.forEach((row) => row.destroy()); // destroy all rows
+        const lobbyListArea = this.sceneGrid.getArea(0, 2, 9, 6);
+        const lobbyGrid = uiGrid(
+            0,
+            0,
+            lobbyListArea.width,
+            lobbyListArea.height,
+            9,
+            12,
+            lobbyListArea.x,
+            lobbyListArea.y,
+        );
+
+        this.lobbyData.forEach((lobby, i) => {
+            const rowArea = lobbyGrid.getArea(0, i, 9, 1);
+            this.lobbyRows.push(
+                new LobbyRow(this, rowArea, lobby, (row) => {
+                    this.selectedRow?.setSelected(false); // désélectionne l'ancienne
+                    this.selectedLobby = lobby;
+                    this.selectedRow = row;
+                    row.setSelected(true); // sélectionne la nouvelle
+                }),
+            );
+        });
     }
 
     createDisplay() {
@@ -90,53 +115,35 @@ export class LobbyListScene extends Phaser.Scene {
             .setOrigin(0.5, 0);
 
         //lobby list
-        const LobbyListArea = this.sceneGrid.getArea(0, 2, 9, 6);
+        const lobbyListArea = this.sceneGrid.getArea(0, 2, 9, 6);
         const lobbyListContainer = new CustomContainer(this, {
             title: "",
-            x: LobbyListArea.x + LobbyListArea.width / 2,
-            y: LobbyListArea.y + LobbyListArea.height / 2,
-            width: LobbyListArea.width,
-            height: LobbyListArea.height,
+            x: lobbyListArea.x + lobbyListArea.width / 2,
+            y: lobbyListArea.y + lobbyListArea.height / 2,
+            width: lobbyListArea.width,
+            height: lobbyListArea.height,
             opacity: 0.25,
             borderWidth: 2,
-        });
-
-        const lobbyGrid = uiGrid(
-            0, 0,
-            LobbyListArea.width,
-            LobbyListArea.height,
-            9, 12,   
-            LobbyListArea.x,          
-            LobbyListArea.y
-        );
-        
-        this.lobbyData.forEach((lobby, i) => {
-            const rowArea = lobbyGrid.getArea(0, i, 9, 1);
-            const row = new LobbyRow(this, rowArea, lobby, () => {
-                    this.selectedRow?.setSelected(false); // désélectionne l'ancienne
-                    this.selectedLobby = lobby;
-                    this.selectedRow = row;
-                    row.setSelected(true);                // sélectionne la nouvelle
-                });
         });
         //buttons
 
         const buttonArea = this.sceneGrid.getArea(0, 8, 9, 1);
         const buttonGrid = uiGrid(
-            0, 0,
+            0,
+            0,
             buttonArea.width,
             buttonArea.height,
-            13, 9,
-            buttonArea.x,   
-            buttonArea.y 
+            13,
+            9,
+            buttonArea.x,
+            buttonArea.y,
         );
 
         const createButtonArea = buttonGrid.getArea(0, 0, 9, 9);
-        
-        const cell0 = buttonGrid.getArea(1, 1, 3, 7); // bouton gauche
-        const cell1 = buttonGrid.getArea(5, 1, 3, 7); // bouton centre  
-        const cell2 = buttonGrid.getArea(9, 1, 3, 7); // bouton droit
 
+        const cell0 = buttonGrid.getArea(1, 1, 3, 7); // bouton gauche
+        const cell1 = buttonGrid.getArea(5, 1, 3, 7); // bouton centre
+        const cell2 = buttonGrid.getArea(9, 1, 3, 7); // bouton droit
 
         const createButton = new Button(this, {
             text: "Créer un Lobby",
@@ -145,8 +152,8 @@ export class LobbyListScene extends Phaser.Scene {
             width: cell0.width,
             height: cell0.height,
             onClick: () => {
-                console.log("Créer un lobby - À implémenter");
-            }
+                this.menuSocket.createLobby();
+            },
         });
 
         const joinButton = new Button(this, {
@@ -156,12 +163,12 @@ export class LobbyListScene extends Phaser.Scene {
             width: cell2.width,
             height: cell2.height,
             onClick: () => {
-                if (!this.selectedLobby) {
-                    console.warn("Aucun lobby sélectionné");
-                    return;
+                if (this.selectedLobby) {
+                    this.menuSocket.joinLobby({
+                        lobbyId: this.selectedLobby.id,
+                    });
                 }
-            console.log(`Rejoindre le lobby : ${this.selectedLobby.lobbyId}`);
-            }
+            },
         });
 
         const refreshButton = new Button(this, {
@@ -171,8 +178,8 @@ export class LobbyListScene extends Phaser.Scene {
             width: cell1.width,
             height: cell1.height,
             onClick: () => {
-                console.log("Actualiser - À implémenter");
-            }
+                this.resetLobbies();
+            },
         });
 
         // Créer le bouton Menu
