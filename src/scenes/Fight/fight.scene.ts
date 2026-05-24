@@ -251,9 +251,17 @@ export class FightScene extends GameScene {
         });
     }
 
-    createCharacterStatsUi(perso: Character, gridPosition: { x: number; y: number }) {
+    createCharacterStatsUi(
+        perso: Character,
+        gridPosition: { x: number; y: number },
+    ) {
         // 1) Tu récupères la zone du panel dans la grille globale
-        const statsArea = this.sceneGrid.getArea(gridPosition.x, gridPosition.y, 2, 3);
+        const statsArea = this.sceneGrid.getArea(
+            gridPosition.x,
+            gridPosition.y,
+            2,
+            3,
+        );
 
         // 2) Tu crées le panel
         const statsPanel = new CustomContainer(this, {
@@ -289,7 +297,7 @@ export class FightScene extends GameScene {
         const classNameArea = statsGrid.getArea(3, 0, 6, 1);
 
         const statsClassName = new CustomContainer(this, {
-            title: this.myPlayer!.characterClass.name,
+            title: perso.name,
             x: statsPanel.x - statsPanel.width / 2 + classNameArea.centerX,
             y: statsPanel.y - statsPanel.height / 2 + classNameArea.centerY,
             width: classNameArea.width,
@@ -301,7 +309,7 @@ export class FightScene extends GameScene {
         const playerNameArea = statsGrid.getArea(0, 4, 3, 1);
 
         const statsName = new CustomContainer(this, {
-            title: this.myPlayer.name,
+            title: perso.name,
             x: statsPanel.x - statsPanel.width / 2 + playerNameArea.centerX,
             y: statsPanel.y - statsPanel.height / 2 + playerNameArea.centerY,
             width: playerNameArea.width,
@@ -349,24 +357,30 @@ export class FightScene extends GameScene {
         statsTable.placeContent(1, 3, perso.baseStats.energy);
         statsTable.placeContent(3, 2, perso.baseStats.dodging);
 
-        return { statsPanel, statsTable, statsImage, statsClassName, statsName };
+        return {
+            statsPanel,
+            statsTable,
+            statsImage,
+            statsClassName,
+            statsName,
+        };
     }
 
     public inspectCharacter(perso: Character) {
-    // Détruire l'ancien panneau si existant
-    if (this.inspectedStatsPanel) {
-        this.inspectedStatsPanel.statsPanel.destroy();
-        this.inspectedStatsPanel.statsTable.destroy();
-        this.inspectedStatsPanel.statsImage.destroy();
-        this.inspectedStatsPanel.statsClassName.destroy();
-        this.inspectedStatsPanel.statsName.destroy();
-        this.inspectedStatsPanel = null;
-    }
+        // Détruire l'ancien panneau si existant
+        if (this.inspectedStatsPanel) {
+            this.inspectedStatsPanel.statsPanel.destroy();
+            this.inspectedStatsPanel.statsTable.destroy();
+            this.inspectedStatsPanel.statsImage.destroy();
+            this.inspectedStatsPanel.statsClassName.destroy();
+            this.inspectedStatsPanel.statsName.destroy();
+            this.inspectedStatsPanel = null;
+        }
 
-    this.inspectedStatsPanel = this.createCharacterStatsUi(
-        perso,
-        { x: 7, y: 6 }  
-    );
-}
+        this.inspectedStatsPanel = this.createCharacterStatsUi(perso, {
+            x: 7,
+            y: 6,
+        });
+    }
 }
 
