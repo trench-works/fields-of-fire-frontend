@@ -3,7 +3,7 @@ import { LobbyData } from "../interfaces/LobbyData";
 
 export class LobbiesRepository {
     async getLobbies(): Promise<LobbyData[]> {
-        return Http.fetch<LobbyData>("/lobbies");
+        return Http.get<LobbyData[]>("/lobbies");
     }
 }
 

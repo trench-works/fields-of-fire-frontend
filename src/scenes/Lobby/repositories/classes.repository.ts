@@ -3,7 +3,7 @@ import { CharacterClass } from "../../../Model/CharacterClass";
 
 export class ClassesRepository {
     async getClasses(): Promise<CharacterClass[]> {
-        return Http.fetch<CharacterClass>("/class");
+        return Http.get<CharacterClass[]>("/class");
     }
 }
 
