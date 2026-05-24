@@ -42,7 +42,7 @@ export class Http {
     >(
         method: string,
         endpoint: string,
-        payload?: HttpPayload<Param, Query, Body>,
+        payload: HttpPayload<Param, Query, Body> | undefined,
     ): Promise<Response> {
         if (!global.config) {
             await new AppConfigLoader().loadConfig().then((appConfig) => {
@@ -71,6 +71,7 @@ export class Http {
         const rep = await fetch(url, {
             method,
             body: payload?.body ? JSON.stringify(payload?.body) : undefined,
+            headers: { "Content-Type": "application/json" },
         });
         const data: Response = await rep.json();
         return data;

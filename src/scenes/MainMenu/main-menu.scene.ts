@@ -6,11 +6,14 @@ import {
 } from "../../assets/BackgroundAsset";
 import { LobbyListScene } from "../LobbyList/lobby-list.scene";
 import { PopupInput } from "./objects/LoginPopup";
+import { UserRepository } from "./repositories/user.repository";
 
 export class MainMenu extends Phaser.Scene {
     private readonly BUTTON_WIDTH = 500;
     private readonly BUTTON_HEIGHT = 100;
     private sceneGrid = GridUtils.uiGrid(0, 0);
+
+    private playButton!: CustomContainer;
 
     constructor() {
         super({ key: "mainMenuScene" });
@@ -57,7 +60,7 @@ export class MainMenu extends Phaser.Scene {
 
         // Bouton Jouer (ligne 0)
         const playArea = buttonsGrid.getArea(0, 0, 1, 1);
-        new CustomContainer(this, {
+        this.playButton = new CustomContainer(this, {
             title: "Jouer",
             x: buttonsArea.x + playArea.centerX,
             y: buttonsArea.y + playArea.centerY,
@@ -66,10 +69,13 @@ export class MainMenu extends Phaser.Scene {
             backgroundImage: "menuBalle",
             titleColor: "#FFFFFF",
             fontsize: 50,
+            alpha: global.config.user ? 1 : 0.5,
             textPosition: { x: -130, y: -10 },
             hoverTint: 0xcccccc,
             onClick: () => {
-                LobbyListScene.start(this);
+                if (global.config.user) {
+                    LobbyListScene.start(this);
+                }
             },
         });
 
@@ -90,13 +96,12 @@ export class MainMenu extends Phaser.Scene {
                 console.log("Paramètres - À implémenter");
             },
         });
-        
 
         //bouton login
         const loginArea = this.sceneGrid.getArea(8, 0, 1, 1);
         new Button(this, {
             text: "Login",
-            x: loginArea.x+ loginArea.width / 2,
+            x: loginArea.x + loginArea.width / 2,
             y: loginArea.y + loginArea.height / 2,
             width: loginArea.width,
             height: loginArea.height,
@@ -106,14 +111,16 @@ export class MainMenu extends Phaser.Scene {
                 new PopupInput(this, {
                     title: "Connexion",
                     placeholder: "Entrez votre pseudo...",
-                    onValidate: (value: string) => {
-                        console.log(`Login avec : ${value}`);
+                    onValidate: async (value: string) => {
+                        await new UserRepository().authenticate(value);
+                        if (global.config.user) {
+                            this.playButton.alpha = 1;
+                            return true;
+                        }
+                        return false;
                     },
-                    onCancel: () => {
-                        console.log("Login annulé");
-                    }
                 });
-            }
+            },
         });
     }
 }

@@ -18,6 +18,7 @@ interface ContainerConfig {
     onClick?: () => void;
     textPosition?: { x: number; y: number };
     hoverTint?: number;
+    alpha?: number;
 }
 
 export class CustomContainer extends Phaser.GameObjects.Container {
@@ -27,7 +28,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         | null = null;
     private borderGraphics?: Phaser.GameObjects.Graphics;
     private titleText: Phaser.GameObjects.Text;
-    private onClick: (() => void) | undefined;
+    public onClick: (() => void) | undefined;
     private bgColor: string;
     private bgOpacity: number;
     private hoverTint: number | undefined;
@@ -46,6 +47,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             backgroundImage,
             opacity = 1,
             fontsize = 24,
+            alpha,
             onClick,
             textPosition = { x: 0, y: -height / 2 + 15 },
             hoverTint,
@@ -57,6 +59,9 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         this.bgOpacity = opacity;
         this.onClick = onClick;
         this.hoverTint = hoverTint;
+        if (alpha) {
+            this.alpha = alpha;
+        }
 
         // --- TEXTE ---
         this.titleText = scene.add
