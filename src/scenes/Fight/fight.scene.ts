@@ -51,6 +51,13 @@ export class FightScene extends GameScene {
     private menuButton!: MenuButton;
     private gamePayload!: Game;
     private classes: CharacterClass[] = [];
+    private inspectedStatsPanel: {
+        statsPanel: CustomContainer;
+        statsTable: DataDisplayer;
+        statsImage: CustomContainer;
+        statsClassName: CustomContainer;
+        statsName: CustomContainer;
+    } | null = null;
 
     constructor() {
         super({ key: "fightScene" });
@@ -237,12 +244,16 @@ export class FightScene extends GameScene {
             }
         });
 
-        this.createCharacterStatsUi(this.myPlayer!);
+        this.createCharacterStatsUi(this.myPlayer!, { x: 0, y: 6 });
+
+        this.events.on("characterClicked", (perso: Character) => {
+            this.inspectCharacter(perso);
+        });
     }
 
-    createCharacterStatsUi(perso: Character) {
+    createCharacterStatsUi(perso: Character, gridPosition: { x: number; y: number }) {
         // 1) Tu récupères la zone du panel dans la grille globale
-        const statsArea = this.sceneGrid.getArea(0, 6, 2, 3);
+        const statsArea = this.sceneGrid.getArea(gridPosition.x, gridPosition.y, 2, 3);
 
         // 2) Tu crées le panel
         const statsPanel = new CustomContainer(this, {
@@ -326,17 +337,36 @@ export class FightScene extends GameScene {
             }
         });
 
-        statsTable.placeContent(1, 0, this.myPlayer!.baseStats.life);
-        statsTable.placeContent(3, 0, this.myPlayer!.baseStats.initiative);
-        statsTable.placeContent(1, 2, this.myPlayer!.baseStats.accuracy);
+        statsTable.placeContent(1, 0, perso.baseStats.life);
+        statsTable.placeContent(3, 0, perso.baseStats.initiative);
+        statsTable.placeContent(1, 2, perso.baseStats.accuracy);
 
-        statsTable.placeContent(3, 3, this.myPlayer!.baseStats.mouvement);
-        statsTable.placeContent(3, 1, this.myPlayer!.baseStats.precision);
+        statsTable.placeContent(3, 3, perso.baseStats.mouvement);
+        statsTable.placeContent(3, 1, perso.baseStats.precision);
 
-        statsTable.placeContent(1, 1, this.myPlayer!.baseStats.strength);
+        statsTable.placeContent(1, 1, perso.baseStats.strength);
 
-        statsTable.placeContent(1, 3, this.myPlayer!.baseStats.energy);
-        statsTable.placeContent(3, 2, this.myPlayer!.baseStats.dodging);
+        statsTable.placeContent(1, 3, perso.baseStats.energy);
+        statsTable.placeContent(3, 2, perso.baseStats.dodging);
+
+        return { statsPanel, statsTable, statsImage, statsClassName, statsName };
     }
+
+    public inspectCharacter(perso: Character) {
+    // Détruire l'ancien panneau si existant
+    if (this.inspectedStatsPanel) {
+        this.inspectedStatsPanel.statsPanel.destroy();
+        this.inspectedStatsPanel.statsTable.destroy();
+        this.inspectedStatsPanel.statsImage.destroy();
+        this.inspectedStatsPanel.statsClassName.destroy();
+        this.inspectedStatsPanel.statsName.destroy();
+        this.inspectedStatsPanel = null;
+    }
+
+    this.inspectedStatsPanel = this.createCharacterStatsUi(
+        perso,
+        { x: 7, y: 6 }  
+    );
+}
 }
 

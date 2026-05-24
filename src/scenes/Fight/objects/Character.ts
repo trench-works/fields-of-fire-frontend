@@ -114,6 +114,11 @@ export class Character extends GameObject {
             this.sprite.setOrigin(0.5, 0.95);
             this.sprite.setScale(scaleFactor / 1.5);
 
+            this.sprite.setInteractive();
+            this.sprite.on("pointerdown", () => {
+                scene.events.emit("characterClicked", this);
+            });
+
             this.createAnimations(this.spriteKey);
         }
     }
