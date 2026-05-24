@@ -76,6 +76,7 @@ export class LobbyListScene extends Phaser.Scene {
                 player,
             });
         });
+        this.resetLobbies();
         this.createDisplay();
     }
 
