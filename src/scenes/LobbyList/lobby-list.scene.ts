@@ -18,6 +18,8 @@ export class LobbyListScene extends Phaser.Scene {
     private selectedRow: LobbyRow | null = null;
     private lobbyRows: LobbyRow[] = [];
 
+    private lobbyResetTimeout: NodeJS.Timeout | undefined;
+
     static start(scene: Phaser.Scene) {
         scene.scene.start("lobbyListScene");
     }
@@ -38,6 +40,13 @@ export class LobbyListScene extends Phaser.Scene {
     }
 
     resetLobbies() {
+        if (this.lobbyResetTimeout) {
+            clearTimeout(this.lobbyResetTimeout);
+        }
+        this.lobbyResetTimeout = setTimeout(
+            this.resetLobbies.bind(this),
+            10 * 1000,
+        );
         new LobbiesRepository().getLobbies().then((lobbies) => {
             this.lobbyData = lobbies;
             this.displayLobbyList();
