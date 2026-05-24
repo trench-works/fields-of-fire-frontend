@@ -13,7 +13,7 @@ export class UserRepository {
             },
         );
         if (user) {
-            global.config.user = user;
+            global.user = user;
         }
     }
 }

@@ -18,6 +18,10 @@ export class MainMenu extends Phaser.Scene {
 
     constructor() {
         super({ key: "mainMenuScene" });
+        const user = localStorage.getItem("user");
+        if (user) {
+            global.user = JSON.parse(user);
+        }
     }
 
     static start(scene: Phaser.Scene) {
@@ -70,11 +74,11 @@ export class MainMenu extends Phaser.Scene {
             backgroundImage: "menuBalle",
             titleColor: "#FFFFFF",
             fontsize: 50,
-            alpha: global.config.user ? 1 : 0.5,
+            alpha: global.user ? 1 : 0.5,
             textPosition: { x: -130, y: -10 },
             hoverTint: 0xcccccc,
             onClick: () => {
-                if (global.config.user) {
+                if (global.user) {
                     LobbyListScene.start(this);
                 }
             },
@@ -101,31 +105,37 @@ export class MainMenu extends Phaser.Scene {
         //bouton login
         const loginArea = this.sceneGrid.getArea(8, 0, 1, 1);
         this.connectButton = new Button(this, {
-            text: "Login",
+            text: global.user.username,
             x: loginArea.x + loginArea.width / 2,
             y: loginArea.y + loginArea.height / 2,
             width: loginArea.width,
             height: loginArea.height,
             textColor: "#FFFFFF",
             color: "#db7f29",
-            onClick: () => {
-                new PopupInput(this, {
-                    title: "Connexion",
-                    placeholder: "Entrez votre pseudo...",
-                    onValidate: async (value: string) => {
-                        await new UserRepository().authenticate(value);
-                        if (global.config.user) {
-                            this.playButton.alpha = 1;
-                            this.connectButton.onClick = undefined;
-                            this.connectButton.setText(
-                                global.config.user.username,
-                            );
-                            return true;
-                        }
-                        return false;
-                    },
-                });
-            },
+            onClick: global.user
+                ? () => {
+                      new PopupInput(this, {
+                          title: "Connexion",
+                          placeholder: "Entrez votre pseudo...",
+                          onValidate: async (value: string) => {
+                              await new UserRepository().authenticate(value);
+                              if (global.user) {
+                                  this.playButton.alpha = 1;
+                                  this.connectButton.onClick = undefined;
+                                  this.connectButton.setText(
+                                      global.user.username,
+                                  );
+                                  localStorage.setItem(
+                                      "user",
+                                      JSON.stringify(global.user),
+                                  );
+                                  return true;
+                              }
+                              return false;
+                          },
+                      });
+                  }
+                : undefined,
         });
     }
 }

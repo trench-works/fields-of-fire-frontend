@@ -13,7 +13,7 @@ interface ButtonConfig {
     y?: number;
     text: string;
     color?: string;
-    onClick: () => void;
+    onClick?: () => void;
     fontSize?: string;
     textColor?: string;
     padding?: ButtonPadding;

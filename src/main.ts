@@ -9,6 +9,10 @@ import { LobbyListScene } from "./scenes/LobbyList/lobby-list.scene";
 
 declare global {
     var config: App;
+    var user: {
+        id: string;
+        username: string;
+    };
 }
 
 const config = {

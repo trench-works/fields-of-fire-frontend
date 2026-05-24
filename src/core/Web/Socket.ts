@@ -26,7 +26,7 @@ export class Socket<
     }
 
     protected open(key: RessourceKey) {
-        this.userId = global.config.user?.id;
+        this.userId = global.user?.id;
         this.key = key;
         this.createSocket();
     }

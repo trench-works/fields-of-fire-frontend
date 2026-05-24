@@ -1,10 +1,6 @@
 import { ConfigLoader } from "../core/config/Config";
 
 export type App = {
-    user?: {
-        id: string;
-        username: string;
-    };
     server: {
         url: string;
         port: string;
