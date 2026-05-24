@@ -28,7 +28,7 @@ export class Button extends Phaser.GameObjects.Container {
     private buttonText: Phaser.GameObjects.Text;
     private color: string;
     private hoverColor: string | null;
-    private onClick: () => void;
+    public onClick?: () => void;
     private bg: Phaser.GameObjects.Rectangle;
 
     constructor(scene: Phaser.Scene, config: ButtonConfig) {
@@ -119,7 +119,7 @@ export class Button extends Phaser.GameObjects.Container {
     private setupEvents() {
         this.on("pointerdown", () => {
             //console.log("Button clicked!");
-            this.onClick();
+            this.onClick?.();
         });
 
         this.on("pointerover", () => {

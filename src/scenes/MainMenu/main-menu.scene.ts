@@ -14,6 +14,7 @@ export class MainMenu extends Phaser.Scene {
     private sceneGrid = GridUtils.uiGrid(0, 0);
 
     private playButton!: CustomContainer;
+    private connectButton!: Button;
 
     constructor() {
         super({ key: "mainMenuScene" });
@@ -99,7 +100,7 @@ export class MainMenu extends Phaser.Scene {
 
         //bouton login
         const loginArea = this.sceneGrid.getArea(8, 0, 1, 1);
-        new Button(this, {
+        this.connectButton = new Button(this, {
             text: "Login",
             x: loginArea.x + loginArea.width / 2,
             y: loginArea.y + loginArea.height / 2,
@@ -115,6 +116,10 @@ export class MainMenu extends Phaser.Scene {
                         await new UserRepository().authenticate(value);
                         if (global.config.user) {
                             this.playButton.alpha = 1;
+                            this.connectButton.onClick = undefined;
+                            this.connectButton.setText(
+                                global.config.user.username,
+                            );
                             return true;
                         }
                         return false;
