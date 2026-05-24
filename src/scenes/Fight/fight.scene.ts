@@ -345,17 +345,17 @@ export class FightScene extends GameScene {
             }
         });
 
+        // first column
         statsTable.placeContent(1, 0, perso.baseStats.life);
-        statsTable.placeContent(3, 0, perso.baseStats.initiative);
-        statsTable.placeContent(1, 2, perso.baseStats.accuracy);
-
-        statsTable.placeContent(3, 3, perso.baseStats.mouvement);
-        statsTable.placeContent(3, 1, perso.baseStats.precision);
-
         statsTable.placeContent(1, 1, perso.baseStats.strength);
-
+        statsTable.placeContent(1, 2, perso.baseStats.accuracy);
         statsTable.placeContent(1, 3, perso.baseStats.energy);
+
+        // second column
+        statsTable.placeContent(3, 0, perso.baseStats.initiative);
+        statsTable.placeContent(3, 1, perso.baseStats.precision);
         statsTable.placeContent(3, 2, perso.baseStats.dodging);
+        statsTable.placeContent(3, 3, perso.baseStats.mouvement);
 
         return {
             statsPanel,
