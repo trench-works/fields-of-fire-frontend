@@ -8,6 +8,7 @@ import { RangeVisualizer } from "../../scenes/Fight/objects/RangeVisualizer";
 import { ActionManager } from "../../scenes/Fight/objects/ActionManager";
 import { ActionAssetId } from "../../assets";
 import { EntityType, Game } from "../../Model/Game";
+import { Diamond } from "./Diamond";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -44,6 +45,9 @@ export class GameScene extends Scene {
     public gridPositions: Cell[][] = [];
     public scaleFactor: number = 1;
 
+    protected groundLayer: Phaser.Tilemaps.TilemapLayer | null = null;
+    private entityHighlights: Phaser.GameObjects.Graphics[] = [];
+
     spawnEntities() {
         this.characters.forEach((entity) => {
             entity.spawn(this, this.scaleFactor, this.gridPositions);
@@ -76,28 +80,77 @@ export class GameScene extends Scene {
             new Position(centerMap.offsetX, centerMap.offsetY),
         );
 
-        const groundLayer = map.createLayer(
+        this.groundLayer = map.createLayer(
             "Ground",
             tileset!,
             centerMap.offsetX,
             centerMap.offsetY,
         );
 
-        if (!groundLayer) {
+        if (!this.groundLayer) {
             throw new Error("Ground layer seemingly inexistent");
         }
 
         this.scaleFactor = centerMap.scaleFactor;
 
-        groundLayer.setScale(centerMap.scaleFactor);
-        groundLayer.setDepth(0);
+        this.groundLayer.setScale(centerMap.scaleFactor);
+        this.groundLayer.setDepth(0);
 
         this.generatePlayGrid(
-            groundLayer,
+            this.groundLayer,
             actionManager,
             rangeVisualizer,
             game,
         );
+        this.displayEntitiesHighlights(game);
+    }
+
+    displayEntitiesHighlights(game: Game) {
+        if (!this.groundLayer) {
+            return;
+        }
+        for (const highlightEntity of this.entityHighlights) {
+            highlightEntity.destroy();
+        }
+        this.entityHighlights = [];
+        for (let x = 0; x < game.plateau.length; x++) {
+            for (let y = 0; y < game.plateau.length; y++) {
+                const tile = this.groundLayer.getTileAt(x, y);
+                const caseTile = game.plateau[x][y];
+                if (caseTile.isHole || caseTile.isWall) {
+                    tile.setVisible(false);
+                    continue;
+                }
+                if (!tile) continue;
+
+                const worldX = tile.getCenterX();
+                const worldY = tile.getCenterY();
+
+                if (caseTile.entityId) {
+                    const entity = game.entities.find(
+                        (entity) => entity.entityId === caseTile.entityId,
+                    );
+                    if (entity) {
+                        const hoverGraphics = this.add.graphics();
+                        hoverGraphics.lineStyle(
+                            2,
+                            entity.entityType === EntityType.ALLY
+                                ? 0x00ff00
+                                : 0xff0000,
+                            1,
+                        ); // contour blanc
+                        hoverGraphics.strokePoints(
+                            new Diamond(tile, this.scaleFactor).points,
+                            true,
+                        );
+                        hoverGraphics.setPosition(worldX, worldY);
+                        hoverGraphics.setDepth(this.groundLayer.depth + 5);
+                        hoverGraphics.setVisible(true);
+                        this.entityHighlights.push(hoverGraphics);
+                    }
+                }
+            }
+        }
     }
 
     generatePlayGrid(
@@ -115,45 +168,12 @@ export class GameScene extends Scene {
                     continue;
                 }
                 if (!tile) continue;
+                const diamond = new Diamond(tile, this.scaleFactor);
 
-                const Yof = 16;
-                const Xof = 32;
-                const diamond = new Phaser.Geom.Polygon([
-                    //point1 (left corner)
-                    0 - Xof * this.scaleFactor,
-                    (-tile.height * this.scaleFactor) / 4,
-                    //point2 (top corner)
-                    0,
-                    (-tile.height * this.scaleFactor) / 2,
-                    //point3 (right corner)
-                    (tile.width * this.scaleFactor) / 2,
-                    0 - Yof * this.scaleFactor,
-                    //point4 (bottom corner)
-                    0,
-                    0,
-                ]);
                 const worldX = tile.getCenterX();
                 const worldY = tile.getCenterY();
 
-                if (caseTile.entityId) {
-                    const entity = game.entities.find(
-                        (entity) => entity.entityId === caseTile.entityId,
-                    );
-                    if (entity) {
-                        const hoverGraphics = this.add.graphics();
-                        hoverGraphics.lineStyle(
-                            2,
-                            entity.entityType === EntityType.ALLY
-                                ? 0x00ff00
-                                : 0xff0000,
-                            1,
-                        ); // contour blanc
-                        hoverGraphics.strokePoints(diamond.points, true);
-                        hoverGraphics.setPosition(worldX, worldY);
-                        hoverGraphics.setDepth(layer.depth + 5);
-                        hoverGraphics.setVisible(true);
-                    }
-                }
+                const Yof = 16;
 
                 const zone = this.add.zone(
                     worldX,

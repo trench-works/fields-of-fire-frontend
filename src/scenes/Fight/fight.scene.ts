@@ -86,6 +86,16 @@ export class FightScene extends GameScene {
     init({ game, player: { playerId } }: FightSceneInit) {
         this.playerSocket = new GamePlayerSocket(game.id, playerId);
         this.playerSocket.onClose(() => MainMenu.start(this));
+        this.playerSocket.onUpdate((game: Game) => {
+            this.displayEntitiesHighlights(game);
+            const player = game.players.find(
+                (player) => player.userId === global.user.id,
+            )!;
+            const entity = game.entities.find(
+                (entity) => entity.entityId === player.entityId,
+            )!;
+            this.myPlayer.move(entity.position, this.gridPositions);
+        });
         this.actionManager.bindListener();
 
         this.gamePayload = game;

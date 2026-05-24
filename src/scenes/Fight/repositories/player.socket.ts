@@ -1,4 +1,5 @@
 import { Position, Socket, SocketListener } from "../../../core";
+import { Game } from "../../../Model/Game";
 const GAME_TOPIC = "game";
 /**
  * Game Player
@@ -10,6 +11,7 @@ enum GamePlayerActions {
 
 enum GamePlayerEvents {
     MOVE = "move",
+    UPDATE = "update",
 }
 
 type GamePlayerKey = {
@@ -41,6 +43,10 @@ export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
 
     onMove(listener: SocketListener<EntityMove>): void {
         this.on(GamePlayerEvents.MOVE, listener);
+    }
+
+    onUpdate(listener: SocketListener<Game>): void {
+        this.on(GamePlayerEvents.UPDATE, listener);
     }
 }
 

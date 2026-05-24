@@ -15,7 +15,7 @@ enum GameActions {
 }
 
 enum GameEvents {
-    MOVE = "move",
+    UPDATE = "update",
 }
 
 type EntityMove = {
@@ -34,8 +34,8 @@ export class GameSocket extends Socket<GameKey, GameActions, string> {
         return this.send(GameActions.LEAVE, {});
     }
 
-    onMove(listener: SocketListener<EntityMove>): void {
-        this.on(GameEvents.MOVE, listener);
+    onUpdate(listener: SocketListener<EntityMove>): void {
+        this.on(GameEvents.UPDATE, listener);
     }
 }
 
