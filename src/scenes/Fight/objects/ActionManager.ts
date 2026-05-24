@@ -17,7 +17,7 @@ export class ActionManager {
     set currentAction(action: Action | undefined) {
         this._currentAction = action;
 
-        this.scene.characters.forEach(character => {
+        this.scene.characters.forEach((character) => {
             if (action) {
                 character.disableClick();
             } else {
@@ -36,14 +36,5 @@ export class ActionManager {
             target: pos,
         });
         this.clearCurentAction();
-    }
-
-    bindListener() {
-        this.scene.playerSocket.onMove(({ entity: { entityId, position } }) => {
-            console.log(
-                `Entity ${entityId} moved to position ${position.x}, ${position.y}`,
-            );
-            this.scene.myPlayer.move(position, this.scene.gridPositions);
-        });
     }
 }

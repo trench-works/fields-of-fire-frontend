@@ -96,12 +96,7 @@ export class GameScene extends Scene {
         this.groundLayer.setScale(centerMap.scaleFactor);
         this.groundLayer.setDepth(0);
 
-        this.generatePlayGrid(
-            this.groundLayer,
-            actionManager,
-            rangeVisualizer,
-            game,
-        );
+        this.generatePlayGrid(actionManager, rangeVisualizer, game);
         this.displayEntitiesHighlights(game);
     }
 
@@ -144,7 +139,6 @@ export class GameScene extends Scene {
                             true,
                         );
                         hoverGraphics.setPosition(worldX, worldY);
-                        hoverGraphics.setDepth(this.groundLayer.depth + 5);
                         hoverGraphics.setVisible(true);
                         hoverGraphics.setDepth(this.groundLayer.depth + 3);
                         this.entityHighlights.push(hoverGraphics);
@@ -155,14 +149,16 @@ export class GameScene extends Scene {
     }
 
     generatePlayGrid(
-        layer: Phaser.Tilemaps.TilemapLayer,
         actionManager: ActionManager,
         rangeVisualizer: RangeVisualizer,
         game: Game,
     ) {
+        if (!this.groundLayer) {
+            return;
+        }
         for (let x = 0; x < game.plateau.length; x++) {
             for (let y = 0; y < game.plateau.length; y++) {
-                const tile = layer.getTileAt(x, y);
+                const tile = this.groundLayer.getTileAt(x, y);
                 const caseTile = game.plateau[x][y];
                 if (caseTile.isHole || caseTile.isWall) {
                     tile.setVisible(false);
@@ -187,11 +183,11 @@ export class GameScene extends Scene {
                 hoverGraphics.lineStyle(2, 0xffffff, 1); // contour blanc
                 hoverGraphics.strokePoints(diamond.points, true);
                 hoverGraphics.setPosition(worldX, worldY);
-                hoverGraphics.setDepth(layer.depth + 5);
+                hoverGraphics.setDepth(this.groundLayer.depth + 5);
                 hoverGraphics.setVisible(false);
 
                 zone.setInteractive(diamond, Phaser.Geom.Polygon.Contains);
-                zone.setDepth(layer.depth + 3);
+                zone.setDepth(this.groundLayer.depth + 3);
 
                 // --- DEBUG VISUEL ---
                 //this.gridShower(diamond, worldX, worldY, layer);

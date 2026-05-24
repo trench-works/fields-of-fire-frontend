@@ -96,7 +96,6 @@ export class FightScene extends GameScene {
             )!;
             this.myPlayer.move(entity.position, this.gridPositions);
         });
-        this.actionManager.bindListener();
 
         this.gamePayload = game;
         const player = game.players.find(

@@ -10,7 +10,6 @@ enum GamePlayerActions {
 }
 
 enum GamePlayerEvents {
-    MOVE = "move",
     UPDATE = "update",
 }
 
@@ -24,13 +23,6 @@ type ActionPlayer = {
     target: Position;
 };
 
-type EntityMove = {
-    entity: {
-        entityId: string;
-        position: Position;
-    };
-};
-
 export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
     constructor(gameId: string, playerId: string) {
         super(GAME_TOPIC);
@@ -39,10 +31,6 @@ export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
 
     action(actionPlayer: ActionPlayer) {
         return this.send(GamePlayerActions.ACTION, actionPlayer);
-    }
-
-    onMove(listener: SocketListener<EntityMove>): void {
-        this.on(GamePlayerEvents.MOVE, listener);
     }
 
     onUpdate(listener: SocketListener<Game>): void {
