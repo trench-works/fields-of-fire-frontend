@@ -1,10 +1,11 @@
 import Phaser from "phaser";
-import { CustomContainer, GridUtils } from "../../core";
+import { Button, CustomContainer, GridUtils } from "../../core";
 import {
     BackgroundAsset,
     BackgroundAssetId,
 } from "../../assets/BackgroundAsset";
 import { LobbyListScene } from "../LobbyList/lobby-list.scene";
+import { PopupInput } from "./objects/LoginPopup";
 
 export class MainMenu extends Phaser.Scene {
     private readonly BUTTON_WIDTH = 500;
@@ -88,6 +89,31 @@ export class MainMenu extends Phaser.Scene {
             onClick: () => {
                 console.log("Paramètres - À implémenter");
             },
+        });
+        
+
+        //bouton login
+        const loginArea = this.sceneGrid.getArea(8, 0, 1, 1);
+        new Button(this, {
+            text: "Login",
+            x: loginArea.x+ loginArea.width / 2,
+            y: loginArea.y + loginArea.height / 2,
+            width: loginArea.width,
+            height: loginArea.height,
+            textColor: "#FFFFFF",
+            color: "#db7f29",
+            onClick: () => {
+                new PopupInput(this, {
+                    title: "Connexion",
+                    placeholder: "Entrez votre pseudo...",
+                    onValidate: (value: string) => {
+                        console.log(`Login avec : ${value}`);
+                    },
+                    onCancel: () => {
+                        console.log("Login annulé");
+                    }
+                });
+            }
         });
     }
 }
