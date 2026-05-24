@@ -146,6 +146,7 @@ export class GameScene extends Scene {
                         hoverGraphics.setPosition(worldX, worldY);
                         hoverGraphics.setDepth(this.groundLayer.depth + 5);
                         hoverGraphics.setVisible(true);
+                        hoverGraphics.setDepth(this.groundLayer.depth + 3);
                         this.entityHighlights.push(hoverGraphics);
                     }
                 }
