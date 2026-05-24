@@ -10,6 +10,7 @@ import { Tooltip } from "../../../core/UI/Tooltip";
 import { Action } from "../../../Model/Action";
 import { Effect } from "../../../Model/Effect";
 import { Stats } from "../../../Model/Stats";
+import { FightScene } from "../fight.scene";
 
 export type CharactersProps = GameObjectProps & {
     position: Position;
@@ -116,8 +117,10 @@ export class Character extends GameObject {
 
             this.sprite.setInteractive();
             this.sprite.on("pointerdown", () => {
+            if (!(scene as FightScene).actionManager.currentAction) {
                 scene.events.emit("characterClicked", this);
-            });
+            }
+        });
 
             this.createAnimations(this.spriteKey);
         }
