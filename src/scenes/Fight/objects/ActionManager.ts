@@ -3,21 +3,36 @@ import { Action } from "../../../Model/Action";
 import { FightScene } from "../fight.scene";
 
 export class ActionManager {
-    public currentAction: Action | undefined;
+    private _currentAction: Action | undefined;
     public scene!: FightScene;
 
     constructor(scene: FightScene) {
         this.scene = scene;
     }
 
+    get currentAction(): Action | undefined {
+        return this._currentAction;
+    }
+
+    set currentAction(action: Action | undefined) {
+        this._currentAction = action;
+
+        this.scene.characters.forEach(character => {
+            if (action) {
+                character.disableClick();
+            } else {
+                character.enableClick();
+            }
+        });
+    }
+
     clearCurentAction() {
-        this.currentAction = undefined;
+        this.currentAction = undefined; // ← passe par le setter, réactive les clics
     }
 
     launchAction(pos: Position) {
-        //to implement
         this.scene.playerSocket.action({
-            actionId: this.currentAction?.id || "",
+            actionId: this._currentAction?.id || "",
             target: pos,
         });
         this.clearCurentAction();
@@ -28,9 +43,7 @@ export class ActionManager {
             console.log(
                 `Entity ${entityId} moved to position ${position.x}, ${position.y}`,
             );
-
             this.scene.myPlayer.move(position, this.scene.gridPositions);
         });
     }
 }
-

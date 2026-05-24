@@ -192,5 +192,13 @@ export class Character extends GameObject {
     async recalculate(): Promise<void> {
         return;
     }
+
+    public enableClick() {
+    this.sprite?.setInteractive();
+    }
+
+    public disableClick() {
+        this.sprite?.disableInteractive();
+    }
 }
 
