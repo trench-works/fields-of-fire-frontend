@@ -113,7 +113,8 @@ export class MainMenu extends Phaser.Scene {
             textColor: "#FFFFFF",
             color: "#db7f29",
             onClick: global.user
-                ? () => {
+                ? undefined
+                : () => {
                       new PopupInput(this, {
                           title: "Connexion",
                           placeholder: "Entrez votre pseudo...",
@@ -134,8 +135,7 @@ export class MainMenu extends Phaser.Scene {
                               return false;
                           },
                       });
-                  }
-                : undefined,
+                  },
         });
     }
 }
