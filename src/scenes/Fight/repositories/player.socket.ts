@@ -7,6 +7,7 @@ const GAME_TOPIC = "game";
 
 enum GamePlayerActions {
     ACTION = "action",
+    FINISH_TURN = "finish-turn",
 }
 
 enum GamePlayerEvents {
@@ -27,6 +28,10 @@ export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
     constructor(gameId: string, playerId: string) {
         super(GAME_TOPIC);
         super.open({ gameId, playerId });
+    }
+
+    finishTurn() {
+        return this.send(GamePlayerActions.FINISH_TURN);
     }
 
     action(actionPlayer: ActionPlayer) {

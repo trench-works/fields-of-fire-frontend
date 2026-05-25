@@ -67,13 +67,15 @@ export class Socket<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     send<PayloadType = any>(
         action: InputActions,
-        payload: PayloadType,
+        payload?: PayloadType,
     ): Error | void {
         if (this.socket?.readyState !== WebSocket.OPEN) {
             console.error("Socket is not connected yet...");
             return new Error("Socket is not connected yet...");
         }
-        this.socket.send(JSON.stringify({ actionId: action, payload }));
+        this.socket.send(
+            JSON.stringify({ actionId: action, payload: payload ?? {} }),
+        );
     }
 
     private handleMessage({ data }: MessageEvent) {
