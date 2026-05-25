@@ -211,12 +211,12 @@ export class GameScene extends Scene {
 
                     const rangeManager: number | undefined =
                         actionManager.currentAction?.id === ActionAssetId.WALK
-                            ? this.myPlayer.baseStats.mouvement
+                            ? this.myPlayer.stats.mouvement
                             : actionManager.currentAction?.range;
 
                     if (
                         rangeVisualizer.isItInRange(
-                            this.myPlayer.position,
+                            this.myPlayer.entity.position,
                             rangeManager!,
                             new Position(x, y),
                         )

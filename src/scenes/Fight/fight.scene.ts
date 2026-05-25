@@ -106,10 +106,9 @@ export class FightScene extends GameScene {
         const playerClass = this.classes.find(
             (charClass) => charClass.id === playerEntity.classId,
         )!;
-        this.myPlayer = new Character({
+        this.myPlayer = new Character(this, {
             entity: playerEntity,
             character: playerClass,
-            scene: this,
         });
         this.characters = game.entities
             .filter((entity) => entity.entityId !== playerEntity.entityId)
@@ -117,10 +116,9 @@ export class FightScene extends GameScene {
                 const entityClass = this.classes.find(
                     (charClass) => charClass.id === entity.classId,
                 )!;
-                return new Character({
+                return new Character(this, {
                     entity: entity,
                     character: entityClass,
-                    scene: this,
                 });
             });
     }
@@ -212,10 +210,10 @@ export class FightScene extends GameScene {
         });
 
         // --- Placement des icônes ---
-        this.myPlayer.actionList.forEach((action, index) => {
+        this.myPlayer.charClass.actionList.forEach((action, index) => {
             const rangeManager: number | undefined =
                 action.id === "walk"
-                    ? this.myPlayer.baseStats.mouvement
+                    ? this.myPlayer.stats.mouvement
                     : action.range;
 
             const iconObj = statsTable.placeContent(
@@ -225,7 +223,7 @@ export class FightScene extends GameScene {
                     icon: ActionAsset.getAssetKey(action.id),
                     onClick: () => {
                         this.rangeVisualizer.onActionSelected(
-                            this.myPlayer!.position,
+                            this.myPlayer!.entity.position,
                             rangeManager,
                         );
                         this.actionManager.currentAction = action;
@@ -286,13 +284,13 @@ export class FightScene extends GameScene {
             width: imgArea.width,
             height: imgArea.height,
             borderWidth: 7,
-            backgroundImage: perso.iconImageKey,
+            backgroundImage: perso.charClass.iconImageKey,
         });
 
         const classNameArea = statsGrid.getArea(3, 0, 6, 1);
 
         const statsClassName = new CustomContainer(this, {
-            title: perso.name,
+            title: perso.charClass.name,
             x: statsPanel.x - statsPanel.width / 2 + classNameArea.centerX,
             y: statsPanel.y - statsPanel.height / 2 + classNameArea.centerY,
             width: classNameArea.width,
@@ -304,7 +302,7 @@ export class FightScene extends GameScene {
         const playerNameArea = statsGrid.getArea(0, 4, 3, 1);
 
         const statsName = new CustomContainer(this, {
-            title: perso.name,
+            title: perso.charClass.name,
             x: statsPanel.x - statsPanel.width / 2 + playerNameArea.centerX,
             y: statsPanel.y - statsPanel.height / 2 + playerNameArea.centerY,
             width: playerNameArea.width,
@@ -341,16 +339,17 @@ export class FightScene extends GameScene {
         });
 
         // first column
-        statsTable.placeContent(1, 0, perso.baseStats.life);
-        statsTable.placeContent(1, 1, perso.baseStats.strength);
-        statsTable.placeContent(1, 2, perso.baseStats.accuracy);
-        statsTable.placeContent(1, 3, perso.baseStats.energy);
+        const stats = perso.stats;
+        statsTable.placeContent(1, 0, stats.life);
+        statsTable.placeContent(1, 1, stats.strength);
+        statsTable.placeContent(1, 2, stats.accuracy);
+        statsTable.placeContent(1, 3, stats.energy);
 
         // second column
-        statsTable.placeContent(3, 0, perso.baseStats.initiative);
-        statsTable.placeContent(3, 1, perso.baseStats.precision);
-        statsTable.placeContent(3, 2, perso.baseStats.dodging);
-        statsTable.placeContent(3, 3, perso.baseStats.mouvement);
+        statsTable.placeContent(3, 0, stats.initiative);
+        statsTable.placeContent(3, 1, stats.precision);
+        statsTable.placeContent(3, 2, stats.dodging);
+        statsTable.placeContent(3, 3, stats.mouvement);
 
         return {
             statsPanel,

@@ -2,48 +2,35 @@ import {
     RenderResult,
     SceneRenderConfig,
     GameObject,
-    GameObjectProps,
     Position,
     PositionUtils,
 } from "../../../core";
-import { Action } from "../../../Model/Action";
 import { CharacterClass } from "../../../Model/CharacterClass";
 import { Effect } from "../../../Model/Effect";
 import { Entity } from "../../../Model/Entity";
-import { Stats } from "../../../Model/Stats";
 import { FightScene } from "../fight.scene";
 
-export type CharactersProps = GameObjectProps & {
+export type CharactersProps = {
     character: CharacterClass;
     entity: Entity;
 };
 
 export class Character extends GameObject {
     public currentEffect: Effect[] = [];
-    public position: Position;
-    public spriteKey: string;
     protected sprite: Phaser.GameObjects.Sprite | undefined;
-    public id: string;
-    public iconImageKey: string;
-    public name: string;
-    public actionList: Action[];
-    public baseStats: Stats;
+    public charClass: CharacterClass;
+    public entity: Entity;
 
-    constructor({ character, entity, scene }: CharactersProps) {
+    constructor(scene: Phaser.Scene, { character, entity }: CharactersProps) {
         super({ scene });
 
-        this.position = entity.position;
-        this.spriteKey = character.spriteKey;
-        this.iconImageKey = character.iconImageKey;
-        this.id = entity.entityId;
-        this.name = character.name;
-        this.actionList = character.actionList;
-        this.baseStats = character.stats;
+        this.charClass = character;
+        this.entity = entity;
     }
 
     get stats() {
         const stats = {
-            ...this.baseStats,
+            ...this.charClass.stats,
         };
 
         this.currentEffect.forEach((effect) => {
@@ -60,15 +47,18 @@ export class Character extends GameObject {
     }
 
     preload(loader: Phaser.Loader.LoaderPlugin) {
-        if (this.spriteKey) {
+        if (this.charClass.spriteKey) {
             loader.spritesheet(
-                this.spriteKey,
-                `assets/Sprites/${this.spriteKey}.png`,
+                this.charClass.spriteKey,
+                `assets/Sprites/${this.charClass.spriteKey}.png`,
                 { frameWidth: 96, frameHeight: 128 },
             );
-            loader.image(this.iconImageKey, `assets/${this.iconImageKey}.png`);
+            loader.image(
+                this.charClass.iconImageKey,
+                `assets/${this.charClass.iconImageKey}.png`,
+            );
 
-            this.actionList.forEach((action) => {
+            this.charClass.actionList.forEach((action) => {
                 if (action.id) {
                     loader.image(action.id, `assets/action/${action.id}.png`);
                     console.log(`assets/action/${action.id}.png`);
@@ -81,14 +71,14 @@ export class Character extends GameObject {
     spawn(scene: Phaser.Scene, scaleFactor: number, gridPositions: any[][]) {
         this.scene = scene;
 
-        const { x, y } = this.position;
+        const { x, y } = this.entity.position;
         const cell = gridPositions[y][x];
 
         if (cell) {
             this.sprite = scene.physics.add.sprite(
                 cell.pixelPosition.x,
                 cell.pixelPosition.y,
-                this.spriteKey,
+                this.charClass.spriteKey,
             );
 
             this.sprite.setDepth(5);
@@ -102,12 +92,12 @@ export class Character extends GameObject {
                 }
             });
 
-            this.createAnimations(this.spriteKey);
+            this.createAnimations(this.charClass.spriteKey);
         }
     }
 
     //Joue l'animation d'idle par défaut du personnage, ou une animation spécifique si une clé est fournie
-    playAnimation(key: string = this.spriteKey + "-idle-DR") {
+    playAnimation(key: string = this.charClass.spriteKey + "-idle-DR") {
         if (!this.sprite) return;
         if (this.sprite.anims.currentAnim?.key === key) return;
         this.sprite.play(key);
@@ -139,27 +129,30 @@ export class Character extends GameObject {
     ) {
         this.scene.anims.create({
             key: `${animationName}`,
-            frames: this.scene.anims.generateFrameNumbers(this.spriteKey, {
-                start: startFrame,
-                end: endFrame,
-            }),
+            frames: this.scene.anims.generateFrameNumbers(
+                this.charClass.spriteKey,
+                {
+                    start: startFrame,
+                    end: endFrame,
+                },
+            ),
             frameRate: frameRate,
             repeat: repeat,
         });
     }
     render(renderConfig: SceneRenderConfig): RenderResult {
         const renderPosition = PositionUtils.getPixelsFromPosition(
-            this.position,
+            this.entity.position,
             renderConfig,
         );
         return {
             position: renderPosition,
-            sprite: this.spriteKey,
+            sprite: this.charClass.spriteKey,
         };
     }
 
     move(newPosition: Position, gridPositions: any[][]) {
-        this.position = newPosition;
+        this.entity.position = newPosition;
 
         if (!this.sprite) return;
 
