@@ -1,4 +1,5 @@
 import { Position } from "../core";
+import { Effect } from "./Effect";
 
 export enum EntityType {
     ALLY = "ALLY",
@@ -11,4 +12,6 @@ export type Entity = {
     classId: string;
     position: Position;
     entityType: EntityType;
+    effects: Effect[];
 };
+

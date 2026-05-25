@@ -4,27 +4,27 @@ import {
     GameObject,
     Position,
     PositionUtils,
+    Cell,
 } from "../../../core";
 import { CharacterClass } from "../../../Model/CharacterClass";
-import { Effect } from "../../../Model/Effect";
 import { Entity } from "../../../Model/Entity";
 import { FightScene } from "../fight.scene";
 
 export type CharactersProps = {
-    character: CharacterClass;
+    charClass: CharacterClass;
     entity: Entity;
 };
 
 export class Character extends GameObject {
-    public currentEffect: Effect[] = [];
     protected sprite: Phaser.GameObjects.Sprite | undefined;
+
     public charClass: CharacterClass;
     public entity: Entity;
 
-    constructor(scene: Phaser.Scene, { character, entity }: CharactersProps) {
+    constructor(scene: Phaser.Scene, { charClass, entity }: CharactersProps) {
         super({ scene });
 
-        this.charClass = character;
+        this.charClass = charClass;
         this.entity = entity;
     }
 
@@ -33,7 +33,7 @@ export class Character extends GameObject {
             ...this.charClass.stats,
         };
 
-        this.currentEffect.forEach((effect) => {
+        this.entity.effects.forEach((effect) => {
             stats.life += effect.statModification.life;
             stats.precision += effect.statModification.precision;
             stats.strength += effect.statModification.precision;
@@ -68,7 +68,7 @@ export class Character extends GameObject {
     }
 
     //Spawne le personnage sur la scène, en créant son sprite et en le positionnant correctement sur la grille
-    spawn(scene: Phaser.Scene, scaleFactor: number, gridPositions: any[][]) {
+    spawn(scene: Phaser.Scene, scaleFactor: number, gridPositions: Cell[][]) {
         this.scene = scene;
 
         const { x, y } = this.entity.position;
@@ -151,7 +151,7 @@ export class Character extends GameObject {
         };
     }
 
-    move(newPosition: Position, gridPositions: any[][]) {
+    move(newPosition: Position, gridPositions: Cell[][]) {
         this.entity.position = newPosition;
 
         if (!this.sprite) return;

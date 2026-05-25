@@ -108,7 +108,7 @@ export class FightScene extends GameScene {
         )!;
         this.myPlayer = new Character(this, {
             entity: playerEntity,
-            character: playerClass,
+            charClass: playerClass,
         });
         this.characters = game.entities
             .filter((entity) => entity.entityId !== playerEntity.entityId)
@@ -118,7 +118,7 @@ export class FightScene extends GameScene {
                 )!;
                 return new Character(this, {
                     entity: entity,
-                    character: entityClass,
+                    charClass: entityClass,
                 });
             });
     }

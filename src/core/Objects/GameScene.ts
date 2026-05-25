@@ -237,17 +237,31 @@ export class GameScene extends Scene {
             }
         }
     }
-    gridShower(
-        diamond: Phaser.Geom.Polygon,
-        worldX: number,
-        worldY: number,
-        layer: Phaser.Tilemaps.TilemapLayer,
-    ) {
-        const g = this.add.graphics();
-        g.lineStyle(2, 0xff0000, 1); // contour rouge
-        g.strokePoints(diamond.points, true);
-        g.setPosition(worldX, worldY);
-        g.setDepth(layer.depth + 4);
+    gridShower(tile: Phaser.Tilemaps.Tile): {
+        graphics: Phaser.GameObjects.Graphics;
+        zone: Phaser.GameObjects.Zone;
+    } {
+        const diamond = new Diamond(tile, this.scaleFactor);
+        // Create Graphic
+        const worldX = tile.getCenterX();
+        const worldY = tile.getCenterY();
+        const graphics = this.add.graphics();
+        graphics.lineStyle(2, 0xff0000, 1); // contour rouge
+        graphics.strokePoints(diamond.points, true);
+        graphics.setPosition(worldX, worldY);
+        graphics.setDepth(this.groundLayer?.depth ?? 0 + 4);
+
+        // Create Zone
+        const zone = this.add.zone(
+            worldX,
+            worldY,
+            this.groundLayer?.width ?? 10,
+            this.groundLayer?.height ?? 10,
+        );
+        zone.setInteractive(diamond, Phaser.Geom.Polygon.Contains);
+        zone.setDepth(this.groundLayer?.depth ?? 0 + 3);
+
+        return { graphics, zone };
     }
 }
 
