@@ -118,30 +118,20 @@ export class GameScene extends Scene {
                 }
                 if (!tile) continue;
 
-                const worldX = tile.getCenterX();
-                const worldY = tile.getCenterY();
-
                 if (caseTile.entityId) {
                     const entity = game.entities.find(
                         (entity) => entity.entityId === caseTile.entityId,
                     );
                     if (entity) {
-                        const hoverGraphics = this.add.graphics();
-                        hoverGraphics.lineStyle(
-                            2,
-                            entity.entityType === EntityType.ALLY
-                                ? 0x00ff00
-                                : 0xff0000,
-                            1,
-                        ); // contour blanc
-                        hoverGraphics.strokePoints(
-                            new Diamond(tile, this.scaleFactor).points,
-                            true,
+                        this.entityHighlights.push(
+                            this.getTileHighlights(tile, {
+                                color:
+                                    entity.entityType === EntityType.ALLY
+                                        ? 0x00ff00
+                                        : 0xff0000,
+                                depth: 2,
+                            }),
                         );
-                        hoverGraphics.setPosition(worldX, worldY);
-                        hoverGraphics.setVisible(true);
-                        hoverGraphics.setDepth(this.groundLayer.depth + 3);
-                        this.entityHighlights.push(hoverGraphics);
                     }
                 }
             }
@@ -167,31 +157,20 @@ export class GameScene extends Scene {
                 if (!tile) continue;
                 const diamond = new Diamond(tile, this.scaleFactor);
 
-                const worldX = tile.getCenterX();
-                const worldY = tile.getCenterY();
-
-                const Yof = 16;
-
-                const zone = this.add.zone(
-                    worldX,
-                    worldY,
-                    game.plateau.length,
-                    game.plateau.length,
-                );
-
-                const hoverGraphics = this.add.graphics();
-                hoverGraphics.lineStyle(2, 0xffffff, 1); // contour blanc
-                hoverGraphics.strokePoints(diamond.points, true);
-                hoverGraphics.setPosition(worldX, worldY);
-                hoverGraphics.setDepth(this.groundLayer.depth + 5);
+                const hoverGraphics = this.getTileHighlights(tile, {
+                    color: 0xffffff,
+                    diamond,
+                    depth: 2,
+                });
                 hoverGraphics.setVisible(false);
 
-                zone.setInteractive(diamond, Phaser.Geom.Polygon.Contains);
-                zone.setDepth(this.groundLayer.depth + 3);
+                const zone = this.getTileInteractiveZone(tile, { diamond });
 
                 // --- DEBUG VISUEL ---
                 //this.gridShower(diamond, worldX, worldY, layer);
 
+                const worldX = tile.getCenterX();
+                const worldY = tile.getCenterY();
                 if (!this.gridPositions[y]) {
                     this.gridPositions[y] = [];
                 }
@@ -200,7 +179,7 @@ export class GameScene extends Scene {
                     gridPosition: new Position(x, y),
                     pixelPosition: new Position(
                         worldX,
-                        worldY - Yof * this.scaleFactor,
+                        worldY - 16 * this.scaleFactor,
                     ),
                     zone,
                     hoverGraphics,
@@ -237,31 +216,43 @@ export class GameScene extends Scene {
             }
         }
     }
-    gridShower(tile: Phaser.Tilemaps.Tile): {
-        graphics: Phaser.GameObjects.Graphics;
-        zone: Phaser.GameObjects.Zone;
-    } {
-        const diamond = new Diamond(tile, this.scaleFactor);
-        // Create Graphic
+    getTileHighlights(
+        tile: Phaser.Tilemaps.Tile,
+        props?: { color: number; diamond?: Diamond; depth?: number },
+    ): Phaser.GameObjects.Graphics {
+        let diamond: Diamond | undefined = props?.diamond;
+        if (!diamond) {
+            diamond = new Diamond(tile, this.scaleFactor);
+        }
         const worldX = tile.getCenterX();
         const worldY = tile.getCenterY();
+
+        // Create Graphic
         const graphics = this.add.graphics();
-        graphics.lineStyle(2, 0xff0000, 1); // contour rouge
+        graphics.lineStyle(2, props?.color ?? 0xffffff, 1);
         graphics.strokePoints(diamond.points, true);
         graphics.setPosition(worldX, worldY);
-        graphics.setDepth(this.groundLayer?.depth ?? 0 + 4);
+        graphics.setDepth(this.groundLayer?.depth ?? 0 + (props?.depth ?? 1));
+
+        return graphics;
+    }
+
+    getTileInteractiveZone(
+        tile: Phaser.Tilemaps.Tile,
+        props?: { diamond?: Diamond },
+    ): Phaser.GameObjects.Zone {
+        let diamond: Diamond | undefined = props?.diamond;
+        if (!diamond) {
+            diamond = new Diamond(tile, this.scaleFactor);
+        }
+        const worldX = tile.getCenterX();
+        const worldY = tile.getCenterY();
 
         // Create Zone
-        const zone = this.add.zone(
-            worldX,
-            worldY,
-            this.groundLayer?.width ?? 10,
-            this.groundLayer?.height ?? 10,
-        );
+        const zone = this.add.zone(worldX, worldY, 10, 10);
         zone.setInteractive(diamond, Phaser.Geom.Polygon.Contains);
-        zone.setDepth(this.groundLayer?.depth ?? 0 + 3);
-
-        return { graphics, zone };
+        zone.setDepth(this.groundLayer?.depth ?? 0 + 2);
+        return zone;
     }
 }
 

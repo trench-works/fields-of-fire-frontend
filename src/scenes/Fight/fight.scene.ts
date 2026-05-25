@@ -302,7 +302,7 @@ export class FightScene extends GameScene {
         const playerNameArea = statsGrid.getArea(0, 4, 3, 1);
 
         const statsName = new CustomContainer(this, {
-            title: perso.charClass.name,
+            title: perso.charClass.name?.split(" ")[0],
             x: statsPanel.x - statsPanel.width / 2 + playerNameArea.centerX,
             y: statsPanel.y - statsPanel.height / 2 + playerNameArea.centerY,
             width: playerNameArea.width,

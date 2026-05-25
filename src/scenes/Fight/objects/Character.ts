@@ -33,7 +33,7 @@ export class Character extends GameObject {
             ...this.charClass.stats,
         };
 
-        this.entity.effects.forEach((effect) => {
+        this.entity.effects?.forEach((effect) => {
             stats.life += effect.statModification.life;
             stats.precision += effect.statModification.precision;
             stats.strength += effect.statModification.precision;
