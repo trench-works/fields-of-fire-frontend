@@ -105,7 +105,7 @@ export class MainMenu extends Phaser.Scene {
         //bouton login
         const loginArea = this.sceneGrid.getArea(8, 0, 1, 1);
         this.connectButton = new Button(this, {
-            text: global.user.username,
+            text: global.user?.username ?? "Login",
             x: loginArea.x + loginArea.width / 2,
             y: loginArea.y + loginArea.height / 2,
             width: loginArea.width,
