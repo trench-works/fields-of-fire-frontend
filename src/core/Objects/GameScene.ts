@@ -3,12 +3,12 @@ import { Character } from "../../scenes/Fight/objects/Character";
 import { GameObject } from "./GameObject";
 import { scaleAndCenter } from "../Utils/Scale";
 import { Position } from "../Types/Position";
-import { PlayableCharacter } from "../../Model/PlayableCharacter";
 import { RangeVisualizer } from "../../scenes/Fight/objects/RangeVisualizer";
 import { ActionManager } from "../../scenes/Fight/objects/ActionManager";
 import { ActionAssetId } from "../../assets";
-import { EntityType, Game } from "../../Model/Game";
+import { Game } from "../../Model/Game";
 import { Diamond } from "./Diamond";
+import { EntityType } from "../../Model/Entity";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -41,7 +41,7 @@ export class GameScene extends Scene {
     public displayObjects: Displayable[] = [];
     public gameObjects: GameObject[] = [];
     public characters: Character[] = [];
-    public myPlayer!: PlayableCharacter;
+    public myPlayer!: Character;
     public gridPositions: Cell[][] = [];
     public scaleFactor: number = 1;
 

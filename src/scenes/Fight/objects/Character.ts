@@ -6,20 +6,16 @@ import {
     Position,
     PositionUtils,
 } from "../../../core";
-import { Tooltip } from "../../../core/UI/Tooltip";
 import { Action } from "../../../Model/Action";
+import { CharacterClass } from "../../../Model/CharacterClass";
 import { Effect } from "../../../Model/Effect";
+import { Entity } from "../../../Model/Entity";
 import { Stats } from "../../../Model/Stats";
 import { FightScene } from "../fight.scene";
 
 export type CharactersProps = GameObjectProps & {
-    position: Position;
-    spriteKey: string;
-    iconImageKey: string;
-    id: string;
-    name: string;
-    actionList: Action[];
-    baseStats: Stats;
+    character: CharacterClass;
+    entity: Entity;
 };
 
 export class Character extends GameObject {
@@ -33,25 +29,16 @@ export class Character extends GameObject {
     public actionList: Action[];
     public baseStats: Stats;
 
-    constructor({
-        position,
-        spriteKey,
-        iconImageKey,
-        id,
-        name,
-        actionList,
-        baseStats,
-        scene,
-    }: CharactersProps) {
+    constructor({ character, entity, scene }: CharactersProps) {
         super({ scene });
 
-        this.position = position;
-        this.spriteKey = spriteKey;
-        this.iconImageKey = iconImageKey;
-        this.id = id;
-        this.name = name;
-        this.actionList = actionList;
-        this.baseStats = baseStats;
+        this.position = entity.position;
+        this.spriteKey = character.spriteKey;
+        this.iconImageKey = character.iconImageKey;
+        this.id = entity.entityId;
+        this.name = character.name;
+        this.actionList = character.actionList;
+        this.baseStats = character.stats;
     }
 
     get stats() {
@@ -84,7 +71,7 @@ export class Character extends GameObject {
             loader.spritesheet(
                 this.spriteKey,
                 `assets/Sprites/${this.spriteKey}.png`,
-                { frameWidth: 96, frameHeight: 128 }
+                { frameWidth: 96, frameHeight: 128 },
             );
             loader.image(this.iconImageKey, `assets/${this.iconImageKey}.png`);
 
@@ -108,7 +95,7 @@ export class Character extends GameObject {
             this.sprite = scene.physics.add.sprite(
                 cell.pixelPosition.x,
                 cell.pixelPosition.y,
-                this.spriteKey
+                this.spriteKey,
             );
 
             this.sprite.setDepth(5);
@@ -117,10 +104,10 @@ export class Character extends GameObject {
 
             this.sprite.setInteractive();
             this.sprite.on("pointerdown", () => {
-            if (!(scene as FightScene).actionManager.currentAction) {
-                scene.events.emit("characterClicked", this);
-            }
-        });
+                if (!(scene as FightScene).actionManager.currentAction) {
+                    scene.events.emit("characterClicked", this);
+                }
+            });
 
             this.createAnimations(this.spriteKey);
         }
@@ -155,7 +142,7 @@ export class Character extends GameObject {
         startFrame: number,
         endFrame: number,
         frameRate: number = 2,
-        repeat: number = -1
+        repeat: number = -1,
     ) {
         this.scene.anims.create({
             key: `${animationName}`,
@@ -170,7 +157,7 @@ export class Character extends GameObject {
     render(renderConfig: SceneRenderConfig): RenderResult {
         const renderPosition = PositionUtils.getPixelsFromPosition(
             this.position,
-            renderConfig
+            renderConfig,
         );
         return {
             position: renderPosition,
@@ -194,7 +181,7 @@ export class Character extends GameObject {
     }
 
     public enableClick() {
-    this.sprite?.setInteractive();
+        this.sprite?.setInteractive();
     }
 
     public disableClick() {

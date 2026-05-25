@@ -1,5 +1,4 @@
 import { Character } from "./objects/Character";
-import { PlayableCharacter } from "../../Model/PlayableCharacter";
 import {
     GameScene,
     SceneRenderConfig,
@@ -107,19 +106,11 @@ export class FightScene extends GameScene {
         const playerClass = this.classes.find(
             (charClass) => charClass.id === playerEntity.classId,
         )!;
-        this.myPlayer = new PlayableCharacter(
-            {
-                position: playerEntity.position,
-                id: playerId,
-                spriteKey: playerClass.spriteKey,
-                iconImageKey: playerClass.iconImageKey,
-                name: playerClass.name,
-                baseStats: playerClass.stats,
-                actionList: playerClass.actionList,
-                scene: this,
-            },
-            playerClass,
-        );
+        this.myPlayer = new Character({
+            entity: playerEntity,
+            character: playerClass,
+            scene: this,
+        });
         this.characters = game.entities
             .filter((entity) => entity.entityId !== playerEntity.entityId)
             .map((entity) => {
@@ -127,13 +118,8 @@ export class FightScene extends GameScene {
                     (charClass) => charClass.id === entity.classId,
                 )!;
                 return new Character({
-                    position: entity.position,
-                    id: playerId,
-                    spriteKey: entityClass.spriteKey,
-                    iconImageKey: entityClass.iconImageKey,
-                    name: entityClass.name,
-                    baseStats: entityClass.stats,
-                    actionList: entityClass.actionList,
+                    entity: entity,
+                    character: entityClass,
                     scene: this,
                 });
             });
