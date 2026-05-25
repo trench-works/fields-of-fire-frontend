@@ -1,10 +1,7 @@
-import { Stats } from './Stats';
+import { Stats } from "./Stats";
 
-export class Effect {
-    constructor(
-        public name: string,
-        public duration: number,
-        public statModification: Stats
-    ){}
-
-}
+export type Effect = {
+    name: string;
+    duration: number;
+    statModification: Stats;
+};

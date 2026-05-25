@@ -42,25 +42,18 @@ export class Character extends GameObject {
     }
 
     get stats() {
-        const stats = new Stats({
-            life: this.baseStats.life,
-            precision: this.baseStats.precision, //boost ranged dammage
-            strength: this.baseStats.strength,
-            accuracy: this.baseStats.accuracy, //chance to hit
-            initiative: this.baseStats.initiative,
-            energy: this.baseStats.energy,
-            mouvement: this.baseStats.mouvement,
-            dodging: 0, // TODO: change this value
-        });
+        const stats = {
+            ...this.baseStats,
+        };
 
         this.currentEffect.forEach((effect) => {
-            stats.addLife(effect.statModification.life);
-            stats.addPrecision(effect.statModification.precision);
-            stats.addStrengh(effect.statModification.precision);
-            stats.addAccuracy(effect.statModification.accuracy);
-            stats.addInitiative(effect.statModification.initiative);
-            stats.addEnergy(effect.statModification.energy);
-            stats.addMouvement(effect.statModification.mouvement);
+            stats.life += effect.statModification.life;
+            stats.precision += effect.statModification.precision;
+            stats.strength += effect.statModification.precision;
+            stats.accuracy += effect.statModification.accuracy;
+            stats.initiative += effect.statModification.initiative;
+            stats.energy += effect.statModification.energy;
+            stats.mouvement += effect.statModification.mouvement;
         });
 
         return stats;
