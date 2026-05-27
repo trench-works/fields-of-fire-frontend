@@ -242,6 +242,8 @@ export class FightScene extends GameScene {
         this.events.on("characterClicked", (perso: Character) => {
             this.inspectCharacter(perso);
         });
+
+        this.turnDisplayer( this.characters);
     }
 
     createCharacterStatsUi(
@@ -376,5 +378,68 @@ export class FightScene extends GameScene {
             y: 6,
         });
     }
-}
 
+    public turnDisplayer(characters: Character[]) {
+
+        const turndisplay = this.sceneGrid.getArea(0, 0, 6, 2);
+        const turnPanel = new CustomContainer(this, {
+            title: "",
+            x: turndisplay.x + turndisplay.width / 2,
+            y: turndisplay.y + turndisplay.height / 2,
+            width: turndisplay.width,
+            height: turndisplay.height,
+            opacity: 0.25,
+        });
+
+        turnPanel.setDepth(-1); 
+
+        const sortedCharacters = [...characters].sort(
+            (a, b) => b.stats.initiative - a.stats.initiative
+        );
+
+        const actualTurnCellH = 7;
+        const turnCellH = 4;
+        const turnCellW = 4;
+
+        const turnGrid = GridUtils.uiGrid(
+            0,
+            0,
+            turnPanel.width,
+            turnPanel.height,
+            sortedCharacters.length * 10,
+            9,
+        );
+
+        const firstCell = turnGrid.getArea(1, 1, turnCellW, actualTurnCellH);
+        const firstTurnImage = new CustomContainer(this, {
+            title: sortedCharacters[0].charClass.name?.split(" ")[0] ?? "",
+            x: turnPanel.x - turnPanel.width / 2 + firstCell.centerX,
+            y: turnPanel.y - turnPanel.height / 2 + firstCell.centerY,
+            width: firstCell.width,
+            height: firstCell.height,
+            borderWidth: 5,
+            borderColor: Color.actualTurnBorder,
+            backgroundImage: sortedCharacters[0].charClass.iconImageKey,
+        });
+
+        const otherCellW = turnCellW * 0.75 ;
+        const otherStartCol = 1 + turnCellW + 1;
+
+        sortedCharacters.slice(1).forEach((character, index) => {
+            const col = otherStartCol + index * (otherCellW + 1);
+            const otherCell = turnGrid.getArea(col, 1, otherCellW, turnCellH);
+
+            new CustomContainer(this, {
+                title: character.charClass.name?.split(" ")[0] ?? "",
+                x: turnPanel.x - turnPanel.width / 2 + otherCell.centerX,
+                y: turnPanel.y - turnPanel.height / 2 + otherCell.centerY,
+                width: otherCell.width,
+                height: otherCell.height,
+                borderWidth: 2,
+                borderColor: Color.otherTurnBorder,
+                backgroundImage: character.charClass.iconImageKey,
+                opacity: 0.7,
+            });
+        });
+   }
+}
