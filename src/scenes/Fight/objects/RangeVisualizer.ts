@@ -14,16 +14,16 @@ export class RangeVisualizer {
             [
                 new Phaser.Geom.Point(
                     -32 * this.scene.scaleFactor,
-                    0 * this.scene.scaleFactor
+                    0 * this.scene.scaleFactor,
                 ),
                 new Phaser.Geom.Point(0, -16 * this.scene.scaleFactor),
                 new Phaser.Geom.Point(
                     32 * this.scene.scaleFactor,
-                    0 * this.scene.scaleFactor
+                    0 * this.scene.scaleFactor,
                 ),
                 new Phaser.Geom.Point(0, 16 * this.scene.scaleFactor),
             ],
-            true
+            true,
         );
 
         g.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
@@ -52,13 +52,16 @@ export class RangeVisualizer {
         }
     }
 
-    getCellsInRange(center: Position, range: number): Cell[] {
+    getCellsInRange(center: Position, range: number, notSelf: boolean): Cell[] {
         const result: Cell[] = [];
 
-        for (let y = 0; y < this.scene.gridPositions.length; y++) {
-            for (let x = 0; x < this.scene.gridPositions[y].length; x++) {
+        for (let x = 0; x < this.scene.gridPositions.length; x++) {
+            for (let y = 0; y < this.scene.gridPositions[x].length; y++) {
                 const dist = Math.abs(center.x - x) + Math.abs(center.y - y);
-                if (dist <= range) {
+                if (
+                    dist <= range &&
+                    (notSelf === false || !(x === center.x && y === center.y))
+                ) {
                     result.push(this.scene.gridPositions[y][x]);
                 }
             }
@@ -67,7 +70,11 @@ export class RangeVisualizer {
         return result;
     }
 
-    onActionSelected(origin: Position, range: number | undefined) {
+    onActionSelected(
+        origin: Position,
+        range: number | undefined,
+        notSelf: boolean = false,
+    ) {
         this.clearRange();
 
         if (!range && range !== 0) {
@@ -75,7 +82,7 @@ export class RangeVisualizer {
             return;
         }
 
-        const cells = this.getCellsInRange(origin, range);
+        const cells = this.getCellsInRange(origin, range, notSelf);
 
         this.showRange(cells);
     }

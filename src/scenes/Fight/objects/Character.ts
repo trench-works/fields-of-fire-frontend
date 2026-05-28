@@ -2,7 +2,6 @@ import {
     RenderResult,
     SceneRenderConfig,
     GameObject,
-    Position,
     PositionUtils,
     Cell,
 } from "../../../core";
@@ -30,7 +29,7 @@ export class Character extends GameObject {
 
     get stats() {
         const stats = {
-            ...this.charClass.stats,
+            ...this.entity.stats,
         };
 
         this.entity.effects?.forEach((effect) => {
@@ -151,12 +150,10 @@ export class Character extends GameObject {
         };
     }
 
-    move(newPosition: Position, gridPositions: Cell[][]) {
-        this.entity.position = newPosition;
-
+    move(gridPositions: Cell[][]) {
         if (!this.sprite) return;
 
-        const { x, y } = newPosition;
+        const { x, y } = this.entity.position;
         const cell = gridPositions[y][x];
 
         this.sprite.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);

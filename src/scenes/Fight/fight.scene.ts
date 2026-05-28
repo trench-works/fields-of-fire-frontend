@@ -57,6 +57,7 @@ export class FightScene extends GameScene {
         statsClassName: CustomContainer;
         statsName: CustomContainer;
     } | null = null;
+    private charStatsDisplays: Phaser.GameObjects.GameObject[] = [];
 
     constructor() {
         super({ key: "fightScene" });
@@ -86,16 +87,15 @@ export class FightScene extends GameScene {
         this.playerSocket = new GamePlayerSocket(game.id, playerId);
         this.playerSocket.onClose(() => MainMenu.start(this));
         this.playerSocket.onUpdate((game: Game) => {
+            this.loadGameData(game, playerId);
             this.displayEntitiesHighlights(game);
-            const player = game.players.find(
-                (player) => player.userId === global.user.id,
-            )!;
-            const entity = game.entities.find(
-                (entity) => entity.entityId === player.entityId,
-            )!;
-            this.myPlayer.move(entity.position, this.gridPositions);
+            this.displayCharacter();
         });
 
+        this.loadGameData(game, playerId);
+    }
+
+    loadGameData(game: Game, playerId: string) {
         this.gamePayload = game;
         const player = game.players.find(
             (player) => player.playerId === playerId,
@@ -106,10 +106,12 @@ export class FightScene extends GameScene {
         const playerClass = this.classes.find(
             (charClass) => charClass.id === playerEntity.classId,
         )!;
-        this.myPlayer = new Character(this, {
+        this.myPlayer ??= new Character(this, {
             entity: playerEntity,
             charClass: playerClass,
         });
+        this.myPlayer.entity = playerEntity;
+        this.myPlayer.move(this.gridPositions);
         this.characters = game.entities
             .filter((entity) => entity.entityId !== playerEntity.entityId)
             .map((entity) => {
@@ -211,23 +213,25 @@ export class FightScene extends GameScene {
 
         // --- Placement des icônes ---
         this.myPlayer.charClass.actionList.forEach((action, index) => {
-            const rangeManager: number | undefined =
-                action.id === "walk"
-                    ? this.myPlayer.stats.mouvement
-                    : action.range;
-
             const iconObj = statsTable.placeContent(
                 index,
                 0,
                 {
                     icon: ActionAsset.getAssetKey(action.id),
                     onClick: () => {
+                        const rangeManager: number | undefined =
+                            action.id === "walk"
+                                ? this.myPlayer.stats.mouvement
+                                : action.range;
+
                         this.rangeVisualizer.onActionSelected(
                             this.myPlayer!.entity.position,
                             rangeManager,
+                            action.id === "walk",
                         );
                         this.actionManager.currentAction = action;
                     },
+                    alpha: 1,
                 },
                 64,
             );
@@ -237,13 +241,13 @@ export class FightScene extends GameScene {
             }
         });
 
-        this.createCharacterStatsUi(this.myPlayer!, { x: 0, y: 6 });
-
         this.events.on("characterClicked", (perso: Character) => {
             this.inspectCharacter(perso);
         });
 
         this.turnDisplayer();
+        this.displayEntitiesHighlights(this.gamePayload);
+        this.displayCharacter();
     }
 
     createCharacterStatsUi(
@@ -362,6 +366,26 @@ export class FightScene extends GameScene {
         };
     }
 
+    public displayCharacter() {
+        for (const charDisplay of this.charStatsDisplays) {
+            charDisplay.destroy();
+        }
+        const {
+            statsPanel,
+            statsTable,
+            statsImage,
+            statsClassName,
+            statsName,
+        } = this.createCharacterStatsUi(this.myPlayer, { x: 0, y: 6 });
+        this.charStatsDisplays = [
+            statsPanel,
+            statsTable,
+            statsImage,
+            statsClassName,
+            statsName,
+        ];
+    }
+
     public inspectCharacter(perso: Character) {
         // Détruire l'ancien panneau si existant
         if (this.inspectedStatsPanel) {
@@ -393,7 +417,7 @@ export class FightScene extends GameScene {
         turnPanel.setDepth(-1);
 
         const actualTurnCellH = 7;
-        const turnCellH = 4;
+        const turnCellH = 5;
         const turnCellW = 4;
 
         const turnGrid = GridUtils.uiGrid(

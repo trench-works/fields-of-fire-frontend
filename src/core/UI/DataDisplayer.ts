@@ -50,7 +50,7 @@ export class DataDisplayer extends CustomContainer {
                 this.cellAreas[r][c] = {
                     position: new Position(
                         -this.width / 2 + area.centerX,
-                        -this.height / 2 + area.centerY
+                        -this.height / 2 + area.centerY,
                     ),
                     width: area.width,
                     height: area.height,
@@ -62,13 +62,16 @@ export class DataDisplayer extends CustomContainer {
     public placeContent(
         col: number,
         row: number,
-        value: string | number | { icon: string; onClick?: () => void },
-        iconSize?: number
+        value:
+            | string
+            | number
+            | { icon: string; onClick?: () => void; alpha?: number },
+        iconSize?: number,
     ) {
         const area = this.cellAreas[row]?.[col];
         if (!area) return;
 
-        let obj: UiObject;
+        let obj: Phaser.GameObjects.Image | Phaser.GameObjects.Text;
 
         if (typeof value === "string" || typeof value === "number") {
             obj = this.scene.add
@@ -80,6 +83,7 @@ export class DataDisplayer extends CustomContainer {
         } else if (value.icon) {
             obj = this.scene.add.image(0, 0, value.icon);
             obj.setDisplaySize(iconSize || 32, iconSize || 32);
+            obj.setAlpha(value.alpha ?? 1);
 
             // --- AJOUT : rendre l’icône interactive si onClick existe ---
             if (value.onClick) {
@@ -95,6 +99,5 @@ export class DataDisplayer extends CustomContainer {
 
         return obj;
     }
-
 }
 
