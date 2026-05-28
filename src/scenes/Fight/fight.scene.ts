@@ -243,7 +243,7 @@ export class FightScene extends GameScene {
             this.inspectCharacter(perso);
         });
 
-        this.turnDisplayer( this.characters);
+        this.turnDisplayer();
     }
 
     createCharacterStatsUi(
@@ -379,8 +379,7 @@ export class FightScene extends GameScene {
         });
     }
 
-    public turnDisplayer(characters: Character[]) {
-
+    public turnDisplayer() {
         const turndisplay = this.sceneGrid.getArea(0, 0, 6, 2);
         const turnPanel = new CustomContainer(this, {
             title: "",
@@ -391,11 +390,7 @@ export class FightScene extends GameScene {
             opacity: 0.25,
         });
 
-        turnPanel.setDepth(-1); 
-
-        const sortedCharacters = [...characters].sort(
-            (a, b) => b.stats.initiative - a.stats.initiative
-        );
+        turnPanel.setDepth(-1);
 
         const actualTurnCellH = 7;
         const turnCellH = 4;
@@ -406,40 +401,47 @@ export class FightScene extends GameScene {
             0,
             turnPanel.width,
             turnPanel.height,
-            sortedCharacters.length * 10,
+            this.gamePayload?.playerTurns?.length * 10,
             9,
         );
 
         const firstCell = turnGrid.getArea(1, 1, turnCellW, actualTurnCellH);
-        const firstTurnImage = new CustomContainer(this, {
-            title: sortedCharacters[0].charClass.name?.split(" ")[0] ?? "",
-            x: turnPanel.x - turnPanel.width / 2 + firstCell.centerX,
-            y: turnPanel.y - turnPanel.height / 2 + firstCell.centerY,
-            width: firstCell.width,
-            height: firstCell.height,
-            borderWidth: 5,
-            borderColor: Color.actualTurnBorder,
-            backgroundImage: sortedCharacters[0].charClass.iconImageKey,
-        });
+        const otherCellW = turnCellW * 0.75;
+        const otherStartCol = turnCellW + 1;
 
-        const otherCellW = turnCellW * 0.75 ;
-        const otherStartCol = 1 + turnCellW + 1;
+        this.gamePayload?.playerTurns?.forEach((entityId, index) => {
+            const entity = this.gamePayload.entities.find(
+                (entity) => entity.entityId === entityId,
+            );
+            const charClass = this.classes?.find(
+                (charClass) => charClass.id === entity?.classId,
+            );
+            const isFirstCell = index === 0;
 
-        sortedCharacters.slice(1).forEach((character, index) => {
-            const col = otherStartCol + index * (otherCellW + 1);
+            const col = otherStartCol + (index - 1) * (otherCellW + 1);
             const otherCell = turnGrid.getArea(col, 1, otherCellW, turnCellH);
 
             new CustomContainer(this, {
-                title: character.charClass.name?.split(" ")[0] ?? "",
-                x: turnPanel.x - turnPanel.width / 2 + otherCell.centerX,
-                y: turnPanel.y - turnPanel.height / 2 + otherCell.centerY,
-                width: otherCell.width,
-                height: otherCell.height,
-                borderWidth: 2,
-                borderColor: Color.otherTurnBorder,
-                backgroundImage: character.charClass.iconImageKey,
-                opacity: 0.7,
+                title: charClass?.name?.split(" ")[0] ?? "",
+                x:
+                    turnPanel.x -
+                    turnPanel.width / 2 +
+                    (isFirstCell ? firstCell : otherCell).centerX +
+                    (isFirstCell ? 0 : 50),
+                y:
+                    turnPanel.y -
+                    turnPanel.height / 2 +
+                    (isFirstCell ? firstCell : otherCell).centerY,
+                width: (isFirstCell ? firstCell : otherCell).width,
+                height: (isFirstCell ? firstCell : otherCell).height,
+                borderWidth: isFirstCell ? 5 : 2,
+                borderColor: isFirstCell
+                    ? Color.actualTurnBorder
+                    : Color.otherTurnBorder,
+                backgroundImage: charClass?.iconImageKey,
+                opacity: isFirstCell ? 1 : 0.7,
             });
         });
-   }
+    }
 }
+
