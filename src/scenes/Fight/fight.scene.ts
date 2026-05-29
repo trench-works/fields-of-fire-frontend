@@ -8,6 +8,7 @@ import {
     Position,
     PositionUtils,
     MenuButton,
+    Button,
 } from "../../core";
 import { CharacterClass } from "../../Model/CharacterClass";
 import { SceneConfig } from "../../config/SceneConfig";
@@ -198,7 +199,7 @@ export class FightScene extends GameScene {
             actionPanel.width,
             actionPanel.height,
         );
-        const actionListArea = actionGrid.getArea(0, 1, 9, 7);
+        const actionListArea = actionGrid.getArea(0, 1, 7, 7);
 
         const statsTable = new DataDisplayer(this, {
             position: new Position(
@@ -207,7 +208,7 @@ export class FightScene extends GameScene {
             ),
             width: actionListArea.width,
             height: actionListArea.height,
-            cols: 9,
+            cols: 7,
             rows: 1,
         });
 
@@ -239,6 +240,21 @@ export class FightScene extends GameScene {
                 iconObj.setInteractive();
                 this.tooltip.attachTo(iconObj, action.name ?? action.id);
             }
+        });
+
+        const endTurnArea = actionGrid.getArea(7, 1, 1.9, 7);
+
+        const endTurnButton = new Button(this, {
+            x : actionPanel.x - actionPanel.width / 2 + endTurnArea.centerX,
+            y : actionPanel.y - actionPanel.height / 2 + endTurnArea.centerY,
+            width: endTurnArea.width,
+            height: endTurnArea.height,
+            text: "Fin du tour",
+            borderColor: Color.containerBorder,
+            borderWidth: 2,
+            onClick: () => {  
+                console.log("Fin du tour");
+            },
         });
 
         this.events.on("characterClicked", (perso: Character) => {
