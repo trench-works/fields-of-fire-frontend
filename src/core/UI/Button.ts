@@ -55,7 +55,8 @@ export class Button extends Phaser.GameObjects.Container {
         // Créer le texte du bouton
         this.buttonText = scene.add
             .text(0, 0, text, {
-                font: `${fontSize} Arial`,
+                fontFamily: 'MyFont',
+                fontSize: fontSize,
                 color: textColor,
             })
             .setOrigin(0.5);

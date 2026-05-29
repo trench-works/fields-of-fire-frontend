@@ -14,7 +14,7 @@ interface ContainerConfig {
     borderColor?: string;
     backgroundImage?: string;
     opacity?: number;
-    fontsize?: number;
+    fontSize?: number;
     onClick?: () => void;
     textPosition?: { x: number; y: number };
     hoverTint?: number;
@@ -46,7 +46,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             borderColor = Color.containerBorder,
             backgroundImage,
             opacity = 1,
-            fontsize = 24,
+            fontSize = 24,
             alpha,
             onClick,
             textPosition = { x: 0, y: -height / 2 + 15 },
@@ -66,7 +66,8 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         // --- TEXTE ---
         this.titleText = scene.add
             .text(0, 0, title, {
-                font: `${fontsize}px Arial`,
+                fontFamily: 'MyFont',
+                fontSize: fontSize,
                 color: titleColor,
             })
             .setOrigin(0.5);

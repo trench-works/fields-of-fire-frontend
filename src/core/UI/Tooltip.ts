@@ -52,7 +52,8 @@ export class Tooltip extends Phaser.GameObjects.Container {
         this.bg = scene.make.graphics({}, false);
         this.label = scene.add
             .text(this.cfg.padding, this.cfg.padding, "", {
-                font: `${this.cfg.fontSize}px Arial`,
+                fontFamily: 'MyFont',
+                fontSize: this.cfg.fontSize + "px",
                 color: this.cfg.textColor,
                 wordWrap: { width: this.cfg.maxWidth - this.cfg.padding * 2 },
             })

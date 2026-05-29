@@ -47,7 +47,7 @@ export class PopupInput {
             height: popupH,
             borderWidth: 2,
             opacity: 0.95,
-            fontsize: 20,
+            fontSize: 20,
             textPosition: { x: 0, y: -popupH / 2 + 25 },
         });
         this.container.setDepth(11);

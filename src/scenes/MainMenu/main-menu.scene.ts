@@ -47,7 +47,8 @@ export class MainMenu extends Phaser.Scene {
         // Créer un titre du menu
         this.add
             .text(this.scale.width / 2, 200, "Les Mémoires Oubliées", {
-                font: "72px Arial",
+                fontFamily: 'MyFont',
+                fontSize: "48px",
                 color: "#FFFFFF",
             })
             .setOrigin(0.5);
@@ -73,7 +74,7 @@ export class MainMenu extends Phaser.Scene {
             height: this.BUTTON_HEIGHT,
             backgroundImage: "menuBalle",
             titleColor: "#FFFFFF",
-            fontsize: 50,
+            fontSize: 40,
             alpha: global.user ? 1 : 0.5,
             textPosition: { x: -130, y: -10 },
             hoverTint: 0xcccccc,
@@ -94,7 +95,7 @@ export class MainMenu extends Phaser.Scene {
             height: this.BUTTON_HEIGHT,
             backgroundImage: "menuBalle",
             titleColor: "#FFFFFF",
-            fontsize: 50,
+            fontSize: 40,
             textPosition: { x: -70, y: -10 },
             hoverTint: 0xcccccc,
             onClick: () => {

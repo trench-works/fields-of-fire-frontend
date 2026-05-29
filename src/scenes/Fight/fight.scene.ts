@@ -319,7 +319,7 @@ export class FightScene extends GameScene {
             height: classNameArea.height,
             borderWidth: 2,
             bgColor: Color.containerBorder,
-            fontsize: 18,
+            fontSize: 18,
         });
         const playerNameArea = statsGrid.getArea(0, 4, 3, 1);
 
@@ -331,7 +331,7 @@ export class FightScene extends GameScene {
             height: playerNameArea.height,
             borderWidth: 2,
             bgColor: Color.containerBorder,
-            fontsize: 18,
+            fontSize: 18,
         });
 
         const statValuesArea = statsGrid.getArea(3, 1, 6, 8);
