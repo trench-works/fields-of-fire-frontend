@@ -254,6 +254,7 @@ export class FightScene extends GameScene {
             borderWidth: 2,
             onClick: () => {  
                 console.log("Fin du tour");
+                this.playerSocket.finishTurn();
             },
         });
 
