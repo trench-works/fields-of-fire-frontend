@@ -62,7 +62,7 @@ export class RangeVisualizer {
                     dist <= range &&
                     (notSelf === false || !(x === center.x && y === center.y))
                 ) {
-                    result.push(this.scene.gridPositions[y][x]);
+                    result.push(this.scene.gridPositions[x][y]);
                 }
             }
         }

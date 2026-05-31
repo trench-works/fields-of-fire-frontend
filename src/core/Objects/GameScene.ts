@@ -118,7 +118,10 @@ export class GameScene extends Scene {
                 }
                 if (!tile) continue;
 
-                if (caseTile.entityId) {
+                if (
+                    caseTile.entityId &&
+                    caseTile.entityId === game.playerTurns[0]
+                ) {
                     const entity = game.entities.find(
                         (entity) => entity.entityId === caseTile.entityId,
                     );
@@ -175,7 +178,7 @@ export class GameScene extends Scene {
                     this.gridPositions[y] = [];
                 }
 
-                this.gridPositions[y][x] = {
+                this.gridPositions[x][y] = {
                     gridPosition: new Position(x, y),
                     pixelPosition: new Position(
                         worldX,

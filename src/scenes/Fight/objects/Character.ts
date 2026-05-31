@@ -71,7 +71,7 @@ export class Character extends GameObject {
         this.scene = scene;
 
         const { x, y } = this.entity.position;
-        const cell = gridPositions[y][x];
+        const cell = gridPositions[x][y];
 
         if (cell) {
             this.sprite = scene.physics.add.sprite(
@@ -154,7 +154,7 @@ export class Character extends GameObject {
         if (!this.sprite) return;
 
         const { x, y } = this.entity.position;
-        const cell = gridPositions[y][x];
+        const cell = gridPositions[x][y];
 
         this.sprite.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
     }
