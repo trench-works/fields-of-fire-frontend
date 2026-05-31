@@ -13,7 +13,7 @@ import {
 import { CharacterClass } from "../../Model/CharacterClass";
 import { SceneConfig } from "../../config/SceneConfig";
 import { Color } from "../../config/ColorConfig";
-import { ActionAsset } from "../../assets";
+import { ActionAsset, ActionAssetId } from "../../assets";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
 import { GamePlayerSocket } from "./repositories/player.socket";
 import { ActionManager } from "./objects/ActionManager";
@@ -49,7 +49,6 @@ export class FightScene extends GameScene {
     public rangeVisualizer: RangeVisualizer = new RangeVisualizer(this);
     public tooltip!: Tooltip;
     private menuButton!: MenuButton;
-    private gamePayload!: Game;
     private classes: CharacterClass[] = [];
     private inspectedStatsPanel: {
         statsPanel: CustomContainer;
@@ -220,16 +219,23 @@ export class FightScene extends GameScene {
                 {
                     icon: ActionAsset.getAssetKey(action.id),
                     onClick: () => {
-                        const rangeManager: number | undefined =
-                            action.id === "walk"
-                                ? this.myPlayer.stats.mouvement
-                                : action.range;
+                        this.rangeVisualizer.clearRange();
+                        switch (action.id) {
+                            case ActionAssetId.WALK:
+                                this.rangeVisualizer.getCellsInMoveRange(
+                                    this.myPlayer!.entity.position,
+                                    this.myPlayer.stats.mouvement,
+                                );
+                                break;
+                            case ActionAssetId.SHOOT:
+                                this.rangeVisualizer.getCellsInAttackRange(
+                                    this.myPlayer!.entity.position,
+                                    action.range ?? 0,
+                                );
+                                break;
+                        }
 
-                        this.rangeVisualizer.onActionSelected(
-                            this.myPlayer!.entity.position,
-                            rangeManager,
-                            action.id === "walk",
-                        );
+                        this.rangeVisualizer.showRange();
                         this.actionManager.currentAction = action;
                     },
                     alpha: 1,
@@ -245,14 +251,14 @@ export class FightScene extends GameScene {
         const endTurnArea = actionGrid.getArea(7, 1, 1.9, 7);
 
         const endTurnButton = new Button(this, {
-            x : actionPanel.x - actionPanel.width / 2 + endTurnArea.centerX,
-            y : actionPanel.y - actionPanel.height / 2 + endTurnArea.centerY,
+            x: actionPanel.x - actionPanel.width / 2 + endTurnArea.centerX,
+            y: actionPanel.y - actionPanel.height / 2 + endTurnArea.centerY,
             width: endTurnArea.width,
             height: endTurnArea.height,
             text: "Fin du tour",
             borderColor: Color.containerBorder,
             borderWidth: 2,
-            onClick: () => {  
+            onClick: () => {
                 console.log("Fin du tour");
                 this.playerSocket.finishTurn();
             },
@@ -270,6 +276,7 @@ export class FightScene extends GameScene {
     createCharacterStatsUi(
         perso: Character,
         gridPosition: { x: number; y: number },
+        name: string,
     ) {
         // 1) Tu récupères la zone du panel dans la grille globale
         const statsArea = this.sceneGrid.getArea(
@@ -325,7 +332,7 @@ export class FightScene extends GameScene {
         const playerNameArea = statsGrid.getArea(0, 4, 3, 1);
 
         const statsName = new CustomContainer(this, {
-            title: perso.charClass.name?.split(" ")[0],
+            title: name,
             x: statsPanel.x - statsPanel.width / 2 + playerNameArea.centerX,
             y: statsPanel.y - statsPanel.height / 2 + playerNameArea.centerY,
             width: playerNameArea.width,
@@ -393,7 +400,11 @@ export class FightScene extends GameScene {
             statsImage,
             statsClassName,
             statsName,
-        } = this.createCharacterStatsUi(this.myPlayer, { x: 0, y: 6 });
+        } = this.createCharacterStatsUi(
+            this.myPlayer,
+            { x: 0, y: 6 },
+            user.username,
+        );
         this.charStatsDisplays = [
             statsPanel,
             statsTable,
@@ -414,10 +425,14 @@ export class FightScene extends GameScene {
             this.inspectedStatsPanel = null;
         }
 
-        this.inspectedStatsPanel = this.createCharacterStatsUi(perso, {
-            x: 7,
-            y: 6,
-        });
+        this.inspectedStatsPanel = this.createCharacterStatsUi(
+            perso,
+            {
+                x: 7,
+                y: 6,
+            },
+            this.myPlayer.charClass.name.split(" ")[0],
+        );
     }
 
     public turnDisplayer() {
@@ -454,6 +469,9 @@ export class FightScene extends GameScene {
             const entity = this.gamePayload.entities.find(
                 (entity) => entity.entityId === entityId,
             );
+            const player = this.gamePayload.players.find(
+                (player) => player.entityId === entityId,
+            );
             const charClass = this.classes?.find(
                 (charClass) => charClass.id === entity?.classId,
             );
@@ -463,7 +481,7 @@ export class FightScene extends GameScene {
             const otherCell = turnGrid.getArea(col, 1, otherCellW, turnCellH);
 
             new CustomContainer(this, {
-                title: charClass?.name?.split(" ")[0] ?? "",
+                title: player?.name ?? charClass?.name?.split(" ")[0] ?? "",
                 x:
                     turnPanel.x -
                     turnPanel.width / 2 +

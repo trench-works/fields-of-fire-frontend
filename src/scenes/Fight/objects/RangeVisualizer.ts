@@ -2,12 +2,13 @@ import { Cell, GameScene, Position } from "../../../core";
 
 export class RangeVisualizer {
     public scene: GameScene;
+    private cellsInRange: Cell[] = [];
 
     constructor(scene: GameScene) {
         this.scene = scene;
     }
 
-    highlightCell(cell: Cell) {
+    private highlightCell(cell: Cell) {
         const g = this.scene.add.graphics();
         g.fillStyle(0x00aaff, 0.6); // bleu transparent
         g.fillPoints(
@@ -33,65 +34,99 @@ export class RangeVisualizer {
         (cell as any).highlight = g;
     }
 
-    showRange(cells: Cell[]) {
-        cells.forEach((cell) => {
+    showRange(): this {
+        this.cellsInRange.forEach((cell) => {
             if (cell) {
                 this.highlightCell(cell);
             }
         });
+        return this;
     }
 
-    clearRange() {
-        for (const row of this.scene.gridPositions) {
-            for (const cell of row) {
-                if ((cell as any)?.highlight) {
-                    (cell as any).highlight.destroy();
-                    delete (cell as any).highlight;
+    clearRange(): this {
+        for (const cell of this.cellsInRange) {
+            if ((cell as any)?.highlight) {
+                (cell as any).highlight.destroy();
+                delete (cell as any).highlight;
+            }
+        }
+        return this;
+    }
+
+    getCellsInMoveRange(start: Position, range: number): this {
+        //TODO: this one will avoid walls, holes and entity
+        const inRangeCells: Map<string, Position> = new Map();
+
+        const cellsAround = this.getCellsAround(start, 1, range);
+        for (const cellInRange of cellsAround) {
+            inRangeCells.set(`${cellInRange.x},${cellInRange.y}`, cellInRange);
+        }
+        this.cellsInRange = Array.from(inRangeCells.values()).map(
+            ({ x, y }) => this.scene.gridPositions[x][y],
+        );
+        return this;
+    }
+
+    private getCellsAround(
+        pos: Position,
+        explorationI: number,
+        maxRange: number,
+    ): Position[] {
+        if (explorationI > maxRange) {
+            return [];
+        }
+        const board = this.scene.gamePayload.plateau;
+        const cells: Position[] = [];
+        for (let x = pos.x - 1; x <= pos.x + 1; x++) {
+            for (let y = pos.y - 1; y <= pos.y + 1; y++) {
+                if (x === pos.x || y === pos.y) {
+                    const cell = board[x][y];
+                    if (
+                        cell &&
+                        !cell.isHole &&
+                        !cell.isWall &&
+                        !cell.entityId
+                    ) {
+                        const cellPos = new Position(x, y);
+                        cells.push(
+                            cellPos,
+                            ...this.getCellsAround(
+                                cellPos,
+                                explorationI + 1,
+                                maxRange,
+                            ),
+                        );
+                    }
                 }
             }
         }
+        return cells;
     }
 
-    getCellsInRange(center: Position, range: number, notSelf: boolean): Cell[] {
+    getCellsInAttackRange(start: Position, range: number): this {
+        //TODO: this one will avoid only walls and is directional
+        /**
+         * 1 - determinate forbidden angles ranges on distance like -> "cant shoot from angle 185 to 190 starting from 30 pixel away"
+         */
         const result: Cell[] = [];
 
         for (let x = 0; x < this.scene.gridPositions.length; x++) {
             for (let y = 0; y < this.scene.gridPositions[x].length; y++) {
-                const dist = Math.abs(center.x - x) + Math.abs(center.y - y);
-                if (
-                    dist <= range &&
-                    (notSelf === false || !(x === center.x && y === center.y))
-                ) {
+                const dist = Math.abs(start.x - x) + Math.abs(start.y - y);
+                if (dist <= range && !(x === start.x && y === start.y)) {
                     result.push(this.scene.gridPositions[x][y]);
                 }
             }
         }
+        this.cellsInRange = result;
 
-        return result;
+        return this;
     }
 
-    onActionSelected(
-        origin: Position,
-        range: number | undefined,
-        notSelf: boolean = false,
-    ) {
-        this.clearRange();
-
-        if (!range && range !== 0) {
-            console.log("this action don't have any range");
-            return;
-        }
-
-        const cells = this.getCellsInRange(origin, range, notSelf);
-
-        this.showRange(cells);
-    }
-
-    isItInRange(origin: Position, range: number, target: Position): boolean {
-        const dist =
-            Math.abs(origin.x - target.x) + Math.abs(origin.y - target.y);
-
-        return dist <= range;
+    isInRange({ x, y }: Position): boolean {
+        return this.cellsInRange.some(
+            ({ gridPosition }) => gridPosition.x === x && gridPosition.y === y,
+        );
     }
 }
 

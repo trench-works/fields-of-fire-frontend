@@ -5,7 +5,6 @@ import { scaleAndCenter } from "../Utils/Scale";
 import { Position } from "../Types/Position";
 import { RangeVisualizer } from "../../scenes/Fight/objects/RangeVisualizer";
 import { ActionManager } from "../../scenes/Fight/objects/ActionManager";
-import { ActionAssetId } from "../../assets";
 import { Game } from "../../Model/Game";
 import { Diamond } from "./Diamond";
 import { EntityType } from "../../Model/Entity";
@@ -44,6 +43,8 @@ export class GameScene extends Scene {
     public myPlayer!: Character;
     public gridPositions: Cell[][] = [];
     public scaleFactor: number = 1;
+
+    public gamePayload!: Game;
 
     protected groundLayer: Phaser.Tilemaps.TilemapLayer | null = null;
     private entityHighlights: Phaser.GameObjects.Graphics[] = [];
@@ -191,18 +192,7 @@ export class GameScene extends Scene {
                 zone.on("pointerdown", () => {
                     console.log(`Tile clicked: ${x}, ${y}`);
 
-                    const rangeManager: number | undefined =
-                        actionManager.currentAction?.id === ActionAssetId.WALK
-                            ? this.myPlayer.stats.mouvement
-                            : actionManager.currentAction?.range;
-
-                    if (
-                        rangeVisualizer.isItInRange(
-                            this.myPlayer.entity.position,
-                            rangeManager!,
-                            new Position(x, y),
-                        )
-                    ) {
+                    if (rangeVisualizer.isInRange(new Position(x, y))) {
                         actionManager.launchAction(new Position(x, y));
                     }
 
