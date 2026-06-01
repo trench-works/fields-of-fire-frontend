@@ -8,7 +8,6 @@ import {
     Button,
     DataDisplayObject,
 } from "../../../core";
-import { Tooltip } from "../../../core/UI/Tooltip";
 import { Action } from "../../../Model/Action";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/GameStore";
@@ -25,7 +24,6 @@ export class ActionDisplayer extends FightSceneDisplayer {
     protected actionElements: Map<string, DataDisplayObject> = new Map();
     protected endTurnButton!: Button;
     protected actionsList!: DataDisplayer;
-    protected tooltip!: Tooltip;
 
     constructor(
         scene: FightScene,
@@ -114,12 +112,6 @@ export class ActionDisplayer extends FightSceneDisplayer {
             borderWidth: 2,
         });
 
-        this.tooltip = Tooltip.getInstance(this.scene, {
-            textColor: "#000000",
-            fontSize: 14,
-            delay: 750,
-        });
-
         return this;
     }
 
@@ -136,7 +128,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
                 64,
             );
             if (iconObj) {
-                this.tooltip.attachTo(iconObj, action.name ?? action.id);
+                this.scene.tooltip.attachTo(iconObj, action.name ?? action.id);
                 this.actionElements.set(action.id, iconObj);
             }
         });

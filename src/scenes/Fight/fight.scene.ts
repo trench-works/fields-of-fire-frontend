@@ -34,9 +34,22 @@ export type FightSceneInit = {
 };
 
 export class FightScene extends GameScene {
+    /**
+     * Stores
+     */
     protected classStore: ClassStore;
     protected gameStore: GameStore;
     protected playerStore: PlayerStore;
+
+    /**
+     * Sockets
+     */
+    public playerSocket!: GamePlayerSocket;
+
+    /**
+     * Displayers
+     */
+    private actions!: ActionDisplayer;
 
     public renderConfig: SceneRenderConfig;
     public sceneGrid = GridUtils.uiGrid(0, 0);
@@ -50,11 +63,9 @@ export class FightScene extends GameScene {
         "energy",
         "mouvement",
     ];
-    public playerSocket!: GamePlayerSocket;
     public actionManager: ActionManager = new ActionManager(this);
     public rangeVisualizer: RangeVisualizer = new RangeVisualizer(this);
     public tooltip!: Tooltip;
-    private menuButton!: MenuButton;
     private inspectedStatsPanel: {
         statsPanel: CustomContainer;
         statsTable: DataDisplayer;
@@ -63,8 +74,6 @@ export class FightScene extends GameScene {
         statsName: CustomContainer;
     } | null = null;
     private charStatsDisplays: Phaser.GameObjects.GameObject[] = [];
-
-    private actions!: ActionDisplayer;
 
     constructor() {
         super({ key: "fightScene" });
@@ -181,12 +190,12 @@ export class FightScene extends GameScene {
     }
 
     create() {
-        this.actions.render();
         this.tooltip = Tooltip.getInstance(this, {
             textColor: "#000000",
             fontSize: 14,
             delay: 750,
         });
+        this.actions.render();
 
         const bg = this.add
             .image(0, 0, BackgroundAsset.getAssetKey(BackgroundAssetId.FIGHT))
@@ -202,7 +211,7 @@ export class FightScene extends GameScene {
         this.spawnEntities();
 
         // Créer le bouton Menu
-        this.menuButton = new MenuButton(this, {
+        new MenuButton(this, {
             position: "topRight",
             onResumeClick: () => {
                 // Reprendre le jeu (le menu se ferme automatiquement)
