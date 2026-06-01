@@ -18,10 +18,8 @@ export interface CellArea {
     height: number;
 }
 
-export interface UiObject extends Phaser.GameObjects.GameObject {
-    setPosition(x: number, y: number): this;
-    setDisplaySize(width: number, height: number): this;
-}
+export type DataDisplayObject = Phaser.GameObjects.GameObject &
+    Phaser.GameObjects.Components.Alpha;
 
 export class DataDisplayer extends CustomContainer {
     private grid: UiGrid;
@@ -67,9 +65,9 @@ export class DataDisplayer extends CustomContainer {
             | number
             | { icon: string; onClick?: () => void; alpha?: number },
         iconSize?: number,
-    ) {
+    ): DataDisplayObject | undefined {
         const area = this.cellAreas[row]?.[col];
-        if (!area) return;
+        if (!area) return undefined;
 
         let obj: Phaser.GameObjects.Image | Phaser.GameObjects.Text;
 

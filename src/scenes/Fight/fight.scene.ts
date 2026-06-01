@@ -8,12 +8,10 @@ import {
     Position,
     PositionUtils,
     MenuButton,
-    Button,
 } from "../../core";
 import { CharacterClass } from "../../Model/CharacterClass";
 import { SceneConfig } from "../../config/SceneConfig";
 import { Color } from "../../config/ColorConfig";
-import { ActionAsset, ActionAssetId } from "../../assets";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
 import { GamePlayerSocket } from "./repositories/player.socket";
 import { ActionManager } from "./objects/ActionManager";
@@ -21,6 +19,8 @@ import { Tooltip } from "../../core/UI/Tooltip";
 import { Game } from "../../Model/Game";
 import { ClassesRepository } from "../Lobby/repositories/classes.repository";
 import { MainMenu } from "../MainMenu/main-menu.scene";
+import { ActionDisplayer } from "./components/ActionDisplayer";
+import { ActionAsset } from "../../assets";
 
 export type FightSceneInit = {
     game: Game;
@@ -33,7 +33,7 @@ export class FightScene extends GameScene {
     public tileSetImage = "ground";
     public tileWidth = 64;
     public renderConfig: SceneRenderConfig;
-    private sceneGrid = GridUtils.uiGrid(0, 0);
+    public sceneGrid = GridUtils.uiGrid(0, 0);
     private allExistingStats: string[] = [
         "life",
         "initiative",
@@ -59,6 +59,8 @@ export class FightScene extends GameScene {
     } | null = null;
     private charStatsDisplays: Phaser.GameObjects.GameObject[] = [];
 
+    private actions!: ActionDisplayer;
+
     constructor() {
         super({ key: "fightScene" });
         const config = new SceneConfig().loadConfig().getConfig("scene_1");
@@ -77,6 +79,7 @@ export class FightScene extends GameScene {
         this.renderConfig.offset = PositionUtils.getMapOffset(
             this.renderConfig,
         );
+        this.actions = new ActionDisplayer(this);
     }
 
     static start(scene: Phaser.Scene, data: FightSceneInit) {
@@ -84,6 +87,7 @@ export class FightScene extends GameScene {
     }
 
     init({ game, player: { playerId } }: FightSceneInit) {
+        this.actions.setGame(game).setPlayerInfos(playerId, this.classes);
         this.playerSocket = new GamePlayerSocket(game.id, playerId);
         this.playerSocket.onClose(() => MainMenu.start(this));
         this.playerSocket.onUpdate((game: Game) => {
@@ -148,6 +152,7 @@ export class FightScene extends GameScene {
     }
 
     create() {
+        this.actions.prepare();
         this.tooltip = Tooltip.getInstance(this, {
             textColor: "#000000",
             fontSize: 14,
@@ -181,88 +186,7 @@ export class FightScene extends GameScene {
             },
         });
 
-        const actionArea = this.sceneGrid.getArea(2, 8, 5, 1);
-        const actionPanel = new CustomContainer(this, {
-            title: "",
-            x: actionArea.x + actionArea.width / 2,
-            y: actionArea.y + actionArea.height / 2,
-            width: actionArea.width,
-            height: actionArea.height,
-            borderWidth: 2,
-            opacity: 0.5,
-        });
-
-        const actionGrid = GridUtils.uiGrid(
-            0,
-            0,
-            actionPanel.width,
-            actionPanel.height,
-        );
-        const actionListArea = actionGrid.getArea(0, 1, 7, 7);
-
-        const statsTable = new DataDisplayer(this, {
-            position: new Position(
-                actionPanel.x - actionPanel.width / 2 + actionListArea.centerX,
-                actionPanel.y - actionPanel.height / 2 + actionListArea.centerY,
-            ),
-            width: actionListArea.width,
-            height: actionListArea.height,
-            cols: 7,
-            rows: 1,
-        });
-
         // --- Placement des icônes ---
-        this.myPlayer.charClass.actionList.forEach((action, index) => {
-            const iconObj = statsTable.placeContent(
-                index,
-                0,
-                {
-                    icon: ActionAsset.getAssetKey(action.id),
-                    onClick: () => {
-                        this.rangeVisualizer.clearRange();
-                        switch (action.id) {
-                            case ActionAssetId.WALK:
-                                this.rangeVisualizer.getCellsInMoveRange(
-                                    this.myPlayer!.entity.position,
-                                    this.myPlayer.stats.mouvement,
-                                );
-                                break;
-                            case ActionAssetId.SHOOT:
-                                this.rangeVisualizer.getCellsInAttackRange(
-                                    this.myPlayer!.entity.position,
-                                    action.range ?? 0,
-                                );
-                                break;
-                        }
-
-                        this.rangeVisualizer.showRange();
-                        this.actionManager.currentAction = action;
-                    },
-                    alpha: 1,
-                },
-                64,
-            );
-            if (iconObj) {
-                iconObj.setInteractive();
-                this.tooltip.attachTo(iconObj, action.name ?? action.id);
-            }
-        });
-
-        const endTurnArea = actionGrid.getArea(7, 1, 1.9, 7);
-
-        const endTurnButton = new Button(this, {
-            x: actionPanel.x - actionPanel.width / 2 + endTurnArea.centerX,
-            y: actionPanel.y - actionPanel.height / 2 + endTurnArea.centerY,
-            width: endTurnArea.width,
-            height: endTurnArea.height,
-            text: "Fin du tour",
-            borderColor: Color.containerBorder,
-            borderWidth: 2,
-            onClick: () => {
-                console.log("Fin du tour");
-                this.playerSocket.finishTurn();
-            },
-        });
 
         this.events.on("characterClicked", (perso: Character) => {
             this.inspectCharacter(perso);

@@ -1,13 +1,13 @@
 export abstract class ImageAssetManager<AssetId extends string, AssetType> {
     constructor(
         private readonly assetKey: string,
-        private readonly ASSETS: Record<AssetId, AssetType>
+        private readonly ASSETS: Record<AssetId, AssetType>,
     ) {}
 
     protected abstract getIds(): AssetId[];
     protected abstract getAssetFileLink(
         assetKey: string,
-        asset: AssetType
+        asset: AssetType,
     ): string;
 
     protected isAssetId(id: string): id is AssetId {
@@ -31,8 +31,8 @@ export abstract class ImageAssetManager<AssetId extends string, AssetType> {
             return;
         }
         load.image(
-            this.assetKey + id,
-            this.getAssetFileLink(this.assetKey, asset)
+            this.getAssetKey(id),
+            this.getAssetFileLink(this.assetKey, asset),
         );
     }
 
@@ -41,7 +41,7 @@ export abstract class ImageAssetManager<AssetId extends string, AssetType> {
             console.error(`${id} not a action asset id`);
             return "";
         }
-        return this.assetKey + id;
+        return `${this.assetKey}_${id}`;
     }
 }
 
