@@ -9,7 +9,6 @@ import {
     PositionUtils,
     MenuButton,
 } from "../../core";
-import { CharacterClass } from "../../Model/CharacterClass";
 import { SceneConfig } from "../../config/SceneConfig";
 import { Color } from "../../config/ColorConfig";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
@@ -21,6 +20,14 @@ import { ClassesRepository } from "../Lobby/repositories/classes.repository";
 import { MainMenu } from "../MainMenu/main-menu.scene";
 import { ActionDisplayer } from "./components/ActionDisplayer";
 import { ActionAsset } from "../../assets";
+import {
+    BackgroundAsset,
+    BackgroundAssetId,
+} from "../../assets/BackgroundAsset";
+import { ClassStore } from "./stores/ClassStore";
+import { GameStore } from "./stores/GameStore";
+import { PlayerStore } from "./stores/PlayerStore";
+import { BoardDisplayer } from "./components/BoardDisplayer";
 
 export type FightSceneInit = {
     game: Game;
@@ -30,10 +37,24 @@ export type FightSceneInit = {
 
 
 export class FightScene extends GameScene {
-    public backgroundImage = "red_bg";
-    public fightMap = "chessmap";
-    public tileSetImage = "ground";
-    public tileWidth = 64;
+    /**
+     * Stores
+     */
+    protected classStore: ClassStore;
+    protected gameStore: GameStore;
+    protected playerStore: PlayerStore;
+
+    /**
+     * Displayers
+     */
+    private actions: ActionDisplayer;
+    private board: BoardDisplayer;
+
+    /**
+     * Sockets
+     */
+    public playerSocket!: GamePlayerSocket;
+
     public renderConfig: SceneRenderConfig;
     public sceneGrid = GridUtils.uiGrid(0, 0);
     private allExistingStats: string[] = [
@@ -46,12 +67,9 @@ export class FightScene extends GameScene {
         "energy",
         "mouvement",
     ];
-    public playerSocket!: GamePlayerSocket;
     public actionManager: ActionManager = new ActionManager(this);
     public rangeVisualizer: RangeVisualizer = new RangeVisualizer(this);
     public tooltip!: Tooltip;
-    private menuButton!: MenuButton;
-    private classes: CharacterClass[] = [];
     private inspectedStatsPanel: {
         statsPanel: CustomContainer;
         statsTable: DataDisplayer;
@@ -60,8 +78,6 @@ export class FightScene extends GameScene {
         statsName: CustomContainer;
     } | null = null;
     private charStatsDisplays: Phaser.GameObjects.GameObject[] = [];
-
-    private actions!: ActionDisplayer;
     private readonly statDescriptions: Record<string, string> = {
         life:       "Points de vie. S'ils tombent à 0, vous mourrez.",
         precision:  "Augmente les dégâts des attaques à distance.",
@@ -75,14 +91,34 @@ export class FightScene extends GameScene {
 
     constructor() {
         super({ key: "fightScene" });
+
+        /**
+         * Stores
+         */
+        this.classStore = new ClassStore();
+        this.gameStore = new GameStore();
+        this.playerStore = new PlayerStore(this.classStore, this.gameStore);
+
+        /**
+         * Displayers
+         */
+
+        this.actions = new ActionDisplayer(
+            this,
+            this.gameStore,
+            this.playerStore,
+        );
+        this.board = new BoardDisplayer(this, this.gameStore);
+
         const config = new SceneConfig().loadConfig().getConfig("scene_1");
         if (!config) {
             throw new Error("Config doesnt exist");
         }
 
-        new ClassesRepository().getClasses().then((data) => {
-            this.classes = data;
-        });
+        new ClassesRepository()
+            .getClasses()
+            .then((data) => this.classStore.setClasses(data));
+
         this.renderConfig = {
             tileSize: config.render_config.tile_size,
             renderType: config.render_config.render_type,
@@ -91,7 +127,6 @@ export class FightScene extends GameScene {
         this.renderConfig.offset = PositionUtils.getMapOffset(
             this.renderConfig,
         );
-        this.actions = new ActionDisplayer(this);
     }
 
     static start(scene: Phaser.Scene, data: FightSceneInit) {
@@ -99,20 +134,27 @@ export class FightScene extends GameScene {
     }
 
     init({ game, player: { playerId } }: FightSceneInit) {
-        this.actions
-            .preRender()
-            .setGame(game)
-            .setPlayerInfos(playerId, this.classes);
+        this.gameStore.setGame(game);
+        this.playerStore.setPlayerId(playerId);
+
+        this.actions.preRender();
+
         this.playerSocket = new GamePlayerSocket(game.id, playerId);
         this.playerSocket.onClose(() => MainMenu.start(this));
         this.playerSocket.onUpdate((game: Game) => {
+            /**
+             * Update Store
+             */
+            this.gameStore.setGame(game);
+            this.playerStore.update();
+
+            /**
+             * Update Displayers
+             */
+            this.board.update();
+            this.actions.update();
             this.loadGameData(game, playerId);
-            this.displayEntitiesHighlights(game);
             this.displayCharacter();
-            this.actions
-                .setGame(game)
-                .setPlayerInfos(playerId, this.classes)
-                .update();
         });
 
         this.loadGameData(game, playerId);
@@ -126,7 +168,7 @@ export class FightScene extends GameScene {
         const playerEntity = game.entities.find(
             (entity) => entity.entityId === player.entityId,
         )!;
-        const playerClass = this.classes.find(
+        const playerClass = this.classStore.classes.find(
             (charClass) => charClass.id === playerEntity.classId,
         )!;
         this.myPlayer ??= new Character(this, {
@@ -138,7 +180,7 @@ export class FightScene extends GameScene {
         this.characters = game.entities
             .filter((entity) => entity.entityId !== playerEntity.entityId)
             .map((entity) => {
-                const entityClass = this.classes.find(
+                const entityClass = this.classStore.classes.find(
                     (charClass) => charClass.id === entity.classId,
                 )!;
                 return new Character(this, {
@@ -150,6 +192,8 @@ export class FightScene extends GameScene {
 
     preload() {
         ActionAsset.loadAll(this.load);
+        BackgroundAsset.load(this.load, BackgroundAssetId.FIGHT);
+
         this.load.tilemapTiledJSON(
             this.fightMap,
             `assets/${this.fightMap}.json`,
@@ -163,37 +207,27 @@ export class FightScene extends GameScene {
         this.characters.push(this.myPlayer);
         //précharge les image des persos de la scène
         this.characters.forEach((object) => object.preload(this.load));
-
-        this.load.image(
-            this.backgroundImage,
-            `assets/${this.backgroundImage}.png`,
-        );
-        
     }
 
     create() {
-        this.actions.render();
         this.tooltip = Tooltip.getInstance(this, {
             textColor: "#000000",
             fontSize: 14,
             delay: 750,
         });
+        this.actions.render();
+        this.board.render().update();
 
         const bg = this.add
-            .image(0, 0, this.backgroundImage)
+            .image(0, 0, BackgroundAsset.getAssetKey(BackgroundAssetId.FIGHT))
             .setOrigin(0, 0)
             .setDepth(-1);
         bg.setDisplaySize(this.scale.width, this.scale.height);
 
-        this.generateMap(
-            this.actionManager,
-            this.rangeVisualizer,
-            this.gamePayload,
-        );
         this.spawnEntities();
 
         // Créer le bouton Menu
-        this.menuButton = new MenuButton(this, {
+        new MenuButton(this, {
             position: "topRight",
             onResumeClick: () => {
                 // Reprendre le jeu (le menu se ferme automatiquement)
@@ -213,7 +247,6 @@ export class FightScene extends GameScene {
         });
 
         this.turnDisplayer();
-        this.displayEntitiesHighlights(this.gamePayload);
         this.displayCharacter();
     }
 
@@ -418,7 +451,7 @@ export class FightScene extends GameScene {
             const player = this.gamePayload.players.find(
                 (player) => player.entityId === entityId,
             );
-            const charClass = this.classes?.find(
+            const charClass = this.classStore.classes.find(
                 (charClass) => charClass.id === entity?.classId,
             );
             const isFirstCell = index === 0;

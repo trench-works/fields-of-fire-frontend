@@ -1,2 +1,3 @@
 export * from "./GameObject";
-export * from "./GameScene";
+export * from "../../scenes/Fight/GameScene";
+

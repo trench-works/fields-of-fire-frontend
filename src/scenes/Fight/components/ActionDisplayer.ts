@@ -8,44 +8,37 @@ import {
     Button,
     DataDisplayObject,
 } from "../../../core";
-import { Tooltip } from "../../../core/UI/Tooltip";
 import { Action } from "../../../Model/Action";
-import { CharacterClass } from "../../../Model/CharacterClass";
-import { Entity } from "../../../Model/Entity";
+import { FightScene } from "../fight.scene";
+import { GameStore } from "../stores/GameStore";
+import { PlayerStore } from "../stores/PlayerStore";
 import { FightSceneDisplayer } from "./FightSceneDisplayer";
 
 const CLICKABLE_ALPHA = 1;
 const UNCLICKABLE_ALPHA = 0.5;
 
 export class ActionDisplayer extends FightSceneDisplayer {
-    protected playerId!: string;
-    protected playerEntity!: Entity;
-    protected playerClass!: CharacterClass;
-
+    /**
+     * Displayed Elements
+     */
     protected actionElements: Map<string, DataDisplayObject> = new Map();
     protected endTurnButton!: Button;
     protected actionsList!: DataDisplayer;
-    protected tooltip!: Tooltip;
 
-    setPlayerInfos(playerId: string, characterClasses: CharacterClass[]): this {
-        this.playerId = playerId;
-        const player = this.game.players.find(
-            (player) => player.playerId === playerId,
-        )!;
-        this.playerEntity = this.game.entities.find(
-            (entity) => entity.entityId === player.entityId,
-        )!;
-        this.playerClass = characterClasses.find(
-            (charClass) => charClass.id === this.playerEntity.classId,
-        )!;
-        return this;
+    constructor(
+        scene: FightScene,
+        gameStore: GameStore,
+        private readonly playerStore: PlayerStore,
+    ) {
+        super(scene, gameStore);
     }
 
     protected handleActionClick(action: Action) {
         const isPlayerTurn =
-            this.game.playerTurns[0] === this.playerEntity.entityId;
-        const hasMovement = this.playerEntity.stats.mouvement > 0;
-        const hasEnergy = this.playerEntity.stats.energy > 0;
+            this.gameStore.game.playerTurns[0] ===
+            this.playerStore.playerEntity.entityId;
+        const hasMovement = this.playerStore.playerEntity.stats.mouvement > 0;
+        const hasEnergy = this.playerStore.playerEntity.stats.energy > 0;
         if (!isPlayerTurn) {
             return;
         }
@@ -56,8 +49,8 @@ export class ActionDisplayer extends FightSceneDisplayer {
                     return;
                 }
                 this.scene.rangeVisualizer.getCellsInMoveRange(
-                    this.playerEntity.position,
-                    this.playerEntity.stats.mouvement,
+                    this.playerStore.playerEntity.position,
+                    this.playerStore.playerEntity.stats.mouvement,
                 );
                 break;
             case ActionAssetId.SHOOT:
@@ -66,7 +59,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
                     return;
                 }
                 this.scene.rangeVisualizer.getCellsInAttackRange(
-                    this.playerEntity.position,
+                    this.playerStore.playerEntity.position,
                     action.range ?? 0,
                 );
                 break;
@@ -119,17 +112,11 @@ export class ActionDisplayer extends FightSceneDisplayer {
             borderWidth: 2,
         });
 
-        this.tooltip = Tooltip.getInstance(this.scene, {
-            textColor: "#000000",
-            fontSize: 14,
-            delay: 750,
-        });
-
         return this;
     }
 
     render(): this {
-        this.playerClass.actionList.forEach((action, index) => {
+        this.playerStore.playerClass.actionList.forEach((action, index) => {
             const iconObj = this.actionsList.placeContent(
                 index,
                 0,
@@ -141,7 +128,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
                 64,
             );
             if (iconObj) {
-                this.tooltip.attachTo(iconObj, action.name ?? action.id);
+                this.scene.tooltip.attachTo(iconObj, action.name ?? action.id);
                 this.actionElements.set(action.id, iconObj);
             }
         });
@@ -155,11 +142,12 @@ export class ActionDisplayer extends FightSceneDisplayer {
 
     update(): this {
         const isPlayerTurn =
-            this.game.playerTurns[0] === this.playerEntity.entityId;
-        const hasMovement = this.playerEntity.stats.mouvement > 0;
-        const hasEnergy = this.playerEntity.stats.energy > 0;
+            this.gameStore.game.playerTurns[0] ===
+            this.playerStore.playerEntity.entityId;
+        const hasMovement = this.playerStore.playerEntity.stats.mouvement > 0;
+        const hasEnergy = this.playerStore.playerEntity.stats.energy > 0;
 
-        this.playerClass.actionList.forEach((action) => {
+        this.playerStore.playerClass.actionList.forEach((action) => {
             const actionObject = this.actionElements.get(action.id)!;
             switch (action.id) {
                 case ActionAssetId.WALK:
