@@ -1,13 +1,12 @@
 import { Character } from "./objects/Character";
 import {
-    GameScene,
-    SceneRenderConfig,
     DataDisplayer,
     CustomContainer,
     GridUtils,
     Position,
     PositionUtils,
     MenuButton,
+    GameObject,
 } from "../../core";
 import { SceneConfig } from "../../config/SceneConfig";
 import { Color } from "../../config/ColorConfig";
@@ -28,6 +27,29 @@ import { ClassStore } from "./stores/ClassStore";
 import { GameStore } from "./stores/GameStore";
 import { PlayerStore } from "./stores/PlayerStore";
 import { BoardDisplayer } from "./components/BoardDisplayer";
+import { Scene } from "phaser";
+
+export type SceneRenderConfig = {
+    tileSize: number;
+    renderType: string;
+    offset: Position;
+};
+
+export type RenderResult = {
+    position: Position;
+    sprite: string;
+};
+
+export type Cell = {
+    gridPosition: Position;
+    pixelPosition: Position;
+    zone: Phaser.GameObjects.Zone;
+    hoverGraphics?: Phaser.GameObjects.Graphics;
+};
+
+export interface Displayable {
+    render(renderConfig: SceneRenderConfig): RenderResult | RenderResult[];
+}
 
 export type FightSceneInit = {
     game: Game;
@@ -36,7 +58,7 @@ export type FightSceneInit = {
 
 
 
-export class FightScene extends GameScene {
+export class FightScene extends Scene {
     /**
      * Stores
      */
@@ -88,6 +110,24 @@ export class FightScene extends GameScene {
         energy:     "Points d'énergie nécessaires pour utiliser des actions.",
         mouvement:  "Nombre de cases que vous pouvez parcourir par tour.",
     };
+
+    public fightMap = "chessmap";
+    public tileSetImage = "ground";
+    public tileWidth = 64;
+    public displayObjects: Displayable[] = [];
+    public gameObjects: GameObject[] = [];
+    public characters: Character[] = [];
+    public myPlayer!: Character;
+    public gridPositions: Cell[][] = [];
+    public scaleFactor: number = 1;
+
+    public gamePayload!: Game;
+
+    spawnEntities() {
+        this.characters.forEach((entity) => {
+            entity.spawn(this, this.scaleFactor, this.gridPositions);
+        });
+    }
 
     constructor() {
         super({ key: "fightScene" });

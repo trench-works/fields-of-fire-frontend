@@ -1,14 +1,12 @@
-import {
-    RenderResult,
-    SceneRenderConfig,
-    GameObject,
-    PositionUtils,
-    Cell,
-} from "../../../core";
-import { Action } from "../../../Model/Action";
+import { GameObject, PositionUtils } from "../../../core";
 import { CharacterClass } from "../../../Model/CharacterClass";
 import { Entity } from "../../../Model/Entity";
-import { FightScene } from "../fight.scene";
+import {
+    Cell,
+    FightScene,
+    RenderResult,
+    SceneRenderConfig,
+} from "../fight.scene";
 
 export type CharactersProps = {
     charClass: CharacterClass;
