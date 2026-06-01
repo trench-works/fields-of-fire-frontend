@@ -1,4 +1,5 @@
 import { GameObject, PositionUtils } from "../../../core";
+import { Action } from "../../../Model/Action";
 import { CharacterClass } from "../../../Model/CharacterClass";
 import { Entity } from "../../../Model/Entity";
 import {
