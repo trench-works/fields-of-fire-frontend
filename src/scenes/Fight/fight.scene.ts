@@ -27,6 +27,8 @@ export type FightSceneInit = {
     player: { playerId: string };
 };
 
+
+
 export class FightScene extends GameScene {
     public backgroundImage = "red_bg";
     public fightMap = "chessmap";
@@ -60,6 +62,16 @@ export class FightScene extends GameScene {
     private charStatsDisplays: Phaser.GameObjects.GameObject[] = [];
 
     private actions!: ActionDisplayer;
+    private readonly statDescriptions: Record<string, string> = {
+        life:       "Points de vie. S'ils tombent à 0, vous mourrez.",
+        precision:  "Augmente les dégâts des attaques à distance.",
+        strength:   "Augmente les dégâts des attaques au corps à corps.",
+        accuracy:   "Chance de toucher vos adversaires.",
+        initiative:  "Détermine l'ordre de passage dans le tour.",
+        dodging:    "Chance d'esquiver les attaques ennemies.",
+        energy:     "Points d'énergie nécessaires pour utiliser des actions.",
+        mouvement:  "Nombre de cases que vous pouvez parcourir par tour.",
+    };
 
     constructor() {
         super({ key: "fightScene" });
@@ -156,6 +168,7 @@ export class FightScene extends GameScene {
             this.backgroundImage,
             `assets/${this.backgroundImage}.png`,
         );
+        
     }
 
     create() {
@@ -286,7 +299,6 @@ export class FightScene extends GameScene {
             rows: 4,
         });
 
-        // --- Placement des icônes ---
         this.allExistingStats.forEach((icon, index) => {
             const row = Math.floor(index / 2);
             const col = (index % 2) * 2;
@@ -295,11 +307,14 @@ export class FightScene extends GameScene {
 
             if (iconObj) {
                 iconObj.setInteractive();
-                this.tooltip.attachTo(iconObj, icon); // ex: "life", "strength" …
+                this.tooltip.attachTo(
+                    iconObj,
+                    this.statDescriptions[icon] ?? icon,
+                    icon,                                
+                );
             }
         });
 
-        // first column
         const stats = perso.stats;
         statsTable.placeContent(1, 0, stats.life);
         statsTable.placeContent(1, 1, stats.strength);
