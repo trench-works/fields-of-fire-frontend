@@ -294,7 +294,8 @@ export class FightScene extends Scene {
             .setEntity(perso.entity)
             .setCharacterClass(perso.charClass)
             .setName(perso.charClass.name.split(" ")[0])
-            .update();
+            .update()
+            .setIsShow(true);
     }
 }
 
