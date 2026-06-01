@@ -25,6 +25,7 @@ export class Tooltip extends Phaser.GameObjects.Container {
     private bodyLabel: Phaser.GameObjects.Text;
     private cfg: Required<TooltipConfig>;
     private showTimer: Phaser.Time.TimerEvent | null = null;
+    private fixedTarget: Phaser.GameObjects.Sprite | null = null; // ✅ référence dynamique
 
     private constructor(scene: Phaser.Scene, config: TooltipConfig = {}) {
         super(scene, 0, 0);
@@ -32,7 +33,7 @@ export class Tooltip extends Phaser.GameObjects.Container {
         this.cfg = {
             bgColor:       config.bgColor       ?? Color.containerBg,
             textColor:     config.textColor      ?? "#FFFFFF",
-            titleColor:    config.titleColor     ?? Color.btnBg ,
+            titleColor:    config.titleColor     ?? Color.btnBg,
             fontSize:      config.fontSize       ?? 14,
             titleFontSize: config.titleFontSize  ?? 16,
             padding:       config.padding        ?? 10,
@@ -48,7 +49,6 @@ export class Tooltip extends Phaser.GameObjects.Container {
 
         this.bg = scene.make.graphics({}, false);
 
-        // ✅ Titre (bold, couleur distincte)
         this.titleLabel = scene.add
             .text(pad, pad, "", {
                 fontFamily: "MyFont",
@@ -59,7 +59,6 @@ export class Tooltip extends Phaser.GameObjects.Container {
             })
             .setOrigin(0, 0);
 
-        // ✅ Corps sous le titre
         this.bodyLabel = scene.add
             .text(pad, pad, "", {
                 fontFamily: "MyFont",
@@ -89,20 +88,13 @@ export class Tooltip extends Phaser.GameObjects.Container {
         return Tooltip.instances.get(scene)!;
     }
 
-    /**
-     * Attache un tooltip avec titre optionnel.
-     * @param target - L'objet sur lequel écouter le hover
-     * @param text   - Texte du corps, ou juste le texte si pas de titre
-     * @param title  - Titre affiché en haut (optionnel)
-     * @param delay  - Délai en ms (surcharge le délai global)
-     */
     public attachTo(
         target: Phaser.GameObjects.GameObject,
         text: string,
-        title?: string | number,  // ← garde la compat avec l'ancien usage (delay number)
+        title?: string | number,
         delay?: number,
+        fixedTarget?: Phaser.GameObjects.Sprite, // ✅ sprite au lieu de position fixe
     ): void {
-        // ✅ Rétrocompatibilité : si title est un nombre c'est l'ancien paramètre delay
         let resolvedTitle: string | undefined;
         let resolvedDelay: number = delay ?? this.cfg.delay;
 
@@ -113,18 +105,18 @@ export class Tooltip extends Phaser.GameObjects.Container {
             resolvedTitle = title;
         }
 
-        target.on("pointerover", () => this.scheduleShow(text, resolvedDelay, resolvedTitle));
+        target.on("pointerover", () => this.scheduleShow(text, resolvedDelay, resolvedTitle, fixedTarget));
         target.on("pointerout",  () => this.cancelAndHide());
     }
 
-    private scheduleShow(text: string, delay: number, title?: string): void {
+    private scheduleShow(text: string, delay: number, title?: string, fixedTarget?: Phaser.GameObjects.Sprite): void {
         this.cancelTimer();
         if (delay <= 0) {
-            this.show(text, title);
+            this.show(text, title, fixedTarget);
             return;
         }
         this.showTimer = this.scene.time.delayedCall(delay, () => {
-            this.show(text, title);
+            this.show(text, title, fixedTarget);
         });
     }
 
@@ -140,14 +132,15 @@ export class Tooltip extends Phaser.GameObjects.Container {
         }
     }
 
-    private show(text: string, title?: string): void {
+    private show(text: string, title?: string, fixedTarget?: Phaser.GameObjects.Sprite): void {
+        this.fixedTarget = fixedTarget ?? null; // ✅ stocke la référence au sprite
+
         const pad = this.cfg.padding;
-        const gap = 4; // espace entre titre et corps
+        const gap = 4;
 
         if (title) {
-            this.titleLabel.setText(title).setVisible(true);
-            this.bodyLabel.setText(text).setVisible(true);
             this.titleLabel.setText(title.charAt(0).toUpperCase() + title.slice(1)).setVisible(true);
+            this.bodyLabel.setText(text).setVisible(true);
             this.bodyLabel.setPosition(pad, pad + this.titleLabel.height + gap);
         } else {
             this.titleLabel.setVisible(false);
@@ -176,11 +169,23 @@ export class Tooltip extends Phaser.GameObjects.Container {
     }
 
     private hide(): void {
+        this.fixedTarget = null; // ✅ reset
         this.setVisible(false);
     }
 
     private followPointer(): void {
         if (!this.visible) return;
+
+        if (this.fixedTarget) {
+            // ✅ position recalculée à chaque frame depuis le sprite
+            const tooltipW = Math.max(this.titleLabel.width, this.bodyLabel.width) + this.cfg.padding * 2;
+            this.setPosition(
+                this.fixedTarget.x - tooltipW / 2,  // ✅ centré sur la largeur du tooltip
+                this.fixedTarget.y - 240,            // ✅ au dessus du sprite
+            );
+            return;
+        }
+
         const pointer = this.scene.input.activePointer;
 
         let px = pointer.x + this.cfg.offsetX;

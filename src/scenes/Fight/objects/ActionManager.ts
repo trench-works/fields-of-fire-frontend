@@ -15,13 +15,20 @@ export class ActionManager {
     }
 
     set currentAction(action: Action | undefined) {
+
+        console.log("Action sélectionnée :", action?.name || "Aucune");
         this._currentAction = action;
 
         this.scene.characters.forEach((character) => {
             if (action) {
+                console.log(`Désactivation des clics pour ${character.entity.entityId} en raison de l'action sélectionnée`);
                 character.disableClick();
+                character.showPreview(true, action);
+                
             } else {
+                console.log(`Réactivation des clics pour ${character.entity.entityId} en raison de la suppression de l'action sélectionnée`);
                 character.enableClick();
+                character.showPreview(false);
             }
         });
     }

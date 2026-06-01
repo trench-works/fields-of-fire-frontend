@@ -5,6 +5,7 @@ import {
     PositionUtils,
     Cell,
 } from "../../../core";
+import { Action } from "../../../Model/Action";
 import { CharacterClass } from "../../../Model/CharacterClass";
 import { Entity } from "../../../Model/Entity";
 import { FightScene } from "../fight.scene";
@@ -169,6 +170,38 @@ export class Character extends GameObject {
 
     public disableClick() {
         this.sprite?.disableInteractive();
+    }
+
+    public showPreview(show: boolean, action?: Action) {
+        if (!this.sprite) return;
+        const fightScene = this.scene as FightScene;
+
+        this.sprite?.off("pointerover");
+        this.sprite?.off("pointerout");
+
+        const title = `❤️ ${this.entity.stats.life} PV`;
+
+        if (!show) {
+            fightScene.tooltip.attachTo(
+                this.sprite!,
+                this.charClass.name,
+                title,
+                undefined,
+                this.sprite!
+            );
+        } else {
+            const estimatedDamage = action
+                ? `Dégâts estimés : 12²` // ← ici tu peux calculer les dégâts estimés en fonction de l'action et des stats du personnage
+                : "Aucune action sélectionnée";
+
+            fightScene.tooltip.attachTo(
+                this.sprite!,
+                estimatedDamage,  // ← description = dégâts estimés
+                title,
+                undefined,
+                this.sprite!
+            );
+        }
     }
 }
 
