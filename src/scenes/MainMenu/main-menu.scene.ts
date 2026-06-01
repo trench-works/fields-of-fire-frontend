@@ -1,14 +1,12 @@
 import Phaser from "phaser";
-import { Button, CustomContainer, GridUtils } from "../../core";
-import {
-    BackgroundAsset,
-    BackgroundAssetId,
-} from "../../assets/BackgroundAsset";
+import { BaseScene, Button, CustomContainer, GridUtils } from "../../core";
+import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { LobbyListScene } from "../LobbyList/lobby-list.scene";
 import { PopupInput } from "./objects/LoginPopup";
 import { UserRepository } from "./repositories/user.repository";
+import { SceneAssetId } from "../../assets/ScenesAsset";
 
-export class MainMenu extends Phaser.Scene {
+export class MainMenu extends BaseScene {
     private readonly BUTTON_WIDTH = 500;
     private readonly BUTTON_HEIGHT = 100;
     private sceneGrid = GridUtils.uiGrid(0, 0);
@@ -17,7 +15,7 @@ export class MainMenu extends Phaser.Scene {
     private connectButton!: Button;
 
     constructor() {
-        super({ key: "mainMenuScene" });
+        super(SceneAssetId.MENU, BackgroundAssetId.MAIN_MENU);
         const user = localStorage.getItem("user");
         if (user) {
             global.user = JSON.parse(user);
@@ -25,29 +23,20 @@ export class MainMenu extends Phaser.Scene {
     }
 
     static start(scene: Phaser.Scene) {
-        scene.scene.start("mainMenuScene");
+        scene.scene.start(SceneAssetId.MENU);
     }
 
     preload() {
-        // Charger les images nécessaires
-        BackgroundAsset.load(this.load, BackgroundAssetId.MAIN_MENU);
+        super.preload();
         this.load.image("menuBalle", "assets/menuBalle.png");
     }
 
     create() {
-        // Ajouter l'image de fond qui prend toute la page
-        const bgImage = this.add.image(
-            this.scale.width / 2,
-            this.scale.height / 2,
-            BackgroundAsset.getAssetKey(BackgroundAssetId.MAIN_MENU),
-        );
-        bgImage.setDisplaySize(this.scale.width, this.scale.height);
-        bgImage.setOrigin(0.5);
-
+        super.create();
         // Créer un titre du menu
         this.add
             .text(this.scale.width / 2, 200, "Les Mémoires Oubliées", {
-                fontFamily: 'MyFont',
+                fontFamily: "MyFont",
                 fontSize: "48px",
                 color: "#FFFFFF",
             })

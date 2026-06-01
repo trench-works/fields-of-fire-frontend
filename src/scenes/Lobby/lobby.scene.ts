@@ -5,6 +5,7 @@ import {
     GridUtils,
     Position,
     MenuButton,
+    BaseScene,
 } from "../../core";
 import { Color } from "../../config/ColorConfig";
 import { CharacterClass } from "../../Model/CharacterClass";
@@ -13,14 +14,15 @@ import { ActionAsset } from "../../assets";
 import { FightScene } from "../Fight/fight.scene";
 import { ClassesRepository } from "./repositories/classes.repository";
 import { MainMenu } from "../MainMenu/main-menu.scene";
+import { SceneAssetId } from "../../assets/ScenesAsset";
+import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 
 export type LobbySceneInit = {
     lobbyId: string;
     playerId: string;
 };
 
-export class LobbyScene extends Phaser.Scene {
-    private backgroundImage = "red_bg";
+export class LobbyScene extends BaseScene {
     private classes: CharacterClass[] = [];
     private selectClassId: string = "entente_fantassin";
     private tabWidth!: number;
@@ -28,20 +30,19 @@ export class LobbyScene extends Phaser.Scene {
     private playerImageContainer!: CustomContainer;
     private playerClassName!: CustomContainer;
     public lobbySocket!: LobbySocket;
-    private menuButton!: MenuButton;
 
     protected lobbyId!: string;
     protected playerId!: string;
 
     constructor() {
-        super({ key: "lobbyScene" });
+        super(SceneAssetId.LOBBY, BackgroundAssetId.LOBBY);
         new ClassesRepository().getClasses().then((data) => {
             this.classes = data;
         });
     }
 
     static start(scene: Phaser.Scene, data: LobbySceneInit) {
-        scene.scene.start("lobbyScene", data);
+        scene.scene.start(SceneAssetId.LOBBY, data);
     }
 
     init({ lobbyId, playerId }: LobbySceneInit) {
@@ -50,10 +51,7 @@ export class LobbyScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image(
-            this.backgroundImage,
-            `assets/${this.backgroundImage}.png`,
-        );
+        super.preload();
         this.classes.forEach((charClass) => {
             if (charClass.playable === true) {
                 this.load.image(
@@ -68,6 +66,7 @@ export class LobbyScene extends Phaser.Scene {
     }
 
     create() {
+        super.create();
         this.lobbySocket = new LobbySocket(this.lobbyId);
         this.lobbySocket.onClose(() => MainMenu.start(this));
 
@@ -88,11 +87,7 @@ export class LobbyScene extends Phaser.Scene {
 
         //title BOX
         const titleBox = GridUtils.uiGrid(0, 0);
-        const bg = this.add
-            .image(0, 0, this.backgroundImage)
-            .setOrigin(0, 0)
-            .setDepth(-1);
-        bg.setDisplaySize(this.scale.width, this.scale.height);
+
         this.add
             .text(this.scale.width / 2, titleBox.y + 20, "LOBBY", {
                 fontSize: "48px",
@@ -102,12 +97,6 @@ export class LobbyScene extends Phaser.Scene {
 
         //tab BOX
         const tabArea = GridUtils.uiGrid(0, 1);
-        const tabPanelWidth = tabArea.cellW * 3;
-        const tabPanelHeight = this.scale.height - tabArea.cellH;
-        const currenttabPosition = new Position(
-            tabArea.x + tabPanelWidth / 2,
-            tabArea.y + tabPanelHeight / 2,
-        );
         //console.log("TabArea dimensions:", tabArea.cellH, tabArea.cellW, " window, " , window.innerWidth, window.innerHeight);
 
         this.tabWidth = tabArea.cellW * 2; // colonnes 0 et 1
@@ -233,7 +222,7 @@ export class LobbyScene extends Phaser.Scene {
         playerPanel.add(fightButton);
 
         // Créer le bouton Menu
-        this.menuButton = new MenuButton(this, {
+        new MenuButton(this, {
             position: "topRight",
             onResumeClick: () => {
                 // Reprendre le jeu (le menu se ferme automatiquement)

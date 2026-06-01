@@ -1,5 +1,11 @@
 import { Character } from "./objects/Character";
-import { GridUtils, Position, PositionUtils, MenuButton } from "../../core";
+import {
+    GridUtils,
+    Position,
+    PositionUtils,
+    MenuButton,
+    BaseScene,
+} from "../../core";
 import { SceneConfig } from "../../config/SceneConfig";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
 import { GamePlayerSocket } from "./repositories/player.socket";
@@ -10,18 +16,15 @@ import { ClassesRepository } from "../Lobby/repositories/classes.repository";
 import { MainMenu } from "../MainMenu/main-menu.scene";
 import { ActionDisplayer } from "./components/ActionDisplayer";
 import { ActionAsset } from "../../assets";
-import {
-    BackgroundAsset,
-    BackgroundAssetId,
-} from "../../assets/BackgroundAsset";
+import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { ClassStore } from "./stores/ClassStore";
 import { GameStore } from "./stores/GameStore";
 import { PlayerStore } from "./stores/PlayerStore";
 import { BoardDisplayer } from "./components/BoardDisplayer";
-import { Scene } from "phaser";
 import { CharactersDisplayer } from "./components/CharactersDisplayer";
 import { TurnDisplayer } from "./components/TurnsDisplayer";
 import { StatsDisplayer } from "./components/StatsDisplayer";
+import { SceneAssetId } from "../../assets/ScenesAsset";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -62,7 +65,7 @@ const allExistingStats: string[] = [
     "mouvement",
 ];
 
-export class FightScene extends Scene {
+export class FightScene extends BaseScene {
     public renderConfig: SceneRenderConfig;
     public sceneGrid = GridUtils.uiGrid(0, 0);
 
@@ -104,7 +107,7 @@ export class FightScene extends Scene {
     public scaleFactor: number = 1;
 
     constructor() {
-        super({ key: "fightScene" });
+        super(SceneAssetId.FIGHT, BackgroundAssetId.FIGHT);
 
         /**
          * Stores
@@ -159,7 +162,7 @@ export class FightScene extends Scene {
     }
 
     static start(scene: Phaser.Scene, data: FightSceneInit) {
-        scene.scene.start("fightScene", data);
+        scene.scene.start(SceneAssetId.FIGHT, data);
     }
 
     init({ game, player: { playerId } }: FightSceneInit) {
@@ -225,8 +228,8 @@ export class FightScene extends Scene {
     }
 
     preload() {
+        super.preload();
         ActionAsset.loadAll(this.load);
-        BackgroundAsset.load(this.load, BackgroundAssetId.FIGHT);
 
         this.load.tilemapTiledJSON(
             this.fightMap,
@@ -244,21 +247,24 @@ export class FightScene extends Scene {
     }
 
     create() {
+        super.create();
         this.tooltip = Tooltip.getInstance(this, {
             textColor: "#000000",
             fontSize: 14,
             delay: 750,
         });
+
         this.actions.render().update();
         this.board.render().update();
         this.character.render().update();
         this.turns.render();
-
-        const bg = this.add
-            .image(0, 0, BackgroundAsset.getAssetKey(BackgroundAssetId.FIGHT))
-            .setOrigin(0, 0)
-            .setDepth(-1);
-        bg.setDisplaySize(this.scale.width, this.scale.height);
+        this.playerStats
+            .setEntity(this.playerStore.playerEntity)
+            .setCharacterClass(this.playerStore.playerClass)
+            .setName(user.username)
+            .render()
+            .update();
+        this.inspectStats.render().setIsShow(false);
 
         // Créer le bouton Menu
         new MenuButton(this, {
@@ -279,15 +285,6 @@ export class FightScene extends Scene {
         this.events.on("characterClicked", (perso: Character) => {
             this.inspectCharacter(perso);
         });
-
-        this.inspectStats.render().setIsShow(false);
-
-        this.playerStats
-            .setEntity(this.playerStore.playerEntity)
-            .setCharacterClass(this.playerStore.playerClass)
-            .setName(user.username)
-            .render()
-            .update();
     }
 
     public inspectCharacter(perso: Character) {

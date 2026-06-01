@@ -29,7 +29,7 @@ export class TurnDisplayer extends FightSceneDisplayer {
             opacity: 0.25,
         });
 
-        this.turnPanel.setDepth(-1);
+        this.turnPanel.setDepth(0);
 
         return this;
     }

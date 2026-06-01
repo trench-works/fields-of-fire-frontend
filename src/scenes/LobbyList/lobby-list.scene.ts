@@ -1,17 +1,23 @@
 import { MenuSocket } from "./repositories/menu.socket";
 import { LobbyScene } from "../Lobby/lobby.scene";
-import { Button, CustomContainer, GridUtils, MenuButton } from "../../core";
+import {
+    BaseScene,
+    Button,
+    CustomContainer,
+    GridUtils,
+    MenuButton,
+} from "../../core";
 import { FightScene } from "../Fight/fight.scene";
 import { MainMenu } from "../MainMenu/main-menu.scene";
 import { uiGrid } from "../../core/Utils/Grid";
 import { LobbyRow } from "./objects/LobbyRow";
 import { LobbyData } from "./interfaces/LobbyData";
 import { LobbiesRepository } from "./repositories/lobbies.repository";
+import { SceneAssetId } from "../../assets/ScenesAsset";
+import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 
-export class LobbyListScene extends Phaser.Scene {
-    private backgroundImage = "red_bg";
+export class LobbyListScene extends BaseScene {
     public menuSocket!: MenuSocket;
-    private menuButton!: MenuButton;
     private sceneGrid = GridUtils.uiGrid(0, 0);
     private lobbyData: LobbyData[] = [];
     private selectedLobby: LobbyData | null = null;
@@ -21,18 +27,15 @@ export class LobbyListScene extends Phaser.Scene {
     private lobbyResetTimeout: NodeJS.Timeout | undefined;
 
     static start(scene: Phaser.Scene) {
-        scene.scene.start("lobbyListScene");
+        scene.scene.start(SceneAssetId.LOBBY_LIST);
     }
 
     constructor() {
-        super({ key: "lobbyListScene" });
+        super(SceneAssetId.LOBBY_LIST, BackgroundAssetId.LOBBY);
     }
 
     preload() {
-        this.load.image(
-            this.backgroundImage,
-            `assets/${this.backgroundImage}.png`,
-        );
+        super.preload();
     }
 
     init() {
@@ -54,10 +57,14 @@ export class LobbyListScene extends Phaser.Scene {
     }
 
     create() {
+        super.create();
         this.menuSocket = new MenuSocket();
         this.menuSocket.onClose(() => MainMenu.start(this));
 
         this.menuSocket.onJoin(({ lobbyId, playerId }) => {
+            if (this.lobbyResetTimeout) {
+                clearTimeout(this.lobbyResetTimeout);
+            }
             console.log(
                 `Rejoint le lobby ${lobbyId} en tant que joueur ${playerId}`,
             );
@@ -68,6 +75,9 @@ export class LobbyListScene extends Phaser.Scene {
         });
 
         this.menuSocket.onReconnect(({ game, player }) => {
+            if (this.lobbyResetTimeout) {
+                clearTimeout(this.lobbyResetTimeout);
+            }
             console.log(
                 `Rejoint la game ${game.id} en tant que joueur ${player.playerId}`,
             );
@@ -111,11 +121,6 @@ export class LobbyListScene extends Phaser.Scene {
     createDisplay() {
         //title BOX
         const titleBox = this.sceneGrid.getArea(0, 0, 9, 2);
-        const bg = this.add
-            .image(0, 0, this.backgroundImage)
-            .setOrigin(0, 0)
-            .setDepth(-1);
-        bg.setDisplaySize(this.scale.width, this.scale.height);
         this.add
             .text(this.scale.width / 2, titleBox.y + 20, "Liste des Lobby", {
                 fontSize: "48px",
@@ -125,7 +130,7 @@ export class LobbyListScene extends Phaser.Scene {
 
         //lobby list
         const lobbyListArea = this.sceneGrid.getArea(0, 2, 9, 6);
-        const lobbyListContainer = new CustomContainer(this, {
+        new CustomContainer(this, {
             title: "",
             x: lobbyListArea.x + lobbyListArea.width / 2,
             y: lobbyListArea.y + lobbyListArea.height / 2,
@@ -148,13 +153,13 @@ export class LobbyListScene extends Phaser.Scene {
             buttonArea.y,
         );
 
-        const createButtonArea = buttonGrid.getArea(0, 0, 9, 9);
+        buttonGrid.getArea(0, 0, 9, 9);
 
         const cell0 = buttonGrid.getArea(1, 1, 3, 7); // bouton gauche
         const cell1 = buttonGrid.getArea(5, 1, 3, 7); // bouton centre
         const cell2 = buttonGrid.getArea(9, 1, 3, 7); // bouton droit
 
-        const createButton = new Button(this, {
+        new Button(this, {
             text: "Créer un Lobby",
             x: cell0.centerX,
             y: cell0.centerY,
@@ -165,7 +170,7 @@ export class LobbyListScene extends Phaser.Scene {
             },
         });
 
-        const joinButton = new Button(this, {
+        new Button(this, {
             text: "Rejoindre un Lobby",
             x: cell2.centerX,
             y: cell2.centerY,
@@ -180,7 +185,7 @@ export class LobbyListScene extends Phaser.Scene {
             },
         });
 
-        const refreshButton = new Button(this, {
+        new Button(this, {
             text: "Actualiser",
             x: cell1.centerX,
             y: cell1.centerY,
@@ -192,7 +197,7 @@ export class LobbyListScene extends Phaser.Scene {
         });
 
         // Créer le bouton Menu
-        this.menuButton = new MenuButton(this, {
+        new MenuButton(this, {
             position: "topRight",
             onResumeClick: () => {
                 // Reprendre le jeu (le menu se ferme automatiquement)
@@ -201,7 +206,10 @@ export class LobbyListScene extends Phaser.Scene {
                 console.log("Options - À implémenter");
             },
             onMainMenuClick: () => {
-                this.scene.start("mainMenuScene");
+                if (this.lobbyResetTimeout) {
+                    clearTimeout(this.lobbyResetTimeout);
+                }
+                MainMenu.start(this);
             },
         });
     }
