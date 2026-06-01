@@ -54,12 +54,12 @@ export class Character extends GameObject {
             );
             loader.image(
                 this.charClass.iconImageKey,
-                `assets/${this.charClass.iconImageKey}.png`,
+                `assets/${this.charClass.iconImageKey}.png`, //TODO: add character asset manager
             );
 
             this.charClass.actionList.forEach((action) => {
                 if (action.id) {
-                    loader.image(action.id, `assets/action/${action.id}.png`);
+                    loader.image(action.id, `assets/action/${action.id}.png`); //TODO: add action asset manager
                     console.log(`assets/action/${action.id}.png`);
                 }
             });
@@ -186,7 +186,7 @@ export class Character extends GameObject {
                 this.charClass.name,
                 title,
                 undefined,
-                this.sprite!
+                this.sprite!,
             );
         } else {
             const estimatedDamage = action
@@ -195,10 +195,10 @@ export class Character extends GameObject {
 
             fightScene.tooltip.attachTo(
                 this.sprite!,
-                estimatedDamage,  // ← description = dégâts estimés
+                estimatedDamage, // ← description = dégâts estimés
                 title,
                 undefined,
-                this.sprite!
+                this.sprite!,
             );
         }
     }

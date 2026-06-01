@@ -235,10 +235,11 @@ export class FightScene extends BaseScene {
             this.fightMap,
             `assets/${this.fightMap}.json`,
         );
-        this.load.image("groundTiles", `assets/${this.tileSetImage}.png`);
 
-        allExistingStats.forEach((stat) =>
-            this.load.image(stat, `assets/icon/icon_${stat}.png`),
+        this.load.image("groundTiles", `assets/${this.tileSetImage}.png`); //TODO: create MiscImagesAsset manager
+
+        allExistingStats.forEach(
+            (stat) => this.load.image(stat, `assets/icon/icon_${stat}.png`), //TODO: create stats asset manager
         );
 
         this.characters.push(this.myPlayer);
