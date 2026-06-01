@@ -1,14 +1,15 @@
 import { Displayer } from "../../../core";
-import { Game } from "../../../Model/Game";
 import { FightScene } from "../fight.scene";
+import { GameStore } from "../stores/GameStore";
 
 export abstract class FightSceneDisplayer extends Displayer {
-    protected game!: Game;
     declare protected scene: FightScene;
 
-    setGame(game: Game): this {
-        this.game = game;
-        return this;
+    constructor(
+        scene: FightScene,
+        protected readonly gameStore: GameStore,
+    ) {
+        super(scene);
     }
 }
 

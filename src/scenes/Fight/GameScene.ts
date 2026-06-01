@@ -1,12 +1,12 @@
 import { Scene } from "phaser";
-import { Character } from "../../scenes/Fight/objects/Character";
-import { GameObject } from "./GameObject";
-import { scaleAndCenter } from "../Utils/Scale";
-import { Position } from "../Types/Position";
-import { RangeVisualizer } from "../../scenes/Fight/objects/RangeVisualizer";
-import { ActionManager } from "../../scenes/Fight/objects/ActionManager";
+import { Character } from "./objects/Character";
+import { GameObject } from "../../core/Objects/GameObject";
+import { scaleAndCenter } from "../../core/Utils/Scale";
+import { Position } from "../../core/Types/Position";
+import { RangeVisualizer } from "./objects/RangeVisualizer";
+import { ActionManager } from "./objects/ActionManager";
 import { Game } from "../../Model/Game";
-import { Diamond } from "./Diamond";
+import { Diamond } from "../../core/Objects/Diamond";
 import { EntityType } from "../../Model/Entity";
 
 export type SceneRenderConfig = {
@@ -32,7 +32,6 @@ export interface Displayable {
 }
 
 export class GameScene extends Scene {
-    public backgroundImage = "red_bg";
     public fightMap = "chessmap";
     public tileSetImage = "ground";
     public tileWidth = 64;
@@ -142,7 +141,7 @@ export class GameScene extends Scene {
         }
     }
 
-    generatePlayGrid(
+    private generatePlayGrid(
         actionManager: ActionManager,
         rangeVisualizer: RangeVisualizer,
         game: Game,
@@ -168,7 +167,9 @@ export class GameScene extends Scene {
                 });
                 hoverGraphics.setVisible(false);
 
-                const zone = this.getTileInteractiveZone(tile, { diamond });
+                const zone = this.getTileInteractiveZone(tile, {
+                    diamond,
+                });
 
                 // --- DEBUG VISUEL ---
                 //this.gridShower(diamond, worldX, worldY, layer);
