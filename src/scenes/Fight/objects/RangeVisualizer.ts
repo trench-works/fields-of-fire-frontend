@@ -124,9 +124,12 @@ export class RangeVisualizer {
     }
 
     isInRange({ x, y }: Position): boolean {
-        return this.cellsInRange.some(
-            ({ gridPosition }) => gridPosition.x === x && gridPosition.y === y,
-        );
+        return this.cellsInRange
+            .filter(Boolean)
+            .some(
+                ({ gridPosition }) =>
+                    gridPosition.x === x && gridPosition.y === y,
+            );
     }
 }
 

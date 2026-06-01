@@ -61,6 +61,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
                 );
                 break;
             case ActionAssetId.SHOOT:
+            case ActionAssetId.HEAL:
                 if (!hasEnergy) {
                     return;
                 }
@@ -170,6 +171,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
                     );
                     break;
                 case ActionAssetId.SHOOT:
+                case ActionAssetId.HEAL:
                     actionObject.setInteractive(isPlayerTurn && hasEnergy);
                     actionObject.setAlpha(
                         isPlayerTurn && hasEnergy
