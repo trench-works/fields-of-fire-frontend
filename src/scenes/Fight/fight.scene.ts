@@ -87,13 +87,20 @@ export class FightScene extends GameScene {
     }
 
     init({ game, player: { playerId } }: FightSceneInit) {
-        this.actions.setGame(game).setPlayerInfos(playerId, this.classes);
+        this.actions
+            .preRender()
+            .setGame(game)
+            .setPlayerInfos(playerId, this.classes);
         this.playerSocket = new GamePlayerSocket(game.id, playerId);
         this.playerSocket.onClose(() => MainMenu.start(this));
         this.playerSocket.onUpdate((game: Game) => {
             this.loadGameData(game, playerId);
             this.displayEntitiesHighlights(game);
             this.displayCharacter();
+            this.actions
+                .setGame(game)
+                .setPlayerInfos(playerId, this.classes)
+                .update();
         });
 
         this.loadGameData(game, playerId);
@@ -152,7 +159,7 @@ export class FightScene extends GameScene {
     }
 
     create() {
-        this.actions.prepare();
+        this.actions.render();
         this.tooltip = Tooltip.getInstance(this, {
             textColor: "#000000",
             fontSize: 14,

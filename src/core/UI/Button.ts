@@ -29,7 +29,7 @@ export class Button extends Phaser.GameObjects.Container {
     private color: string;
     private hoverColor: string | null;
     public onClick?: () => void;
-    private bg: Phaser.GameObjects.Rectangle;
+    protected bg: Phaser.GameObjects.Rectangle;
 
     constructor(scene: Phaser.Scene, config: ButtonConfig) {
         const {
@@ -55,7 +55,7 @@ export class Button extends Phaser.GameObjects.Container {
         // Créer le texte du bouton
         this.buttonText = scene.add
             .text(0, 0, text, {
-                fontFamily: 'MyFont',
+                fontFamily: "MyFont",
                 fontSize: fontSize,
                 color: textColor,
             })
@@ -117,14 +117,21 @@ export class Button extends Phaser.GameObjects.Container {
         );
     }
 
+    public setHoverColor(hoverColor?: string | null): this {
+        if (hoverColor === undefined) {
+            this.hoverColor = "#4a7eb0";
+            return this;
+        }
+        this.hoverColor = hoverColor;
+        return this;
+    }
+
     private setupEvents() {
         this.on("pointerdown", () => {
-            //console.log("Button clicked!");
             this.onClick?.();
         });
 
         this.on("pointerover", () => {
-            //console.log("Hover over button");
             if (this.hoverColor) {
                 this.bg.setFillStyle(
                     Phaser.Display.Color.HexStringToColor(this.hoverColor)
@@ -134,7 +141,6 @@ export class Button extends Phaser.GameObjects.Container {
         });
 
         this.on("pointerout", () => {
-            //console.log("Hover out button");
             this.bg.setFillStyle(
                 Phaser.Display.Color.HexStringToColor(this.color).color,
             );

@@ -24,6 +24,8 @@ export class ActionDisplayer extends FightSceneDisplayer {
 
     protected actionElements: Map<string, DataDisplayObject> = new Map();
     protected endTurnButton!: Button;
+    protected actionsList!: DataDisplayer;
+    protected tooltip!: Tooltip;
 
     setPlayerInfos(playerId: string, characterClasses: CharacterClass[]): this {
         this.playerId = playerId;
@@ -40,15 +42,28 @@ export class ActionDisplayer extends FightSceneDisplayer {
     }
 
     protected handleActionClick(action: Action) {
+        const isPlayerTurn =
+            this.game.playerTurns[0] === this.playerEntity.entityId;
+        const hasMovement = this.playerEntity.stats.mouvement > 0;
+        const hasEnergy = this.playerEntity.stats.energy > 0;
+        if (!isPlayerTurn) {
+            return;
+        }
         this.scene.rangeVisualizer.clearRange();
         switch (action.id) {
             case ActionAssetId.WALK:
+                if (!hasMovement) {
+                    return;
+                }
                 this.scene.rangeVisualizer.getCellsInMoveRange(
                     this.playerEntity.position,
                     this.playerEntity.stats.mouvement,
                 );
                 break;
             case ActionAssetId.SHOOT:
+                if (!hasEnergy) {
+                    return;
+                }
                 this.scene.rangeVisualizer.getCellsInAttackRange(
                     this.playerEntity.position,
                     action.range ?? 0,
@@ -60,7 +75,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
         this.scene.actionManager.currentAction = action;
     }
 
-    prepare(): this {
+    preRender(): this {
         const actionArea = this.scene.sceneGrid.getArea(2, 8, 5, 1);
         const actionPanel = new CustomContainer(this.scene, {
             title: "",
@@ -80,7 +95,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
         );
         const actionListArea = actionGrid.getArea(0, 1, 7, 7);
 
-        const statsTable = new DataDisplayer(this.scene, {
+        this.actionsList = new DataDisplayer(this.scene, {
             position: new Position(
                 actionPanel.x - actionPanel.width / 2 + actionListArea.centerX,
                 actionPanel.y - actionPanel.height / 2 + actionListArea.centerY,
@@ -89,28 +104,6 @@ export class ActionDisplayer extends FightSceneDisplayer {
             height: actionListArea.height,
             cols: 7,
             rows: 1,
-        });
-
-        this.playerClass.actionList.forEach((action, index) => {
-            const iconObj = statsTable.placeContent(
-                index,
-                0,
-                {
-                    icon: ActionAsset.getAssetKey(action.id),
-                    onClick: () => this.handleActionClick(action),
-                    alpha: 1,
-                },
-                64,
-            );
-            if (iconObj) {
-                const tooltip = Tooltip.getInstance(this.scene, {
-                    textColor: "#000000",
-                    fontSize: 14,
-                    delay: 750,
-                });
-                tooltip.attachTo(iconObj, action.name ?? action.id);
-                this.actionElements.set(action.id, iconObj);
-            }
         });
 
         const endTurnArea = actionGrid.getArea(7, 1, 1.9, 7);
@@ -123,12 +116,43 @@ export class ActionDisplayer extends FightSceneDisplayer {
             text: "Fin du tour",
             borderColor: Color.containerBorder,
             borderWidth: 2,
-            onClick: () => this.scene.playerSocket.finishTurn(),
         });
+
+        this.tooltip = Tooltip.getInstance(this.scene, {
+            textColor: "#000000",
+            fontSize: 14,
+            delay: 750,
+        });
+
         return this;
     }
 
-    displayData(): void {
+    render(): this {
+        this.playerClass.actionList.forEach((action, index) => {
+            const iconObj = this.actionsList.placeContent(
+                index,
+                0,
+                {
+                    icon: ActionAsset.getAssetKey(action.id),
+                    onClick: () => this.handleActionClick(action),
+                    alpha: 1,
+                },
+                64,
+            );
+            if (iconObj) {
+                this.tooltip.attachTo(iconObj, action.name ?? action.id);
+                this.actionElements.set(action.id, iconObj);
+            }
+        });
+
+        this.endTurnButton.onClick = () => {
+            this.scene.playerSocket.finishTurn();
+        };
+
+        return this;
+    }
+
+    update(): this {
         const isPlayerTurn =
             this.game.playerTurns[0] === this.playerEntity.entityId;
         const hasMovement = this.playerEntity.stats.mouvement > 0;
@@ -165,6 +189,11 @@ export class ActionDisplayer extends FightSceneDisplayer {
         this.endTurnButton.setAlpha(
             isPlayerTurn ? CLICKABLE_ALPHA : UNCLICKABLE_ALPHA,
         );
+        this.endTurnButton.setHoverColor(isPlayerTurn ? undefined : null);
+        this.endTurnButton.onClick = isPlayerTurn
+            ? () => this.scene.playerSocket.finishTurn()
+            : undefined;
+        return this;
     }
 }
 

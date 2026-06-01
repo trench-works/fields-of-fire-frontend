@@ -62,7 +62,7 @@ export class RangeVisualizer {
             inRangeCells.set(`${cellInRange.x},${cellInRange.y}`, cellInRange);
         }
         this.cellsInRange = Array.from(inRangeCells.values()).map(
-            ({ x, y }) => this.scene.gridPositions[x][y],
+            ({ x, y }) => this.scene.gridPositions[x]?.[y],
         );
         return this;
     }
@@ -80,7 +80,7 @@ export class RangeVisualizer {
         for (let x = pos.x - 1; x <= pos.x + 1; x++) {
             for (let y = pos.y - 1; y <= pos.y + 1; y++) {
                 if (x === pos.x || y === pos.y) {
-                    const cell = board[x][y];
+                    const cell = board[x]?.[y];
                     if (
                         cell &&
                         !cell.isHole &&
@@ -114,7 +114,7 @@ export class RangeVisualizer {
             for (let y = 0; y < this.scene.gridPositions[x].length; y++) {
                 const dist = Math.abs(start.x - x) + Math.abs(start.y - y);
                 if (dist <= range && !(x === start.x && y === start.y)) {
-                    result.push(this.scene.gridPositions[x][y]);
+                    result.push(this.scene.gridPositions[x]?.[y]);
                 }
             }
         }
