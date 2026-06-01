@@ -27,6 +27,7 @@ import {
 import { ClassStore } from "./stores/ClassStore";
 import { GameStore } from "./stores/GameStore";
 import { PlayerStore } from "./stores/PlayerStore";
+import { BoardDisplayer } from "./components/BoardDisplayer";
 
 export type FightSceneInit = {
     game: Game;
@@ -42,14 +43,15 @@ export class FightScene extends GameScene {
     protected playerStore: PlayerStore;
 
     /**
+     * Displayers
+     */
+    private actions: ActionDisplayer;
+    private board: BoardDisplayer;
+
+    /**
      * Sockets
      */
     public playerSocket!: GamePlayerSocket;
-
-    /**
-     * Displayers
-     */
-    private actions!: ActionDisplayer;
 
     public renderConfig: SceneRenderConfig;
     public sceneGrid = GridUtils.uiGrid(0, 0);
@@ -85,6 +87,17 @@ export class FightScene extends GameScene {
         this.gameStore = new GameStore();
         this.playerStore = new PlayerStore(this.classStore, this.gameStore);
 
+        /**
+         * Displayers
+         */
+
+        this.actions = new ActionDisplayer(
+            this,
+            this.gameStore,
+            this.playerStore,
+        );
+        this.board = new BoardDisplayer(this, this.gameStore);
+
         const config = new SceneConfig().loadConfig().getConfig("scene_1");
         if (!config) {
             throw new Error("Config doesnt exist");
@@ -101,11 +114,6 @@ export class FightScene extends GameScene {
         };
         this.renderConfig.offset = PositionUtils.getMapOffset(
             this.renderConfig,
-        );
-        this.actions = new ActionDisplayer(
-            this,
-            this.gameStore,
-            this.playerStore,
         );
     }
 
@@ -131,10 +139,10 @@ export class FightScene extends GameScene {
             /**
              * Update Displayers
              */
-            this.loadGameData(game, playerId);
-            this.displayEntitiesHighlights(game);
-            this.displayCharacter();
+            this.board.update();
             this.actions.update();
+            this.loadGameData(game, playerId);
+            this.displayCharacter();
         });
 
         this.loadGameData(game, playerId);
@@ -196,6 +204,7 @@ export class FightScene extends GameScene {
             delay: 750,
         });
         this.actions.render();
+        this.board.render().update();
 
         const bg = this.add
             .image(0, 0, BackgroundAsset.getAssetKey(BackgroundAssetId.FIGHT))
@@ -203,11 +212,6 @@ export class FightScene extends GameScene {
             .setDepth(-1);
         bg.setDisplaySize(this.scale.width, this.scale.height);
 
-        this.generateMap(
-            this.actionManager,
-            this.rangeVisualizer,
-            this.gamePayload,
-        );
         this.spawnEntities();
 
         // Créer le bouton Menu
@@ -231,7 +235,6 @@ export class FightScene extends GameScene {
         });
 
         this.turnDisplayer();
-        this.displayEntitiesHighlights(this.gamePayload);
         this.displayCharacter();
     }
 
