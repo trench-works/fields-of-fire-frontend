@@ -39,6 +39,7 @@ export type Cell = {
     pixelPosition: Position;
     zone: Phaser.GameObjects.Zone;
     hoverGraphics?: Phaser.GameObjects.Graphics;
+    highlight?: Phaser.GameObjects.Graphics;
 };
 
 export interface Displayable {

@@ -33,7 +33,7 @@ export class RangeVisualizer {
         g.setDepth(2);
 
         // On stocke l’overlay pour pouvoir le retirer plus tard
-        (cell as any).highlight = g;
+        cell.highlight = g;
     }
 
     showRange(): this {
@@ -47,9 +47,9 @@ export class RangeVisualizer {
 
     clearRange(): this {
         for (const cell of this.cellsInRange) {
-            if ((cell as any)?.highlight) {
-                (cell as any).highlight.destroy();
-                delete (cell as any).highlight;
+            if (cell?.highlight) {
+                cell.highlight.destroy();
+                delete cell.highlight;
             }
         }
         return this;
