@@ -57,6 +57,23 @@ export class DataDisplayer extends CustomContainer {
         }
     }
 
+    public placeText(
+        col: number,
+        row: number,
+        value: string | number,
+    ): Phaser.GameObjects.Text {
+        const area = this.cellAreas[row]?.[col];
+        const obj = this.scene.add
+            .text(0, 0, value.toString(), {
+                fontSize: "20px",
+                color: "#fff",
+            })
+            .setOrigin(0.5);
+        obj.setPosition(area.position.x, area.position.y);
+        this.add(obj);
+        return obj;
+    }
+
     public placeContent(
         col: number,
         row: number,
@@ -65,9 +82,8 @@ export class DataDisplayer extends CustomContainer {
             | number
             | { icon: string; onClick?: () => void; alpha?: number },
         iconSize?: number,
-    ): DataDisplayObject | undefined {
+    ): DataDisplayObject {
         const area = this.cellAreas[row]?.[col];
-        if (!area) return undefined;
 
         let obj: Phaser.GameObjects.Image | Phaser.GameObjects.Text;
 

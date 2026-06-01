@@ -1,12 +1,14 @@
-import { Cell, GameScene, Position } from "../../../core";
+import { Position } from "../../../core";
+import { Cell, FightScene } from "../fight.scene";
+import { GameStore } from "../stores/GameStore";
 
 export class RangeVisualizer {
-    public scene: GameScene;
     private cellsInRange: Cell[] = [];
 
-    constructor(scene: GameScene) {
-        this.scene = scene;
-    }
+    constructor(
+        private readonly scene: FightScene,
+        private readonly gameStore: GameStore,
+    ) {}
 
     private highlightCell(cell: Cell) {
         const g = this.scene.add.graphics();
@@ -75,7 +77,7 @@ export class RangeVisualizer {
         if (explorationI > maxRange) {
             return [];
         }
-        const board = this.scene.gamePayload.plateau;
+        const board = this.gameStore.game.plateau;
         const cells: Position[] = [];
         for (let x = pos.x - 1; x <= pos.x + 1; x++) {
             for (let y = pos.y - 1; y <= pos.y + 1; y++) {

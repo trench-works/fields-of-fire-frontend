@@ -168,6 +168,7 @@ export class BoardDisplayer extends FightSceneDisplayer {
             }
         }
     }
+
     getTileHighlights(
         tile: Phaser.Tilemaps.Tile,
         props?: { color: number; diamond?: Diamond; depth?: number },
