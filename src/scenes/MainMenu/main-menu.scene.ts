@@ -5,6 +5,7 @@ import { LobbyListScene } from "../LobbyList/lobby-list.scene";
 import { PopupInput } from "./objects/LoginPopup";
 import { UserRepository } from "./repositories/user.repository";
 import { SceneAssetId } from "../../assets/ScenesAsset";
+import { MiscAsset, MiscAssetId } from "../../assets";
 
 export class MainMenu extends BaseScene {
     private readonly BUTTON_WIDTH = 500;
@@ -28,7 +29,7 @@ export class MainMenu extends BaseScene {
 
     preload() {
         super.preload();
-        this.load.image("menuBalle", "assets/menuBalle.png");
+        MiscAsset.load(this.load, MiscAssetId.BULLET);
     }
 
     create() {
@@ -61,7 +62,7 @@ export class MainMenu extends BaseScene {
             y: buttonsArea.y + playArea.centerY,
             width: this.BUTTON_WIDTH,
             height: this.BUTTON_HEIGHT,
-            backgroundImage: "menuBalle",
+            backgroundImage: MiscAsset.getAssetKey(MiscAssetId.BULLET),
             titleColor: "#FFFFFF",
             fontSize: 40,
             alpha: global.user ? 1 : 0.5,
@@ -82,7 +83,7 @@ export class MainMenu extends BaseScene {
             y: buttonsArea.y + settingsArea.centerY,
             width: this.BUTTON_WIDTH,
             height: this.BUTTON_HEIGHT,
-            backgroundImage: "menuBalle",
+            backgroundImage: MiscAsset.getAssetKey(MiscAssetId.BULLET),
             titleColor: "#FFFFFF",
             fontSize: 40,
             textPosition: { x: -70, y: -10 },
