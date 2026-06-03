@@ -36,7 +36,7 @@ export abstract class ImageAssetManager<AssetId extends string, AssetType> {
         );
     }
 
-    getAssetKey(id: AssetId): string {
+    getAssetKey(id: string): string {
         if (!this.isAssetId(id)) {
             console.error(`${id} not a action asset id`);
             return "";
