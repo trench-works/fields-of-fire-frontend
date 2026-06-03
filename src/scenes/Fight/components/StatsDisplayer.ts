@@ -16,7 +16,7 @@ const allExistingStats: string[] = [
     "initiative",
     "strength",
     "precision",
-    "accuracy",
+    "armor",
     "dodging",
     "energy",
     "mouvement",
@@ -26,7 +26,7 @@ const statDescriptions: Record<string, string> = {
     life: "Points de vie. S'ils tombent à 0, vous mourrez.",
     precision: "Augmente les dégâts des attaques à distance.",
     strength: "Augmente les dégâts des attaques au corps à corps.",
-    accuracy: "Chance de toucher vos adversaires.",
+    armor: "Réduit les dégâts subis.",
     initiative: "Détermine l'ordre de passage dans le tour.",
     dodging: "Chance d'esquiver les attaques ennemies.",
     energy: "Points d'énergie nécessaires pour utiliser des actions.",
@@ -42,7 +42,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
 
     private lifeStat!: Phaser.GameObjects.Text;
     private strengthStat!: Phaser.GameObjects.Text;
-    private accuracyStat!: Phaser.GameObjects.Text;
+    private armorStat!: Phaser.GameObjects.Text;
     private energyStat!: Phaser.GameObjects.Text;
     private initiativeStat!: Phaser.GameObjects.Text;
     private precisionStat!: Phaser.GameObjects.Text;
@@ -195,7 +195,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
 
         this.lifeStat = this.statsTable.placeText(1, 0, "N/A");
         this.strengthStat = this.statsTable.placeText(1, 1, "N/A");
-        this.accuracyStat = this.statsTable.placeText(1, 2, "N/A");
+        this.armorStat = this.statsTable.placeText(1, 2, "N/A");
         this.energyStat = this.statsTable.placeText(1, 3, "N/A");
 
         // second column
@@ -209,7 +209,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
     update(): this {
         this.lifeStat.setText(String(this.entity.stats.life));
         this.strengthStat.setText(String(this.entity.stats.strength));
-        this.accuracyStat.setText(String(this.entity.stats.accuracy));
+        this.armorStat.setText(String(this.entity.stats.armor));
         this.energyStat.setText(String(this.entity.stats.energy));
         this.initiativeStat.setText(String(this.entity.stats.initiative));
         this.precisionStat.setText(String(this.entity.stats.precision));
@@ -231,7 +231,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
 
         this.lifeStat.setVisible(isShow);
         this.strengthStat.setVisible(isShow);
-        this.accuracyStat.setVisible(isShow);
+        this.armorStat.setVisible(isShow);
         this.energyStat.setVisible(isShow);
         this.initiativeStat.setVisible(isShow);
         this.precisionStat.setVisible(isShow);
