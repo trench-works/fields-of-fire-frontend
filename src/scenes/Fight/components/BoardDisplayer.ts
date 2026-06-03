@@ -1,3 +1,4 @@
+import { MiscAsset, MiscAssetId } from "../../../assets";
 import { Position } from "../../../core";
 import { Diamond } from "../../../core/Objects/Diamond";
 import { scaleAndCenter } from "../../../core/Utils/Scale";
@@ -16,8 +17,8 @@ export class BoardDisplayer extends FightSceneDisplayer {
             key: this.scene.fightMap,
         });
         const tileset = map.addTilesetImage(
-            this.scene.tileSetImage,
-            "groundTiles",
+            MiscAssetId.GROUND_TILE,
+            MiscAsset.getAssetKey(MiscAssetId.GROUND_TILE),
         );
 
         const centerMap = scaleAndCenter({

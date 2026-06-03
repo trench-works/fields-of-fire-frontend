@@ -1,3 +1,4 @@
+import { IconAsset } from "../../../assets";
 import { Color } from "../../../config/ColorConfig";
 import {
     CustomContainer,
@@ -181,7 +182,9 @@ export class StatsDisplayer extends FightSceneDisplayer {
             const row = Math.floor(index / 2);
             const col = (index % 2) * 2;
 
-            const iconObj = this.statsTable.placeContent(col, row, { icon });
+            const iconObj = this.statsTable.placeContent(col, row, {
+                icon: IconAsset.getAssetKey(icon),
+            });
 
             if (iconObj) {
                 iconObj.setInteractive();

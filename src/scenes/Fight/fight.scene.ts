@@ -15,7 +15,7 @@ import { Game } from "../../Model/Game";
 import { ClassesRepository } from "../Lobby/repositories/classes.repository";
 import { MainMenu } from "../MainMenu/main-menu.scene";
 import { ActionDisplayer } from "./components/ActionDisplayer";
-import { ActionAsset } from "../../assets";
+import { ActionAsset, IconAsset, MiscAsset, MiscAssetId } from "../../assets";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { ClassStore } from "./stores/ClassStore";
 import { GameStore } from "./stores/GameStore";
@@ -54,17 +54,6 @@ export type FightSceneInit = {
     player: { playerId: string };
 };
 
-const allExistingStats: string[] = [
-    "life",
-    "initiative",
-    "strength",
-    "precision",
-    "armor",
-    "dodging",
-    "energy",
-    "mouvement",
-];
-
 export class FightScene extends BaseScene {
     public renderConfig: SceneRenderConfig;
     public sceneGrid = GridUtils.uiGrid(0, 0);
@@ -100,7 +89,6 @@ export class FightScene extends BaseScene {
     public tooltip!: Tooltip;
 
     public fightMap = "chessmap";
-    public tileSetImage = "ground";
     public characters: Character[] = [];
     public myPlayer!: Character;
     public gridPositions: Cell[][] = [];
@@ -236,11 +224,9 @@ export class FightScene extends BaseScene {
             `assets/${this.fightMap}.json`,
         );
 
-        this.load.image("groundTiles", `assets/${this.tileSetImage}.png`); //TODO: create MiscImagesAsset manager
+        MiscAsset.load(this.load, MiscAssetId.GROUND_TILE);
 
-        allExistingStats.forEach(
-            (stat) => this.load.image(stat, `assets/icon/icon_${stat}.png`), //TODO: create stats asset manager
-        );
+        IconAsset.loadAll(this.load);
 
         this.characters.push(this.myPlayer);
         //précharge les image des persos de la scène
