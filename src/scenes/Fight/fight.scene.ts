@@ -25,6 +25,7 @@ import { CharactersDisplayer } from "./components/CharactersDisplayer";
 import { TurnDisplayer } from "./components/TurnsDisplayer";
 import { StatsDisplayer } from "./components/StatsDisplayer";
 import { SceneAssetId } from "../../assets/ScenesAsset";
+import { ParticleAsset } from "../../assets/ParticleAsset";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -223,6 +224,8 @@ export class FightScene extends BaseScene {
             this.fightMap,
             `assets/${this.fightMap}.json`,
         );
+
+        ParticleAsset.loadAll(this.load);
 
         MiscAsset.load(this.load, MiscAssetId.GROUND_TILE);
 
