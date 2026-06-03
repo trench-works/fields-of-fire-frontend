@@ -28,7 +28,6 @@ export class ActionManager {
             } else {
                 console.log(`Réactivation des clics pour ${character.entity.entityId} en raison de la suppression de l'action sélectionnée`);
                 character.enableClick();
-                character.showPreview(false);
             }
         });
     }
