@@ -1,4 +1,4 @@
-import { IconAsset } from "../../../assets";
+import { CharacterCloseupAsset, IconAsset } from "../../../assets";
 import { Color } from "../../../config/ColorConfig";
 import {
     CustomContainer,
@@ -221,7 +221,9 @@ export class StatsDisplayer extends FightSceneDisplayer {
 
         this.statsName.setTitle(this.name);
         this.statsClassName.setTitle(this.characterClass.name);
-        this.statsImage.setBackgroundImage(this.characterClass.iconImageKey);
+        this.statsImage.setBackgroundImage(
+            CharacterCloseupAsset.getAssetKey(this.entity.classId),
+        );
         return this;
     }
 

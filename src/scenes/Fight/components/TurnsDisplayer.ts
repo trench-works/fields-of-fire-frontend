@@ -1,3 +1,4 @@
+import { CharacterCloseupAsset } from "../../../assets";
 import { Color } from "../../../config/ColorConfig";
 import { CustomContainer, GridUtils } from "../../../core";
 import { FightScene } from "../fight.scene";
@@ -56,7 +57,7 @@ export class TurnDisplayer extends FightSceneDisplayer {
         this.gameStore.game.playerTurns.forEach((entityId, index) => {
             const entity = this.gameStore.game.entities.find(
                 (entity) => entity.entityId === entityId,
-            );
+            )!;
             const player = this.gameStore.game.players.find(
                 (player) => player.entityId === entityId,
             );
@@ -86,7 +87,9 @@ export class TurnDisplayer extends FightSceneDisplayer {
                     borderColor: isFirstCell
                         ? Color.actualTurnBorder
                         : Color.otherTurnBorder,
-                    backgroundImage: charClass?.iconImageKey,
+                    backgroundImage: CharacterCloseupAsset.getAssetKey(
+                        entity.classId,
+                    ),
                     opacity: isFirstCell ? 1 : 0.7,
                 }),
             );
