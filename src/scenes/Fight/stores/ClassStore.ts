@@ -7,5 +7,9 @@ export class ClassStore {
         this.classes = classes;
         return this;
     }
+
+    getClass(classId: string): CharacterClass {
+        return this.classes.find((charClass) => charClass.id === classId)!;
+    }
 }
 

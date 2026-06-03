@@ -1,4 +1,4 @@
-import { Character } from "./objects/Character";
+import { Character } from "./components/character/Character";
 import {
     GridUtils,
     Position,
@@ -15,13 +15,20 @@ import { Game } from "../../Model/Game";
 import { ClassesRepository } from "../Lobby/repositories/classes.repository";
 import { MainMenu } from "../MainMenu/main-menu.scene";
 import { ActionDisplayer } from "./components/ActionDisplayer";
-import { ActionAsset, IconAsset, MiscAsset, MiscAssetId } from "../../assets";
+import {
+    ActionAsset,
+    CharacterCloseupAsset,
+    CharacterSpriteAsset,
+    IconAsset,
+    MiscAsset,
+    MiscAssetId,
+} from "../../assets";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { ClassStore } from "./stores/ClassStore";
 import { GameStore } from "./stores/GameStore";
 import { PlayerStore } from "./stores/PlayerStore";
 import { BoardDisplayer } from "./components/BoardDisplayer";
-import { CharactersDisplayer } from "./components/CharactersDisplayer";
+import { CharactersDisplayer } from "./components/character/CharactersDisplayer";
 import { TurnDisplayer } from "./components/TurnsDisplayer";
 import { StatsDisplayer } from "./components/StatsDisplayer";
 import { SceneAssetId } from "../../assets/ScenesAsset";
@@ -114,7 +121,11 @@ export class FightScene extends BaseScene {
             this.playerStore,
         );
         this.board = new BoardDisplayer(this, this.gameStore);
-        this.character = new CharactersDisplayer(this, this.gameStore);
+        this.character = new CharactersDisplayer(
+            this,
+            this.gameStore,
+            this.classStore,
+        );
         this.turns = new TurnDisplayer(this, this.gameStore, this.classStore);
         this.playerStats = new StatsDisplayer(this, this.gameStore, {
             x: 0,
@@ -186,34 +197,7 @@ export class FightScene extends BaseScene {
                 .setCharacterClass(this.playerStore.playerClass)
                 .setName(user.username)
                 .update();
-
-            this.loadGameData(); //TODO: remove this
         });
-
-        this.loadGameData();
-    }
-
-    loadGameData() {
-        this.myPlayer ??= new Character(this, {
-            entity: this.playerStore.playerEntity,
-            charClass: this.playerStore.playerClass,
-        });
-        this.myPlayer.entity = this.playerStore.playerEntity;
-        this.myPlayer.move(this.gridPositions);
-        this.characters = this.gameStore.game.entities
-            .filter(
-                (entity) =>
-                    entity.entityId !== this.playerStore.playerEntity.entityId,
-            )
-            .map((entity) => {
-                const entityClass = this.classStore.classes.find(
-                    (charClass) => charClass.id === entity.classId,
-                )!;
-                return new Character(this, {
-                    entity: entity,
-                    charClass: entityClass,
-                });
-            });
     }
 
     preload() {
@@ -228,12 +212,10 @@ export class FightScene extends BaseScene {
         ParticleAsset.loadAll(this.load);
 
         MiscAsset.load(this.load, MiscAssetId.GROUND_TILE);
+        CharacterCloseupAsset.loadAll(this.load);
+        CharacterSpriteAsset.loadAll(this.load);
 
         IconAsset.loadAll(this.load);
-
-        this.characters.push(this.myPlayer);
-        //précharge les image des persos de la scène
-        this.characters.forEach((object) => object.preload(this.load));
     }
 
     create() {
@@ -272,16 +254,18 @@ export class FightScene extends BaseScene {
 
         // --- Placement des icônes ---
 
-        this.events.on("characterClicked", (perso: Character) => {
-            this.inspectCharacter(perso);
+        this.events.on("characterClicked", (entityId: string) => {
+            this.inspectCharacter(entityId);
         });
     }
 
-    public inspectCharacter(perso: Character) {
+    public inspectCharacter(entityId: string) {
+        const entity = this.gameStore.getEntity(entityId);
+        const charClass = this.classStore.getClass(entity.classId);
         this.inspectStats
-            .setEntity(perso.entity)
-            .setCharacterClass(perso.charClass)
-            .setName(perso.charClass.name.split(" ")[0])
+            .setEntity(entity)
+            .setCharacterClass(charClass)
+            .setName(charClass.name.split(" ")[0])
             .update()
             .setIsShow(true);
     }

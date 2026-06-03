@@ -10,7 +10,7 @@ import {
 import { Color } from "../../config/ColorConfig";
 import { CharacterClass } from "../../Model/CharacterClass";
 import { LobbySocket } from "./repositories/lobby.socket";
-import { ActionAsset } from "../../assets";
+import { CharacterCloseupAsset, CharacterIconAsset } from "../../assets";
 import { FightScene } from "../Fight/fight.scene";
 import { ClassesRepository } from "./repositories/classes.repository";
 import { MainMenu } from "../MainMenu/main-menu.scene";
@@ -52,17 +52,8 @@ export class LobbyScene extends BaseScene {
 
     preload() {
         super.preload();
-        this.classes.forEach((charClass) => {
-            if (charClass.playable === true) {
-                this.load.image(
-                    charClass.imageKey,
-                    `assets/${charClass.imageKey}.png`,
-                );
-                charClass.actionList.forEach(({ id }) =>
-                    ActionAsset.load(this.load, id),
-                );
-            }
-        });
+        CharacterIconAsset.loadAll(this.load);
+        CharacterCloseupAsset.loadAll(this.load);
     }
 
     create() {
@@ -191,9 +182,9 @@ export class LobbyScene extends BaseScene {
             y: imgArea.centerY - playerPanelHeight / 2 + 10,
             width: imgArea.width,
             height: imgArea.height,
-            backgroundImage: this.classes.find(
-                ({ id }) => id === this.selectClassId,
-            )?.imageKey,
+            backgroundImage: CharacterCloseupAsset.getAssetKey(
+                this.selectClassId,
+            ),
             borderWidth: 5,
         });
         playerPanel.add(playerImageContainer);
@@ -268,7 +259,7 @@ export class LobbyScene extends BaseScene {
                 y: y + 10,
                 width: grid.cellW * 2,
                 height: area.height / 2,
-                backgroundImage: charClass.imageKey,
+                backgroundImage: CharacterIconAsset.getAssetKey(charClass.id),
                 borderWidth: 7,
                 onClick: () => {
                     this.events.emit("class-selected", charClass);
@@ -287,8 +278,7 @@ export class LobbyScene extends BaseScene {
 
         // Met directement la nouvelle image
         this.playerImageContainer.setBackgroundImage(
-            this.classes.find(({ id }) => id === this.selectClassId)
-                ?.imageKey ?? "",
+            CharacterCloseupAsset.getAssetKey(this.selectClassId) ?? "",
         );
 
         // Met à jour le nom

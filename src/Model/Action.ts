@@ -3,7 +3,6 @@ import { Effect } from "./Effect";
 
 export class Action {
     id!: string;
-    animationSpriteConfig?: { frameWidth: number; frameHeight: number };
     name!: string;
     description?: string;
     dammage?: number;
