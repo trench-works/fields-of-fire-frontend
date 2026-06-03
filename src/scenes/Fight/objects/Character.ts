@@ -36,7 +36,7 @@ export class Character extends GameObject {
             stats.life += effect.statModification.life;
             stats.precision += effect.statModification.precision;
             stats.strength += effect.statModification.precision;
-            stats.accuracy += effect.statModification.accuracy;
+            stats.armor += effect.statModification.armor;
             stats.initiative += effect.statModification.initiative;
             stats.energy += effect.statModification.energy;
             stats.mouvement += effect.statModification.mouvement;

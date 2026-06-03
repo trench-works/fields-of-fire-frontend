@@ -59,7 +59,7 @@ const allExistingStats: string[] = [
     "initiative",
     "strength",
     "precision",
-    "accuracy",
+    "armor",
     "dodging",
     "energy",
     "mouvement",
