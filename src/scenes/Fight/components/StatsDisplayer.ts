@@ -26,7 +26,7 @@ const statDescriptions: Record<string, string> = {
     life: "Points de vie. S'ils tombent à 0, vous mourrez.",
     precision: "Augmente les dégâts des attaques à distance.",
     strength: "Augmente les dégâts des attaques au corps à corps.",
-    armor: "Chance de toucher vos adversaires.",
+    armor: "Réduit les dégâts subis.",
     initiative: "Détermine l'ordre de passage dans le tour.",
     dodging: "Chance d'esquiver les attaques ennemies.",
     energy: "Points d'énergie nécessaires pour utiliser des actions.",
