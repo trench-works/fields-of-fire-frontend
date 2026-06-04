@@ -44,13 +44,6 @@ export class Character extends FightSceneDisplayer {
             this.sprite.setOrigin(0.5, 0.95);
             this.sprite.setScale(this.scene.scaleFactor / 1.5);
 
-            this.sprite.setInteractive();
-            this.sprite.on("pointerdown", () => {
-                if (!this.scene.actionManager.currentAction) {
-                    this.scene.events.emit("characterClicked", this.entityId);
-                }
-            });
-
             this.createAnimations(entity.classId);
         }
         return this;
@@ -101,47 +94,6 @@ export class Character extends FightSceneDisplayer {
         this.sprite.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
 
         return this;
-    }
-
-    public enableClick() {
-        this.sprite?.setInteractive();
-    }
-
-    public disableClick() {
-        this.sprite?.disableInteractive();
-    }
-
-    public showPreview(show: boolean, action?: Action) {
-        if (!this.sprite) return;
-
-        this.sprite?.off("pointerover");
-        this.sprite?.off("pointerout");
-
-        const entity = this.gameStore.getEntity(this.entityId);
-
-        const title = `❤️ ${entity.stats.life} PV`;
-
-        if (!show) {
-            this.scene.tooltip.attachTo(
-                this.sprite!,
-                this.classStore.getClass(entity.classId).name,
-                title,
-                undefined,
-                this.sprite!,
-            );
-        } else {
-            const estimatedDamage = action
-                ? `Dégâts estimés : 12²` // ← ici tu peux calculer les dégâts estimés en fonction de l'action et des stats du personnage
-                : "Aucune action sélectionnée";
-
-            this.scene.tooltip.attachTo(
-                this.sprite!,
-                estimatedDamage, // ← description = dégâts estimés
-                title,
-                undefined,
-                this.sprite!,
-            );
-        }
     }
 }
 

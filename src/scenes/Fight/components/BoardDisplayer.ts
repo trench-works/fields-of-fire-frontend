@@ -147,15 +147,24 @@ export class BoardDisplayer extends FightSceneDisplayer {
                 zone.on("pointerdown", () => {
                     console.log(`Tile clicked: ${x}, ${y}`);
 
-                    if (
-                        this.scene.rangeVisualizer.isInRange(new Position(x, y))
-                    ) {
-                        this.scene.actionManager.launchAction(
-                            new Position(x, y),
-                        );
+                    if (this.scene.actionManager.currentAction) {
+                        if (
+                            this.scene.rangeVisualizer.isInRange(new Position(x, y))
+                        ) {
+                            this.scene.actionManager.launchAction(
+                                new Position(x, y),
+                            );
+                        }
+                    } else {
+                        if (caseTile.entityId) {
+                            console.log(`Inspecting entity ${caseTile.entityId}`);
+                            this.scene.inspectCharacter(
+                                this.gameStore.game.plateau[x][y].entityId,
+                            );
+                        }
                     }
-
                     this.scene.rangeVisualizer.clearRange();
+                    
                 });
                 zone.on("pointerover", () => {
                     hoverGraphics.setVisible(true);

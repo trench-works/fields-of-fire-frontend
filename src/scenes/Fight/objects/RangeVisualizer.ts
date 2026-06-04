@@ -115,7 +115,7 @@ export class RangeVisualizer {
         for (let x = 0; x < this.scene.gridPositions.length; x++) {
             for (let y = 0; y < this.scene.gridPositions[x].length; y++) {
                 const dist = Math.abs(start.x - x) + Math.abs(start.y - y);
-                if (dist <= range && !(x === start.x && y === start.y)) {
+                if (dist <= range) {
                     result.push(this.scene.gridPositions[x]?.[y]);
                 }
             }

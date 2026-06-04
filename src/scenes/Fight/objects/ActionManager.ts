@@ -18,25 +18,14 @@ export class ActionManager {
 
         console.log("Action sélectionnée :", action?.name || "Aucune");
         this._currentAction = action;
-
-        this.scene.characters.forEach((character) => {
-            if (action) {
-                console.log(`Désactivation des clics pour ${character.entity.entityId} en raison de l'action sélectionnée`);
-                character.disableClick();
-                character.showPreview(true, action);
-                
-            } else {
-                console.log(`Réactivation des clics pour ${character.entity.entityId} en raison de la suppression de l'action sélectionnée`);
-                character.enableClick();
-            }
-        });
     }
 
     clearCurentAction() {
-        this.currentAction = undefined; // ← passe par le setter, réactive les clics
+        this.currentAction = undefined;
     }
 
     launchAction(pos: Position) {
+        console.log(`Lancement de l'action ${this._currentAction?.name} sur la position (${pos.x}, ${pos.y})`);
         this.scene.playerSocket.action({
             actionId: this._currentAction?.id || "",
             target: pos,
