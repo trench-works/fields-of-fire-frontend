@@ -113,7 +113,7 @@ export class LobbyScene extends BaseScene {
                 },
             },
             {
-                label: "Equipements",
+                label: "Réglages",
                 build: (container) => {
                     container.add(
                         this.add.text(50, 0, "not implemented yet", {
@@ -227,38 +227,32 @@ export class LobbyScene extends BaseScene {
         });
     }
 
-    //  --- ATTENTION !!!
-    // cette fonction c'est du bricolage et nécessite un rework futur
-    // ne jamais lui donner + de 3 classes sinon EXPLOSION
-
     private buildClassesTab(container: Phaser.GameObjects.Container) {
         const classes = this.classes.filter((charClass) => charClass.playable);
         const classesPerRow = 3;
-        const contentwidth: number = container.width;
+        const rows = 2; 
+        const padding = 100; 
+
         const grid = GridUtils.uiGrid(
-            0,
-            0,
-            contentwidth,
+            0, 0,
+            container.width,
             this.tabHeight,
-            9,
-            Math.ceil(classes.length / classesPerRow),
+            classesPerRow,
+            rows,
         );
 
-        classes.forEach((charClass, index) => {
-            const col = (index % classesPerRow) * 3;
+        classes.slice(0, classesPerRow * rows).forEach((charClass, index) => {
+            const col = index % classesPerRow;
             const row = Math.floor(index / classesPerRow);
 
             const area = grid.getArea(col, row, 1, 1);
 
-            const x = area.centerX - this.tabWidth / 2 + grid.cellW * 2.5;
-            const y = area.centerY - this.tabHeight / 2 + grid.cellH * 0.25;
-
             const classContainer = new CustomContainer(this, {
-                title: "",
-                x: x,
-                y: y + 10,
-                width: grid.cellW * 2,
-                height: area.height / 2,
+                title: charClass.name, // ✅ nom de la classe affiché
+                x: area.centerX,
+                y: area.centerY,
+                width: area.width - padding,
+                height: area.height - padding,
                 backgroundImage: CharacterIconAsset.getAssetKey(charClass.id),
                 borderWidth: 7,
                 onClick: () => {
