@@ -7,7 +7,7 @@ export class Character extends FightSceneDisplayer {
     constructor(
         scene: FightScene,
         gameStore: GameStore,
-        private readonly entityId: string,
+        public readonly entityId: string,
     ) {
         super(scene, gameStore);
     }
