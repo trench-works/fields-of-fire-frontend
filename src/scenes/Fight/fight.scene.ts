@@ -177,8 +177,7 @@ export class FightScene extends BaseScene {
         scene.scene.start(SceneAssetId.FIGHT, data);
     }
 
-    private handleUpdate(game: GameUpdateEvent): Promise<void>[] {
-        console.log("HANDLE UPDATE", game);
+    private handleUpdate({ game }: GameUpdateEvent): Promise<void>[] {
         /**
          * Update Store
          */
@@ -200,6 +199,7 @@ export class FightScene extends BaseScene {
         if (this.inspectStats.isShow) {
             this.inspectCharacter(this.inspectStats.entityId);
         }
+
         return [new Promise((resolve) => setTimeout(resolve, 1000))];
     }
 

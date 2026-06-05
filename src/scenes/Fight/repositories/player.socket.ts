@@ -24,7 +24,10 @@ type ActionPlayer = {
     target: Position;
 };
 
-export type GameUpdateEvent = Game;
+export type GameUpdateEvent = {
+    game: Game;
+    animations: any[];
+};
 
 export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
     constructor(gameId: string, playerId: string) {
