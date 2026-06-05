@@ -1,17 +1,12 @@
 import { FightScene } from "../../fight.scene";
 import { Character } from "./Character";
-import { ClassStore } from "../../stores/ClassStore";
 import { GameStore } from "../../stores/GameStore";
 import { FightSceneDisplayer } from "../FightSceneDisplayer";
 
 export class CharactersDisplayer extends FightSceneDisplayer {
     characters: Character[] = [];
 
-    constructor(
-        scene: FightScene,
-        gameStore: GameStore,
-        private readonly classStore: ClassStore,
-    ) {
+    constructor(scene: FightScene, gameStore: GameStore) {
         super(scene, gameStore);
     }
 
@@ -21,12 +16,7 @@ export class CharactersDisplayer extends FightSceneDisplayer {
 
     render(): this {
         this.characters = this.gameStore.game.entities.map((entity) =>
-            new Character(
-                this.scene,
-                this.gameStore,
-                this.classStore,
-                entity.entityId,
-            )
+            new Character(this.scene, this.gameStore, entity.entityId)
                 .preRender()
                 .render(),
         );

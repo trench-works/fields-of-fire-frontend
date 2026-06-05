@@ -121,11 +121,7 @@ export class FightScene extends BaseScene {
             this.playerStore,
         );
         this.board = new BoardDisplayer(this, this.gameStore);
-        this.character = new CharactersDisplayer(
-            this,
-            this.gameStore,
-            this.classStore,
-        );
+        this.character = new CharactersDisplayer(this, this.gameStore);
         this.turns = new TurnDisplayer(this, this.gameStore, this.classStore);
         this.playerStats = new StatsDisplayer(this, this.gameStore, {
             x: 0,

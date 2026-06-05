@@ -1,7 +1,5 @@
-import { Action } from "../../../../Model/Action";
 import { FightSceneDisplayer } from "../FightSceneDisplayer";
 import { FightScene } from "../../fight.scene";
-import { ClassStore } from "../../stores/ClassStore";
 import { GameStore } from "../../stores/GameStore";
 import { CharacterSpriteAsset } from "../../../../assets";
 
@@ -9,7 +7,6 @@ export class Character extends FightSceneDisplayer {
     constructor(
         scene: FightScene,
         gameStore: GameStore,
-        private readonly classStore: ClassStore,
         private readonly entityId: string,
     ) {
         super(scene, gameStore);
