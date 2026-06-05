@@ -2,21 +2,14 @@ import { Position } from "../../../core";
 import { Action, ActionType } from "../../../Model/Action";
 import { Entity } from "../../../Model/Entity";
 import { FightScene } from "../fight.scene";
+import { StatsUtils } from "../../../Model/Stats";
 
 export class ActionManager {
-    private _currentAction: Action | undefined;
+    public currentAction: Action | undefined;
     public scene!: FightScene;
 
     constructor(scene: FightScene) {
         this.scene = scene;
-    }
-
-    get currentAction(): Action | undefined {
-        return this._currentAction;
-    }
-
-    set currentAction(action: Action | undefined) {
-        this._currentAction = action;
     }
 
     clearCurentAction() {
@@ -25,28 +18,34 @@ export class ActionManager {
 
     launchAction(pos: Position) {
         this.scene.playerSocket.action({
-            actionId: this._currentAction?.id || "",
+            actionId: this.currentAction?.id || "",
             target: pos,
         });
         this.clearCurentAction();
     }
 
-    calculateDamage(action: Action, attacker: Entity, target: Entity): number {
-        const damageRange = action.damage!.max - action.damage!.min + 1;
-        const randomDamage =
-            Math.floor(Math.random() * damageRange) + action.damage!.min;
-
+    calculateDamagePreview(
+        action: Action,
+        attacker: Entity,
+        target: Entity,
+    ): [number, number] {
+        const attackerStats = StatsUtils.fromEntity(attacker);
+        const targetStats = StatsUtils.fromEntity(target);
+        if (!action.damage) {
+            return [0, 0];
+        }
         const statBonus =
             action.actionType === ActionType.MELEE
-                ? Math.ceil(attacker.stats!.strength / 10)
-                : Math.ceil(attacker.stats!.precision / 10);
+                ? Math.ceil(attackerStats.strength / 10)
+                : Math.ceil(attackerStats.precision / 10);
 
-        const brutTotal = randomDamage + statBonus;
-        const reduction = Math.ceil(brutTotal * (target.stats!.armor / 100));
+        const minBrut = action.damage.min + statBonus;
+        const maxBrut = action.damage.min + statBonus;
 
-        console.log(`Calculated : ${brutTotal - reduction} dammage`);
-
-        return brutTotal - reduction;
+        return [
+            minBrut - Math.ceil(minBrut * (targetStats!.armor / 100)),
+            maxBrut - Math.ceil(maxBrut * (targetStats!.armor / 100)),
+        ];
     }
 }
 

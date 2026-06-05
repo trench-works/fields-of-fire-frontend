@@ -196,11 +196,13 @@ export class BoardDisplayer extends FightSceneDisplayer {
                             if (action.id !== "walk") {
                                 this.scene.tooltip.showNow(
                                     "Estimated Damage: " +
-                                        this.scene.actionManager.calculateDamage(
-                                            action,
-                                            this.playerStore.playerEntity,
-                                            entity,
-                                        ) +
+                                        this.scene.actionManager
+                                            .calculateDamagePreview(
+                                                action,
+                                                this.playerStore.playerEntity,
+                                                entity,
+                                            )
+                                            .join(" - ") +
                                         " ❤️",
                                     `Attaquer sur cette case`,
                                     { x: zone.x, y: zone.y - 300 },
