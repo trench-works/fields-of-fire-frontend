@@ -1,4 +1,5 @@
 import { Position } from "../../../core";
+import { Action } from "../../../Model/Action";
 import { Cell, FightScene } from "../fight.scene";
 import { GameStore } from "../stores/GameStore";
 
@@ -10,9 +11,9 @@ export class RangeVisualizer {
         private readonly gameStore: GameStore,
     ) {}
 
-    private highlightCell(cell: Cell) {
+    private highlightCell(cell: Cell, color: number = 0x00aaff) {
         const g = this.scene.add.graphics();
-        g.fillStyle(0x00aaff, 0.6); // bleu transparent
+        g.fillStyle(color, 0.6); // bleu transparent
         g.fillPoints(
             [
                 new Phaser.Geom.Point(
@@ -133,5 +134,30 @@ export class RangeVisualizer {
                     gridPosition.x === x && gridPosition.y === y,
             );
     }
+
+    spellZonePreview(action: Action, target: Position) {
+        if (!action.zoneType) {
+            const cell = this.scene.gridPositions[target.x]?.[target.y];
+            if (cell) {
+                this.highlightCell(cell, 0x42a97b);
+            }
+        } else {
+            switch (action.zoneType) {
+                case 'DIAMOND':
+                    if (!action.zoneSize) {
+                        return;
+                    }
+                    for (let x = target.x - action.zoneSize; x <= target.x + action.zoneSize; x++) {
+                        for (let y = target.y - action.zoneSize; y <= target.y + action.zoneSize; y++) {
+                            if (Math.abs(target.x - x) + Math.abs(target.y - y) <= action!.zoneSize) {
+                                this.highlightCell(this.scene.gridPositions[x]?.[y], 0x42a97b);
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+    
 }
 
