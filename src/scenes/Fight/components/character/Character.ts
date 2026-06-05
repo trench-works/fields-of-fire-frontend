@@ -37,7 +37,7 @@ export class Character extends FightSceneDisplayer {
                 CharacterSpriteAsset.getAssetKey(entity.classId),
             );
 
-            this.sprite.setDepth(5);
+            this.sprite.setDepth(Math.max(x, y));
             this.sprite.setOrigin(0.5, 0.95);
             this.sprite.setScale(this.scene.scaleFactor / 1.5);
 
@@ -89,6 +89,7 @@ export class Character extends FightSceneDisplayer {
         const cell = this.scene.gridPositions[x][y];
 
         this.sprite.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
+        this.sprite.setDepth(Math.max(x, y));
 
         return this;
     }

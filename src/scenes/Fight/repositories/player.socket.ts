@@ -24,9 +24,15 @@ type ActionPlayer = {
     target: Position;
 };
 
+export type GameAnimation = {
+    key: string;
+    entityId: string;
+    data: Record<string, any>;
+};
+
 export type GameUpdateEvent = {
     game: Game;
-    animations: any[];
+    animations: GameAnimation[];
 };
 
 export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
