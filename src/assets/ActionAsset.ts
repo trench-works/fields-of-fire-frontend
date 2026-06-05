@@ -25,7 +25,7 @@ class ActionAssetManager extends ImageAssetManager<ActionAssetId, string> {
             [ActionAssetId.WALK]: "action_image_moove",
             [ActionAssetId.SHOOT]: "action_image_shoot",
             [ActionAssetId.HEAL]: "action_image_heal",
-            [ActionAssetId.ARTILLERY_SUPPORT]: "action_image_artillery_support",
+            [ActionAssetId.ARTILLERY_SUPPORT]: "action_image_artillerySupport",
             [ActionAssetId.AMPUTATE]: "action_image_amputate",
             [ActionAssetId.BAYONET]: "action_image_bayonet",
             [ActionAssetId.INTIMIDATION]: "action_image_intimidation",
