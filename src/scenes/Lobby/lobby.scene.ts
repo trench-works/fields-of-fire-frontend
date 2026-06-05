@@ -67,9 +67,6 @@ export class LobbyScene extends BaseScene {
             const player = game.players.find(
                 (player) => player.userId === global.user?.id,
             )!;
-            console.log(
-                `Rejoint la partie ${game.id} en tant que joueur ${player.playerId}`,
-            );
             FightScene.start(this, {
                 game,
                 player,
@@ -88,7 +85,6 @@ export class LobbyScene extends BaseScene {
 
         //tab BOX
         const tabArea = GridUtils.uiGrid(0, 1);
-        //console.log("TabArea dimensions:", tabArea.cellH, tabArea.cellW, " window, " , window.innerWidth, window.innerHeight);
 
         this.tabWidth = tabArea.cellW * 2; // colonnes 0 et 1
         this.tabHeight = this.scale.height - tabArea.cellH; // lignes 1 à 8
@@ -198,7 +194,6 @@ export class LobbyScene extends BaseScene {
             borderColor: "#ffffff",
             onClick: () => {
                 if (this.selectClassId) {
-                    console.log("will start game");
                     this.lobbySocket.startGame();
                 }
             },

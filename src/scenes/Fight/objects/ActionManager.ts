@@ -15,8 +15,6 @@ export class ActionManager {
     }
 
     set currentAction(action: Action | undefined) {
-
-        console.log("Action sélectionnée :", action?.name || "Aucune");
         this._currentAction = action;
     }
 
@@ -25,7 +23,6 @@ export class ActionManager {
     }
 
     launchAction(pos: Position) {
-        console.log(`Lancement de l'action ${this._currentAction?.name} sur la position (${pos.x}, ${pos.y})`);
         this.scene.playerSocket.action({
             actionId: this._currentAction?.id || "",
             target: pos,
@@ -33,3 +30,4 @@ export class ActionManager {
         this.clearCurentAction();
     }
 }
+

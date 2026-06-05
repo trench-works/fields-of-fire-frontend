@@ -66,7 +66,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         // --- TEXTE ---
         this.titleText = scene.add
             .text(0, 0, title, {
-                fontFamily: 'MyFont',
+                fontFamily: "MyFont",
                 fontSize: fontSize,
                 color: titleColor,
             })
@@ -173,12 +173,10 @@ export class CustomContainer extends Phaser.GameObjects.Container {
 
     private setupEvents() {
         this.on("pointerdown", () => {
-            //console.log("Button clicked!");
             this.onClick?.();
         });
 
         this.on("pointerover", () => {
-            //console.log("Hover over button");
             if (
                 this.hoverTint !== undefined &&
                 this.background instanceof Phaser.GameObjects.Image
@@ -188,7 +186,6 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         });
 
         this.on("pointerout", () => {
-            //console.log("Hover out button");
             if (this.background instanceof Phaser.GameObjects.Image) {
                 this.background.clearTint();
             }

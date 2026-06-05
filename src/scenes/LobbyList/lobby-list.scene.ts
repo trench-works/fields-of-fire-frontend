@@ -65,9 +65,6 @@ export class LobbyListScene extends BaseScene {
             if (this.lobbyResetTimeout) {
                 clearTimeout(this.lobbyResetTimeout);
             }
-            console.log(
-                `Rejoint le lobby ${lobbyId} en tant que joueur ${playerId}`,
-            );
             LobbyScene.start(this, {
                 lobbyId,
                 playerId,
@@ -78,9 +75,6 @@ export class LobbyListScene extends BaseScene {
             if (this.lobbyResetTimeout) {
                 clearTimeout(this.lobbyResetTimeout);
             }
-            console.log(
-                `Rejoint la game ${game.id} en tant que joueur ${player.playerId}`,
-            );
             FightScene.start(this, {
                 game,
                 player,

@@ -125,7 +125,6 @@ export class PopupInput {
         this.inputElement.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
                 onValidate(this.inputElement.value);
-                console.log("Input validé :", this.inputElement.value);
                 this.destroy();
             }
         });

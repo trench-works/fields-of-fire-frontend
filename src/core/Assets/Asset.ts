@@ -85,11 +85,6 @@ export abstract class SpriteAssetManager<
         id: string,
         asset: Record<AssetId, AssetType>[AssetId],
     ) {
-        console.log(
-            this.getAssetKey(id),
-            this.getAssetFileLink(this.assetKey, asset),
-            this.frameConfig,
-        );
         load.spritesheet(
             this.getAssetKey(id),
             this.getAssetFileLink(this.assetKey, asset),
