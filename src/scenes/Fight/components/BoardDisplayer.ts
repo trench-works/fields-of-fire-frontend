@@ -156,10 +156,9 @@ export class BoardDisplayer extends FightSceneDisplayer {
                             );
                         }
                     } else {
-                        if (caseTile.entityId) {
-                            this.scene.inspectCharacter(
-                                this.gameStore.game.plateau[x][y].entityId,
-                            );
+                        const tile = this.gameStore.game.plateau[x][y];
+                        if (tile.entityId) {
+                            this.scene.inspectCharacter(tile.entityId);
                         }
                     }
                     this.scene.rangeVisualizer.clearRange();
