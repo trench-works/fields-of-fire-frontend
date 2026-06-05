@@ -197,6 +197,9 @@ export class FightScene extends BaseScene {
                 .setCharacterClass(this.playerStore.playerClass)
                 .setName(user.username)
                 .update();
+            if (this.inspectStats.isShow) {
+                this.inspectCharacter(this.inspectStats.entityId);
+            }
         });
     }
 

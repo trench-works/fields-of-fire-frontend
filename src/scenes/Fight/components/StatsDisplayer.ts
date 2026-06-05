@@ -8,6 +8,7 @@ import {
 } from "../../../core";
 import { CharacterClass } from "../../../Model/CharacterClass";
 import { Entity } from "../../../Model/Entity";
+import { StatsUtils } from "../../../Model/Stats";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/GameStore";
 import { FightSceneDisplayer } from "./FightSceneDisplayer";
@@ -56,6 +57,15 @@ export class StatsDisplayer extends FightSceneDisplayer {
     private entity!: Entity;
     private characterClass!: CharacterClass;
     private name!: string;
+    private show!: boolean;
+
+    get entityId() {
+        return this.entity.entityId;
+    }
+
+    get isShow() {
+        return this.show;
+    }
 
     constructor(
         scene: FightScene,
@@ -210,14 +220,16 @@ export class StatsDisplayer extends FightSceneDisplayer {
     }
 
     update(): this {
-        this.lifeStat.setText(String(this.entity.stats.life));
-        this.strengthStat.setText(String(this.entity.stats.strength));
-        this.armorStat.setText(String(this.entity.stats.armor));
-        this.energyStat.setText(String(this.entity.stats.energy));
-        this.initiativeStat.setText(String(this.entity.stats.initiative));
-        this.precisionStat.setText(String(this.entity.stats.precision));
-        this.dodgingStat.setText(String(this.entity.stats.dodging));
-        this.mouvementStat.setText(String(this.entity.stats.mouvement));
+        const stats = StatsUtils.fromEntity(this.entity);
+
+        this.lifeStat.setText(String(stats.life));
+        this.strengthStat.setText(String(stats.strength));
+        this.armorStat.setText(String(stats.armor));
+        this.energyStat.setText(String(stats.energy));
+        this.initiativeStat.setText(String(stats.initiative));
+        this.precisionStat.setText(String(stats.precision));
+        this.dodgingStat.setText(String(stats.dodging));
+        this.mouvementStat.setText(String(stats.mouvement));
 
         this.statsName.setTitle(this.name);
         this.statsClassName.setTitle(this.characterClass.name);
@@ -228,6 +240,8 @@ export class StatsDisplayer extends FightSceneDisplayer {
     }
 
     setIsShow(isShow: boolean): this {
+        this.show = isShow;
+
         this.statsPanel.setVisible(isShow);
         this.statsTable.setVisible(isShow);
         this.statsImage.setVisible(isShow);
