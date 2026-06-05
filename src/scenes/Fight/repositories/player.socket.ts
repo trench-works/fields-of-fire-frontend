@@ -25,7 +25,7 @@ type ActionPlayer = {
 };
 
 export type GameAnimation = {
-    key: string;
+    key: "move" | "action";
     entityId: string;
     data: Record<string, any>;
 };

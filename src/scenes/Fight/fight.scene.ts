@@ -177,12 +177,22 @@ export class FightScene extends BaseScene {
         scene.scene.start(SceneAssetId.FIGHT, data);
     }
 
-    private handleUpdate({ game }: GameUpdateEvent): Promise<void>[] {
+    private handleUpdate({
+        game,
+        animations,
+    }: GameUpdateEvent): Promise<void>[] {
         /**
          * Update Store
          */
         this.gameStore.setGame(game);
         this.playerStore.update();
+
+        /**
+         * Do animations !!!!!
+         */
+        for (const animation of animations) {
+            console.log(animation); //TODO: instead filter and handle those animations in their respective displayers
+        }
 
         /**
          * Update Displayers
