@@ -5,10 +5,14 @@ import {
     PositionUtils,
     MenuButton,
     BaseScene,
+    EventQueue,
 } from "../../core";
 import { SceneConfig } from "../../config/SceneConfig";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
-import { GamePlayerSocket } from "./repositories/player.socket";
+import {
+    GamePlayerSocket,
+    GameUpdateEvent,
+} from "./repositories/player.socket";
 import { ActionManager } from "./objects/ActionManager";
 import { Tooltip } from "../../core/UI/Tooltip";
 import { Game } from "../../Model/Game";
@@ -87,6 +91,7 @@ export class FightScene extends BaseScene {
      * Sockets
      */
     public playerSocket!: GamePlayerSocket;
+    private gameUpdateQueue!: EventQueue<GameUpdateEvent>;
 
     /**
      * Utils
@@ -110,6 +115,13 @@ export class FightScene extends BaseScene {
         this.classStore = new ClassStore();
         this.gameStore = new GameStore();
         this.playerStore = new PlayerStore(this.classStore, this.gameStore);
+
+        /**
+         * Usecases
+         */
+        this.gameUpdateQueue = new EventQueue<GameUpdateEvent>((event) =>
+            this.handleUpdate(event),
+        );
 
         /**
          * Displayers
@@ -165,6 +177,32 @@ export class FightScene extends BaseScene {
         scene.scene.start(SceneAssetId.FIGHT, data);
     }
 
+    private handleUpdate(game: GameUpdateEvent): Promise<void>[] {
+        console.log("HANDLE UPDATE", game);
+        /**
+         * Update Store
+         */
+        this.gameStore.setGame(game);
+        this.playerStore.update();
+
+        /**
+         * Update Displayers
+         */
+        this.board.update();
+        this.actions.update();
+        this.turns.update();
+        this.character.update();
+        this.playerStats
+            .setEntity(this.playerStore.playerEntity)
+            .setCharacterClass(this.playerStore.playerClass)
+            .setName(user.username)
+            .update();
+        if (this.inspectStats.isShow) {
+            this.inspectCharacter(this.inspectStats.entityId);
+        }
+        return [new Promise((resolve) => setTimeout(resolve, 1000))];
+    }
+
     init({ game, player: { playerId } }: FightSceneInit) {
         this.gameStore.setGame(game);
         this.playerStore.setPlayerId(playerId);
@@ -178,29 +216,7 @@ export class FightScene extends BaseScene {
 
         this.playerSocket = new GamePlayerSocket(game.id, playerId);
         this.playerSocket.onClose(() => MainMenu.start(this));
-        this.playerSocket.onUpdate((game: Game) => {
-            /**
-             * Update Store
-             */
-            this.gameStore.setGame(game);
-            this.playerStore.update();
-
-            /**
-             * Update Displayers
-             */
-            this.board.update();
-            this.actions.update();
-            this.turns.update();
-            this.character.update();
-            this.playerStats
-                .setEntity(this.playerStore.playerEntity)
-                .setCharacterClass(this.playerStore.playerClass)
-                .setName(user.username)
-                .update();
-            if (this.inspectStats.isShow) {
-                this.inspectCharacter(this.inspectStats.entityId);
-            }
-        });
+        this.playerSocket.onUpdate((event) => this.gameUpdateQueue.add(event));
     }
 
     preload() {
@@ -213,11 +229,9 @@ export class FightScene extends BaseScene {
         );
 
         ParticleAsset.loadAll(this.load);
-
         MiscAsset.load(this.load, MiscAssetId.GROUND_TILE);
         CharacterCloseupAsset.loadAll(this.load);
         CharacterSpriteAsset.loadAll(this.load);
-
         IconAsset.loadAll(this.load);
     }
 

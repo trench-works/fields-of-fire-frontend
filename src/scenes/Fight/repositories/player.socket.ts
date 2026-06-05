@@ -24,6 +24,8 @@ type ActionPlayer = {
     target: Position;
 };
 
+export type GameUpdateEvent = Game;
+
 export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
     constructor(gameId: string, playerId: string) {
         super(GAME_TOPIC);
@@ -38,7 +40,7 @@ export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
         return this.send(GamePlayerActions.ACTION, actionPlayer);
     }
 
-    onUpdate(listener: SocketListener<Game>): void {
+    onUpdate(listener: SocketListener<GameUpdateEvent>): void {
         this.on(GamePlayerEvents.UPDATE, listener);
     }
 }

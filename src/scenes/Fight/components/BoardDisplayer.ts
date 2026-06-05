@@ -182,10 +182,8 @@ export class BoardDisplayer extends FightSceneDisplayer {
                         const entity = this.gameStore.getEntity(
                             this.gameStore.game.plateau[x][y].entityId,
                         );
-                        console.log("entity", entity);
 
                         if (!this.scene.actionManager.currentAction) {
-                            console.log("show tooltip");
                             this.scene.tooltip.showNow(
                                 this.classStore.getClass(entity.classId).name,
                                 `❤️ ${entity.stats.life} PV`,
