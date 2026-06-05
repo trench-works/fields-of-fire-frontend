@@ -12,6 +12,8 @@ import { FightSceneDisplayer } from "./FightSceneDisplayer";
 export class BoardDisplayer extends FightSceneDisplayer {
     private entityHighlights: Phaser.GameObjects.Graphics[] = [];
     private groundLayer: Phaser.Tilemaps.TilemapLayer | null = null;
+    private wallLayer: Phaser.Tilemaps.TilemapLayer | null = null;
+
     constructor(
         scene: FightScene,
         gameStore: GameStore,
@@ -48,6 +50,7 @@ export class BoardDisplayer extends FightSceneDisplayer {
         this.scene.renderConfig.offset.add(
             new Position(centerMap.offsetX, centerMap.offsetY),
         );
+        this.scene.scaleFactor = centerMap.scaleFactor;
 
         this.groundLayer = map.createLayer(
             "Ground",
@@ -55,15 +58,24 @@ export class BoardDisplayer extends FightSceneDisplayer {
             centerMap.offsetX,
             centerMap.offsetY,
         );
+        this.wallLayer = map.createLayer(
+            "Wall",
+            tileset!,
+            centerMap.offsetX,
+            centerMap.offsetY - 32 * this.scene.scaleFactor,
+        );
 
         if (!this.groundLayer) {
             throw new Error("Ground layer seemingly inexistent");
         }
+        if (!this.wallLayer) {
+            throw new Error("Wall layer seemingly inexistent");
+        }
 
-        this.scene.scaleFactor = centerMap.scaleFactor;
-
-        this.groundLayer.setScale(centerMap.scaleFactor);
+        this.groundLayer.setScale(this.scene.scaleFactor);
         this.groundLayer.setDepth(0);
+        this.wallLayer.setScale(this.scene.scaleFactor);
+        this.wallLayer.setDepth(1);
 
         this.generatePlayGrid();
         this.displayEntitiesHighlights();
@@ -71,7 +83,7 @@ export class BoardDisplayer extends FightSceneDisplayer {
     }
 
     private displayEntitiesHighlights() {
-        if (!this.groundLayer) {
+        if (!this.groundLayer || !this.wallLayer) {
             return;
         }
         for (const highlightEntity of this.entityHighlights) {
@@ -80,31 +92,45 @@ export class BoardDisplayer extends FightSceneDisplayer {
         this.entityHighlights = [];
         for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
-                const tile = this.groundLayer.getTileAt(x, y);
                 const caseTile = this.gameStore.game.plateau[x][y];
-                if (caseTile.isHole || caseTile.isWall) {
-                    tile.setVisible(false);
-                    continue;
+                // Ground part
+                const tile = this.groundLayer.getTileAt(x, y);
+                if (tile) {
+                    if (caseTile.isHole) {
+                        tile.setVisible(false);
+                    } else if (!caseTile.isWall) {
+                        if (
+                            caseTile.entityId &&
+                            caseTile.entityId ===
+                                this.gameStore.game.playerTurns[0]
+                        ) {
+                            const entity = this.gameStore.game.entities.find(
+                                (entity) =>
+                                    entity.entityId === caseTile.entityId,
+                            );
+                            if (entity) {
+                                this.entityHighlights.push(
+                                    this.getTileHighlights(tile, {
+                                        color:
+                                            entity.entityType ===
+                                            EntityType.ALLY
+                                                ? 0x00ff00
+                                                : 0xff0000,
+                                        depth: 2,
+                                    }),
+                                );
+                            }
+                        }
+                    }
                 }
-                if (!tile) continue;
 
-                if (
-                    caseTile.entityId &&
-                    caseTile.entityId === this.gameStore.game.playerTurns[0]
-                ) {
-                    const entity = this.gameStore.game.entities.find(
-                        (entity) => entity.entityId === caseTile.entityId,
-                    );
-                    if (entity) {
-                        this.entityHighlights.push(
-                            this.getTileHighlights(tile, {
-                                color:
-                                    entity.entityType === EntityType.ALLY
-                                        ? 0x00ff00
-                                        : 0xff0000,
-                                depth: 2,
-                            }),
-                        );
+                // Wall part
+                const wallTile = this.wallLayer.getTileAt(x, y);
+                if (wallTile) {
+                    if (caseTile.isWall) {
+                        //changer la depth de la wallTile
+                    } else {
+                        wallTile.setVisible(false);
                     }
                 }
             }
@@ -112,109 +138,110 @@ export class BoardDisplayer extends FightSceneDisplayer {
     }
 
     private generatePlayGrid() {
-        if (!this.groundLayer) {
+        if (!this.groundLayer || !this.wallLayer) {
             return;
         }
         for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
                 const tile = this.groundLayer.getTileAt(x, y);
                 const caseTile = this.gameStore.game.plateau[x][y];
-                if (caseTile.isHole || caseTile.isWall) {
+                if (caseTile.isHole) {
                     tile.setVisible(false);
-                    continue;
-                }
-                if (!tile) continue;
-                const diamond = new Diamond(tile, this.scene.scaleFactor);
+                } else if (!caseTile.isWall) {
+                    if (!tile) continue;
+                    const diamond = new Diamond(tile, this.scene.scaleFactor);
 
-                const hoverGraphics = this.getTileHighlights(tile, {
-                    color: 0xffffff,
-                    diamond,
-                    depth: 2,
-                });
-                hoverGraphics.setVisible(false);
+                    const hoverGraphics = this.getTileHighlights(tile, {
+                        color: 0xffffff,
+                        diamond,
+                        depth: 2,
+                    });
+                    hoverGraphics.setVisible(false);
 
-                const zone = this.getTileInteractiveZone(tile, {
-                    diamond,
-                });
+                    const zone = this.getTileInteractiveZone(tile, {
+                        diamond,
+                    });
 
-                // --- DEBUG VISUEL ---
-                //this.gridShower(diamond, worldX, worldY, layer);
+                    // --- DEBUG VISUEL ---
+                    //this.gridShower(diamond, worldX, worldY, layer);
 
-                const worldX = tile.getCenterX();
-                const worldY = tile.getCenterY();
-                if (!this.scene.gridPositions[y]) {
-                    this.scene.gridPositions[y] = [];
-                }
-
-                this.scene.gridPositions[x][y] = {
-                    gridPosition: new Position(x, y),
-                    pixelPosition: new Position(
-                        worldX,
-                        worldY - 16 * this.scene.scaleFactor,
-                    ),
-                    zone,
-                    hoverGraphics,
-                };
-
-                zone.on("pointerdown", () => {
-                    if (this.scene.actionManager.currentAction) {
-                        if (
-                            this.scene.rangeVisualizer.isInRange(
-                                new Position(x, y),
-                            )
-                        ) {
-                            this.scene.actionManager.launchAction(
-                                new Position(x, y),
-                            );
-                        }
-                    } else {
-                        const tile = this.gameStore.game.plateau[x][y];
-                        if (tile.entityId) {
-                            this.scene.inspectCharacter(tile.entityId);
-                        }
+                    const worldX = tile.getCenterX();
+                    const worldY = tile.getCenterY();
+                    if (!this.scene.gridPositions[y]) {
+                        this.scene.gridPositions[y] = [];
                     }
-                    this.scene.rangeVisualizer.clearRange();
-                    this.scene.actionManager.clearCurrentAction();
-                });
-                zone.on("pointerover", () => {
-                    hoverGraphics.setVisible(true);
-                    if (this.gameStore.game.plateau[x][y].entityId) {
-                        const entity = this.gameStore.getEntity(
-                            this.gameStore.game.plateau[x][y].entityId,
-                        );
 
-                        if (!this.scene.actionManager.currentAction) {
-                            this.scene.tooltip.showNow(
-                                this.classStore.getClass(entity.classId).name,
-                                `❤️ ${entity.stats.life} PV`,
-                                { x: zone.x, y: zone.y - 300 },
-                            );
-                        } else {
-                            const action =
-                                this.scene.actionManager.currentAction;
-                            if (action.id !== "walk") {
-                                this.scene.tooltip.showNow(
-                                    `Estimated ${(action.damage?.max ?? 0) <= 0 ? "Healing" : "Damage"}: ${this.scene.actionManager
-                                        .calculateDamagePreview(
-                                            action,
-                                            this.playerStore.playerEntity,
-                                            entity,
-                                        )
-                                        .join(" - ")}  ❤️`,
-                                    `Attaquer sur cette case`,
-                                    { x: zone.x, y: zone.y - 300 },
+                    this.scene.gridPositions[x][y] = {
+                        gridPosition: new Position(x, y),
+                        pixelPosition: new Position(
+                            worldX,
+                            worldY - 16 * this.scene.scaleFactor,
+                        ),
+                        zone,
+                        hoverGraphics,
+                    };
+
+                    zone.on("pointerdown", () => {
+                        if (this.scene.actionManager.currentAction) {
+                            if (
+                                this.scene.rangeVisualizer.isInRange(
+                                    new Position(x, y),
+                                )
+                            ) {
+                                this.scene.actionManager.launchAction(
+                                    new Position(x, y),
                                 );
                             }
+                        } else {
+                            const tile = this.gameStore.game.plateau[x][y];
+                            if (tile.entityId) {
+                                this.scene.inspectCharacter(tile.entityId);
+                            }
                         }
-                    }
-                });
-                zone.on("pointerout", () => {
-                    hoverGraphics.setVisible(false);
-                    this.scene.tooltip.hide();
-                });
+                        this.scene.rangeVisualizer.clearRange();
+                        this.scene.actionManager.clearCurrentAction();
+                    });
+                    zone.on("pointerover", () => {
+                        hoverGraphics.setVisible(true);
+                        if (this.gameStore.game.plateau[x][y].entityId) {
+                            const entity = this.gameStore.getEntity(
+                                this.gameStore.game.plateau[x][y].entityId,
+                            );
 
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (tile as any).zone = zone;
+                            if (!this.scene.actionManager.currentAction) {
+                                this.scene.tooltip.showNow(
+                                    this.classStore.getClass(entity.classId)
+                                        .name,
+                                    `❤️ ${entity.stats.life} PV`,
+                                    { x: zone.x, y: zone.y - 300 },
+                                );
+                            } else {
+                                const action =
+                                    this.scene.actionManager.currentAction;
+                                if (action.id !== "walk") {
+                                    this.scene.tooltip.showNow(
+                                        `Estimated ${(action.damage?.max ?? 0) <= 0 ? "Healing" : "Damage"}: ${this.scene.actionManager
+                                            .calculateDamagePreview(
+                                                action,
+                                                this.playerStore.playerEntity,
+                                                entity,
+                                            )
+                                            .join(" - ")}  ❤️`,
+                                        `Attaquer sur cette case`,
+                                        { x: zone.x, y: zone.y - 300 },
+                                    );
+                                }
+                            }
+                        }
+                    });
+                    zone.on("pointerout", () => {
+                        hoverGraphics.setVisible(false);
+                        this.scene.tooltip.hide();
+                    });
+
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    (tile as any).zone = zone;
+                }
             }
         }
     }
