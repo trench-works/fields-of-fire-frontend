@@ -5,7 +5,8 @@ export class Action {
     id!: string;
     name!: string;
     description?: string;
-    dammage?: number;
+    damage?: { min: number; max: number };
+    actionType!: ActionType;
     effectList?: Effect[];
     range?: number;
     zoneType?: string;
@@ -14,5 +15,10 @@ export class Action {
     pushValue?: number;
     cost!: number;
     isWalkAction?: boolean;
+}
+
+export enum ActionType {
+    MELEE = "MELEE",
+    RANGED = "RANGED"
 }
 

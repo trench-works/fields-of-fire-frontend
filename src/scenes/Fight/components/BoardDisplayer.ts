@@ -2,12 +2,23 @@ import { MiscAsset, MiscAssetId } from "../../../assets";
 import { Position } from "../../../core";
 import { Diamond } from "../../../core/Objects/Diamond";
 import { scaleAndCenter } from "../../../core/Utils/Scale";
-import { EntityType } from "../../../Model/Entity";
+import { Action } from "../../../Model/Action";
+import { Entity, EntityType } from "../../../Model/Entity";
+import { FightScene } from "../fight.scene";
+import { ClassStore } from "../stores/ClassStore";
+import { GameStore } from "../stores/GameStore";
 import { FightSceneDisplayer } from "./FightSceneDisplayer";
 
 export class BoardDisplayer extends FightSceneDisplayer {
     private entityHighlights: Phaser.GameObjects.Graphics[] = [];
     private groundLayer: Phaser.Tilemaps.TilemapLayer | null = null;
+    constructor(
+        scene: FightScene,
+        gameStore: GameStore,
+        private readonly classStore: ClassStore,
+    ) {
+        super(scene, gameStore);
+    }
 
     preRender(): this {
         return this;
@@ -165,9 +176,34 @@ export class BoardDisplayer extends FightSceneDisplayer {
                 });
                 zone.on("pointerover", () => {
                     hoverGraphics.setVisible(true);
+                    if (this.gameStore.game.plateau[x][y].entityId) {
+                        const entity = this.gameStore.getEntity(this.gameStore.game.plateau[x][y].entityId);
+                        console.log("entity", entity);
+
+                        if (!this.scene.actionManager.currentAction) { 
+                            console.log("show tooltip" );
+                            this.scene.tooltip.showNow(
+                                this.classStore.getClass(entity.classId).name,
+                                `❤️ ${entity.stats.life} PV`,
+                                { x: zone.x , y: zone.y - 300 },
+                            );
+                        }else {
+                            const action = this.scene.actionManager.currentAction;
+                            if( action.id !== "walk") { 
+                                const playerEntity = this.gameStore.getEntity(this.scene.myPlayer.entityId);
+                                this.scene.tooltip.showNow(
+                                    "Estimated Damage: " + this.scene.actionManager.calculateDamage(action, playerEntity, entity) + " ❤️",
+                                    `Se déplacer vers cette case`,
+                                    { x: zone.x , y: zone.y - 300 },
+                                );
+                            }
+                        }
+                        
+                    }
                 });
                 zone.on("pointerout", () => {
                     hoverGraphics.setVisible(false);
+                    this.scene.tooltip.hide();
                 });
 
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any

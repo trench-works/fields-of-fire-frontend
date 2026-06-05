@@ -19,7 +19,7 @@ interface TooltipConfig {
 
 export class Tooltip extends Phaser.GameObjects.Container {
     private static instances: Map<Phaser.Scene, Tooltip> = new Map();
-
+    private fixedPosition: { x: number, y: number } | null = null
     private bg: Phaser.GameObjects.Graphics;
     private titleLabel: Phaser.GameObjects.Text;
     private bodyLabel: Phaser.GameObjects.Text;
@@ -105,18 +105,18 @@ export class Tooltip extends Phaser.GameObjects.Container {
             resolvedTitle = title;
         }
 
-        target.on("pointerover", () => this.scheduleShow(text, resolvedDelay, resolvedTitle, fixedTarget));
+        target.on("pointerover", () => this.scheduleShow(text, resolvedDelay, resolvedTitle));
         target.on("pointerout",  () => this.cancelAndHide());
     }
 
-    private scheduleShow(text: string, delay: number, title?: string, fixedTarget?: Phaser.GameObjects.Sprite): void {
+    private scheduleShow(text: string, delay: number, title?: string): void {
         this.cancelTimer();
         if (delay <= 0) {
-            this.show(text, title, fixedTarget);
+            this.show(text, title);
             return;
         }
         this.showTimer = this.scene.time.delayedCall(delay, () => {
-            this.show(text, title, fixedTarget);
+            this.show(text, title);
         });
     }
 
@@ -132,9 +132,7 @@ export class Tooltip extends Phaser.GameObjects.Container {
         }
     }
 
-    private show(text: string, title?: string, fixedTarget?: Phaser.GameObjects.Sprite): void {
-        this.fixedTarget = fixedTarget ?? null; // ✅ stocke la référence au sprite
-
+    private show(text: string, title?: string): void {
         const pad = this.cfg.padding;
         const gap = 4;
 
@@ -168,24 +166,25 @@ export class Tooltip extends Phaser.GameObjects.Container {
         this.setVisible(true);
     }
 
-    private hide(): void {
-        this.fixedTarget = null; // ✅ reset
+    public hide(): void {
+        this.fixedTarget = null;
+        this.fixedPosition = null;
         this.setVisible(false);
     }
 
     private followPointer(): void {
         if (!this.visible) return;
 
+        if (this.fixedPosition) return;
+
         if (this.fixedTarget) {
-            // ✅ position recalculée à chaque frame depuis le sprite
             const tooltipW = Math.max(this.titleLabel.width, this.bodyLabel.width) + this.cfg.padding * 2;
             this.setPosition(
-                this.fixedTarget.x - tooltipW / 2,  // ✅ centré sur la largeur du tooltip
-                this.fixedTarget.y - 240,            // ✅ au dessus du sprite
+                this.fixedTarget.x - tooltipW / 2,
+                this.fixedTarget.y - 240,
             );
             return;
         }
-
         const pointer = this.scene.input.activePointer;
 
         let px = pointer.x + this.cfg.offsetX;
@@ -206,5 +205,14 @@ export class Tooltip extends Phaser.GameObjects.Container {
         this.scene?.events.off("update", this.followPointer, this);
         Tooltip.instances.delete(this.scene);
         super.destroy(fromScene);
+    }
+
+    public showNow(text: string, title?: string, position?: { x: number, y: number }): void {
+        this.fixedPosition = position ?? null;
+        this.show(text, title);
+        if (position) {
+            const tooltipW = Math.max(this.titleLabel.width, this.bodyLabel.width) + this.cfg.padding * 2;
+            this.setPosition(position.x - tooltipW / 2, position.y);
+        }
     }
 }
