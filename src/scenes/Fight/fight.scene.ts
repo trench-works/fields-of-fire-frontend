@@ -98,7 +98,6 @@ export class FightScene extends BaseScene {
 
     public fightMap = "chessmap";
     public characters: Character[] = [];
-    public myPlayer!: Character;
     public gridPositions: Cell[][] = [];
     public scaleFactor: number = 1;
 
@@ -120,7 +119,12 @@ export class FightScene extends BaseScene {
             this.gameStore,
             this.playerStore,
         );
-        this.board = new BoardDisplayer(this, this.gameStore, this.classStore);
+        this.board = new BoardDisplayer(
+            this,
+            this.gameStore,
+            this.classStore,
+            this.playerStore,
+        );
         this.character = new CharactersDisplayer(this, this.gameStore);
         this.turns = new TurnDisplayer(this, this.gameStore, this.classStore);
         this.playerStats = new StatsDisplayer(this, this.gameStore, {

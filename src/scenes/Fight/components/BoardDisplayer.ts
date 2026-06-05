@@ -2,11 +2,11 @@ import { MiscAsset, MiscAssetId } from "../../../assets";
 import { Position } from "../../../core";
 import { Diamond } from "../../../core/Objects/Diamond";
 import { scaleAndCenter } from "../../../core/Utils/Scale";
-import { Action } from "../../../Model/Action";
-import { Entity, EntityType } from "../../../Model/Entity";
+import { EntityType } from "../../../Model/Entity";
 import { FightScene } from "../fight.scene";
 import { ClassStore } from "../stores/ClassStore";
 import { GameStore } from "../stores/GameStore";
+import { PlayerStore } from "../stores/PlayerStore";
 import { FightSceneDisplayer } from "./FightSceneDisplayer";
 
 export class BoardDisplayer extends FightSceneDisplayer {
@@ -16,6 +16,7 @@ export class BoardDisplayer extends FightSceneDisplayer {
         scene: FightScene,
         gameStore: GameStore,
         private readonly classStore: ClassStore,
+        private readonly playerStore: PlayerStore,
     ) {
         super(scene, gameStore);
     }
@@ -177,28 +178,35 @@ export class BoardDisplayer extends FightSceneDisplayer {
                 zone.on("pointerover", () => {
                     hoverGraphics.setVisible(true);
                     if (this.gameStore.game.plateau[x][y].entityId) {
-                        const entity = this.gameStore.getEntity(this.gameStore.game.plateau[x][y].entityId);
+                        const entity = this.gameStore.getEntity(
+                            this.gameStore.game.plateau[x][y].entityId,
+                        );
                         console.log("entity", entity);
 
-                        if (!this.scene.actionManager.currentAction) { 
-                            console.log("show tooltip" );
+                        if (!this.scene.actionManager.currentAction) {
+                            console.log("show tooltip");
                             this.scene.tooltip.showNow(
                                 this.classStore.getClass(entity.classId).name,
                                 `❤️ ${entity.stats.life} PV`,
-                                { x: zone.x , y: zone.y - 300 },
+                                { x: zone.x, y: zone.y - 300 },
                             );
-                        }else {
-                            const action = this.scene.actionManager.currentAction;
-                            if( action.id !== "walk") { 
-                                const playerEntity = this.gameStore.getEntity(this.scene.myPlayer.entityId);
+                        } else {
+                            const action =
+                                this.scene.actionManager.currentAction;
+                            if (action.id !== "walk") {
                                 this.scene.tooltip.showNow(
-                                    "Estimated Damage: " + this.scene.actionManager.calculateDamage(action, playerEntity, entity) + " ❤️",
-                                    `Se déplacer vers cette case`,
-                                    { x: zone.x , y: zone.y - 300 },
+                                    "Estimated Damage: " +
+                                        this.scene.actionManager.calculateDamage(
+                                            action,
+                                            this.playerStore.playerEntity,
+                                            entity,
+                                        ) +
+                                        " ❤️",
+                                    `Attaquer sur cette case`,
+                                    { x: zone.x, y: zone.y - 300 },
                                 );
                             }
                         }
-                        
                     }
                 });
                 zone.on("pointerout", () => {
