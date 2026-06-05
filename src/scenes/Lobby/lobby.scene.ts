@@ -126,13 +126,6 @@ export class LobbyScene extends BaseScene {
         ]);
         tabManager.setPosition(tabArea.x + this.tabWidth / 2, tabArea.y + 20);
 
-        this.events.on("class-selected", (charClass: CharacterClass) => {
-            this.selectClassId = charClass.id;
-
-            // Rafraîchir l'image du playerPanel
-            this.updatePlayerImage();
-        });
-
         //Selected character info BOX
         const area = GridUtils.uiGrid(6, 1);
         const playerPanelWidth = area.cellW * 3;
@@ -230,11 +223,12 @@ export class LobbyScene extends BaseScene {
     private buildClassesTab(container: Phaser.GameObjects.Container) {
         const classes = this.classes.filter((charClass) => charClass.playable);
         const classesPerRow = 3;
-        const rows = 2; 
-        const padding = 100; 
+        const rows = 2;
+        const padding = 100;
 
         const grid = GridUtils.uiGrid(
-            0, 0,
+            0,
+            0,
             container.width,
             this.tabHeight,
             classesPerRow,
@@ -256,29 +250,27 @@ export class LobbyScene extends BaseScene {
                 backgroundImage: CharacterIconAsset.getAssetKey(charClass.id),
                 borderWidth: 7,
                 onClick: () => {
-                    this.events.emit("class-selected", charClass);
+                    this.updatePlayerImage(charClass.id);
                 },
             });
             container.add(classContainer);
         });
     }
 
-    updatePlayerImage() {
-        if (!this.selectClassId) return;
-
+    updatePlayerImage(classId: string) {
+        this.selectClassId = classId;
         this.lobbySocket.changeClass({
-            classId: this.selectClassId,
+            classId,
         });
 
         // Met directement la nouvelle image
         this.playerImageContainer.setBackgroundImage(
-            CharacterCloseupAsset.getAssetKey(this.selectClassId) ?? "",
+            CharacterCloseupAsset.getAssetKey(classId) ?? "",
         );
 
         // Met à jour le nom
         this.playerClassName.setTitle(
-            this.classes.find(({ id }) => id === this.selectClassId)?.name ??
-                "",
+            this.classes.find(({ id }) => id === classId)?.name ?? "",
         );
     }
 }
