@@ -12,7 +12,7 @@ export class ActionManager {
         this.scene = scene;
     }
 
-    clearCurentAction() {
+    public clearCurrentAction() {
         this.currentAction = undefined;
     }
 
@@ -21,7 +21,7 @@ export class ActionManager {
             actionId: this.currentAction?.id || "",
             target: pos,
         });
-        this.clearCurentAction();
+        this.clearCurrentAction();
     }
 
     calculateDamagePreview(

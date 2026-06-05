@@ -174,6 +174,7 @@ export class BoardDisplayer extends FightSceneDisplayer {
                         }
                     }
                     this.scene.rangeVisualizer.clearRange();
+                    this.scene.actionManager.clearCurrentAction();
                 });
                 zone.on("pointerover", () => {
                     hoverGraphics.setVisible(true);
