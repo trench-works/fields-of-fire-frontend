@@ -195,15 +195,13 @@ export class BoardDisplayer extends FightSceneDisplayer {
                                 this.scene.actionManager.currentAction;
                             if (action.id !== "walk") {
                                 this.scene.tooltip.showNow(
-                                    "Estimated Damage: " +
-                                        this.scene.actionManager
-                                            .calculateDamagePreview(
-                                                action,
-                                                this.playerStore.playerEntity,
-                                                entity,
-                                            )
-                                            .join(" - ") +
-                                        " ❤️",
+                                    `Estimated ${(action.damage?.max ?? 0) <= 0 ? "Healing" : "Damage"}: ${this.scene.actionManager
+                                        .calculateDamagePreview(
+                                            action,
+                                            this.playerStore.playerEntity,
+                                            entity,
+                                        )
+                                        .join(" - ")}  ❤️`,
                                     `Attaquer sur cette case`,
                                     { x: zone.x, y: zone.y - 300 },
                                 );

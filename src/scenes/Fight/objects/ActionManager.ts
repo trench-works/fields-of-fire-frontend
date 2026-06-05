@@ -40,11 +40,14 @@ export class ActionManager {
                 : Math.ceil(attackerStats.precision / 10);
 
         const minBrut = action.damage.min + statBonus;
-        const maxBrut = action.damage.min + statBonus;
+        const maxBrut = action.damage.max + statBonus;
 
+        if (action.damage.max <= 0) {
+            return [Math.abs(maxBrut), Math.abs(minBrut)];
+        }
         return [
-            minBrut - Math.ceil(minBrut * (targetStats!.armor / 100)),
-            maxBrut - Math.ceil(maxBrut * (targetStats!.armor / 100)),
+            minBrut - Math.ceil(minBrut * (targetStats.armor / 100)),
+            maxBrut - Math.ceil(maxBrut * (targetStats.armor / 100)),
         ];
     }
 }
