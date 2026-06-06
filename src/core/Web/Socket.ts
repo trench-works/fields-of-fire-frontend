@@ -19,10 +19,12 @@ export class Socket<
     private key: RessourceKey | undefined;
 
     private onCloseListeners: (() => void)[];
+    private onSubscribedListeners: (() => void)[];
 
     constructor(private readonly topic: string) {
         this.isError = false;
         this.onCloseListeners = [];
+        this.onSubscribedListeners = [];
     }
 
     protected open(key: RessourceKey) {
@@ -81,10 +83,14 @@ export class Socket<
     private handleMessage({ data }: MessageEvent) {
         const { payload, actionId }: InputAction<OutputActions> =
             JSON.parse(data);
-        const listeners = this.listeners.get(actionId);
-        if (listeners) {
-            for (const listener of listeners) {
-                listener(payload);
+        if (actionId === "subscribed") {
+            this.onSubscribedListeners.forEach((listener) => listener());
+        } else {
+            const listeners = this.listeners.get(actionId);
+            if (listeners) {
+                for (const listener of listeners) {
+                    listener(payload);
+                }
             }
         }
     }
@@ -100,6 +106,10 @@ export class Socket<
         } else {
             this.listeners.set(action, [listener]);
         }
+    }
+
+    onSubscribed(listener: () => void): Error | void {
+        this.onSubscribedListeners.push(listener);
     }
 
     onClose(listener: () => void): Error | void {

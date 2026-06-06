@@ -13,6 +13,7 @@ enum GamePlayerActions {
 
 enum GamePlayerEvents {
     UPDATE = "update",
+    GAME_END = "game-end",
 }
 
 type GamePlayerKey = {
@@ -44,6 +45,8 @@ export type GameEventAnimation = GameMoveAnimation | GameAttackAnimation;
 
 export type GameUpdateEvent = AnimatedPayload<Game, GameEventAnimation>;
 
+export type GameEndEvent = { lobbyId: string; playerWin: boolean };
+
 export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
     constructor(gameId: string, playerId: string) {
         super(GAME_TOPIC);
@@ -60,6 +63,10 @@ export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
 
     onUpdate(listener: SocketListener<GameUpdateEvent>): void {
         this.on(GamePlayerEvents.UPDATE, listener);
+    }
+
+    onGameEnd(listener: SocketListener<GameEndEvent>): void {
+        this.on(GamePlayerEvents.GAME_END, listener);
     }
 }
 

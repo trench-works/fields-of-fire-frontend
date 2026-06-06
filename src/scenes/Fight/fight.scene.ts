@@ -37,6 +37,8 @@ import { StatsDisplayer } from "./components/StatsDisplayer";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { ParticleAsset } from "../../assets/ParticleAsset";
 import { AttackDisplayer } from "./components/attack/AttackDisplayer";
+import { MenuSocket } from "../LobbyList/repositories/menu.socket";
+import { LobbyScene } from "../Lobby/lobby.scene";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -235,6 +237,20 @@ export class FightScene extends BaseScene {
         this.playerSocket = new GamePlayerSocket(game.id, playerId);
         this.playerSocket.onClose(() => MainMenu.start(this));
         this.playerSocket.onUpdate((event) => this.gameUpdateQueue.add(event));
+        this.playerSocket.onGameEnd((event) => {
+            //TODO: DISPLAY POPUP WITH INFO event.playerWin (true|false)
+            const menuSocket = new MenuSocket();
+            menuSocket.onClose(() => MainMenu.start(this));
+            menuSocket.onJoin(({ lobbyId, playerId }) => {
+                LobbyScene.start(this, {
+                    lobbyId,
+                    playerId,
+                });
+            });
+            menuSocket.onSubscribed(() => {
+                menuSocket.joinLobby({ lobbyId: event.lobbyId });
+            });
+        });
     }
 
     preload() {
