@@ -39,7 +39,7 @@ export class Character extends FightSceneDisplayer {
                 CharacterSpriteAsset.getAssetKey(entity.classId),
             );
 
-            this.sprite.setDepth(Math.max(x, y));
+            this.sprite.setDepth(Math.max(x * 10, y * 10) + 1);
             this.sprite.setOrigin(0.5, 0.95);
             this.sprite.setScale(this.scene.scaleFactor / 1.5);
 

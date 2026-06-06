@@ -30,7 +30,7 @@ import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { ClassStore } from "./stores/ClassStore";
 import { GameStore } from "./stores/GameStore";
 import { PlayerStore } from "./stores/PlayerStore";
-import { BoardDisplayer } from "./components/BoardDisplayer";
+import { BoardDisplayer } from "./components/board/BoardDisplayer";
 import { CharactersDisplayer } from "./components/character/CharactersDisplayer";
 import { TurnDisplayer } from "./components/TurnsDisplayer";
 import { StatsDisplayer } from "./components/StatsDisplayer";
