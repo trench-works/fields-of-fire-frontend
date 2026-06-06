@@ -25,9 +25,22 @@ type ActionPlayer = {
     target: Position;
 };
 
-export type GameEventAnimation =
-    | GameAnimation<"move", { entityId: string }>
-    | GameAnimation<"attack", { entityId: string; actionId: string }>;
+export type GameMoveAnimation = GameAnimation<
+    "move",
+    {
+        entityId: string;
+    }
+>;
+export type GameAttackAnimation = GameAnimation<
+    "attack",
+    {
+        entityId: string;
+        actionId: string;
+        target: { x: number; y: number };
+    }
+>;
+
+export type GameEventAnimation = GameMoveAnimation | GameAttackAnimation;
 
 export type GameUpdateEvent = AnimatedPayload<Game, GameEventAnimation>;
 

@@ -96,10 +96,15 @@ export class TurnDisplayer extends FightSceneDisplayer {
         });
         return this;
     }
+
     update(): this {
         this.icons.forEach((icon) => icon.destroy());
         this.icons = [];
         return this.render();
+    }
+
+    animate(): this {
+        return this;
     }
 }
 

@@ -259,5 +259,9 @@ export class StatsDisplayer extends FightSceneDisplayer {
 
         return this;
     }
+
+    animate(): this {
+        return this;
+    }
 }
 

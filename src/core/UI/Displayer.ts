@@ -4,5 +4,7 @@ export abstract class Displayer {
     abstract preRender(): this;
     abstract render(): this;
     abstract update(): this;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    abstract animate(...args: any[]): this;
 }
 

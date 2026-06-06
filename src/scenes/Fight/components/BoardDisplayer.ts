@@ -295,5 +295,9 @@ export class BoardDisplayer extends FightSceneDisplayer {
         this.displayEntitiesHighlights();
         return this;
     }
+
+    animate(): this {
+        return this;
+    }
 }
 
