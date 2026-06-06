@@ -103,7 +103,7 @@ export class TurnDisplayer extends FightSceneDisplayer {
         return this.render();
     }
 
-    animate(): this {
+    async animate(): Promise<this> {
         return this;
     }
 }

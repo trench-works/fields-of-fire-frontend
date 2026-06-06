@@ -3,6 +3,7 @@ import { Character } from "./Character";
 import { GameStore } from "../../stores/GameStore";
 import { FightSceneDisplayer } from "../FightSceneDisplayer";
 import { GameMoveAnimation } from "../../repositories/player.socket";
+import { Game } from "../../../../Model/Game";
 
 export class CharactersDisplayer extends FightSceneDisplayer {
     characters: Character[] = [];
@@ -29,7 +30,7 @@ export class CharactersDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    animate(animation: GameMoveAnimation): this {
+    async animate(animation: GameMoveAnimation, newGame: Game): Promise<this> {
         return this;
     }
 }

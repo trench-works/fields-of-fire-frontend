@@ -10,7 +10,6 @@ import {
 } from "../../../core";
 import { Action } from "../../../Model/Action";
 import { FightScene } from "../fight.scene";
-import { GameAttackAnimation } from "../repositories/player.socket";
 import { GameStore } from "../stores/GameStore";
 import { PlayerStore } from "../stores/PlayerStore";
 import { FightSceneDisplayer } from "./FightSceneDisplayer";
@@ -187,7 +186,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    animate(animation: GameAttackAnimation): this {
+    async animate(): Promise<this> {
         return this;
     }
 }

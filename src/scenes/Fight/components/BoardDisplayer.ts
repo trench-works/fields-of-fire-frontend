@@ -309,7 +309,7 @@ export class BoardDisplayer extends FightSceneDisplayer {
         this.scene.tooltip.showFightingTooltip(tooltipItems);
     }
 
-    animate(): this {
+    async animate(): Promise<this> {
         return this;
     }
 }

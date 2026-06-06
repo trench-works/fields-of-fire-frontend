@@ -5,6 +5,6 @@ export abstract class Displayer {
     abstract render(): this;
     abstract update(): this;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    abstract animate(...args: any[]): this;
+    abstract animate(...args: any[]): Promise<this>;
 }
 
