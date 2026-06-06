@@ -1,18 +1,17 @@
-import { MiscAsset, MiscAssetId } from "../../../assets";
-import { Position } from "../../../core";
-import { Diamond } from "../../../core/Objects/Diamond";
-import { scaleAndCenter } from "../../../core/Utils/Scale";
-import { EntityType } from "../../../Model/Entity";
-import { FightScene } from "../fight.scene";
-import { ClassStore } from "../stores/ClassStore";
-import { GameStore } from "../stores/GameStore";
-import { PlayerStore } from "../stores/PlayerStore";
-import { FightSceneDisplayer } from "./FightSceneDisplayer";
+import { MiscAsset, MiscAssetId } from "../../../../assets";
+import { Position } from "../../../../core";
+import { Diamond } from "../../../../core/Objects/Diamond";
+import { scaleAndCenter } from "../../../../core/Utils/Scale";
+import { EntityType } from "../../../../Model/Entity";
+import { FightScene } from "../../fight.scene";
+import { ClassStore } from "../../stores/ClassStore";
+import { GameStore } from "../../stores/GameStore";
+import { PlayerStore } from "../../stores/PlayerStore";
+import { FightSceneDisplayer } from "../FightSceneDisplayer";
 
-export class BoardDisplayer extends FightSceneDisplayer {
-    private entityHighlights: Phaser.GameObjects.Graphics[] = [];
+export class GroundDisplayer extends FightSceneDisplayer {
+    private tileHighlights: Phaser.GameObjects.Graphics[] = [];
     private groundLayer: Phaser.Tilemaps.TilemapLayer | null = null;
-    private wallLayer: Phaser.Tilemaps.TilemapLayer | null = null;
 
     constructor(
         scene: FightScene,
@@ -58,24 +57,13 @@ export class BoardDisplayer extends FightSceneDisplayer {
             centerMap.offsetX,
             centerMap.offsetY,
         );
-        this.wallLayer = map.createLayer(
-            "Wall",
-            tileset!,
-            centerMap.offsetX,
-            centerMap.offsetY - 32 * this.scene.scaleFactor,
-        );
 
         if (!this.groundLayer) {
             throw new Error("Ground layer seemingly inexistent");
         }
-        if (!this.wallLayer) {
-            throw new Error("Wall layer seemingly inexistent");
-        }
 
         this.groundLayer.setScale(this.scene.scaleFactor);
         this.groundLayer.setDepth(0);
-        this.wallLayer.setScale(this.scene.scaleFactor);
-        this.wallLayer.setDepth(1);
 
         this.generatePlayGrid();
         this.displayEntitiesHighlights();
@@ -83,13 +71,13 @@ export class BoardDisplayer extends FightSceneDisplayer {
     }
 
     private displayEntitiesHighlights() {
-        if (!this.groundLayer || !this.wallLayer) {
+        if (!this.groundLayer) {
             return;
         }
-        for (const highlightEntity of this.entityHighlights) {
+        for (const highlightEntity of this.tileHighlights) {
             highlightEntity.destroy();
         }
-        this.entityHighlights = [];
+        this.tileHighlights = [];
         for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
                 const caseTile = this.gameStore.game.plateau[x][y];
@@ -109,28 +97,18 @@ export class BoardDisplayer extends FightSceneDisplayer {
                                     entity.entityId === caseTile.entityId,
                             );
                             if (entity) {
-                                this.entityHighlights.push(
+                                this.tileHighlights.push(
                                     this.getTileHighlights(tile, {
                                         color:
                                             entity.entityType ===
                                             EntityType.ALLY
                                                 ? 0x00ff00
                                                 : 0xff0000,
-                                        depth: 2,
+                                        depth: Math.max(x * 10, y * 10),
                                     }),
                                 );
                             }
                         }
-                    }
-                }
-
-                // Wall part
-                const wallTile = this.wallLayer.getTileAt(x, y);
-                if (wallTile) {
-                    if (caseTile.isWall) {
-                        //changer la depth de la wallTile
-                    } else {
-                        wallTile.setVisible(false);
                     }
                 }
             }
@@ -138,7 +116,7 @@ export class BoardDisplayer extends FightSceneDisplayer {
     }
 
     private generatePlayGrid() {
-        if (!this.groundLayer || !this.wallLayer) {
+        if (!this.groundLayer) {
             return;
         }
         for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
