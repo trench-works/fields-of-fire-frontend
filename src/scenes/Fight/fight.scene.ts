@@ -1,4 +1,3 @@
-import { Character } from "./components/character/Character";
 import {
     GridUtils,
     Position,
@@ -37,6 +36,7 @@ import { TurnDisplayer } from "./components/TurnsDisplayer";
 import { StatsDisplayer } from "./components/StatsDisplayer";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { ParticleAsset } from "../../assets/ParticleAsset";
+import { AttackDisplayer } from "./components/attack/AttackDisplayer";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -86,6 +86,7 @@ export class FightScene extends BaseScene {
     private turns: TurnDisplayer;
     private playerStats: StatsDisplayer;
     private inspectStats: StatsDisplayer;
+    private attacks: AttackDisplayer;
 
     /**
      * Sockets
@@ -102,7 +103,6 @@ export class FightScene extends BaseScene {
     public tooltip!: Tooltip;
 
     public fightMap = "chessmap";
-    public characters: Character[] = [];
     public gridPositions: Cell[][] = [];
     public scaleFactor: number = 1;
 
@@ -147,6 +147,7 @@ export class FightScene extends BaseScene {
             x: 7,
             y: 6,
         });
+        this.attacks = new AttackDisplayer(this, this.gameStore);
 
         /**
          * Utils
@@ -186,6 +187,14 @@ export class FightScene extends BaseScene {
          */
         for (const animation of animations) {
             console.log(animation); //TODO: instead filter and handle those animations in their respective displayers
+            switch (animation.key) {
+                case "move":
+                    await this.character.animate(animation, game);
+                    break;
+                case "attack":
+                    await this.attacks.animate(animation, game);
+                    break;
+            }
         }
 
         /**

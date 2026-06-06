@@ -260,7 +260,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    animate(): this {
+    async animate(): Promise<this> {
         return this;
     }
 }

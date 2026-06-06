@@ -3,6 +3,7 @@ import { FightScene } from "../../fight.scene";
 import { GameStore } from "../../stores/GameStore";
 import { CharacterSpriteAsset } from "../../../../assets";
 import { GameMoveAnimation } from "../../repositories/player.socket";
+import { Game } from "../../../../Model/Game";
 
 export class Character extends FightSceneDisplayer {
     constructor(
@@ -95,7 +96,7 @@ export class Character extends FightSceneDisplayer {
         return this;
     }
 
-    animate(animation: GameMoveAnimation): this {
+    async animate(animation: GameMoveAnimation, newGame: Game): Promise<this> {
         return this;
     }
 }

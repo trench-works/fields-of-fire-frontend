@@ -296,7 +296,7 @@ export class BoardDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    animate(): this {
+    async animate(): Promise<this> {
         return this;
     }
 }

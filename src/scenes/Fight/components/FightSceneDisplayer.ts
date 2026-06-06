@@ -1,4 +1,5 @@
 import { Displayer } from "../../../core";
+import { Game } from "../../../Model/Game";
 import { FightScene } from "../fight.scene";
 import { GameEventAnimation } from "../repositories/player.socket";
 import { GameStore } from "../stores/GameStore";
@@ -13,6 +14,9 @@ export abstract class FightSceneDisplayer extends Displayer {
         super(scene);
     }
 
-    abstract animate(animation: GameEventAnimation): this;
+    abstract animate(
+        animation: GameEventAnimation,
+        newGame: Game,
+    ): Promise<this>;
 }
 
