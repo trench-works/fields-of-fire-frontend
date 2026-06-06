@@ -20,6 +20,11 @@ export class Character extends FightSceneDisplayer {
 
     protected sprite: Phaser.GameObjects.Sprite | undefined;
 
+    destroy(): this {
+        this.sprite?.destroy();
+        return this;
+    }
+
     //Joue l'animation d'idle par défaut du personnage, ou une animation spécifique si une clé est fournie
     playAnimation(key: string) {
         if (!this.sprite) return;

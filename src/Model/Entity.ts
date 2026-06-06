@@ -15,5 +15,6 @@ export type Entity = {
     entityType: EntityType;
     stats: Stats;
     effects: Effect[];
+    dead: boolean;
 };
 

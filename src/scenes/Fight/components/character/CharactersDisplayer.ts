@@ -26,7 +26,14 @@ export class CharactersDisplayer extends FightSceneDisplayer {
     }
 
     update(): this {
-        this.characters.forEach((character) => character.update());
+        for (const character of this.characters) {
+            const entity = this.gameStore.getEntity(character.entityId);
+            if (entity.dead) {
+                character.destroy();
+            } else {
+                character.update();
+            }
+        }
         return this;
     }
 
