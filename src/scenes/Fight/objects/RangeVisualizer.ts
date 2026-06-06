@@ -136,6 +136,10 @@ export class RangeVisualizer {
     }
 
     spellZonePreview(action: Action, target: Position) {
+        if (!this.isInRange(target)) {
+            return;
+        }
+
         if (!action.zoneType) {
             const cell = this.scene.gridPositions[target.x]?.[target.y];
             if (cell) {

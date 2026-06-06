@@ -233,6 +233,12 @@ export class BoardDisplayer extends FightSceneDisplayer {
                                 }
                             }
                         }
+                        if (this.scene.actionManager.currentAction) {
+                            this.scene.rangeVisualizer.spellZonePreview(
+                                this.scene.actionManager.currentAction,
+                                new Position(x, y),
+                            );
+                        }
                     });
                     zone.on("pointerout", () => {
                         hoverGraphics.setVisible(false);
