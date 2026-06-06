@@ -215,34 +215,16 @@ export class BoardDisplayer extends FightSceneDisplayer {
                                     `❤️ ${entity.stats.life} PV`,
                                     { x: zone.x, y: zone.y - 300 },
                                 );
-                            } else {
-                                const action =
-                                    this.scene.actionManager.currentAction;
-                                if (action.id !== "walk") {
-                                    this.scene.tooltip.showNow(
-                                        `Estimated ${(action.damage?.max ?? 0) <= 0 ? "Healing" : "Damage"}: ${this.scene.actionManager
-                                            .calculateDamagePreview(
-                                                action,
-                                                this.playerStore.playerEntity,
-                                                entity,
-                                            )
-                                            .join(" - ")}  ❤️`,
-                                        `Attaquer sur cette case`,
-                                        { x: zone.x, y: zone.y - 300 },
-                                    );
-                                }
-                            }
+                            } 
                         }
                         if (this.scene.actionManager.currentAction) {
-                            this.scene.rangeVisualizer.spellZonePreview(
-                                this.scene.actionManager.currentAction,
-                                new Position(x, y),
-                            );
+                            this.manageToolTip(x, y);
                         }
                     });
                     zone.on("pointerout", () => {
                         hoverGraphics.setVisible(false);
                         this.scene.tooltip.hide();
+                        this.scene.rangeVisualizer.clearZonePreview();
                     });
 
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -294,6 +276,37 @@ export class BoardDisplayer extends FightSceneDisplayer {
     update(): this {
         this.displayEntitiesHighlights();
         return this;
+    }
+
+    manageToolTip(x?: number, y?: number) {
+        const action = this.scene.actionManager.currentAction;
+        if (!action) return;
+
+        const zoneCells = this.scene.rangeVisualizer.spellZonePreview(action, new Position(x, y));
+        if (!zoneCells || action.id === "walk") return;
+
+        // ✅ collecte tous les tooltips à afficher
+        const tooltipItems: { text: string; title?: string; position: { x: number; y: number } }[] = [];
+
+        zoneCells.forEach((cell) => {
+            const entityId = this.gameStore.game.plateau[cell.gridPosition.x][cell.gridPosition.y].entityId;
+            if (!entityId) return;
+
+            const targetEntity = this.gameStore.getEntity(entityId);
+            if (!targetEntity) return;
+
+            const damagePreview = this.scene.actionManager
+                .calculateDamagePreview(action, this.playerStore.playerEntity, targetEntity)
+                .join(" - ");
+
+            tooltipItems.push({
+                text: `${(action.damage?.max ?? 0) <= 0 ? "🩹" : "⚔️"} ${damagePreview}`,
+                title: this.classStore.getClass(targetEntity.classId).name,
+                position: { x: cell.pixelPosition.x, y: cell.pixelPosition.y - 300 },
+            });
+        });
+
+        this.scene.tooltip.showFightingTooltip(tooltipItems);
     }
 }
 

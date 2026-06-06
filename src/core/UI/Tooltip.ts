@@ -26,6 +26,7 @@ export class Tooltip extends Phaser.GameObjects.Container {
     private cfg: Required<TooltipConfig>;
     private showTimer: Phaser.Time.TimerEvent | null = null;
     private fixedTarget: Phaser.GameObjects.Sprite | null = null; // ✅ référence dynamique
+    private activeTooltips: Phaser.GameObjects.Container[] = [];
 
     private constructor(scene: Phaser.Scene, config: TooltipConfig = {}) {
         super(scene, 0, 0);
@@ -169,6 +170,7 @@ export class Tooltip extends Phaser.GameObjects.Container {
     public hide(): void {
         this.fixedTarget = null;
         this.fixedPosition = null;
+        this.clearMultiple();
         this.setVisible(false);
     }
 
@@ -215,4 +217,61 @@ export class Tooltip extends Phaser.GameObjects.Container {
             this.setPosition(position.x - tooltipW / 2, position.y);
         }
     }
+
+    public showFightingTooltip(items: { text: string; title?: string; position: { x: number; y: number } }[]): void {
+        this.clearMultiple(); // nettoie les précédents
+
+        items.forEach(({ text, title, position }) => {
+            const pad = this.cfg.padding;
+            const gap = 4;
+
+            const bg = this.scene.make.graphics({}, false);
+
+            const titleLabel = this.scene.add.text(pad, pad, "", {
+                fontFamily: "MyFont",
+                fontSize: this.cfg.titleFontSize + "px",
+                color: this.cfg.titleColor,
+                fontStyle: "bold",
+            }).setOrigin(0, 0);
+
+            const bodyLabel = this.scene.add.text(pad, pad, "", {
+                fontFamily: "MyFont",
+                fontSize: this.cfg.fontSize + "px",
+                color: this.cfg.textColor,
+            }).setOrigin(0, 0);
+
+            if (title) {
+                titleLabel.setText(title.charAt(0).toUpperCase() + title.slice(1)).setVisible(true);
+                bodyLabel.setText(text).setVisible(true);
+                bodyLabel.setPosition(pad, pad + titleLabel.height + gap);
+            } else {
+                titleLabel.setVisible(false);
+                bodyLabel.setText(text).setPosition(pad, pad);
+            }
+
+            const contentH = title ? titleLabel.height + gap + bodyLabel.height : bodyLabel.height;
+            const w = Math.max(titleLabel.width, bodyLabel.width) + pad * 2;
+            const h = contentH + pad * 2;
+
+            bg.fillStyle(0x000000, 0.4);
+            bg.fillRoundedRect(2, 2, w, h, 6);
+            bg.fillStyle(ColorUtils.parseColor(this.cfg.bgColor), 0.5);
+            bg.fillRoundedRect(0, 0, w, h, 6);
+            
+
+            const container = this.scene.add.container(
+                position.x - w / 2,
+                position.y,
+                [bg, titleLabel, bodyLabel]
+            );
+            container.setDepth(9999);
+            this.activeTooltips.push(container);
+        });
+    }
+
+    public clearMultiple(): void {
+        this.activeTooltips.forEach(c => c.destroy());
+        this.activeTooltips = [];
+    }
+
 }

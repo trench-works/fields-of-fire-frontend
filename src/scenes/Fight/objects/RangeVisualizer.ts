@@ -1,52 +1,45 @@
 import { Position } from "../../../core";
-import { Action } from "../../../Model/Action";
+import { Action, ActionZoneType } from "../../../Model/Action";
 import { Cell, FightScene } from "../fight.scene";
 import { GameStore } from "../stores/GameStore";
 
 export class RangeVisualizer {
     private cellsInRange: Cell[] = [];
+    private zoneHighlights: Phaser.GameObjects.Graphics[] = [];
 
     constructor(
         private readonly scene: FightScene,
         private readonly gameStore: GameStore,
     ) {}
 
-    private highlightCell(cell: Cell, color: number = 0x00aaff) {
+    private highlightCell(cell: Cell, color: number = 0x00aaff): Phaser.GameObjects.Graphics {
         const g = this.scene.add.graphics();
-        g.fillStyle(color, 0.6); // bleu transparent
+        g.fillStyle(color, 0.6);
         g.fillPoints(
             [
-                new Phaser.Geom.Point(
-                    -32 * this.scene.scaleFactor,
-                    0 * this.scene.scaleFactor,
-                ),
+                new Phaser.Geom.Point(-32 * this.scene.scaleFactor, 0),
                 new Phaser.Geom.Point(0, -16 * this.scene.scaleFactor),
-                new Phaser.Geom.Point(
-                    32 * this.scene.scaleFactor,
-                    0 * this.scene.scaleFactor,
-                ),
+                new Phaser.Geom.Point(32 * this.scene.scaleFactor, 0),
                 new Phaser.Geom.Point(0, 16 * this.scene.scaleFactor),
             ],
             true,
         );
-
         g.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
         g.setDepth(2);
-
-        // On stocke l’overlay pour pouvoir le retirer plus tard
-        cell.highlight = g;
+        return g; // ✅ ne stocke plus sur cell.highlight ici
     }
 
     showRange(): this {
         this.cellsInRange.forEach((cell) => {
             if (cell) {
-                this.highlightCell(cell);
+                 cell.highlight = this.highlightCell(cell);
             }
         });
         return this;
     }
 
     clearRange(): this {
+        this.clearZonePreview();
         for (const cell of this.cellsInRange) {
             if (cell?.highlight) {
                 cell.highlight.destroy();
@@ -135,32 +128,36 @@ export class RangeVisualizer {
             );
     }
 
-    spellZonePreview(action: Action, target: Position) {
-        if (!this.isInRange(target)) {
-            return;
-        }
+    clearZonePreview() {
+        this.zoneHighlights.forEach((g) => g.destroy());
+        this.zoneHighlights = [];
+    }
 
-        if (!action.zoneType) {
-            const cell = this.scene.gridPositions[target.x]?.[target.y];
-            if (cell) {
-                this.highlightCell(cell, 0x42a97b);
-            }
-        } else {
-            switch (action.zoneType) {
-                case 'DIAMOND':
-                    if (!action.zoneSize) {
-                        return;
-                    }
-                    for (let x = target.x - action.zoneSize; x <= target.x + action.zoneSize; x++) {
-                        for (let y = target.y - action.zoneSize; y <= target.y + action.zoneSize; y++) {
-                            if (Math.abs(target.x - x) + Math.abs(target.y - y) <= action!.zoneSize) {
-                                this.highlightCell(this.scene.gridPositions[x]?.[y], 0x42a97b);
-                            }
+    spellZonePreview(action: Action, target: Position){
+        this.clearZonePreview(); // ✅ nettoie avant de redessiner
+        const zoneCells: Cell[] = [];
+
+        if (!this.isInRange(target)) return;
+        if (!action.zoneType?.length) return;
+        switch (action.zoneType[0]) {
+            case ActionZoneType.DIAMOND:
+                if (!action.zoneSize) return;
+            const zoneSize = action.zoneSize - 1;
+            for (let x = target.x - zoneSize; x <= target.x + zoneSize; x++) {
+                for (let y = target.y - zoneSize; y <= target.y + zoneSize; y++) {
+                    if (Math.abs(target.x - x) + Math.abs(target.y - y) <= zoneSize) {
+                        const cell = this.scene.gridPositions[x]?.[y];
+                        if (cell) {
+                            this.zoneHighlights.push(this.highlightCell(cell, 0x42a97b));
+                            zoneCells.push(cell);
                         }
                     }
-                    break;
+                }
             }
-        }
+                break;
+            }
+
+        return zoneCells;
     }
     
 }

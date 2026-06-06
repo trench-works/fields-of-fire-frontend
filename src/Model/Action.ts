@@ -9,7 +9,7 @@ export class Action {
     actionType!: ActionType;
     effectList?: Effect[];
     range?: number;
-    zoneType?: string;
+    zoneType?: ActionZoneType;
     zoneSize?: number;
     mooveToTarget?: Position;
     pushValue?: number;
@@ -22,3 +22,9 @@ export enum ActionType {
     RANGED = "RANGED"
 }
 
+export enum ActionZoneType {
+    DIAMOND = "diamond",
+    CIRCLE = "circle",
+    PLUS = "plus",
+    XCROSS = "xcross",
+}
