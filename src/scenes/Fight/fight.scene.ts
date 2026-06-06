@@ -177,16 +177,10 @@ export class FightScene extends BaseScene {
         scene.scene.start(SceneAssetId.FIGHT, data);
     }
 
-    private handleUpdate({
-        game,
+    private async handleUpdate({
+        data: game,
         animations,
-    }: GameUpdateEvent): Promise<void>[] {
-        /**
-         * Update Store
-         */
-        this.gameStore.setGame(game);
-        this.playerStore.update();
-
+    }: GameUpdateEvent): Promise<void> {
         /**
          * Do animations !!!!!
          */
@@ -194,6 +188,11 @@ export class FightScene extends BaseScene {
             console.log(animation); //TODO: instead filter and handle those animations in their respective displayers
         }
 
+        /**
+         * Update Store
+         */
+        this.gameStore.setGame(game);
+        this.playerStore.update();
         /**
          * Update Displayers
          */
@@ -210,7 +209,7 @@ export class FightScene extends BaseScene {
             this.inspectCharacter(this.inspectStats.entityId);
         }
 
-        return [new Promise((resolve) => setTimeout(resolve, 1000))];
+        await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
     init({ game, player: { playerId } }: FightSceneInit) {

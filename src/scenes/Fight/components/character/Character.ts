@@ -2,6 +2,7 @@ import { FightSceneDisplayer } from "../FightSceneDisplayer";
 import { FightScene } from "../../fight.scene";
 import { GameStore } from "../../stores/GameStore";
 import { CharacterSpriteAsset } from "../../../../assets";
+import { GameMoveAnimation } from "../../repositories/player.socket";
 
 export class Character extends FightSceneDisplayer {
     constructor(
@@ -91,6 +92,10 @@ export class Character extends FightSceneDisplayer {
         this.sprite.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
         this.sprite.setDepth(Math.max(x, y));
 
+        return this;
+    }
+
+    animate(animation: GameMoveAnimation): this {
         return this;
     }
 }

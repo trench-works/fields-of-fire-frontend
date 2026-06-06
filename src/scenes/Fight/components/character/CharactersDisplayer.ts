@@ -2,6 +2,7 @@ import { FightScene } from "../../fight.scene";
 import { Character } from "./Character";
 import { GameStore } from "../../stores/GameStore";
 import { FightSceneDisplayer } from "../FightSceneDisplayer";
+import { GameMoveAnimation } from "../../repositories/player.socket";
 
 export class CharactersDisplayer extends FightSceneDisplayer {
     characters: Character[] = [];
@@ -25,6 +26,10 @@ export class CharactersDisplayer extends FightSceneDisplayer {
 
     update(): this {
         this.characters.forEach((character) => character.update());
+        return this;
+    }
+
+    animate(animation: GameMoveAnimation): this {
         return this;
     }
 }

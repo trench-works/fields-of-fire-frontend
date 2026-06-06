@@ -1,4 +1,5 @@
-import { Position, Socket, SocketListener } from "../../../core";
+import { GameAnimation, Position, Socket, SocketListener } from "../../../core";
+import { AnimatedPayload } from "../../../core";
 import { Game } from "../../../Model/Game";
 const GAME_TOPIC = "game";
 /**
@@ -24,16 +25,24 @@ type ActionPlayer = {
     target: Position;
 };
 
-export type GameAnimation = {
-    key: "move" | "action";
-    entityId: string;
-    data: Record<string, any>;
-};
+export type GameMoveAnimation = GameAnimation<
+    "move",
+    {
+        entityId: string;
+    }
+>;
+export type GameAttackAnimation = GameAnimation<
+    "attack",
+    {
+        entityId: string;
+        actionId: string;
+        target: { x: number; y: number };
+    }
+>;
 
-export type GameUpdateEvent = {
-    game: Game;
-    animations: GameAnimation[];
-};
+export type GameEventAnimation = GameMoveAnimation | GameAttackAnimation;
+
+export type GameUpdateEvent = AnimatedPayload<Game, GameEventAnimation>;
 
 export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
     constructor(gameId: string, playerId: string) {
