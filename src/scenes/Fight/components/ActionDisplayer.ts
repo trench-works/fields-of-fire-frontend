@@ -53,8 +53,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
                     this.playerStore.playerEntity.stats.mouvement,
                 );
                 break;
-            case ActionAssetId.SHOOT:
-            case ActionAssetId.HEAL:
+            default:
                 if (!hasEnergy) {
                     return;
                 }
@@ -158,19 +157,12 @@ export class ActionDisplayer extends FightSceneDisplayer {
                             : UNCLICKABLE_ALPHA,
                     );
                     break;
-                case ActionAssetId.SHOOT:
-                case ActionAssetId.HEAL:
+                default:
                     actionObject.setInteractive(isPlayerTurn && hasEnergy);
                     actionObject.setAlpha(
                         isPlayerTurn && hasEnergy
                             ? CLICKABLE_ALPHA
                             : UNCLICKABLE_ALPHA,
-                    );
-                    break;
-                default:
-                    actionObject.setInteractive(isPlayerTurn);
-                    actionObject.setAlpha(
-                        isPlayerTurn ? CLICKABLE_ALPHA : UNCLICKABLE_ALPHA,
                     );
                     break;
             }

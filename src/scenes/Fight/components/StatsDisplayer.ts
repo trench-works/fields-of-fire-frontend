@@ -91,7 +91,6 @@ export class StatsDisplayer extends FightSceneDisplayer {
     }
 
     preRender(): this {
-        // 1) Tu récupères la zone du panel dans la grille globale
         const statsArea = this.scene.sceneGrid.getArea(
             this.position.x,
             this.position.y,
@@ -99,7 +98,6 @@ export class StatsDisplayer extends FightSceneDisplayer {
             3,
         );
 
-        // 2) Tu crées le panel
         this.statsPanel = new CustomContainer(this.scene, {
             title: "",
             x: statsArea.x + statsArea.width / 2,
@@ -110,7 +108,6 @@ export class StatsDisplayer extends FightSceneDisplayer {
             opacity: 0.5,
         });
 
-        // 3) Tu crées une grille *interne* au panel
         const statsGrid = GridUtils.uiGrid(
             0,
             0,
