@@ -2,7 +2,7 @@ export class EventQueue<T> {
     private readonly events: T[];
     private isAwaiting: boolean;
 
-    constructor(private readonly treate: (event: T) => Promise<void>[]) {
+    constructor(private readonly treate: (event: T) => Promise<void>) {
         this.events = [];
         this.isAwaiting = false;
     }
@@ -23,10 +23,7 @@ export class EventQueue<T> {
         }
 
         this.isAwaiting = true;
-        const promises = this.treate(event);
-        if (promises.length) {
-            await Promise.all(promises);
-        }
+        await this.treate(event);
         this.isAwaiting = false;
 
         if (this.events.length) {
