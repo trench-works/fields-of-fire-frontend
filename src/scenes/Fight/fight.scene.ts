@@ -247,7 +247,8 @@ export class FightScene extends BaseScene {
         );
 
         ParticleAsset.loadAll(this.load);
-        MiscAsset.load(this.load, MiscAssetId.GROUND_TILE);
+        MiscAsset.load(this.load, MiscAssetId.GROUND);
+        MiscAsset.load(this.load, MiscAssetId.WALL);
         CharacterCloseupAsset.loadAll(this.load);
         CharacterSpriteAsset.loadAll(this.load);
         IconAsset.loadAll(this.load);

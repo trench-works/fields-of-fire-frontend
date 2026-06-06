@@ -58,6 +58,18 @@
             "tilewidth": 64,
             "name": "ground",
             "offset": { "x": 0, "y": 32 }
+        },
+        {
+            "columns": 5,
+            "firstgid": 1,
+            "image": "misc/wall.png",
+            "imageheight": 64,
+            "imagewidth": 320,
+            "margin": 0,
+            "tileheight": 64,
+            "tilewidth": 64,
+            "name": "wall",
+            "offset": { "x": 0, "y": 32 }
         }
     ],
     "tilewidth": 64,

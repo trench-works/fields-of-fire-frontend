@@ -1,7 +1,8 @@
 import { ImageAssetManager } from "../core/Assets/Asset";
 
 export enum MiscAssetId {
-    GROUND_TILE = "ground",
+    GROUND = "ground",
+    WALL = "wall",
     BULLET = "bullet",
 }
 
@@ -16,7 +17,8 @@ class MiscAssetManager extends ImageAssetManager<MiscAssetId, string> {
 
     constructor() {
         super("misc", {
-            [MiscAssetId.GROUND_TILE]: "ground",
+            [MiscAssetId.GROUND]: "ground",
+            [MiscAssetId.WALL]: "wall",
             [MiscAssetId.BULLET]: "menuBalle",
         });
     }

@@ -21,8 +21,8 @@ export class WallDisplayer extends FightSceneDisplayer {
             key: this.scene.fightMap,
         });
         const tileset = map.addTilesetImage(
-            MiscAssetId.GROUND_TILE,
-            MiscAsset.getAssetKey(MiscAssetId.GROUND_TILE),
+            MiscAssetId.WALL,
+            MiscAsset.getAssetKey(MiscAssetId.WALL),
         );
 
         const centerMap = scaleAndCenter({
