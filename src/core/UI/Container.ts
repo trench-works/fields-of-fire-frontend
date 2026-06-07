@@ -14,10 +14,11 @@ interface ContainerConfig {
     borderColor?: string;
     backgroundImage?: string;
     opacity?: number;
-    fontsize?: number;
+    fontSize?: number;
     onClick?: () => void;
     textPosition?: { x: number; y: number };
     hoverTint?: number;
+    alpha?: number;
 }
 
 export class CustomContainer extends Phaser.GameObjects.Container {
@@ -27,7 +28,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         | null = null;
     private borderGraphics?: Phaser.GameObjects.Graphics;
     private titleText: Phaser.GameObjects.Text;
-    private onClick: (() => void) | undefined;
+    public onClick: (() => void) | undefined;
     private bgColor: string;
     private bgOpacity: number;
     private hoverTint: number | undefined;
@@ -45,7 +46,8 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             borderColor = Color.containerBorder,
             backgroundImage,
             opacity = 1,
-            fontsize = 24,
+            fontSize = 24,
+            alpha,
             onClick,
             textPosition = { x: 0, y: -height / 2 + 15 },
             hoverTint,
@@ -57,11 +59,15 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         this.bgOpacity = opacity;
         this.onClick = onClick;
         this.hoverTint = hoverTint;
+        if (alpha) {
+            this.alpha = alpha;
+        }
 
         // --- TEXTE ---
         this.titleText = scene.add
             .text(0, 0, title, {
-                font: `${fontsize}px Arial`,
+                fontFamily: "MyFont",
+                fontSize: fontSize,
                 color: titleColor,
             })
             .setOrigin(0.5);
@@ -80,7 +86,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
                 ColorUtils.parseColor(borderColor),
                 borderWidth,
                 width,
-                height
+                height,
             );
             this.add(this.borderGraphics);
         }
@@ -106,7 +112,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         borderColor: number,
         borderWidth: number,
         width: number,
-        height: number
+        height: number,
     ) {
         g.clear();
         g.lineStyle(borderWidth, borderColor, 1);
@@ -132,7 +138,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
                 -height / 2,
                 width,
                 height,
-                10
+                10,
             );
         }
     }
@@ -148,7 +154,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         if (imageKey) {
             const img = this.scene.make.image(
                 { x: 0, y: 0, key: imageKey },
-                false
+                false,
             );
             img.setDisplaySize(width, height);
             img.setOrigin(0.5);
@@ -167,12 +173,10 @@ export class CustomContainer extends Phaser.GameObjects.Container {
 
     private setupEvents() {
         this.on("pointerdown", () => {
-            //console.log("Button clicked!");
             this.onClick?.();
         });
 
         this.on("pointerover", () => {
-            //console.log("Hover over button");
             if (
                 this.hoverTint !== undefined &&
                 this.background instanceof Phaser.GameObjects.Image
@@ -182,7 +186,6 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         });
 
         this.on("pointerout", () => {
-            //console.log("Hover out button");
             if (this.background instanceof Phaser.GameObjects.Image) {
                 this.background.clearTint();
             }

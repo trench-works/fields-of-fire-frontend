@@ -1,10 +1,14 @@
-import { Stats } from './Stats';
+import { Stats } from "./Stats";
 
-export class Effect {
-    constructor(
-        public name: string,
-        public duration: number,
-        public statModification: Stats
-    ){}
-
+export enum EffectType {
+    POISON = "poison",
+    APPLY = "apply",
 }
+
+export type Effect = {
+    name: string;
+    type: EffectType;
+    duration: number;
+    modifier: Stats;
+};
+

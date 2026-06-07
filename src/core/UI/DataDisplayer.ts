@@ -18,10 +18,8 @@ export interface CellArea {
     height: number;
 }
 
-export interface UiObject extends Phaser.GameObjects.GameObject {
-    setPosition(x: number, y: number): this;
-    setDisplaySize(width: number, height: number): this;
-}
+export type DataDisplayObject = Phaser.GameObjects.GameObject &
+    Phaser.GameObjects.Components.Alpha;
 
 export class DataDisplayer extends CustomContainer {
     private grid: UiGrid;
@@ -50,7 +48,7 @@ export class DataDisplayer extends CustomContainer {
                 this.cellAreas[r][c] = {
                     position: new Position(
                         -this.width / 2 + area.centerX,
-                        -this.height / 2 + area.centerY
+                        -this.height / 2 + area.centerY,
                     ),
                     width: area.width,
                     height: area.height,
@@ -59,16 +57,35 @@ export class DataDisplayer extends CustomContainer {
         }
     }
 
+    public placeText(
+        col: number,
+        row: number,
+        value: string | number,
+    ): Phaser.GameObjects.Text {
+        const area = this.cellAreas[row]?.[col];
+        const obj = this.scene.add
+            .text(0, 0, value.toString(), {
+                fontSize: "20px",
+                color: "#fff",
+            })
+            .setOrigin(0.5);
+        obj.setPosition(area.position.x, area.position.y);
+        this.add(obj);
+        return obj;
+    }
+
     public placeContent(
         col: number,
         row: number,
-        value: string | number | { icon: string; onClick?: () => void },
-        iconSize?: number
-    ) {
+        value:
+            | string
+            | number
+            | { icon: string; onClick?: () => void; alpha?: number },
+        iconSize?: number,
+    ): DataDisplayObject {
         const area = this.cellAreas[row]?.[col];
-        if (!area) return;
 
-        let obj: UiObject;
+        let obj: Phaser.GameObjects.Image | Phaser.GameObjects.Text;
 
         if (typeof value === "string" || typeof value === "number") {
             obj = this.scene.add
@@ -80,6 +97,7 @@ export class DataDisplayer extends CustomContainer {
         } else if (value.icon) {
             obj = this.scene.add.image(0, 0, value.icon);
             obj.setDisplaySize(iconSize || 32, iconSize || 32);
+            obj.setAlpha(value.alpha ?? 1);
 
             // --- AJOUT : rendre l’icône interactive si onClick existe ---
             if (value.onClick) {
@@ -95,6 +113,5 @@ export class DataDisplayer extends CustomContainer {
 
         return obj;
     }
-
 }
 

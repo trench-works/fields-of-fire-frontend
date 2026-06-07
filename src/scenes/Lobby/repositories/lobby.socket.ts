@@ -1,44 +1,61 @@
-import { Socket } from "../../../core";
+import { Socket, SocketListener } from "../../../core";
+import { Game } from "../../../Model/Game";
 
-const USER_ID = "dev";
-const LOBBY_TOPIC = "game";
+const LOBBY_TOPIC = "lobby";
 
 type LobbyKey = {
-    gameId: string;
+    lobbyId: string;
 };
 
-type JoinGame = {
-    gameId: string;
+type ChangeClass = {
+    classId: string;
 };
 
-type JoinedGame = {
-    game: { id: string };
-    player: { id: string };
+type LobbyUpdated = {
+    lobbyId: string;
+    players: { playerId: string; classId: string; userId: string }[];
 };
+
+type GameStarted = Game;
 
 enum LobbyActions {
-    JOIN = "join",
+    START = "start",
+    LEAVE = "leave",
+    CHANGE_CLASS = "change-class",
 }
 
 enum LobbyEvents {
-    JOIN = "join",
+    START = "start",
+    UPDATE = "update",
 }
 /**
  * Game Defautl Socket (only for testing purpose, should be removed later)
  */
 
 export class LobbySocket extends Socket<LobbyKey, LobbyActions, LobbyEvents> {
-    constructor(gameId: string) {
+    constructor(lobbyId: string) {
         super(LOBBY_TOPIC);
-        super.open(USER_ID, { gameId });
+        super.open({ lobbyId });
     }
 
-    onJoin(listener: (joinedGame: JoinedGame) => void) {
-        this.on<JoinedGame>(LobbyEvents.JOIN, listener);
+    onStart(listener: SocketListener<GameStarted>) {
+        this.on(LobbyEvents.START, listener);
     }
 
-    joinGame(joinGame: JoinGame) {
-        return this.send<JoinGame>(LobbyActions.JOIN, joinGame);
+    onLobbyUpdate(listener: SocketListener<LobbyUpdated>) {
+        this.on(LobbyEvents.UPDATE, listener);
+    }
+
+    leaveLobby() {
+        return this.send(LobbyActions.LEAVE, {});
+    }
+
+    changeClass(changeClass: ChangeClass) {
+        return this.send(LobbyActions.CHANGE_CLASS, changeClass);
+    }
+
+    startGame() {
+        return this.send(LobbyActions.START, {});
     }
 }
 

@@ -52,7 +52,8 @@ export class MenuPanel extends Phaser.GameObjects.Container {
             scene.scale.height / 2 - 180,
             "MENU",
             {
-                font: "48px Arial",
+                fontFamily: 'MyFont',
+                fontSize: "60px",
                 color: "#FFFFFF",
             }
         );

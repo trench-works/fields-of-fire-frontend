@@ -1,13 +1,13 @@
-export abstract class ImageAssetManager<AssetId extends string, AssetType> {
+export abstract class AssetManager<AssetId extends string, AssetType> {
     constructor(
-        private readonly assetKey: string,
-        private readonly ASSETS: Record<AssetId, AssetType>
+        protected readonly assetKey: string,
+        protected readonly assets: Record<AssetId, AssetType>,
     ) {}
 
     protected abstract getIds(): AssetId[];
     protected abstract getAssetFileLink(
         assetKey: string,
-        asset: AssetType
+        asset: AssetType,
     ): string;
 
     protected isAssetId(id: string): id is AssetId {
@@ -22,26 +22,74 @@ export abstract class ImageAssetManager<AssetId extends string, AssetType> {
 
     load(load: Phaser.Loader.LoaderPlugin, id: string): void {
         if (!this.isAssetId(id)) {
-            console.error(`${id} not a action asset id`);
+            console.error(`${id} not an asset id`);
             return;
         }
-        const asset = this.ASSETS[id];
+        const asset = this.assets[id];
         if (!asset) {
             console.error(`Asset ${id} not found`);
             return;
         }
-        load.image(
-            this.assetKey + id,
-            this.getAssetFileLink(this.assetKey, asset)
-        );
+        this.loader(load, id, asset);
     }
+
+    abstract loader(
+        load: Phaser.Loader.LoaderPlugin,
+        id: string,
+        asset: Record<AssetId, AssetType>[AssetId],
+    ): void;
 
     getAssetKey(id: string): string {
         if (!this.isAssetId(id)) {
             console.error(`${id} not a action asset id`);
             return "";
         }
-        return this.assetKey + id;
+        return `${this.assetKey}_${id}`;
+    }
+}
+
+export abstract class ImageAssetManager<
+    AssetId extends string,
+    AssetType,
+> extends AssetManager<AssetId, AssetType> {
+    constructor(assetKey: string, assets: Record<AssetId, AssetType>) {
+        super(assetKey, assets);
+    }
+
+    loader(
+        load: Phaser.Loader.LoaderPlugin,
+        id: string,
+        asset: Record<AssetId, AssetType>[AssetId],
+    ) {
+        load.image(
+            this.getAssetKey(id),
+            this.getAssetFileLink(this.assetKey, asset),
+        );
+    }
+}
+
+export abstract class SpriteAssetManager<
+    AssetId extends string,
+    AssetType,
+> extends ImageAssetManager<AssetId, AssetType> {
+    constructor(
+        assetKey: string,
+        assets: Record<AssetId, AssetType>,
+        protected readonly frameConfig: Phaser.Types.Loader.FileTypes.ImageFrameConfig,
+    ) {
+        super(assetKey, assets);
+    }
+
+    loader(
+        load: Phaser.Loader.LoaderPlugin,
+        id: string,
+        asset: Record<AssetId, AssetType>[AssetId],
+    ) {
+        load.spritesheet(
+            this.getAssetKey(id),
+            this.getAssetFileLink(this.assetKey, asset),
+            this.frameConfig,
+        );
     }
 }
 

@@ -4,3 +4,4 @@ export * from "./DataDisplayer";
 export * from "./TabManager";
 export * from "./MenuPanel";
 export * from "./MenuButton";
+export * from "./Displayer";

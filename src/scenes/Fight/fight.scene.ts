@@ -1,53 +1,171 @@
-import { Character } from "./objects/Character";
-import { PlayableCharacter } from "../../Model/PlayableCharacter";
 import {
-    GameScene,
-    SceneRenderConfig,
-    DataDisplayer,
-    CustomContainer,
     GridUtils,
     Position,
     PositionUtils,
     MenuButton,
+    BaseScene,
+    EventQueue,
 } from "../../core";
-import { CharacterClass } from "../../Model/CharacterClass";
 import { SceneConfig } from "../../config/SceneConfig";
-import { Color } from "../../config/ColorConfig";
-import { ActionAsset } from "../../assets";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
-import { GamePlayerSocket } from "./repositories/player.repository";
+import {
+    GamePlayerSocket,
+    GameUpdateEvent,
+} from "./repositories/player.socket";
 import { ActionManager } from "./objects/ActionManager";
 import { Tooltip } from "../../core/UI/Tooltip";
+import { Game } from "../../Model/Game";
+import { ClassesRepository } from "../Lobby/repositories/classes.repository";
+import { MainMenu } from "../MainMenu/main-menu.scene";
+import { ActionDisplayer } from "./components/ActionDisplayer";
+import {
+    ActionAsset,
+    CharacterCloseupAsset,
+    CharacterSpriteAsset,
+    IconAsset,
+    MiscAsset,
+    MiscAssetId,
+} from "../../assets";
+import { BackgroundAssetId } from "../../assets/BackgroundAsset";
+import { ClassStore } from "./stores/ClassStore";
+import { GameStore } from "./stores/GameStore";
+import { PlayerStore } from "./stores/PlayerStore";
+import { BoardDisplayer } from "./components/board/BoardDisplayer";
+import { CharactersDisplayer } from "./components/character/CharactersDisplayer";
+import { TurnDisplayer } from "./components/TurnsDisplayer";
+import { StatsDisplayer } from "./components/StatsDisplayer";
+import { SceneAssetId } from "../../assets/ScenesAsset";
+import { ParticleAsset } from "../../assets/ParticleAsset";
+import { AttackDisplayer } from "./components/attack/AttackDisplayer";
+import { MenuSocket } from "../LobbyList/repositories/menu.socket";
+import { LobbyScene } from "../Lobby/lobby.scene";
 
-export class FightScene extends GameScene {
-    public backgroundImage = "red_bg";
-    public fightMap = "chessmap";
-    public tileSetImage = "damier";
-    public tileWidth = 64;
+export type SceneRenderConfig = {
+    tileSize: number;
+    renderType: string;
+    offset: Position;
+};
+
+export type RenderResult = {
+    position: Position;
+    sprite: string;
+};
+
+export type Cell = {
+    gridPosition: Position;
+    pixelPosition: Position;
+    zone: Phaser.GameObjects.Zone;
+    hoverGraphics?: Phaser.GameObjects.Graphics;
+    highlight?: Phaser.GameObjects.Graphics;
+};
+
+export interface Displayable {
+    render(renderConfig: SceneRenderConfig): RenderResult | RenderResult[];
+}
+
+export type FightSceneInit = {
+    game: Game;
+    player: { playerId: string };
+};
+
+export class FightScene extends BaseScene {
     public renderConfig: SceneRenderConfig;
-    private sceneGrid = GridUtils.uiGrid(0, 0);
-    private allExistingStats: string[] = [
-        "life",
-        "initiative",
-        "strength",
-        "precision",
-        "accuracy",
-        "dodging",
-        "energy",
-        "mouvement",
-    ];
+    public sceneGrid = GridUtils.uiGrid(0, 0);
+
+    /**
+     * Stores
+     */
+    protected classStore: ClassStore;
+    protected gameStore: GameStore;
+    protected playerStore: PlayerStore;
+
+    /**
+     * Displayers
+     */
+    private actions: ActionDisplayer;
+    private board: BoardDisplayer;
+    private character: CharactersDisplayer;
+    private turns: TurnDisplayer;
+    private playerStats: StatsDisplayer;
+    private inspectStats: StatsDisplayer;
+    private attacks: AttackDisplayer;
+
+    /**
+     * Sockets
+     */
     public playerSocket!: GamePlayerSocket;
-    public actionManager: ActionManager = new ActionManager(this);
-    public rangeVisualizer: RangeVisualizer = new RangeVisualizer(this);
-    public tooltip! : Tooltip; 
-    private menuButton!: MenuButton;
+    private gameUpdateQueue!: EventQueue<GameUpdateEvent>;
+
+    /**
+     * Utils
+     */
+    public actionManager: ActionManager;
+    public rangeVisualizer: RangeVisualizer;
+
+    public tooltip!: Tooltip;
+
+    public fightMap = "chessmap";
+    public gridPositions: Cell[][] = [];
+    public scaleFactor: number = 1;
 
     constructor() {
-        super({ key: "fightScene" });
+        super(SceneAssetId.FIGHT, BackgroundAssetId.FIGHT);
+
+        /**
+         * Stores
+         */
+        this.classStore = new ClassStore();
+        this.gameStore = new GameStore();
+        this.playerStore = new PlayerStore(this.classStore, this.gameStore);
+
+        /**
+         * Usecases
+         */
+        this.gameUpdateQueue = new EventQueue<GameUpdateEvent>((event) =>
+            this.handleUpdate(event),
+        );
+
+        /**
+         * Displayers
+         */
+        this.actions = new ActionDisplayer(
+            this,
+            this.gameStore,
+            this.playerStore,
+        );
+        this.board = new BoardDisplayer(
+            this,
+            this.gameStore,
+            this.classStore,
+            this.playerStore,
+        );
+        this.character = new CharactersDisplayer(this, this.gameStore);
+        this.turns = new TurnDisplayer(this, this.gameStore, this.classStore);
+        this.playerStats = new StatsDisplayer(this, this.gameStore, {
+            x: 0,
+            y: 6,
+        });
+        this.inspectStats = new StatsDisplayer(this, this.gameStore, {
+            x: 7,
+            y: 6,
+        });
+        this.attacks = new AttackDisplayer(this, this.gameStore);
+
+        /**
+         * Utils
+         */
+        this.actionManager = new ActionManager(this);
+        this.rangeVisualizer = new RangeVisualizer(this, this.gameStore);
+
         const config = new SceneConfig().loadConfig().getConfig("scene_1");
         if (!config) {
             throw new Error("Config doesnt exist");
         }
+
+        new ClassesRepository()
+            .getClasses()
+            .then((data) => this.classStore.setClasses(data));
+
         this.renderConfig = {
             tileSize: config.render_config.tile_size,
             renderType: config.render_config.render_type,
@@ -56,76 +174,124 @@ export class FightScene extends GameScene {
         this.renderConfig.offset = PositionUtils.getMapOffset(
             this.renderConfig,
         );
-
-        this.characters = this.gameObjects.filter(
-            (obj) => obj instanceof Character,
-        );
-        this.otherPlayers = this.characters.filter(
-            (char) => char.id !== "player_1",
-        ) as PlayableCharacter[];
     }
 
-    init(data: { spawnPos: Position; class: CharacterClass; id: string }) {
-        this.myPlayer = new PlayableCharacter(
-            {
-                position: data.spawnPos,
-                id: data.id,
-                spriteKey: data.class.spriteKey,
-                iconImageKey: data.class.iconImageKey,
-                name: data.class.name,
-                baseStats: data.class.stats,
-                actionList: data.class.actionList,
-                scene: this,
-            },
-            data.class,
-        );
+    static start(scene: Phaser.Scene, data: FightSceneInit) {
+        scene.scene.start(SceneAssetId.FIGHT, data);
+    }
+
+    private async handleUpdate({
+        data: game,
+        animations,
+    }: GameUpdateEvent): Promise<void> {
+        /**
+         * Do animations !!!!!
+         */
+        for (const animation of animations) {
+            console.log(animation); //TODO: instead filter and handle those animations in their respective displayers
+            switch (animation.key) {
+                case "move":
+                    await this.character.animate(animation, game);
+                    break;
+                case "attack":
+                    await this.attacks.animate(animation, game);
+                    break;
+            }
+        }
+
+        /**
+         * Update Store
+         */
+        this.gameStore.setGame(game);
+        this.playerStore.update();
+        /**
+         * Update Displayers
+         */
+        this.board.update();
+        this.actions.update();
+        this.turns.update();
+        this.character.update();
+        this.playerStats
+            .setEntity(this.playerStore.playerEntity)
+            .setCharacterClass(this.playerStore.playerClass)
+            .setName(user.username)
+            .update();
+        if (this.inspectStats.isShow) {
+            this.inspectCharacter(this.inspectStats.entityId);
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+
+    init({ game, player: { playerId } }: FightSceneInit) {
+        this.gameStore.setGame(game);
+        this.playerStore.setPlayerId(playerId);
+
+        this.actions.preRender();
+        this.board.preRender();
+        this.turns.preRender();
+        this.character.preRender();
+        this.playerStats.preRender();
+        this.inspectStats.preRender();
+
+        this.playerSocket = new GamePlayerSocket(game.id, playerId);
+        this.playerSocket.onClose(() => MainMenu.start(this));
+        this.playerSocket.onUpdate((event) => this.gameUpdateQueue.add(event));
+        this.playerSocket.onGameEnd((event) => {
+            //TODO: DISPLAY POPUP WITH INFO event.playerWin (true|false)
+            const menuSocket = new MenuSocket();
+            menuSocket.onClose(() => MainMenu.start(this));
+            menuSocket.onJoin(({ lobbyId, playerId }) => {
+                LobbyScene.start(this, {
+                    lobbyId,
+                    playerId,
+                });
+            });
+            menuSocket.onSubscribed(() => {
+                menuSocket.joinLobby({ lobbyId: event.lobbyId });
+            });
+        });
     }
 
     preload() {
+        super.preload();
         ActionAsset.loadAll(this.load);
+
         this.load.tilemapTiledJSON(
             this.fightMap,
             `assets/${this.fightMap}.json`,
         );
-        this.load.image("groundTiles", `assets/${this.tileSetImage}.png`);
 
-        this.allExistingStats.forEach((stat) =>
-            this.load.image(stat, `assets/icon/icon_${stat}.png`),
-        );
-
-        this.characters.push(this.myPlayer);
-        //précharge les image des persos de la scène
-        this.characters.forEach((object) => object.preload(this.load));
-
-        this.load.image(
-            this.backgroundImage,
-            `assets/${this.backgroundImage}.jpg`,
-        );
+        ParticleAsset.loadAll(this.load);
+        MiscAsset.load(this.load, MiscAssetId.GROUND);
+        MiscAsset.load(this.load, MiscAssetId.WALL);
+        CharacterCloseupAsset.loadAll(this.load);
+        CharacterSpriteAsset.loadAll(this.load);
+        IconAsset.loadAll(this.load);
     }
 
     create() {
-        this.playerSocket = new GamePlayerSocket("3630", this.myPlayer.id);
-
+        super.create();
         this.tooltip = Tooltip.getInstance(this, {
             textColor: "#000000",
             fontSize: 14,
             delay: 750,
         });
 
-        const num = this.otherPlayers.length;
-        this.myPlayer.name = ` Player ${num + 1}`;
-
-        const bg = this.add
-            .image(0, 0, this.backgroundImage)
-            .setOrigin(0, 0)
-            .setDepth(-1);
-        bg.setDisplaySize(this.scale.width, this.scale.height);
-
-        this.generateMap(this.actionManager, this.rangeVisualizer);
-        this.spawnEntities();
+        this.actions.render().update();
+        this.board.render().update();
+        this.character.render().update();
+        this.turns.render();
+        this.playerStats
+            .setEntity(this.playerStore.playerEntity)
+            .setCharacterClass(this.playerStore.playerClass)
+            .setName(user.username)
+            .render()
+            .update();
+        this.inspectStats.render().setIsShow(false);
 
         // Créer le bouton Menu
-        this.menuButton = new MenuButton(this, {
+        new MenuButton(this, {
             position: "topRight",
             onResumeClick: () => {
                 // Reprendre le jeu (le menu se ferme automatiquement)
@@ -138,163 +304,22 @@ export class FightScene extends GameScene {
             },
         });
 
-        const actionArea = this.sceneGrid.getArea(2, 8, 5, 1);
-        const actionPanel = new CustomContainer(this, {
-            title: "",
-            x: actionArea.x + actionArea.width / 2,
-            y: actionArea.y + actionArea.height / 2,
-            width: actionArea.width,
-            height: actionArea.height,
-            borderWidth: 2,
-            opacity: 0.5,
-        });
-
-        const actionGrid = GridUtils.uiGrid(
-            0,
-            0,
-            actionPanel.width,
-            actionPanel.height,
-        );
-        const actionListArea = actionGrid.getArea(0, 1, 9, 7);
-
-        const statsTable = new DataDisplayer(this, {
-            position: new Position(
-                actionPanel.x - actionPanel.width / 2 + actionListArea.centerX,
-                actionPanel.y - actionPanel.height / 2 + actionListArea.centerY,
-            ),
-            width: actionListArea.width,
-            height: actionListArea.height,
-            cols: 9,
-            rows: 1,
-        });
-
         // --- Placement des icônes ---
-        this.myPlayer.actionList.forEach((action, index) => {
-            const rangeManager: number | undefined =
-                action.id === "walk"
-                    ? this.myPlayer.baseStats.mouvement
-                    : action.range;
 
-            const iconObj = statsTable.placeContent(
-                index,
-                0,
-                {
-                    icon: ActionAsset.getAssetKey(action.id),
-                    onClick: () => {
-                        this.rangeVisualizer.onActionSelected(
-                            this.myPlayer!.position,
-                            rangeManager,
-                        );
-                        this.actionManager.currentAction = action;
-                    },
-                },
-                64,
-            );
-            if (iconObj) {
-            iconObj.setInteractive();
-            this.tooltip.attachTo(iconObj, action.name ?? action.id);
-        }
+        this.events.on("characterClicked", (entityId: string) => {
+            this.inspectCharacter(entityId);
         });
-
-        this.createCharacterStatsUi(this.myPlayer!);
     }
 
-    createCharacterStatsUi(perso: Character) {
-        // 1) Tu récupères la zone du panel dans la grille globale
-        const statsArea = this.sceneGrid.getArea(0, 6, 2, 3);
-
-        // 2) Tu crées le panel
-        const statsPanel = new CustomContainer(this, {
-            title: "",
-            x: statsArea.x + statsArea.width / 2,
-            y: statsArea.y + statsArea.height / 2,
-            width: statsArea.width,
-            height: statsArea.height,
-            borderWidth: 6,
-            opacity: 0.5,
-        });
-
-        // 3) Tu crées une grille *interne* au panel
-        const statsGrid = GridUtils.uiGrid(
-            0,
-            0,
-            statsPanel.width,
-            statsPanel.height,
-        );
-
-        const imgArea = statsGrid.getArea(0, 0, 3, 4);
-
-        const statsImage = new CustomContainer(this, {
-            title: "",
-            x: statsPanel.x - statsPanel.width / 2 + imgArea.centerX,
-            y: statsPanel.y - statsPanel.height / 2 + imgArea.centerY,
-            width: imgArea.width,
-            height: imgArea.height,
-            borderWidth: 7,
-            backgroundImage: perso.iconImageKey,
-        });
-
-        const classNameArea = statsGrid.getArea(3, 0, 6, 1);
-
-        const statsClassName = new CustomContainer(this, {
-            title: this.myPlayer!.characterClass.name,
-            x: statsPanel.x - statsPanel.width / 2 + classNameArea.centerX,
-            y: statsPanel.y - statsPanel.height / 2 + classNameArea.centerY,
-            width: classNameArea.width,
-            height: classNameArea.height,
-            borderWidth: 2,
-            bgColor: Color.containerBorder,
-            fontsize: 18,
-        });
-        const playerNameArea = statsGrid.getArea(0, 4, 3, 1);
-
-        const statsName = new CustomContainer(this, {
-            title: this.myPlayer!.name,
-            x: statsPanel.x - statsPanel.width / 2 + playerNameArea.centerX,
-            y: statsPanel.y - statsPanel.height / 2 + playerNameArea.centerY,
-            width: playerNameArea.width,
-            height: playerNameArea.height,
-            borderWidth: 2,
-            bgColor: Color.containerBorder,
-            fontsize: 18,
-        });
-
-        const statValuesArea = statsGrid.getArea(3, 1, 6, 8);
-
-        const statsTable = new DataDisplayer(this, {
-            position: new Position(
-                statsPanel.x - statsPanel.width / 2 + statValuesArea.centerX,
-                statsPanel.y - statsPanel.height / 2 + statValuesArea.centerY,
-            ),
-            width: statValuesArea.width,
-            height: statValuesArea.height,
-            cols: 4,
-            rows: 4,
-        });
-
-        // --- Placement des icônes ---
-        this.allExistingStats.forEach((icon, index) => {
-            const row = Math.floor(index / 2);
-            const col = (index % 2) * 2;
-
-            const iconObj = statsTable.placeContent(col, row, { icon });
-
-            if (iconObj) {
-                iconObj.setInteractive();
-                this.tooltip.attachTo(iconObj, icon); // ex: "life", "strength" …
-            }
-        });
-
-        statsTable.placeContent(1, 0, this.myPlayer!.baseStats.life);
-        statsTable.placeContent(3, 0, this.myPlayer!.baseStats.initiative);
-        statsTable.placeContent(1, 2, this.myPlayer!.baseStats.accuracy);
-
-        statsTable.placeContent(3, 3, this.myPlayer!.baseStats.mouvement);
-        statsTable.placeContent(3, 1, this.myPlayer!.baseStats.precision);
-
-        statsTable.placeContent(1, 1, this.myPlayer!.baseStats.strength);
-
-        statsTable.placeContent(1, 3, this.myPlayer!.baseStats.energy);
-        statsTable.placeContent(3, 2, this.myPlayer!.baseStats.dodging);
+    public inspectCharacter(entityId: string) {
+        const entity = this.gameStore.getEntity(entityId);
+        const charClass = this.classStore.getClass(entity.classId);
+        this.inspectStats
+            .setEntity(entity)
+            .setCharacterClass(charClass)
+            .setName(charClass.name.split(" ")[0])
+            .update()
+            .setIsShow(true);
     }
 }
+

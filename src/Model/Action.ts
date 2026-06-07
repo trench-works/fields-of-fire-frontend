@@ -3,13 +3,13 @@ import { Effect } from "./Effect";
 
 export class Action {
     id!: string;
-    animationSpriteConfig?: { frameWidth: number; frameHeight: number };
     name!: string;
     description?: string;
-    dammage?: number;
+    damage?: { min: number; max: number };
+    actionType!: ActionType;
     effectList?: Effect[];
     range?: number;
-    zoneType?: string;
+    zoneType?: ActionZoneType;
     zoneSize?: number;
     mooveToTarget?: Position;
     pushValue?: number;
@@ -17,3 +17,14 @@ export class Action {
     isWalkAction?: boolean;
 }
 
+export enum ActionType {
+    MELEE = "MELEE",
+    RANGED = "RANGED"
+}
+
+export enum ActionZoneType {
+    DIAMOND = "diamond",
+    CIRCLE = "circle",
+    PLUS = "plus",
+    XCROSS = "xcross",
+}

@@ -1,63 +1,36 @@
-export interface StatProps {
+import { EffectType } from "./Effect";
+import { Entity } from "./Entity";
+
+export type Stats = {
     life: number;
     precision: number;
     strength: number;
-    accuracy: number;
+    armor: number;
     initiative: number;
     dodging: number;
     energy: number;
     mouvement: number;
-}
+};
 
-export class Stats{
-
-    public life: number;
-    public precision: number
-    public strength: number;
-    public accuracy: number;
-    public initiative: number;
-    public dodging: number;
-    public energy: number;
-    public mouvement: number;
-
-    constructor(
-        props : StatProps
-    ){
-        this.life = props.life;
-        this.precision = props.precision;
-        this.strength = props.strength;
-        this.accuracy = props.accuracy;
-        this.initiative = props.initiative;
-        this.dodging = props.dodging;
-        this.energy = props.energy;
-        this.mouvement = props.mouvement;
+export class StatsUtils {
+    static add(baseStats: Stats, ...stats: Stats[]): Stats {
+        const addedStats = { ...baseStats };
+        for (const stat of stats) {
+            for (const [key, value] of Object.entries(stat)) {
+                addedStats[key as keyof Stats] =
+                    addedStats[key as keyof Stats] + value;
+            }
+        }
+        return addedStats;
     }
 
-    addLife(life: number) {
-        this.life+=life;
-    }
-
-    addPrecision(precision: number) {
-        this.precision+=precision;
-    }
-
-    addStrengh(strengh: number) {
-        this.strength+=strengh;
-    }
-
-    addAccuracy(accuracy: number) {
-        this.accuracy+=accuracy;
-    }
-
-    addInitiative(initiative: number) {
-        this.initiative+=initiative;
-    }
-
-    addEnergy(energy: number) {
-        this.energy+=energy;
-    }
-
-    addMouvement(mouvement: number) {
-        this.mouvement+=mouvement;
+    static fromEntity(entity: Entity): Stats {
+        return StatsUtils.add(
+            entity.stats,
+            ...entity.effects
+                .filter((effect) => effect.type === EffectType.APPLY)
+                .map((effect) => effect.modifier),
+        );
     }
 }
+

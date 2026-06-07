@@ -6,17 +6,15 @@ export function uiGrid(
     componentWidth: number = -1,
     componentHeight: number = -1,
     cols = 9,
-    rows = 9
+    rows = 9,
+    offsetX = 0,  
+    offsetY = 0 
 ): UiGrid {
     // Mode plein écran
     if (componentWidth === -1 || componentHeight === -1) {
         componentWidth = window.innerWidth;
         componentHeight = window.innerHeight;
     }
-
-    // Offset automatique
-    let offsetX = 0;
-    let offsetY = 0;
 
     const cellW = componentWidth / cols;
     const cellH = componentHeight / rows;

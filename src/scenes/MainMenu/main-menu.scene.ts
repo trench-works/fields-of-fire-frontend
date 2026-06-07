@@ -1,39 +1,44 @@
 import Phaser from "phaser";
-import { CustomContainer, GridUtils } from "../../core";
-import {
-    BackgroundAsset,
-    BackgroundAssetId,
-} from "../../assets/BackgroundAsset";
+import { BaseScene, Button, CustomContainer, GridUtils } from "../../core";
+import { BackgroundAssetId } from "../../assets/BackgroundAsset";
+import { LobbyListScene } from "../LobbyList/lobby-list.scene";
+import { PopupInput } from "./objects/LoginPopup";
+import { UserRepository } from "./repositories/user.repository";
+import { SceneAssetId } from "../../assets/ScenesAsset";
+import { MiscAsset, MiscAssetId } from "../../assets";
 
-export class MainMenu extends Phaser.Scene {
+export class MainMenu extends BaseScene {
     private readonly BUTTON_WIDTH = 500;
     private readonly BUTTON_HEIGHT = 100;
     private sceneGrid = GridUtils.uiGrid(0, 0);
 
+    private playButton!: CustomContainer;
+    private connectButton!: Button;
+
     constructor() {
-        super({ key: "mainMenuScene" });
+        super(SceneAssetId.MENU, BackgroundAssetId.MAIN_MENU);
+        const user = localStorage.getItem("user");
+        if (user) {
+            global.user = JSON.parse(user);
+        }
+    }
+
+    static start(scene: Phaser.Scene) {
+        scene.scene.start(SceneAssetId.MENU);
     }
 
     preload() {
-        // Charger les images nécessaires
-        BackgroundAsset.load(this.load, BackgroundAssetId.MAIN_MENU);
-        this.load.image("menuBalle", "assets/menuBalle.png");
+        super.preload();
+        MiscAsset.load(this.load, MiscAssetId.BULLET);
     }
 
     create() {
-        // Ajouter l'image de fond qui prend toute la page
-        const bgImage = this.add.image(
-            this.scale.width / 2,
-            this.scale.height / 2,
-            BackgroundAsset.getAssetKey(BackgroundAssetId.MAIN_MENU)
-        );
-        bgImage.setDisplaySize(this.scale.width, this.scale.height);
-        bgImage.setOrigin(0.5);
-
+        super.create();
         // Créer un titre du menu
         this.add
             .text(this.scale.width / 2, 200, "Les Mémoires Oubliées", {
-                font: "72px Arial",
+                fontFamily: "MyFont",
+                fontSize: "48px",
                 color: "#FFFFFF",
             })
             .setOrigin(0.5);
@@ -46,24 +51,27 @@ export class MainMenu extends Phaser.Scene {
             0,
             0,
             buttonsArea.width,
-            buttonsArea.height
+            buttonsArea.height,
         );
 
         // Bouton Jouer (ligne 0)
         const playArea = buttonsGrid.getArea(0, 0, 1, 1);
-        new CustomContainer(this, {
+        this.playButton = new CustomContainer(this, {
             title: "Jouer",
             x: buttonsArea.x + playArea.centerX,
             y: buttonsArea.y + playArea.centerY,
             width: this.BUTTON_WIDTH,
             height: this.BUTTON_HEIGHT,
-            backgroundImage: "menuBalle",
+            backgroundImage: MiscAsset.getAssetKey(MiscAssetId.BULLET),
             titleColor: "#FFFFFF",
-            fontsize: 50,
+            fontSize: 40,
+            alpha: global.user ? 1 : 0.5,
             textPosition: { x: -130, y: -10 },
             hoverTint: 0xcccccc,
             onClick: () => {
-                this.scene.start("lobbyScene");
+                if (global.user) {
+                    LobbyListScene.start(this);
+                }
             },
         });
 
@@ -75,9 +83,9 @@ export class MainMenu extends Phaser.Scene {
             y: buttonsArea.y + settingsArea.centerY,
             width: this.BUTTON_WIDTH,
             height: this.BUTTON_HEIGHT,
-            backgroundImage: "menuBalle",
+            backgroundImage: MiscAsset.getAssetKey(MiscAssetId.BULLET),
             titleColor: "#FFFFFF",
-            fontsize: 50,
+            fontSize: 40,
             textPosition: { x: -70, y: -10 },
             hoverTint: 0xcccccc,
             onClick: () => {
@@ -85,22 +93,40 @@ export class MainMenu extends Phaser.Scene {
             },
         });
 
-        // Bouton Lobby (ligne 2)
-        const lobbyArea = buttonsGrid.getArea(0, 2, 1, 1);
-        new CustomContainer(this, {
-            title: "Lobby",
-            x: buttonsArea.x + lobbyArea.centerX,
-            y: buttonsArea.y + lobbyArea.centerY,
-            width: this.BUTTON_WIDTH,
-            height: this.BUTTON_HEIGHT,
-            backgroundImage: "menuBalle",
-            titleColor: "#FFFFFF",
-            fontsize: 50,
-            textPosition: { x: -130, y: -10 },
-            hoverTint: 0xcccccc,
-            onClick: () => {
-                this.scene.start("lobbyScene");
-            },
+        //bouton login
+        const loginArea = this.sceneGrid.getArea(8, 0, 1, 1);
+        this.connectButton = new Button(this, {
+            text: global.user?.username ?? "Login",
+            x: loginArea.x + loginArea.width / 2,
+            y: loginArea.y + loginArea.height / 2,
+            width: loginArea.width,
+            height: loginArea.height,
+            textColor: "#FFFFFF",
+            color: "#db7f29",
+            onClick: global.user
+                ? undefined
+                : () => {
+                      new PopupInput(this, {
+                          title: "Connexion",
+                          placeholder: "Entrez votre pseudo...",
+                          onValidate: async (value: string) => {
+                              await new UserRepository().authenticate(value);
+                              if (global.user) {
+                                  this.playButton.alpha = 1;
+                                  this.connectButton.onClick = undefined;
+                                  this.connectButton.setText(
+                                      global.user.username,
+                                  );
+                                  localStorage.setItem(
+                                      "user",
+                                      JSON.stringify(global.user),
+                                  );
+                                  return true;
+                              }
+                              return false;
+                          },
+                      });
+                  },
         });
     }
 }
