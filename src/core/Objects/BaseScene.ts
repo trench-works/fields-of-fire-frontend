@@ -4,13 +4,19 @@ import {
     BackgroundAsset,
     BackgroundAssetId,
 } from "../../assets/BackgroundAsset";
+import { Grid } from "../Utils";
+import { TwoAxis } from "../Types";
 
 export class BaseScene extends Scene {
+    public rootGrid: Grid;
+
     constructor(
         key: SceneAssetId,
         protected readonly background: BackgroundAssetId,
+        rootGridOptions?: { division: TwoAxis },
     ) {
         super({ key });
+        this.rootGrid = new Grid(rootGridOptions);
     }
 
     preload() {

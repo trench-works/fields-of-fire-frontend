@@ -17,12 +17,21 @@ class MiscAssetManager extends ImageAssetManager<MiscAssetId, string> {
     }
 
     constructor() {
-        super("misc", {
-            [MiscAssetId.GROUND]: "ground",
-            [MiscAssetId.WALL]: "wall",
-            [MiscAssetId.BULLET]: "menuBalle",
-            [MiscAssetId.BUTTON]: "BoutonSauvage",
-        });
+        super(
+            "misc",
+            {
+                [MiscAssetId.GROUND]: "ground",
+                [MiscAssetId.WALL]: "wall",
+                [MiscAssetId.BULLET]: "menuBalle",
+                [MiscAssetId.BUTTON]: "BoutonSauvage",
+            },
+            {
+                [MiscAssetId.GROUND]: { width: 1, height: 1 },
+                [MiscAssetId.WALL]: { width: 1, height: 1 },
+                [MiscAssetId.BULLET]: { width: 1, height: 1 },
+                [MiscAssetId.BUTTON]: { width: 180, height: 50 },
+            },
+        );
     }
 }
 

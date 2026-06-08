@@ -81,7 +81,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
                 const caseTile = this.gameStore.game.plateau[x][y];
                 // Ground part
-                const tile = this.groundLayer.getTileAt(x, y);
+                const tile = this.groundLayer?.getTileAt?.(x, y);
                 if (tile) {
                     if (caseTile.isHole) {
                         tile.setVisible(false);

@@ -1,12 +1,6 @@
 import { MenuSocket } from "./repositories/menu.socket";
 import { LobbyScene } from "../Lobby/lobby.scene";
-import {
-    BaseScene,
-    Button,
-    CustomContainer,
-    Grid,
-    MenuButton,
-} from "../../core";
+import { BaseScene, Button, CustomContainer, MenuButton } from "../../core";
 import { FightScene } from "../Fight/fight.scene";
 import { MainMenu } from "../MainMenu/main-menu.scene";
 import { LobbyRow } from "./objects/LobbyRow";
@@ -17,10 +11,12 @@ import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 
 export class LobbyListScene extends BaseScene {
     public menuSocket!: MenuSocket;
-    private sceneGrid = new Grid();
+
     private lobbyData: LobbyData[] = [];
     private selectedLobby: LobbyData | null = null;
+
     private selectedRow: LobbyRow | null = null;
+    private refreshButton!: Button;
     private lobbyRows: LobbyRow[] = [];
 
     private lobbyResetTimeout: NodeJS.Timeout | undefined;
@@ -86,36 +82,31 @@ export class LobbyListScene extends BaseScene {
         this.selectedLobby = null;
         this.selectedRow = null;
         this.lobbyRows.forEach((row) => row.destroy()); // destroy all rows
-        const lobbyListArea = this.sceneGrid.getArea({
-            x: 0,
-            y: 2,
-            width: 9,
-            height: 6,
-        });
-        const lobbyGrid = new Grid({
-            size: {
-                width: lobbyListArea.width,
-                height: lobbyListArea.height,
+        const listGrid = this.rootGrid.getSubGrid(
+            {
+                x: 1,
+                y: 3,
+                width: 9,
+                height: 6,
             },
-            division: {
-                vertical: 12,
-                horizontal: 9,
+            {
+                division: {
+                    vertical: 12,
+                    horizontal: 9,
+                },
             },
-            offset: {
-                x: lobbyListArea.x,
-                y: lobbyListArea.y,
-            },
-        });
+        );
 
         this.lobbyData.forEach((lobby, i) => {
-            const rowArea = lobbyGrid.getArea({
-                x: 0,
-                y: i,
+            const rowArea = listGrid.getArea({
+                x: 1,
+                y: i + 1,
                 width: 9,
                 height: 1,
             });
             this.lobbyRows.push(
                 new LobbyRow(this, rowArea, lobby, (row) => {
+                    this.refreshButton.setIsActivated(true);
                     this.selectedRow?.setSelected(false); // désélectionne l'ancienne
                     this.selectedLobby = lobby;
                     this.selectedRow = row;
@@ -127,9 +118,9 @@ export class LobbyListScene extends BaseScene {
 
     createDisplay() {
         //title BOX
-        const titleBox = this.sceneGrid.getArea({
-            x: 0,
-            y: 0,
+        const titleBox = this.rootGrid.getArea({
+            x: 1,
+            y: 2,
             width: 9,
             height: 2,
         });
@@ -141,14 +132,13 @@ export class LobbyListScene extends BaseScene {
             .setOrigin(0.5, 0);
 
         //lobby list
-        const lobbyListArea = this.sceneGrid.getArea({
-            x: 0,
-            y: 2,
+        const lobbyListArea = this.rootGrid.getArea({
+            x: 1,
+            y: 3,
             width: 9,
             height: 6,
         });
         new CustomContainer(this, {
-            title: "",
             x: lobbyListArea.x + lobbyListArea.width / 2,
             y: lobbyListArea.y + lobbyListArea.height / 2,
             width: lobbyListArea.width,
@@ -158,32 +148,26 @@ export class LobbyListScene extends BaseScene {
         });
         //buttons
 
-        const buttonArea = this.sceneGrid.getArea({
-            x: 0,
-            y: 8,
-            width: 9,
-            height: 1,
-        });
-        const buttonGrid = new Grid({
-            size: {
-                width: buttonArea.width,
-                height: buttonArea.height,
+        const buttonGrid = this.rootGrid.getSubGrid(
+            {
+                x: 1,
+                y: 9,
+                width: 9,
+                height: 1,
             },
-            division: {
-                vertical: 9,
-                horizontal: 13,
+            {
+                division: {
+                    vertical: 9,
+                    horizontal: 13,
+                },
             },
-            offset: {
-                x: buttonArea.x,
-                y: buttonArea.y,
-            },
-        });
+        );
 
         buttonGrid.getArea({ x: 0, y: 0, width: 9, height: 9 });
 
-        const cell0 = buttonGrid.getArea({ x: 1, y: 1, width: 3, height: 7 }); // bouton gauche
-        const cell1 = buttonGrid.getArea({ x: 5, y: 1, width: 3, height: 7 }); // bouton centre
-        const cell2 = buttonGrid.getArea({ x: 9, y: 1, width: 3, height: 7 }); // bouton droit
+        const cell0 = buttonGrid.getArea({ x: 2, y: 1, width: 3, height: 7 }); // bouton gauche
+        const cell1 = buttonGrid.getArea({ x: 6, y: 1, width: 3, height: 7 }); // bouton centre
+        const cell2 = buttonGrid.getArea({ x: 10, y: 1, width: 3, height: 7 }); // bouton droit
 
         new Button(this, {
             text: "Créer un Lobby",
@@ -197,6 +181,17 @@ export class LobbyListScene extends BaseScene {
         });
 
         new Button(this, {
+            text: "Actualiser",
+            x: cell1.center.x,
+            y: cell1.center.y,
+            width: cell1.width,
+            height: cell1.height,
+            onClick: () => {
+                this.resetLobbies();
+            },
+        });
+
+        this.refreshButton = new Button(this, {
             text: "Rejoindre un Lobby",
             x: cell2.center.x,
             y: cell2.center.y,
@@ -209,18 +204,7 @@ export class LobbyListScene extends BaseScene {
                     });
                 }
             },
-        });
-
-        new Button(this, {
-            text: "Actualiser",
-            x: cell1.center.x,
-            y: cell1.center.y,
-            width: cell1.width,
-            height: cell1.height,
-            onClick: () => {
-                this.resetLobbies();
-            },
-        });
+        }).setIsActivated(false);
 
         // Créer le bouton Menu
         new MenuButton(this, {

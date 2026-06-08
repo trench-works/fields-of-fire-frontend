@@ -1,6 +1,6 @@
 import { CharacterCloseupAsset, IconAsset } from "../../../assets";
 import { Color } from "../../../config/ColorConfig";
-import { CustomContainer, DataDisplayer, Grid } from "../../../core";
+import { CustomContainer, List } from "../../../core";
 import { CharacterClass } from "../../../Model/CharacterClass";
 import { Entity } from "../../../Model/Entity";
 import { StatsUtils } from "../../../Model/Stats";
@@ -32,7 +32,7 @@ const statDescriptions: Record<string, string> = {
 
 export class StatsDisplayer extends FightSceneDisplayer {
     private statsPanel!: CustomContainer;
-    private statsTable!: DataDisplayer;
+    private statsTable!: List;
     private statsImage!: CustomContainer;
     private statsClassName!: CustomContainer;
     private statsName!: CustomContainer;
@@ -86,7 +86,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
     }
 
     preRender(): this {
-        const statsArea = this.scene.sceneGrid.getArea({
+        const statsArea = this.scene.rootGrid.getArea({
             x: this.position.x,
             y: this.position.y,
             width: 2,
@@ -94,31 +94,21 @@ export class StatsDisplayer extends FightSceneDisplayer {
         });
 
         this.statsPanel = new CustomContainer(this.scene, {
-            title: "",
-            x: statsArea.x + statsArea.width / 2,
-            y: statsArea.y + statsArea.height / 2,
+            x: statsArea.center.x,
+            y: statsArea.center.y,
             width: statsArea.width,
             height: statsArea.height,
             borderWidth: 6,
             opacity: 0.5,
         });
 
-        const statsGrid = new Grid({
-            size: {
-                width: this.statsPanel.width,
-                height: this.statsPanel.height,
-            },
-        });
+        const statsGrid = statsArea.getGrid();
 
-        const imgArea = statsGrid.getArea({ x: 0, y: 0, width: 3, height: 4 });
+        const imgArea = statsGrid.getArea({ x: 1, y: 1, width: 3, height: 4 });
 
         this.statsImage = new CustomContainer(this.scene, {
-            title: "",
-            x: this.statsPanel.x - this.statsPanel.width / 2 + imgArea.center.x,
-            y:
-                this.statsPanel.y -
-                this.statsPanel.height / 2 +
-                imgArea.center.y,
+            x: imgArea.center.x,
+            y: imgArea.center.y,
             width: imgArea.width,
             height: imgArea.height,
             borderWidth: 7,
@@ -126,22 +116,16 @@ export class StatsDisplayer extends FightSceneDisplayer {
         });
 
         const classNameArea = statsGrid.getArea({
-            x: 3,
-            y: 0,
+            x: 4,
+            y: 1,
             width: 6,
             height: 1,
         });
 
         this.statsClassName = new CustomContainer(this.scene, {
             title: "N/A",
-            x:
-                this.statsPanel.x -
-                this.statsPanel.width / 2 +
-                classNameArea.center.x,
-            y:
-                this.statsPanel.y -
-                this.statsPanel.height / 2 +
-                classNameArea.center.y,
+            x: classNameArea.center.x,
+            y: classNameArea.center.y,
             width: classNameArea.width,
             height: classNameArea.height,
             borderWidth: 2,
@@ -149,22 +133,16 @@ export class StatsDisplayer extends FightSceneDisplayer {
             fontSize: 18,
         });
         const playerNameArea = statsGrid.getArea({
-            x: 0,
-            y: 4,
+            x: 1,
+            y: 5,
             width: 3,
             height: 1,
         });
 
         this.statsName = new CustomContainer(this.scene, {
             title: "N/A",
-            x:
-                this.statsPanel.x -
-                this.statsPanel.width / 2 +
-                playerNameArea.center.x,
-            y:
-                this.statsPanel.y -
-                this.statsPanel.height / 2 +
-                playerNameArea.center.y,
+            x: playerNameArea.center.x,
+            y: playerNameArea.center.y,
             width: playerNameArea.width,
             height: playerNameArea.height,
             borderWidth: 2,
@@ -172,29 +150,22 @@ export class StatsDisplayer extends FightSceneDisplayer {
             fontSize: 18,
         });
 
-        const statValuesArea = statsGrid.getArea({
-            x: 3,
-            y: 1,
-            width: 6,
-            height: 8,
-        });
-
-        this.statsTable = new DataDisplayer(this.scene, {
-            position: {
-                x:
-                    this.statsPanel.x -
-                    this.statsPanel.width / 2 +
-                    statValuesArea.center.x,
-                y:
-                    this.statsPanel.y -
-                    this.statsPanel.height / 2 +
-                    statValuesArea.center.y,
+        const statValuesArea = statsGrid.getSubGrid(
+            {
+                x: 5.5,
+                y: 4,
+                width: 6,
+                height: 8,
             },
-            width: statValuesArea.width,
-            height: statValuesArea.height,
-            cols: 4,
-            rows: 4,
-        });
+            {
+                division: {
+                    horizontal: 4,
+                    vertical: 4,
+                },
+            },
+        );
+
+        this.statsTable = new List(this.scene, statValuesArea);
 
         return this;
     }

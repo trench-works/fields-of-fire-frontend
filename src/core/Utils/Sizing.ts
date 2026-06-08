@@ -39,8 +39,11 @@ export class PositionUtils {
 }
 
 export class AxisUtils {
-    static isTwoAxis(axis: TwoAxis | FourAxis): axis is TwoAxis {
+    static isTwoAxis(axis: TwoAxis | FourAxis | number): axis is TwoAxis {
         return (axis as TwoAxis)["vertical"] !== undefined;
+    }
+    static isFourAxis(axis: TwoAxis | FourAxis | number): axis is FourAxis {
+        return (axis as FourAxis)["top"] !== undefined;
     }
 
     static toFourAxis(axis: TwoAxis): FourAxis {
@@ -52,11 +55,14 @@ export class AxisUtils {
         };
     }
 
-    static fromTwoOrFourAxis(axis: TwoAxis | FourAxis): FourAxis {
+    static fromTwoOrFourAxis(axis: TwoAxis | FourAxis | number): FourAxis {
         if (AxisUtils.isTwoAxis(axis)) {
             return AxisUtils.toFourAxis(axis);
         }
-        return axis;
+        if (AxisUtils.isFourAxis(axis)) {
+            return axis;
+        }
+        return { top: axis, bottom: axis, left: axis, right: axis };
     }
 }
 

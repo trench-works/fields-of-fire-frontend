@@ -19,11 +19,19 @@ class BackgroundAssetManager extends ImageAssetManager<
     }
 
     constructor() {
-        super("bkgd", {
-            [BackgroundAssetId.MAIN_MENU]: "mainMenuBackGround",
-            [BackgroundAssetId.LOBBY]: "red_bg",
-            [BackgroundAssetId.FIGHT]: "red_bg",
-        });
+        super(
+            "bkgd",
+            {
+                [BackgroundAssetId.MAIN_MENU]: "mainMenuBackGround",
+                [BackgroundAssetId.LOBBY]: "red_bg",
+                [BackgroundAssetId.FIGHT]: "red_bg",
+            },
+            {
+                [BackgroundAssetId.MAIN_MENU]: { width: 1, height: 1 },
+                [BackgroundAssetId.LOBBY]: { width: 1, height: 1 },
+                [BackgroundAssetId.FIGHT]: { width: 1, height: 1 },
+            },
+        );
     }
 }
 

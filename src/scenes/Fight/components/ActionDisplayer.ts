@@ -1,28 +1,19 @@
 import { ActionAsset, ActionAssetId } from "../../../assets/ActionAsset";
 import { Color } from "../../../config/ColorConfig";
-import {
-    CustomContainer,
-    DataDisplayer,
-    Button,
-    DataDisplayObject,
-    Grid,
-} from "../../../core";
+import { CustomContainer, List, Button } from "../../../core";
 import { Action } from "../../../Model/Action";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/GameStore";
 import { PlayerStore } from "../stores/PlayerStore";
 import { FightSceneDisplayer } from "./FightSceneDisplayer";
 
-const CLICKABLE_ALPHA = 1;
-const UNCLICKABLE_ALPHA = 0.5;
-
 export class ActionDisplayer extends FightSceneDisplayer {
     /**
      * Displayed Elements
      */
-    protected actionElements: Map<string, DataDisplayObject> = new Map();
+    protected actionElements: Map<string, Button> = new Map();
     protected endTurnButton!: Button;
-    protected actionsList!: DataDisplayer;
+    protected actionsList!: List;
 
     constructor(
         scene: FightScene,
@@ -68,83 +59,73 @@ export class ActionDisplayer extends FightSceneDisplayer {
     }
 
     preRender(): this {
-        const actionArea = this.scene.sceneGrid.getArea({
-            x: 2,
-            y: 8,
+        const actionArea = this.scene.rootGrid.getArea({
+            x: 3,
+            y: 9,
             width: 5,
             height: 1,
         });
-        const actionPanel = new CustomContainer(this.scene, {
-            title: "",
-            x: actionArea.x + actionArea.width / 2,
-            y: actionArea.y + actionArea.height / 2,
+
+        new CustomContainer(this.scene, {
+            x: actionArea.center.x,
+            y: actionArea.center.y,
             width: actionArea.width,
             height: actionArea.height,
             borderWidth: 2,
             opacity: 0.5,
         });
 
-        const actionGrid = new Grid({
-            size: {
-                width: actionPanel.width,
-                height: actionPanel.height,
+        const actionGrid = actionArea.getGrid({
+            division: { vertical: 1, horizontal: 9 },
+            margin: { vertical: 20, horizontal: 10 },
+        });
+        const actionListGrid = actionGrid.getSubGrid(
+            {
+                x: 1,
+                y: 1,
+                width: 7,
+                height: 1,
             },
-        });
-        const actionListArea = actionGrid.getArea({
-            x: 0,
-            y: 1,
-            width: 7,
-            height: 7,
-        });
+            {
+                division: {
+                    horizontal: 9,
+                    vertical: 1,
+                },
+                padding: 20,
+            },
+        );
 
-        this.actionsList = new DataDisplayer(this.scene, {
-            position: {
-                x:
-                    actionPanel.x -
-                    actionPanel.width / 2 +
-                    actionListArea.center.x,
-                y:
-                    actionPanel.y -
-                    actionPanel.height / 2 +
-                    actionListArea.center.y,
-            },
-            width: actionListArea.width,
-            height: actionListArea.height,
-            cols: 7,
-            rows: 1,
-        });
+        this.actionsList = new List(this.scene, actionListGrid);
 
         const endTurnArea = actionGrid.getArea({
-            x: 7,
+            x: 8,
             y: 1,
-            width: 1.9,
-            height: 7,
+            width: 2,
+            height: 1,
         });
 
         this.endTurnButton = new Button(this.scene, {
-            x: actionPanel.x - actionPanel.width / 2 + endTurnArea.center.x,
-            y: actionPanel.y - actionPanel.height / 2 + endTurnArea.center.y,
+            x: endTurnArea.center.x,
+            y: endTurnArea.center.y,
             width: endTurnArea.width,
             height: endTurnArea.height,
             text: "Fin du tour",
             borderColor: Color.containerBorder,
             borderWidth: 2,
-        });
+            onClick: () => {},
+        }).setIsActivated(false);
 
         return this;
     }
 
     render(): this {
         this.playerStore.playerClass.actionList.forEach((action, index) => {
-            const iconObj = this.actionsList.placeContent(
-                index,
-                0,
+            const iconObj = this.actionsList.placeButton(
+                { x: index, y: 0 },
                 {
                     icon: ActionAsset.getAssetKey(action.id),
                     onClick: () => this.handleActionClick(action),
-                    alpha: 1,
                 },
-                64,
             );
             if (iconObj) {
                 this.scene.tooltip.attachTo(iconObj, action.name ?? action.id);
@@ -152,9 +133,11 @@ export class ActionDisplayer extends FightSceneDisplayer {
             }
         });
 
-        this.endTurnButton.onClick = () => {
-            this.scene.playerSocket.finishTurn();
-        };
+        this.endTurnButton
+            .setOnClick(() => {
+                this.scene.playerSocket.finishTurn();
+            })
+            .setIsActivated(true);
 
         return this;
     }
@@ -170,30 +153,14 @@ export class ActionDisplayer extends FightSceneDisplayer {
             const actionObject = this.actionElements.get(action.id)!;
             switch (action.id) {
                 case ActionAssetId.WALK:
-                    actionObject.setInteractive(isPlayerTurn && hasMovement);
-                    actionObject.setAlpha(
-                        isPlayerTurn && hasMovement
-                            ? CLICKABLE_ALPHA
-                            : UNCLICKABLE_ALPHA,
-                    );
+                    actionObject.setIsActivated(isPlayerTurn && hasMovement);
                     break;
                 default:
-                    actionObject.setInteractive(isPlayerTurn && hasEnergy);
-                    actionObject.setAlpha(
-                        isPlayerTurn && hasEnergy
-                            ? CLICKABLE_ALPHA
-                            : UNCLICKABLE_ALPHA,
-                    );
+                    actionObject.setIsActivated(isPlayerTurn && hasEnergy);
                     break;
             }
         });
-        this.endTurnButton.setInteractive(isPlayerTurn);
-        this.endTurnButton.setAlpha(
-            isPlayerTurn ? CLICKABLE_ALPHA : UNCLICKABLE_ALPHA,
-        );
-        this.endTurnButton.onClick = isPlayerTurn
-            ? () => this.scene.playerSocket.finishTurn()
-            : undefined;
+        this.endTurnButton.setIsActivated(isPlayerTurn);
         return this;
     }
 

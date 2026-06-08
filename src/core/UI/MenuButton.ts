@@ -31,9 +31,10 @@ export class MenuButton {
         this.button = new Button(scene, {
             x: positionConfig.x,
             y: positionConfig.y,
+            width: 50,
+            height: 50,
             text: "☰",
-            fontSize: "32px",
-            textColor: "#FFFFFF",
+            fontSize: 32,
             onClick: () => {
                 this.menuPanel.toggle();
             },
@@ -49,7 +50,7 @@ export class MenuButton {
     }
 
     private getPosition(
-        position?: "topRight" | "topLeft" | "bottomRight" | "bottomLeft"
+        position?: "topRight" | "topLeft" | "bottomRight" | "bottomLeft",
     ) {
         const padding = 30;
         const { width, height } = this.scene.scale;
@@ -83,3 +84,4 @@ export class MenuButton {
         return this.menuPanel;
     }
 }
+

@@ -1,4 +1,4 @@
-import { Position, MenuButton, BaseScene, EventQueue, Grid } from "../../core";
+import { Position, MenuButton, BaseScene, EventQueue } from "../../core";
 import { SceneConfig } from "../../config/SceneConfig";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
 import {
@@ -64,7 +64,6 @@ export type FightSceneInit = {
 
 export class FightScene extends BaseScene {
     public renderConfig: SceneRenderConfig;
-    public sceneGrid = new Grid();
 
     /**
      * Stores
@@ -136,12 +135,12 @@ export class FightScene extends BaseScene {
         this.character = new CharactersDisplayer(this, this.gameStore);
         this.turns = new TurnDisplayer(this, this.gameStore, this.classStore);
         this.playerStats = new StatsDisplayer(this, this.gameStore, {
-            x: 0,
-            y: 6,
+            x: 1,
+            y: 7,
         });
         this.inspectStats = new StatsDisplayer(this, this.gameStore, {
-            x: 7,
-            y: 6,
+            x: 8,
+            y: 7,
         });
         this.attacks = new AttackDisplayer(this, this.gameStore);
 

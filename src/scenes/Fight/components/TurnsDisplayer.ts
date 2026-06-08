@@ -20,14 +20,13 @@ export class TurnDisplayer extends FightSceneDisplayer {
     }
 
     preRender(): this {
-        const turndisplay = this.scene.sceneGrid.getArea({
-            x: 0,
-            y: 0,
+        const turndisplay = this.scene.rootGrid.getArea({
+            x: 1,
+            y: 1,
             width: 6,
             height: 2,
         });
         this.turnPanel = new CustomContainer(this.scene, {
-            title: "",
             x: turndisplay.x + turndisplay.width / 2,
             y: turndisplay.y + turndisplay.height / 2,
             width: turndisplay.width,
@@ -88,7 +87,7 @@ export class TurnDisplayer extends FightSceneDisplayer {
 
             this.icons.push(
                 new CustomContainer(this.scene, {
-                    title: player?.name ?? charClass?.name?.split(" ")[0] ?? "",
+                    title: player?.name ?? charClass?.name?.split(" ")[0],
                     x:
                         this.turnPanel.x -
                         this.turnPanel.width / 2 +

@@ -1,25 +1,23 @@
 import Phaser from "phaser";
 import { Color } from "../../config/ColorConfig";
 import { ColorUtils } from "../Utils";
+import { Position, Size } from "../Types";
 
-interface ContainerConfig {
-    title: string;
-    bgColor?: string;
-    titleColor?: string;
-    x?: number;
-    y?: number;
-    height?: number;
-    width?: number;
-    borderWidth?: number;
-    borderColor?: string;
-    backgroundImage?: string;
-    opacity?: number;
-    fontSize?: number;
-    onClick?: () => void;
-    textPosition?: { x: number; y: number };
-    hoverTint?: number;
-    alpha?: number;
-}
+type ContainerConfig = Size &
+    Position & {
+        title?: string;
+        bgColor?: string;
+        titleColor?: string;
+        borderWidth?: number;
+        borderColor?: string;
+        backgroundImage?: string;
+        opacity?: number;
+        fontSize?: number;
+        onClick?: () => void;
+        textPosition?: { x: number; y: number };
+        hoverTint?: number;
+        alpha?: number;
+    };
 
 export class CustomContainer extends Phaser.GameObjects.Container {
     private background:
@@ -38,10 +36,10 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             title = "",
             bgColor = Color.containerBg,
             titleColor = "#FFFFFF",
-            x = scene.scale.width / 2,
-            y = scene.scale.height / 2,
-            height = 300,
-            width = 200,
+            x,
+            y,
+            height,
+            width,
             borderWidth = 0,
             borderColor = Color.containerBorder,
             backgroundImage,

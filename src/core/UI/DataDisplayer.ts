@@ -1,15 +1,14 @@
-import { Position } from "../Types";
+import { Position, Size, TwoAxis } from "../Types";
 import { Grid } from "../Utils";
+import { Button } from "./Button";
 import { CustomContainer } from "./Container";
 
 export type CellValue = string | number | { icon: string };
 
 export interface DataDisplayerConfig {
     position: Position;
-    width: number;
-    height: number;
-    cols: number;
-    rows: number;
+    size: Size;
+    division: TwoAxis;
 }
 
 export interface CellArea {
@@ -21,42 +20,33 @@ export interface CellArea {
 export type DataDisplayObject = Phaser.GameObjects.GameObject &
     Phaser.GameObjects.Components.Alpha;
 
-export class DataDisplayer extends CustomContainer {
-    private grid: Grid;
+export class List extends CustomContainer {
     private cellAreas: CellArea[][] = [];
 
-    constructor(scene: Phaser.Scene, config: DataDisplayerConfig) {
+    constructor(scene: Phaser.Scene, grid: Grid) {
         super(scene, {
-            x: config.position.x,
-            y: config.position.y,
-            width: config.width,
-            height: config.height,
-            title: "",
+            x: grid.center.x,
+            y: grid.center.y,
+            width: grid.width,
+            height: grid.height,
             opacity: 0,
         });
 
-        const { cols, rows } = config;
-
-        this.grid = new Grid({
-            size: { width: this.width, height: this.height },
-            division: { vertical: rows, horizontal: cols },
-        });
-
-        for (let r = 0; r < rows; r++) {
+        for (let r = 0; r < grid.division.vertical; r++) {
             this.cellAreas[r] = [];
 
-            for (let c = 0; c < cols; c++) {
-                const area = this.grid.getArea({
-                    x: c,
-                    y: r,
+            for (let c = 0; c < grid.division.horizontal; c++) {
+                const area = grid.getArea({
+                    x: c + 1,
+                    y: r + 1,
                     width: 1,
                     height: 1,
                 });
 
                 this.cellAreas[r][c] = {
                     position: {
-                        x: -this.width / 2 + area.center.x,
-                        y: -this.height / 2 + area.center.y,
+                        x: area.center.x,
+                        y: area.center.y,
                     },
                     width: area.width,
                     height: area.height,
@@ -65,12 +55,27 @@ export class DataDisplayer extends CustomContainer {
         }
     }
 
+    public placeButton(
+        { x, y }: Position,
+        { icon, onClick }: { icon: string; onClick: () => void },
+    ): Button {
+        const area = this.cellAreas[y]?.[x];
+        return new Button(this.scene, {
+            x: area.position.x,
+            y: area.position.y,
+            width: area.width,
+            height: area.height,
+            image: icon,
+            onClick,
+        });
+    }
+
     public placeText(
-        col: number,
-        row: number,
+        x: number,
+        y: number,
         value: string | number,
     ): Phaser.GameObjects.Text {
-        const area = this.cellAreas[row]?.[col];
+        const area = this.cellAreas[y]?.[x];
         const obj = this.scene.add
             .text(0, 0, value.toString(), {
                 fontSize: "20px",
@@ -83,15 +88,15 @@ export class DataDisplayer extends CustomContainer {
     }
 
     public placeContent(
-        col: number,
-        row: number,
+        x: number,
+        y: number,
         value:
             | string
             | number
             | { icon: string; onClick?: () => void; alpha?: number },
         iconSize?: number,
-    ): DataDisplayObject {
-        const area = this.cellAreas[row]?.[col];
+    ): Phaser.GameObjects.GameObject {
+        const area = this.cellAreas[y]?.[x];
 
         let obj: Phaser.GameObjects.Image | Phaser.GameObjects.Text;
 

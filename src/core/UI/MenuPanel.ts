@@ -65,8 +65,8 @@ export class MenuPanel extends Phaser.GameObjects.Container {
         const resumeButton = new Button(scene, {
             x: scene.scale.width / 2,
             y: scene.scale.height / 2 - 80,
-            width: 0,
-            height: 0,
+            width: 300,
+            height: 50,
             text: "Reprendre",
             fontSize: 24,
             onClick: () => {
@@ -84,8 +84,8 @@ export class MenuPanel extends Phaser.GameObjects.Container {
         const settingsButton = new Button(scene, {
             x: scene.scale.width / 2,
             y: scene.scale.height / 2,
-            width: 0,
-            height: 0,
+            width: 300,
+            height: 50,
             text: "Options",
             fontSize: 24,
             onClick: () => {
@@ -103,8 +103,8 @@ export class MenuPanel extends Phaser.GameObjects.Container {
         const mainMenuButton = new Button(scene, {
             x: scene.scale.width / 2,
             y: scene.scale.height / 2 + 80,
-            width: 0,
-            height: 0,
+            width: 300,
+            height: 50,
             text: "Retour au Menu",
             fontSize: 24,
             onClick: () => {

@@ -15,7 +15,6 @@ export class LobbyRow {
         onClick: (row: LobbyRow) => void,
     ) {
         this.container = new CustomContainer(scene, {
-            title: "",
             x: area.center.x,
             y: area.center.y,
             width: area.width,
@@ -28,18 +27,10 @@ export class LobbyRow {
         this.container.on("pointerdown", () => onClick(this));
 
         // Sous-grille locale à la ligne
-        this.rowGrid = new Grid({
-            size: {
-                width: area.width,
-                height: area.height,
-            },
+        this.rowGrid = area.getGrid({
             division: {
                 vertical: 10,
                 horizontal: 1,
-            },
-            offset: {
-                x: area.x,
-                y: area.y,
             },
         });
 
@@ -48,26 +39,26 @@ export class LobbyRow {
 
     private buildCells(scene: Phaser.Scene, lobby: LobbyData) {
         const nameCell = this.rowGrid.getArea({
-            x: 0,
-            y: 0,
+            x: 1,
+            y: 1,
             width: 4,
             height: 1,
         });
         const playersCell = this.rowGrid.getArea({
-            x: 4,
-            y: 0,
+            x: 5,
+            y: 1,
             width: 2,
             height: 1,
         });
         const creatorCell = this.rowGrid.getArea({
-            x: 6,
-            y: 0,
+            x: 7,
+            y: 1,
             width: 2,
             height: 1,
         });
         const statusCell = this.rowGrid.getArea({
-            x: 8,
-            y: 0,
+            x: 9,
+            y: 1,
             width: 2,
             height: 1,
         });
@@ -76,7 +67,7 @@ export class LobbyRow {
             scene.add
                 .text(
                     nameCell.x + 10,
-                    nameCell.center.y,
+                    nameCell.center.y + 20,
                     `Lobby : ${lobby.id}`,
                     {
                         fontSize: "18px",
@@ -90,7 +81,7 @@ export class LobbyRow {
             scene.add
                 .text(
                     playersCell.center.x,
-                    playersCell.center.y,
+                    playersCell.center.y + 20,
                     `${lobby.players.length}/${lobby.maxPlayers}`,
                     {
                         fontSize: "18px",
@@ -104,7 +95,7 @@ export class LobbyRow {
             scene.add
                 .text(
                     creatorCell.center.x,
-                    creatorCell.center.y,
+                    creatorCell.center.y + 20,
                     `Creator : ${lobby.creatorId}`,
                     {
                         fontSize: "18px",
@@ -118,7 +109,7 @@ export class LobbyRow {
             scene.add
                 .text(
                     statusCell.x + statusCell.width - 10,
-                    statusCell.center.y,
+                    statusCell.center.y + 20,
                     lobby.players.length < lobby.maxPlayers ? "Open" : "Full",
                     {
                         fontSize: "18px",

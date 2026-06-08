@@ -16,11 +16,19 @@ class ParticleAssetManager extends ImageAssetManager<ParticleAssetId, string> {
     }
 
     constructor() {
-        super("particle", {
-            [ParticleAssetId.BOOST]: "boost_particle",
-            [ParticleAssetId.DEBUFF]: "debuff_particle",
-            [ParticleAssetId.HEAL]: "heal_particle",
-        });
+        super(
+            "particle",
+            {
+                [ParticleAssetId.BOOST]: "boost_particle",
+                [ParticleAssetId.DEBUFF]: "debuff_particle",
+                [ParticleAssetId.HEAL]: "heal_particle",
+            },
+            {
+                [ParticleAssetId.BOOST]: { width: 1, height: 1 },
+                [ParticleAssetId.DEBUFF]: { width: 1, height: 1 },
+                [ParticleAssetId.HEAL]: { width: 1, height: 1 },
+            },
+        );
     }
 }
 

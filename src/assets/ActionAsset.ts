@@ -21,16 +21,30 @@ class ActionAssetManager extends ImageAssetManager<ActionAssetId, string> {
     }
 
     constructor() {
-        super("action", {
-            [ActionAssetId.WALK]: "action_image_moove",
-            [ActionAssetId.SHOOT]: "action_image_shoot",
-            [ActionAssetId.HEAL]: "action_image_heal",
-            [ActionAssetId.ARTILLERY_SUPPORT]: "action_image_artillerySupport",
-            [ActionAssetId.AMPUTATE]: "action_image_amputate",
-            [ActionAssetId.BAYONET]: "action_image_bayonet",
-            [ActionAssetId.INTIMIDATION]: "action_image_intimidation",
-            [ActionAssetId.SNEAKY]: "action_image_sneaky",
-        });
+        super(
+            "action",
+            {
+                [ActionAssetId.WALK]: "action_image_moove",
+                [ActionAssetId.SHOOT]: "action_image_shoot",
+                [ActionAssetId.HEAL]: "action_image_heal",
+                [ActionAssetId.ARTILLERY_SUPPORT]:
+                    "action_image_artillerySupport",
+                [ActionAssetId.AMPUTATE]: "action_image_amputate",
+                [ActionAssetId.BAYONET]: "action_image_bayonet",
+                [ActionAssetId.INTIMIDATION]: "action_image_intimidation",
+                [ActionAssetId.SNEAKY]: "action_image_sneaky",
+            },
+            {
+                [ActionAssetId.WALK]: { width: 1, height: 1 },
+                [ActionAssetId.SHOOT]: { width: 1, height: 1 },
+                [ActionAssetId.HEAL]: { width: 1, height: 1 },
+                [ActionAssetId.ARTILLERY_SUPPORT]: { width: 1, height: 1 },
+                [ActionAssetId.AMPUTATE]: { width: 1, height: 1 },
+                [ActionAssetId.BAYONET]: { width: 1, height: 1 },
+                [ActionAssetId.INTIMIDATION]: { width: 1, height: 1 },
+                [ActionAssetId.SNEAKY]: { width: 1, height: 1 },
+            },
+        );
     }
 }
 
