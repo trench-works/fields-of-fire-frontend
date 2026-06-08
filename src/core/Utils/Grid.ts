@@ -9,6 +9,31 @@ export type GridOptions = {
     padding?: TwoAxis | FourAxis;
 };
 
+export class GridArea implements Position, Size {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+
+    center: Position;
+
+    constructor(
+        grid: Grid,
+        { x, y, width = 1, height = 1 }: Position & Partial<Size>,
+    ) {
+        this.x = grid.x + x * grid.cell.width;
+        this.y = grid.y + y * grid.cell.height;
+
+        this.width = width * grid.cell.width;
+        this.height = height * grid.cell.height;
+
+        this.center = {
+            x: this.x + this.width / 2,
+            y: this.y + this.height / 2,
+        };
+    }
+}
+
 export class Grid implements Position, Size {
     x: number;
     y: number;
@@ -41,22 +66,8 @@ export class Grid implements Position, Size {
         this.y = offset.y + position.y * this.cell.height + padding.top;
     }
 
-    getArea(
-        c: number,
-        r: number,
-        w: number,
-        h: number,
-    ): Position & Size & { center: Position } {
-        return {
-            x: this.x + c * this.cell.width,
-            y: this.y + r * this.cell.height,
-            width: w * this.cell.width,
-            height: h * this.cell.height,
-            center: {
-                x: this.x + c * this.cell.width + (w * this.cell.width) / 2,
-                y: this.y + r * this.cell.height + (h * this.cell.height) / 2,
-            },
-        };
+    getArea(options: Position & Partial<Size>): GridArea {
+        return new GridArea(this, options);
     }
 }
 

@@ -47,10 +47,30 @@ export class LobbyRow {
     }
 
     private buildCells(scene: Phaser.Scene, lobby: LobbyData) {
-        const nameCell = this.rowGrid.getArea(0, 0, 4, 1);
-        const playersCell = this.rowGrid.getArea(4, 0, 2, 1);
-        const creatorCell = this.rowGrid.getArea(6, 0, 2, 1);
-        const statusCell = this.rowGrid.getArea(8, 0, 2, 1);
+        const nameCell = this.rowGrid.getArea({
+            x: 0,
+            y: 0,
+            width: 4,
+            height: 1,
+        });
+        const playersCell = this.rowGrid.getArea({
+            x: 4,
+            y: 0,
+            width: 2,
+            height: 1,
+        });
+        const creatorCell = this.rowGrid.getArea({
+            x: 6,
+            y: 0,
+            width: 2,
+            height: 1,
+        });
+        const statusCell = this.rowGrid.getArea({
+            x: 8,
+            y: 0,
+            width: 2,
+            height: 1,
+        });
 
         this.texts.push(
             scene.add

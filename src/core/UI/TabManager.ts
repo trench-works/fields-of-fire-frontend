@@ -51,7 +51,12 @@ export class TabManager extends Phaser.GameObjects.Container {
 
             bar.add(btn);
 
-            const contentArea = new Grid().getArea(0, 0, 6, 8); // <-- 6 colonnes × 7 lignes
+            const contentArea = new Grid().getArea({
+                x: 0,
+                y: 0,
+                width: 6,
+                height: 8,
+            }); // <-- 6 colonnes × 7 lignes
 
             // Container de contenu
             const offsetX = -btnWidth / 2;

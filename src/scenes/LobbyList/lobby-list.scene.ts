@@ -86,7 +86,12 @@ export class LobbyListScene extends BaseScene {
         this.selectedLobby = null;
         this.selectedRow = null;
         this.lobbyRows.forEach((row) => row.destroy()); // destroy all rows
-        const lobbyListArea = this.sceneGrid.getArea(0, 2, 9, 6);
+        const lobbyListArea = this.sceneGrid.getArea({
+            x: 0,
+            y: 2,
+            width: 9,
+            height: 6,
+        });
         const lobbyGrid = new Grid({
             size: {
                 width: lobbyListArea.width,
@@ -103,7 +108,12 @@ export class LobbyListScene extends BaseScene {
         });
 
         this.lobbyData.forEach((lobby, i) => {
-            const rowArea = lobbyGrid.getArea(0, i, 9, 1);
+            const rowArea = lobbyGrid.getArea({
+                x: 0,
+                y: i,
+                width: 9,
+                height: 1,
+            });
             this.lobbyRows.push(
                 new LobbyRow(this, rowArea, lobby, (row) => {
                     this.selectedRow?.setSelected(false); // désélectionne l'ancienne
@@ -117,7 +127,12 @@ export class LobbyListScene extends BaseScene {
 
     createDisplay() {
         //title BOX
-        const titleBox = this.sceneGrid.getArea(0, 0, 9, 2);
+        const titleBox = this.sceneGrid.getArea({
+            x: 0,
+            y: 0,
+            width: 9,
+            height: 2,
+        });
         this.add
             .text(this.scale.width / 2, titleBox.y + 20, "Liste des Lobby", {
                 fontSize: "48px",
@@ -126,7 +141,12 @@ export class LobbyListScene extends BaseScene {
             .setOrigin(0.5, 0);
 
         //lobby list
-        const lobbyListArea = this.sceneGrid.getArea(0, 2, 9, 6);
+        const lobbyListArea = this.sceneGrid.getArea({
+            x: 0,
+            y: 2,
+            width: 9,
+            height: 6,
+        });
         new CustomContainer(this, {
             title: "",
             x: lobbyListArea.x + lobbyListArea.width / 2,
@@ -138,7 +158,12 @@ export class LobbyListScene extends BaseScene {
         });
         //buttons
 
-        const buttonArea = this.sceneGrid.getArea(0, 8, 9, 1);
+        const buttonArea = this.sceneGrid.getArea({
+            x: 0,
+            y: 8,
+            width: 9,
+            height: 1,
+        });
         const buttonGrid = new Grid({
             size: {
                 width: buttonArea.width,
@@ -154,11 +179,11 @@ export class LobbyListScene extends BaseScene {
             },
         });
 
-        buttonGrid.getArea(0, 0, 9, 9);
+        buttonGrid.getArea({ x: 0, y: 0, width: 9, height: 9 });
 
-        const cell0 = buttonGrid.getArea(1, 1, 3, 7); // bouton gauche
-        const cell1 = buttonGrid.getArea(5, 1, 3, 7); // bouton centre
-        const cell2 = buttonGrid.getArea(9, 1, 3, 7); // bouton droit
+        const cell0 = buttonGrid.getArea({ x: 1, y: 1, width: 3, height: 7 }); // bouton gauche
+        const cell1 = buttonGrid.getArea({ x: 5, y: 1, width: 3, height: 7 }); // bouton centre
+        const cell2 = buttonGrid.getArea({ x: 9, y: 1, width: 3, height: 7 }); // bouton droit
 
         new Button(this, {
             text: "Créer un Lobby",

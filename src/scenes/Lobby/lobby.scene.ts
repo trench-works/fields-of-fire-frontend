@@ -145,9 +145,19 @@ export class LobbyScene extends BaseScene {
             },
         });
 
-        const imgArea = playerpanelgrid.getArea(0, 0, 5, 5);
+        const imgArea = playerpanelgrid.getArea({
+            x: 0,
+            y: 0,
+            width: 5,
+            height: 5,
+        });
 
-        const classNameArea = playerpanelgrid.getArea(0, 5, 9, 0.5);
+        const classNameArea = playerpanelgrid.getArea({
+            x: 0,
+            y: 5,
+            width: 9,
+            height: 0.5,
+        });
 
         const playerNameContainer = new CustomContainer(this, {
             title:
@@ -179,7 +189,12 @@ export class LobbyScene extends BaseScene {
 
         this.playerImageContainer = playerImageContainer;
 
-        const buttonArea = playerpanelgrid.getArea(0, 8, 4, 1);
+        const buttonArea = playerpanelgrid.getArea({
+            x: 0,
+            y: 8,
+            width: 4,
+            height: 1,
+        });
 
         const fightButton = new Button(this, {
             x: buttonArea.center.x - playerPanelWidth / 2 + 10,
@@ -235,7 +250,7 @@ export class LobbyScene extends BaseScene {
             const col = index % classesPerRow;
             const row = Math.floor(index / classesPerRow);
 
-            const area = grid.getArea(col, row, 1, 1);
+            const area = grid.getArea({ x: col, y: row, width: 1, height: 1 });
 
             const classContainer = new CustomContainer(this, {
                 title: charClass.name,

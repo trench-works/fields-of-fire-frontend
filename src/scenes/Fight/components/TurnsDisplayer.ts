@@ -20,7 +20,12 @@ export class TurnDisplayer extends FightSceneDisplayer {
     }
 
     preRender(): this {
-        const turndisplay = this.scene.sceneGrid.getArea(0, 0, 6, 2);
+        const turndisplay = this.scene.sceneGrid.getArea({
+            x: 0,
+            y: 0,
+            width: 6,
+            height: 2,
+        });
         this.turnPanel = new CustomContainer(this.scene, {
             title: "",
             x: turndisplay.x + turndisplay.width / 2,
@@ -54,7 +59,12 @@ export class TurnDisplayer extends FightSceneDisplayer {
             },
         });
 
-        const firstCell = turnGrid.getArea(1, 1, turnCellW, actualTurnCellH);
+        const firstCell = turnGrid.getArea({
+            x: 1,
+            y: 1,
+            width: turnCellW,
+            height: actualTurnCellH,
+        });
 
         this.gameStore.game.playerTurns.forEach((entityId, index) => {
             const entity = this.gameStore.game.entities.find(
@@ -69,7 +79,12 @@ export class TurnDisplayer extends FightSceneDisplayer {
             const isFirstCell = index === 0;
 
             const col = otherStartCol + (index - 1) * (otherCellW + 1);
-            const otherCell = turnGrid.getArea(col, 1, otherCellW, turnCellH);
+            const otherCell = turnGrid.getArea({
+                x: col,
+                y: 1,
+                width: otherCellW,
+                height: turnCellH,
+            });
 
             this.icons.push(
                 new CustomContainer(this.scene, {

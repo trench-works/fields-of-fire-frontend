@@ -68,7 +68,12 @@ export class ActionDisplayer extends FightSceneDisplayer {
     }
 
     preRender(): this {
-        const actionArea = this.scene.sceneGrid.getArea(2, 8, 5, 1);
+        const actionArea = this.scene.sceneGrid.getArea({
+            x: 2,
+            y: 8,
+            width: 5,
+            height: 1,
+        });
         const actionPanel = new CustomContainer(this.scene, {
             title: "",
             x: actionArea.x + actionArea.width / 2,
@@ -85,7 +90,12 @@ export class ActionDisplayer extends FightSceneDisplayer {
                 height: actionPanel.height,
             },
         });
-        const actionListArea = actionGrid.getArea(0, 1, 7, 7);
+        const actionListArea = actionGrid.getArea({
+            x: 0,
+            y: 1,
+            width: 7,
+            height: 7,
+        });
 
         this.actionsList = new DataDisplayer(this.scene, {
             position: {
@@ -104,7 +114,12 @@ export class ActionDisplayer extends FightSceneDisplayer {
             rows: 1,
         });
 
-        const endTurnArea = actionGrid.getArea(7, 1, 1.9, 7);
+        const endTurnArea = actionGrid.getArea({
+            x: 7,
+            y: 1,
+            width: 1.9,
+            height: 7,
+        });
 
         this.endTurnButton = new Button(this.scene, {
             x: actionPanel.x - actionPanel.width / 2 + endTurnArea.center.x,

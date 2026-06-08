@@ -46,7 +46,12 @@ export class DataDisplayer extends CustomContainer {
             this.cellAreas[r] = [];
 
             for (let c = 0; c < cols; c++) {
-                const area = this.grid.getArea(c, r, 1, 1);
+                const area = this.grid.getArea({
+                    x: c,
+                    y: r,
+                    width: 1,
+                    height: 1,
+                });
 
                 this.cellAreas[r][c] = {
                     position: {

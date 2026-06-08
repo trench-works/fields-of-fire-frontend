@@ -86,12 +86,12 @@ export class StatsDisplayer extends FightSceneDisplayer {
     }
 
     preRender(): this {
-        const statsArea = this.scene.sceneGrid.getArea(
-            this.position.x,
-            this.position.y,
-            2,
-            3,
-        );
+        const statsArea = this.scene.sceneGrid.getArea({
+            x: this.position.x,
+            y: this.position.y,
+            width: 2,
+            height: 3,
+        });
 
         this.statsPanel = new CustomContainer(this.scene, {
             title: "",
@@ -110,7 +110,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
             },
         });
 
-        const imgArea = statsGrid.getArea(0, 0, 3, 4);
+        const imgArea = statsGrid.getArea({ x: 0, y: 0, width: 3, height: 4 });
 
         this.statsImage = new CustomContainer(this.scene, {
             title: "",
@@ -125,7 +125,12 @@ export class StatsDisplayer extends FightSceneDisplayer {
             backgroundImage: "unknown",
         });
 
-        const classNameArea = statsGrid.getArea(3, 0, 6, 1);
+        const classNameArea = statsGrid.getArea({
+            x: 3,
+            y: 0,
+            width: 6,
+            height: 1,
+        });
 
         this.statsClassName = new CustomContainer(this.scene, {
             title: "N/A",
@@ -143,7 +148,12 @@ export class StatsDisplayer extends FightSceneDisplayer {
             bgColor: Color.containerBorder,
             fontSize: 18,
         });
-        const playerNameArea = statsGrid.getArea(0, 4, 3, 1);
+        const playerNameArea = statsGrid.getArea({
+            x: 0,
+            y: 4,
+            width: 3,
+            height: 1,
+        });
 
         this.statsName = new CustomContainer(this.scene, {
             title: "N/A",
@@ -162,7 +172,12 @@ export class StatsDisplayer extends FightSceneDisplayer {
             fontSize: 18,
         });
 
-        const statValuesArea = statsGrid.getArea(3, 1, 6, 8);
+        const statValuesArea = statsGrid.getArea({
+            x: 3,
+            y: 1,
+            width: 6,
+            height: 8,
+        });
 
         this.statsTable = new DataDisplayer(this.scene, {
             position: {
