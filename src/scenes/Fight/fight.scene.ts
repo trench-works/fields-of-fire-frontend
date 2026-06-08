@@ -39,6 +39,7 @@ import { ParticleAsset } from "../../assets/ParticleAsset";
 import { AttackDisplayer } from "./components/attack/AttackDisplayer";
 import { MenuSocket } from "../LobbyList/repositories/menu.socket";
 import { LobbyScene } from "../Lobby/lobby.scene";
+import { EffectAsset } from "../../assets/EffectAsset";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -268,6 +269,7 @@ export class FightScene extends BaseScene {
         CharacterCloseupAsset.loadAll(this.load);
         CharacterSpriteAsset.loadAll(this.load);
         IconAsset.loadAll(this.load);
+        EffectAsset.loadAll(this.load);
     }
 
     create() {

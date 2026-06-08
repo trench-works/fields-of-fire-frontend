@@ -113,5 +113,12 @@ export class DataDisplayer extends CustomContainer {
 
         return obj;
     }
+
+    public clear(): void {
+        const toRemove = this.getAll().slice(2);
+        toRemove.forEach(child => {
+            this.remove(child, true); 
+        });
+    }
 }
 

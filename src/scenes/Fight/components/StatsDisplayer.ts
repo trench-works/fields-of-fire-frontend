@@ -1,4 +1,5 @@
 import { CharacterCloseupAsset, IconAsset } from "../../../assets";
+import { EffectAsset } from "../../../assets/EffectAsset";
 import { Color } from "../../../config/ColorConfig";
 import {
     CustomContainer,
@@ -38,6 +39,7 @@ const statDescriptions: Record<string, string> = {
 export class StatsDisplayer extends FightSceneDisplayer {
     private statsPanel!: CustomContainer;
     private statsTable!: DataDisplayer;
+    private EffectList!: DataDisplayer;
     private statsImage!: CustomContainer;
     private statsClassName!: CustomContainer;
     private statsName!: CustomContainer;
@@ -181,6 +183,24 @@ export class StatsDisplayer extends FightSceneDisplayer {
             rows: 4,
         });
 
+        const EffectListArea = statsGrid.getArea(0,5,3,4)
+        
+        this.EffectList = new DataDisplayer(this.scene, {
+            position: new Position(
+                this.statsPanel.x -
+                    this.statsPanel.width / 2 +
+                    EffectListArea.centerX,
+                this.statsPanel.y -
+                    this.statsPanel.height / 2 +
+                    EffectListArea.centerY,
+            ),
+            width: EffectListArea.width,
+            height: EffectListArea.height,
+            cols: 3,
+            rows: 4,
+        });
+
+
         return this;
     }
 
@@ -213,6 +233,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
         this.precisionStat = this.statsTable.placeText(3, 1, "N/A");
         this.dodgingStat = this.statsTable.placeText(3, 2, "N/A");
         this.mouvementStat = this.statsTable.placeText(3, 3, "N/A");
+
         return this;
     }
 
@@ -233,6 +254,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
         this.statsImage.setBackgroundImage(
             CharacterCloseupAsset.getAssetKey(this.entity.classId),
         );
+        this.displayEffects();
         return this;
     }
 
@@ -255,6 +277,47 @@ export class StatsDisplayer extends FightSceneDisplayer {
         this.mouvementStat.setVisible(isShow);
 
         return this;
+    }
+
+    displayEffects() {
+        this.EffectList.clear();
+
+        const groupedEffects = this.entity.effects.reduce((acc, effect) => {
+            if (!acc.has(effect.id)) {
+                acc.set(effect.id, []);
+            }
+            acc.get(effect.id)!.push(effect);
+            return acc;
+        }, new Map<string, typeof this.entity.effects>());
+
+        Array.from(groupedEffects.entries()).forEach(([id, effects], index) => {
+            const iconObj = this.EffectList.placeContent(
+                index,
+                0,
+                {
+                    icon: EffectAsset.getAssetKey(id),
+                    alpha: 1,
+                },
+                64,
+            );
+
+            const body = effects.map((effect) => {
+                const modified = Object.fromEntries(
+                    Object.entries(effect.modifier).filter(([, value]) => value !== 0)
+                );
+                const modifierLines = Object.entries(modified)
+                    .map(([key, value]) => `${key}: ${value > 0 ? "+" : ""}${value}`)
+                    .join("\n");
+                return `--------\n${modifierLines}\n${effect.author ?? ""}, durée : ${effect.duration}`;
+            }).join("\n");
+
+            const title = effects[0].name ?? id;
+
+            if (iconObj) {
+                iconObj.setInteractive();
+                this.scene.tooltip.attachTo(iconObj, body, title);
+            }
+        });
     }
 
     async animate(): Promise<this> {
