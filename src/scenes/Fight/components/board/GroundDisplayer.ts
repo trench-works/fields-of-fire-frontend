@@ -35,10 +35,8 @@ export class GroundDisplayer extends FightSceneDisplayer {
         );
 
         const centerMap = scaleAndCenter({
-            parentHeight: this.scene.scale.height,
-            parentWidth: this.scene.scale.width,
-            childHeight: map.heightInPixels,
-            childWidth: map.widthInPixels,
+            parent: this.scene.scale,
+            child: { width: map.widthInPixels, height: map.heightInPixels },
             isometricVariation: true,
         });
 
@@ -48,15 +46,15 @@ export class GroundDisplayer extends FightSceneDisplayer {
 
         this.scene.renderConfig.offset = PositionUtils.add(
             this.scene.renderConfig.offset,
-            { x: centerMap.offsetX, y: centerMap.offsetY },
+            { x: centerMap.offset.x, y: centerMap.offset.y },
         );
         this.scene.scaleFactor = centerMap.scaleFactor;
 
         this.groundLayer = map.createLayer(
             "Ground",
             tileset!,
-            centerMap.offsetX,
-            centerMap.offsetY,
+            centerMap.offset.x,
+            centerMap.offset.y,
         );
 
         if (!this.groundLayer) {

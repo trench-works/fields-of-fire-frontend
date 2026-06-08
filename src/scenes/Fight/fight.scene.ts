@@ -294,7 +294,7 @@ export class FightScene extends BaseScene {
                 console.log("Options - À implémenter");
             },
             onMainMenuClick: () => {
-                this.scene.start("mainMenuScene");
+                MainMenu.start(this);
             },
         });
 

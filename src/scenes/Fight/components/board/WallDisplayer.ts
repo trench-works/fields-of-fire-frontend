@@ -26,10 +26,8 @@ export class WallDisplayer extends FightSceneDisplayer {
         );
 
         const centerMap = scaleAndCenter({
-            parentHeight: this.scene.scale.height,
-            parentWidth: this.scene.scale.width,
-            childHeight: map.heightInPixels,
-            childWidth: map.widthInPixels,
+            parent: this.scene.scale,
+            child: { height: map.heightInPixels, width: map.widthInPixels },
             isometricVariation: true,
         });
 
@@ -39,15 +37,15 @@ export class WallDisplayer extends FightSceneDisplayer {
 
         this.scene.renderConfig.offset = PositionUtils.add(
             this.scene.renderConfig.offset,
-            { x: centerMap.offsetX, y: centerMap.offsetY },
+            { x: centerMap.offset.x, y: centerMap.offset.y },
         );
         this.scene.scaleFactor = centerMap.scaleFactor;
 
         this.wallLayer = map.createLayer(
             "Wall",
             tileset!,
-            centerMap.offsetX,
-            centerMap.offsetY - 32 * this.scene.scaleFactor,
+            centerMap.offset.x,
+            centerMap.offset.y - 32 * this.scene.scaleFactor,
         );
 
         if (!this.wallLayer) {
