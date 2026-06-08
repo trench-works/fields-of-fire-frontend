@@ -45,7 +45,6 @@ export class TabManager extends Phaser.GameObjects.Container {
                 text: tab.label,
                 borderWidth: 5,
                 borderColor: "#2A4237",
-                colorOnOver: "#2A4237",
                 onClick: () => this.switchTo(index),
             });
 

@@ -95,7 +95,6 @@ export class PopupInput {
             y: cy + 70,
             width: 160,
             height: 40,
-            color: "#db7f29",
             onClick: () => {
                 onValidate(this.inputElement.value).then((retour) => {
                     if (retour) {

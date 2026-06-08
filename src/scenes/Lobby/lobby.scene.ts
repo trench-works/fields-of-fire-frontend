@@ -202,8 +202,6 @@ export class LobbyScene extends BaseScene {
             width: buttonArea.width,
             height: buttonArea.height,
             text: "Combattre",
-            color: "#2A4237",
-            colorOnOver: "#4a7aa8",
             borderWidth: 2,
             borderColor: "#ffffff",
             onClick: () => {

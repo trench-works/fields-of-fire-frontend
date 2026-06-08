@@ -191,7 +191,6 @@ export class ActionDisplayer extends FightSceneDisplayer {
         this.endTurnButton.setAlpha(
             isPlayerTurn ? CLICKABLE_ALPHA : UNCLICKABLE_ALPHA,
         );
-        this.endTurnButton.setHoverColor(isPlayerTurn ? undefined : null);
         this.endTurnButton.onClick = isPlayerTurn
             ? () => this.scene.playerSocket.finishTurn()
             : undefined;

@@ -1,62 +1,47 @@
 import Phaser from "phaser";
 import { Color } from "../../config/ColorConfig";
+import { FourAxis, Position, Size } from "../Types";
 
-interface ButtonPadding {
-    left: number;
-    right: number;
-    top: number;
-    bottom: number;
-}
-
-interface ButtonConfig {
-    x?: number;
-    y?: number;
-    text: string;
-    color?: string;
-    onClick?: () => void;
-    fontSize?: string;
-    textColor?: string;
-    padding?: ButtonPadding;
-    height?: number;
-    width?: number;
-    borderWidth?: number;
-    borderColor?: string;
-    colorOnOver?: string;
-}
+type ButtonConfig = Position &
+    Size & {
+        text: string;
+        onClick?: () => void;
+        fontSize?: number;
+        textColor?: string;
+        padding?: FourAxis;
+        borderWidth?: number;
+        borderColor?: string;
+    };
 
 export class Button extends Phaser.GameObjects.Container {
     private buttonText: Phaser.GameObjects.Text;
-    private color: string;
-    private hoverColor: string | null;
     public onClick?: () => void;
     protected bg: Phaser.GameObjects.Rectangle;
 
+    protected color = Color.btnBg;
+
     constructor(scene: Phaser.Scene, config: ButtonConfig) {
         const {
-            x = 0,
-            y = 0,
+            x,
+            y,
+            width,
+            height,
             text,
-            color = Color.btnBg,
             onClick,
-            fontSize = "20px",
+            fontSize = 20,
             textColor = "#FFFFFF",
             borderWidth = 0,
-            borderColor = Color.btnBorder,
-            colorOnOver = "#4a7eb0",
-            //padding = { left: 15, right: 15, top: 10, bottom: 10 },
         } = config;
 
         super(scene, x, y);
 
-        this.color = color;
-        this.hoverColor = colorOnOver;
         this.onClick = onClick;
 
         // Créer le texte du bouton
         this.buttonText = scene.add
             .text(0, 0, text, {
                 fontFamily: "MyFont",
-                fontSize: fontSize,
+                fontSize: `${fontSize}px`,
                 color: textColor,
             })
             .setOrigin(0.5);
@@ -74,25 +59,24 @@ export class Button extends Phaser.GameObjects.Container {
             this.setSize(config.width, config.height);
         }
 
-        const bg = scene.add.rectangle(
+        this.bg = scene.add.rectangle(
             0,
             0,
             this.width,
             this.height,
-            Phaser.Display.Color.HexStringToColor(color).color,
+            Phaser.Display.Color.HexStringToColor(this.color).color,
         );
+        this.add(this.bg);
 
         if (borderWidth > 0) {
-            bg.setStrokeStyle(
+            this.bg.setStrokeStyle(
                 borderWidth,
-                Phaser.Display.Color.HexStringToColor(borderColor).color,
+                Phaser.Display.Color.HexStringToColor(Color.btnBorder).color,
             );
         }
 
-        this.bg = bg;
-        this.add(bg);
-        bg.setOrigin(0.5);
-        this.sendToBack(bg);
+        this.bg.setOrigin(0.5);
+        this.sendToBack(this.bg);
         // Défini la hitbox interactive (le "clicable")
         const hitArea = new Phaser.Geom.Rectangle(
             0,
@@ -117,32 +101,20 @@ export class Button extends Phaser.GameObjects.Container {
         );
     }
 
-    public setHoverColor(hoverColor?: string | null): this {
-        if (hoverColor === undefined) {
-            this.hoverColor = "#4a7eb0";
-            return this;
-        }
-        this.hoverColor = hoverColor;
-        return this;
-    }
-
     private setupEvents() {
         this.on("pointerdown", () => {
             this.onClick?.();
         });
 
         this.on("pointerover", () => {
-            if (this.hoverColor) {
-                this.bg.setFillStyle(
-                    Phaser.Display.Color.HexStringToColor(this.hoverColor)
-                        .color,
-                );
-            }
+            this.bg.setFillStyle(
+                Phaser.Display.Color.HexStringToColor("#4a7eb0").color,
+            );
         });
 
         this.on("pointerout", () => {
             this.bg.setFillStyle(
-                Phaser.Display.Color.HexStringToColor(this.color).color,
+                Phaser.Display.Color.HexStringToColor(Color.btnBg).color,
             );
         });
     }
