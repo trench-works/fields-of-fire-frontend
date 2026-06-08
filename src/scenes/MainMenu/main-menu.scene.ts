@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { BaseScene, Button, CustomContainer, GridUtils } from "../../core";
+import { BaseScene, Button, CustomContainer, Grid } from "../../core";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { LobbyListScene } from "../LobbyList/lobby-list.scene";
 import { PopupInput } from "./objects/LoginPopup";
@@ -8,9 +8,9 @@ import { SceneAssetId } from "../../assets/ScenesAsset";
 import { MiscAsset, MiscAssetId } from "../../assets";
 
 export class MainMenu extends BaseScene {
-    private readonly BUTTON_WIDTH = 500;
-    private readonly BUTTON_HEIGHT = 100;
-    private sceneGrid = GridUtils.uiGrid(0, 0);
+    private readonly BUTTON_WIDTH = 400;
+    private readonly BUTTON_HEIGHT = 400 * (50 / 180);
+    private sceneGrid = new Grid();
 
     private playButton!: CustomContainer;
     private connectButton!: Button;
@@ -29,7 +29,7 @@ export class MainMenu extends BaseScene {
 
     preload() {
         super.preload();
-        MiscAsset.load(this.load, MiscAssetId.BULLET);
+        MiscAsset.load(this.load, MiscAssetId.BUTTON);
     }
 
     create() {
@@ -47,22 +47,19 @@ export class MainMenu extends BaseScene {
         const buttonsArea = this.sceneGrid.getArea(4.5, 3, 0, 15);
 
         // Créer une grille interne pour les boutons (3 boutons: 1 colonne, 3 lignes)
-        const buttonsGrid = GridUtils.uiGrid(
-            0,
-            0,
-            buttonsArea.width,
-            buttonsArea.height,
-        );
+        const buttonsGrid = new Grid({
+            size: { width: buttonsArea.width, height: buttonsArea.height },
+        });
 
         // Bouton Jouer (ligne 0)
         const playArea = buttonsGrid.getArea(0, 0, 1, 1);
         this.playButton = new CustomContainer(this, {
             title: "Jouer",
-            x: buttonsArea.x + playArea.centerX,
-            y: buttonsArea.y + playArea.centerY,
+            x: buttonsArea.x + playArea.center.x,
+            y: buttonsArea.y + playArea.center.y,
             width: this.BUTTON_WIDTH,
             height: this.BUTTON_HEIGHT,
-            backgroundImage: MiscAsset.getAssetKey(MiscAssetId.BULLET),
+            backgroundImage: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
             titleColor: "#FFFFFF",
             fontSize: 40,
             alpha: global.user ? 1 : 0.5,
@@ -79,11 +76,11 @@ export class MainMenu extends BaseScene {
         const settingsArea = buttonsGrid.getArea(0, 1, 1, 1);
         new CustomContainer(this, {
             title: "Paramètres",
-            x: buttonsArea.x + settingsArea.centerX,
-            y: buttonsArea.y + settingsArea.centerY,
+            x: buttonsArea.x + settingsArea.center.x,
+            y: buttonsArea.y + settingsArea.center.y,
             width: this.BUTTON_WIDTH,
             height: this.BUTTON_HEIGHT,
-            backgroundImage: MiscAsset.getAssetKey(MiscAssetId.BULLET),
+            backgroundImage: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
             titleColor: "#FFFFFF",
             fontSize: 40,
             textPosition: { x: -70, y: -10 },
@@ -95,14 +92,17 @@ export class MainMenu extends BaseScene {
 
         //bouton login
         const loginArea = this.sceneGrid.getArea(8, 0, 1, 1);
-        this.connectButton = new Button(this, {
-            text: global.user?.username ?? "Login",
+        new CustomContainer(this, {
+            title: global.user?.username ?? "Login",
             x: loginArea.x + loginArea.width / 2,
             y: loginArea.y + loginArea.height / 2,
-            width: loginArea.width,
-            height: loginArea.height,
-            textColor: "#FFFFFF",
-            color: "#db7f29",
+            width: 360,
+            height: 100,
+            backgroundImage: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
+            titleColor: "#FFFFFF",
+            fontSize: 40,
+            textPosition: { x: -70, y: -10 },
+            hoverTint: 0xcccccc,
             onClick: global.user
                 ? undefined
                 : () => {

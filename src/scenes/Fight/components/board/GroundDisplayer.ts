@@ -1,7 +1,7 @@
 import { MiscAsset, MiscAssetId } from "../../../../assets";
-import { Position } from "../../../../core";
 import { Diamond } from "../../../../core/Objects/Diamond";
 import { scaleAndCenter } from "../../../../core/Utils/Scale";
+import { PositionUtils } from "../../../../core/Utils/Sizing";
 import { EntityType } from "../../../../Model/Entity";
 import { FightScene } from "../../fight.scene";
 import { ClassStore } from "../../stores/ClassStore";
@@ -46,8 +46,9 @@ export class GroundDisplayer extends FightSceneDisplayer {
             throw new Error("Render config not defined");
         }
 
-        this.scene.renderConfig.offset.add(
-            new Position(centerMap.offsetX, centerMap.offsetY),
+        this.scene.renderConfig.offset = PositionUtils.add(
+            this.scene.renderConfig.offset,
+            { x: centerMap.offsetX, y: centerMap.offsetY },
         );
         this.scene.scaleFactor = centerMap.scaleFactor;
 
@@ -150,11 +151,11 @@ export class GroundDisplayer extends FightSceneDisplayer {
                     }
 
                     this.scene.gridPositions[x][y] = {
-                        gridPosition: new Position(x, y),
-                        pixelPosition: new Position(
-                            worldX,
-                            worldY - 16 * this.scene.scaleFactor,
-                        ),
+                        gridPosition: { x, y },
+                        pixelPosition: {
+                            x: worldX,
+                            y: worldY - 16 * this.scene.scaleFactor,
+                        },
                         zone,
                         hoverGraphics,
                     };
@@ -162,13 +163,9 @@ export class GroundDisplayer extends FightSceneDisplayer {
                     zone.on("pointerdown", () => {
                         if (this.scene.actionManager.currentAction) {
                             if (
-                                this.scene.rangeVisualizer.isInRange(
-                                    new Position(x, y),
-                                )
+                                this.scene.rangeVisualizer.isInRange({ x, y })
                             ) {
-                                this.scene.actionManager.launchAction(
-                                    new Position(x, y),
-                                );
+                                this.scene.actionManager.launchAction({ x, y });
                             }
                         } else {
                             const tile = this.gameStore.game.plateau[x][y];
@@ -256,14 +253,14 @@ export class GroundDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    manageToolTip(x?: number, y?: number) {
+    manageToolTip(x: number, y: number) {
         const action = this.scene.actionManager.currentAction;
         if (!action) return;
 
-        const zoneCells = this.scene.rangeVisualizer.spellZonePreview(
-            action,
-            new Position(x, y),
-        );
+        const zoneCells = this.scene.rangeVisualizer.spellZonePreview(action, {
+            x,
+            y,
+        });
         if (!zoneCells || action.id === "walk") return;
 
         // ✅ collecte tous les tooltips à afficher

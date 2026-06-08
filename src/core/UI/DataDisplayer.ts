@@ -1,5 +1,5 @@
-import { Position, UiGrid } from "../Types";
-import { GridUtils } from "../Utils";
+import { Position } from "../Types";
+import { Grid } from "../Utils";
 import { CustomContainer } from "./Container";
 
 export type CellValue = string | number | { icon: string };
@@ -22,7 +22,7 @@ export type DataDisplayObject = Phaser.GameObjects.GameObject &
     Phaser.GameObjects.Components.Alpha;
 
 export class DataDisplayer extends CustomContainer {
-    private grid: UiGrid;
+    private grid: Grid;
     private cellAreas: CellArea[][] = [];
 
     constructor(scene: Phaser.Scene, config: DataDisplayerConfig) {
@@ -37,7 +37,10 @@ export class DataDisplayer extends CustomContainer {
 
         const { cols, rows } = config;
 
-        this.grid = GridUtils.uiGrid(0, 0, this.width, this.height, cols, rows);
+        this.grid = new Grid({
+            size: { width: this.width, height: this.height },
+            division: { vertical: rows, horizontal: cols },
+        });
 
         for (let r = 0; r < rows; r++) {
             this.cellAreas[r] = [];
@@ -46,10 +49,10 @@ export class DataDisplayer extends CustomContainer {
                 const area = this.grid.getArea(c, r, 1, 1);
 
                 this.cellAreas[r][c] = {
-                    position: new Position(
-                        -this.width / 2 + area.centerX,
-                        -this.height / 2 + area.centerY,
-                    ),
+                    position: {
+                        x: -this.width / 2 + area.center.x,
+                        y: -this.height / 2 + area.center.y,
+                    },
                     width: area.width,
                     height: area.height,
                 };

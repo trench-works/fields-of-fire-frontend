@@ -2,10 +2,9 @@ import {
     Button,
     CustomContainer,
     TabManager,
-    GridUtils,
-    Position,
     MenuButton,
     BaseScene,
+    Grid,
 } from "../../core";
 import { Color } from "../../config/ColorConfig";
 import { CharacterClass } from "../../Model/CharacterClass";
@@ -74,7 +73,7 @@ export class LobbyScene extends BaseScene {
         });
 
         //title BOX
-        const titleBox = GridUtils.uiGrid(0, 0);
+        const titleBox = new Grid();
 
         this.add
             .text(this.scale.width / 2, titleBox.y + 20, "LOBBY", {
@@ -84,10 +83,10 @@ export class LobbyScene extends BaseScene {
             .setOrigin(0.5, 0);
 
         //tab BOX
-        const tabArea = GridUtils.uiGrid(0, 1);
+        const tabArea = new Grid({ position: { x: 0, y: 1 } });
 
-        this.tabWidth = tabArea.cellW * 2; // colonnes 0 et 1
-        this.tabHeight = this.scale.height - tabArea.cellH; // lignes 1 à 8
+        this.tabWidth = tabArea.cell.width * 2; // colonnes 0 et 1
+        this.tabHeight = this.scale.height - tabArea.cell.height; // lignes 1 à 8
 
         const tabManager = new TabManager(this, [
             {
@@ -123,13 +122,13 @@ export class LobbyScene extends BaseScene {
         tabManager.setPosition(tabArea.x + this.tabWidth / 2, tabArea.y + 20);
 
         //Selected character info BOX
-        const area = GridUtils.uiGrid(6, 1);
-        const playerPanelWidth = area.cellW * 3;
-        const playerPanelHeight = this.scale.height - area.cellH;
-        const currentPlayerInfoPosition = new Position(
-            area.x + playerPanelWidth / 2,
-            area.y + playerPanelHeight / 2,
-        );
+        const area = new Grid({ position: { x: 6, y: 1 } });
+        const playerPanelWidth = area.cell.width * 3;
+        const playerPanelHeight = this.scale.height - area.cell.height;
+        const currentPlayerInfoPosition = {
+            x: area.x + playerPanelWidth / 2,
+            y: area.y + playerPanelHeight / 2,
+        };
         const playerPanel = new CustomContainer(this, {
             title: "",
             x: currentPlayerInfoPosition.x,
@@ -139,12 +138,12 @@ export class LobbyScene extends BaseScene {
             borderWidth: 5,
         });
 
-        const playerpanelgrid = GridUtils.uiGrid(
-            0,
-            0,
-            playerPanelWidth,
-            playerPanelHeight,
-        );
+        const playerpanelgrid = new Grid({
+            size: {
+                width: playerPanelWidth,
+                height: playerPanelHeight,
+            },
+        });
 
         const imgArea = playerpanelgrid.getArea(0, 0, 5, 5);
 
@@ -154,8 +153,8 @@ export class LobbyScene extends BaseScene {
             title:
                 this.classes.find(({ id }) => id === this.selectClassId)
                     ?.name ?? "",
-            x: classNameArea.centerX - playerPanelWidth / 2,
-            y: classNameArea.centerY - playerPanelHeight / 2 + 10,
+            x: classNameArea.center.x - playerPanelWidth / 2,
+            y: classNameArea.center.y - playerPanelHeight / 2 + 10,
             width: classNameArea.width,
             height: classNameArea.height,
             bgColor: Color.containerBorder,
@@ -167,8 +166,8 @@ export class LobbyScene extends BaseScene {
 
         const playerImageContainer = new CustomContainer(this, {
             title: "",
-            x: imgArea.centerX - playerPanelWidth / 2 + 10,
-            y: imgArea.centerY - playerPanelHeight / 2 + 10,
+            x: imgArea.center.x - playerPanelWidth / 2 + 10,
+            y: imgArea.center.y - playerPanelHeight / 2 + 10,
             width: imgArea.width,
             height: imgArea.height,
             backgroundImage: CharacterCloseupAsset.getAssetKey(
@@ -183,8 +182,8 @@ export class LobbyScene extends BaseScene {
         const buttonArea = playerpanelgrid.getArea(0, 8, 4, 1);
 
         const fightButton = new Button(this, {
-            x: buttonArea.centerX - playerPanelWidth / 2 + 10,
-            y: buttonArea.centerY - playerPanelHeight / 2 - 10,
+            x: buttonArea.center.x - playerPanelWidth / 2 + 10,
+            y: buttonArea.center.y - playerPanelHeight / 2 - 10,
             width: buttonArea.width,
             height: buttonArea.height,
             text: "Combattre",
@@ -221,14 +220,16 @@ export class LobbyScene extends BaseScene {
         const rows = 2;
         const padding = 100;
 
-        const grid = GridUtils.uiGrid(
-            0,
-            0,
-            container.width,
-            this.tabHeight,
-            classesPerRow,
-            rows,
-        );
+        const grid = new Grid({
+            size: {
+                width: container.width,
+                height: this.tabHeight,
+            },
+            division: {
+                horizontal: classesPerRow,
+                vertical: rows,
+            },
+        });
 
         classes.slice(0, classesPerRow * rows).forEach((charClass, index) => {
             const col = index % classesPerRow;
@@ -237,9 +238,9 @@ export class LobbyScene extends BaseScene {
             const area = grid.getArea(col, row, 1, 1);
 
             const classContainer = new CustomContainer(this, {
-                title: charClass.name, // ✅ nom de la classe affiché
-                x: area.centerX,
-                y: area.centerY,
+                title: charClass.name,
+                x: area.center.x,
+                y: area.center.y,
                 width: area.width - padding,
                 height: area.height - padding,
                 backgroundImage: CharacterIconAsset.getAssetKey(charClass.id),

@@ -1,5 +1,5 @@
 import { Scene } from "phaser";
-import { Position } from "../Types/Position";
+import { Position } from "../Types/Sizing";
 
 export type GameObjectProps = {
     //input: Input;

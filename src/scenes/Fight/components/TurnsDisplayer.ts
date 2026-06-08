@@ -1,6 +1,6 @@
 import { CharacterCloseupAsset } from "../../../assets";
 import { Color } from "../../../config/ColorConfig";
-import { CustomContainer, GridUtils } from "../../../core";
+import { CustomContainer, Grid } from "../../../core";
 import { FightScene } from "../fight.scene";
 import { ClassStore } from "../stores/ClassStore";
 import { GameStore } from "../stores/GameStore";
@@ -43,14 +43,16 @@ export class TurnDisplayer extends FightSceneDisplayer {
         const otherCellW = turnCellW * 0.75;
         const otherStartCol = turnCellW + 1;
 
-        const turnGrid = GridUtils.uiGrid(
-            0,
-            0,
-            this.turnPanel.width,
-            this.turnPanel.height,
-            this.gameStore.game.playerTurns.length * 10,
-            9,
-        );
+        const turnGrid = new Grid({
+            size: {
+                width: this.turnPanel.width,
+                height: this.turnPanel.height,
+            },
+            division: {
+                horizontal: this.gameStore.game.playerTurns.length * 10,
+                vertical: 9,
+            },
+        });
 
         const firstCell = turnGrid.getArea(1, 1, turnCellW, actualTurnCellH);
 
@@ -75,12 +77,12 @@ export class TurnDisplayer extends FightSceneDisplayer {
                     x:
                         this.turnPanel.x -
                         this.turnPanel.width / 2 +
-                        (isFirstCell ? firstCell : otherCell).centerX +
+                        (isFirstCell ? firstCell : otherCell).center.x +
                         (isFirstCell ? 0 : 50),
                     y:
                         this.turnPanel.y -
                         this.turnPanel.height / 2 +
-                        (isFirstCell ? firstCell : otherCell).centerY,
+                        (isFirstCell ? firstCell : otherCell).center.y,
                     width: (isFirstCell ? firstCell : otherCell).width,
                     height: (isFirstCell ? firstCell : otherCell).height,
                     borderWidth: isFirstCell ? 5 : 2,

@@ -1,4 +1,4 @@
-import { GridUtils } from "../Utils";
+import { Grid } from "../Utils";
 import { Button } from "./Button";
 import { CustomContainer } from "./Container";
 
@@ -26,8 +26,8 @@ export class TabManager extends Phaser.GameObjects.Container {
     }
 
     private createTabs(tabsConfig: TabConfig[]) {
-        const grid = GridUtils.uiGrid(0, 0);
-        const barWidth = grid.cellW * 6;
+        const grid = new Grid();
+        const barWidth = grid.cell.width * 6;
         const barHeight = 40;
 
         const bar = this.scene.add.container(0, 0);
@@ -51,7 +51,7 @@ export class TabManager extends Phaser.GameObjects.Container {
 
             bar.add(btn);
 
-            const contentArea = GridUtils.uiGrid(0, 0).getArea(0, 0, 6, 8); // <-- 6 colonnes × 7 lignes
+            const contentArea = new Grid().getArea(0, 0, 6, 8); // <-- 6 colonnes × 7 lignes
 
             // Container de contenu
             const offsetX = -btnWidth / 2;

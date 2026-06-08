@@ -1,6 +1,6 @@
 import { MiscAsset, MiscAssetId } from "../../../../assets";
-import { Position } from "../../../../core";
 import { scaleAndCenter } from "../../../../core/Utils/Scale";
+import { PositionUtils } from "../../../../core/Utils/Sizing";
 import { FightScene } from "../../fight.scene";
 import { GameStore } from "../../stores/GameStore";
 import { FightSceneDisplayer } from "../FightSceneDisplayer";
@@ -37,8 +37,9 @@ export class WallDisplayer extends FightSceneDisplayer {
             throw new Error("Render config not defined");
         }
 
-        this.scene.renderConfig.offset.add(
-            new Position(centerMap.offsetX, centerMap.offsetY),
+        this.scene.renderConfig.offset = PositionUtils.add(
+            this.scene.renderConfig.offset,
+            { x: centerMap.offsetX, y: centerMap.offsetY },
         );
         this.scene.scaleFactor = centerMap.scaleFactor;
 

@@ -12,7 +12,10 @@ export class RangeVisualizer {
         private readonly gameStore: GameStore,
     ) {}
 
-    private highlightCell(cell: Cell, color: number = 0x00aaff): Phaser.GameObjects.Graphics {
+    private highlightCell(
+        cell: Cell,
+        color: number = 0x00aaff,
+    ): Phaser.GameObjects.Graphics {
         const g = this.scene.add.graphics();
         g.fillStyle(color, 0.6);
         g.fillPoints(
@@ -32,7 +35,7 @@ export class RangeVisualizer {
     showRange(): this {
         this.cellsInRange.forEach((cell) => {
             if (cell) {
-                 cell.highlight = this.highlightCell(cell);
+                cell.highlight = this.highlightCell(cell);
             }
         });
         return this;
@@ -83,7 +86,7 @@ export class RangeVisualizer {
                         !cell.isWall &&
                         !cell.entityId
                     ) {
-                        const cellPos = new Position(x, y);
+                        const cellPos = { x, y };
                         cells.push(
                             cellPos,
                             ...this.getCellsAround(
@@ -133,32 +136,45 @@ export class RangeVisualizer {
         this.zoneHighlights = [];
     }
 
-    spellZonePreview(action: Action, target: Position){
+    spellZonePreview(action: Action, target: Position) {
         this.clearZonePreview(); // ✅ nettoie avant de redessiner
         const zoneCells: Cell[] = [];
 
         if (!this.isInRange(target)) return;
         if (!action.zoneType?.length) return;
         switch (action.zoneType[0]) {
-            case ActionZoneType.DIAMOND:
+            case ActionZoneType.DIAMOND: {
                 if (!action.zoneSize) return;
-            const zoneSize = action.zoneSize - 1;
-            for (let x = target.x - zoneSize; x <= target.x + zoneSize; x++) {
-                for (let y = target.y - zoneSize; y <= target.y + zoneSize; y++) {
-                    if (Math.abs(target.x - x) + Math.abs(target.y - y) <= zoneSize) {
-                        const cell = this.scene.gridPositions[x]?.[y];
-                        if (cell) {
-                            this.zoneHighlights.push(this.highlightCell(cell, 0x42a97b));
-                            zoneCells.push(cell);
+                const zoneSize = action.zoneSize - 1;
+                for (
+                    let x = target.x - zoneSize;
+                    x <= target.x + zoneSize;
+                    x++
+                ) {
+                    for (
+                        let y = target.y - zoneSize;
+                        y <= target.y + zoneSize;
+                        y++
+                    ) {
+                        if (
+                            Math.abs(target.x - x) + Math.abs(target.y - y) <=
+                            zoneSize
+                        ) {
+                            const cell = this.scene.gridPositions[x]?.[y];
+                            if (cell) {
+                                this.zoneHighlights.push(
+                                    this.highlightCell(cell, 0x42a97b),
+                                );
+                                zoneCells.push(cell);
+                            }
                         }
                     }
                 }
-            }
                 break;
             }
+        }
 
         return zoneCells;
     }
-    
 }
 

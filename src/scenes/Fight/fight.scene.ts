@@ -1,11 +1,4 @@
-import {
-    GridUtils,
-    Position,
-    PositionUtils,
-    MenuButton,
-    BaseScene,
-    EventQueue,
-} from "../../core";
+import { Position, MenuButton, BaseScene, EventQueue, Grid } from "../../core";
 import { SceneConfig } from "../../config/SceneConfig";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
 import {
@@ -39,6 +32,7 @@ import { ParticleAsset } from "../../assets/ParticleAsset";
 import { AttackDisplayer } from "./components/attack/AttackDisplayer";
 import { MenuSocket } from "../LobbyList/repositories/menu.socket";
 import { LobbyScene } from "../Lobby/lobby.scene";
+import { PositionUtils } from "../../core/Utils/Sizing";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -70,7 +64,7 @@ export type FightSceneInit = {
 
 export class FightScene extends BaseScene {
     public renderConfig: SceneRenderConfig;
-    public sceneGrid = GridUtils.uiGrid(0, 0);
+    public sceneGrid = new Grid();
 
     /**
      * Stores
@@ -169,7 +163,7 @@ export class FightScene extends BaseScene {
         this.renderConfig = {
             tileSize: config.render_config.tile_size,
             renderType: config.render_config.render_type,
-            offset: new Position(),
+            offset: { x: 0, y: 0 },
         };
         this.renderConfig.offset = PositionUtils.getMapOffset(
             this.renderConfig,

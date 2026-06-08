@@ -4,6 +4,7 @@ export enum MiscAssetId {
     GROUND = "ground",
     WALL = "wall",
     BULLET = "bullet",
+    BUTTON = "bouton",
 }
 
 class MiscAssetManager extends ImageAssetManager<MiscAssetId, string> {
@@ -20,6 +21,7 @@ class MiscAssetManager extends ImageAssetManager<MiscAssetId, string> {
             [MiscAssetId.GROUND]: "ground",
             [MiscAssetId.WALL]: "wall",
             [MiscAssetId.BULLET]: "menuBalle",
+            [MiscAssetId.BUTTON]: "BoutonSauvage",
         });
     }
 }

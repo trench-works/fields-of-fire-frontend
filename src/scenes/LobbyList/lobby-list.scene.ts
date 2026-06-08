@@ -4,12 +4,11 @@ import {
     BaseScene,
     Button,
     CustomContainer,
-    GridUtils,
+    Grid,
     MenuButton,
 } from "../../core";
 import { FightScene } from "../Fight/fight.scene";
 import { MainMenu } from "../MainMenu/main-menu.scene";
-import { uiGrid } from "../../core/Utils/Grid";
 import { LobbyRow } from "./objects/LobbyRow";
 import { LobbyData } from "./interfaces/LobbyData";
 import { LobbiesRepository } from "./repositories/lobbies.repository";
@@ -18,7 +17,7 @@ import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 
 export class LobbyListScene extends BaseScene {
     public menuSocket!: MenuSocket;
-    private sceneGrid = GridUtils.uiGrid(0, 0);
+    private sceneGrid = new Grid();
     private lobbyData: LobbyData[] = [];
     private selectedLobby: LobbyData | null = null;
     private selectedRow: LobbyRow | null = null;
@@ -88,16 +87,20 @@ export class LobbyListScene extends BaseScene {
         this.selectedRow = null;
         this.lobbyRows.forEach((row) => row.destroy()); // destroy all rows
         const lobbyListArea = this.sceneGrid.getArea(0, 2, 9, 6);
-        const lobbyGrid = uiGrid(
-            0,
-            0,
-            lobbyListArea.width,
-            lobbyListArea.height,
-            9,
-            12,
-            lobbyListArea.x,
-            lobbyListArea.y,
-        );
+        const lobbyGrid = new Grid({
+            size: {
+                width: lobbyListArea.width,
+                height: lobbyListArea.height,
+            },
+            division: {
+                vertical: 12,
+                horizontal: 9,
+            },
+            offset: {
+                x: lobbyListArea.x,
+                y: lobbyListArea.y,
+            },
+        });
 
         this.lobbyData.forEach((lobby, i) => {
             const rowArea = lobbyGrid.getArea(0, i, 9, 1);
@@ -136,16 +139,20 @@ export class LobbyListScene extends BaseScene {
         //buttons
 
         const buttonArea = this.sceneGrid.getArea(0, 8, 9, 1);
-        const buttonGrid = uiGrid(
-            0,
-            0,
-            buttonArea.width,
-            buttonArea.height,
-            13,
-            9,
-            buttonArea.x,
-            buttonArea.y,
-        );
+        const buttonGrid = new Grid({
+            size: {
+                width: buttonArea.width,
+                height: buttonArea.height,
+            },
+            division: {
+                vertical: 9,
+                horizontal: 13,
+            },
+            offset: {
+                x: buttonArea.x,
+                y: buttonArea.y,
+            },
+        });
 
         buttonGrid.getArea(0, 0, 9, 9);
 
@@ -155,8 +162,8 @@ export class LobbyListScene extends BaseScene {
 
         new Button(this, {
             text: "Créer un Lobby",
-            x: cell0.centerX,
-            y: cell0.centerY,
+            x: cell0.center.x,
+            y: cell0.center.y,
             width: cell0.width,
             height: cell0.height,
             onClick: () => {
@@ -166,8 +173,8 @@ export class LobbyListScene extends BaseScene {
 
         new Button(this, {
             text: "Rejoindre un Lobby",
-            x: cell2.centerX,
-            y: cell2.centerY,
+            x: cell2.center.x,
+            y: cell2.center.y,
             width: cell2.width,
             height: cell2.height,
             onClick: () => {
@@ -181,8 +188,8 @@ export class LobbyListScene extends BaseScene {
 
         new Button(this, {
             text: "Actualiser",
-            x: cell1.centerX,
-            y: cell1.centerY,
+            x: cell1.center.x,
+            y: cell1.center.y,
             width: cell1.width,
             height: cell1.height,
             onClick: () => {

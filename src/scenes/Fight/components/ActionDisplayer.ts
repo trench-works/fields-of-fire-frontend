@@ -2,11 +2,10 @@ import { ActionAsset, ActionAssetId } from "../../../assets/ActionAsset";
 import { Color } from "../../../config/ColorConfig";
 import {
     CustomContainer,
-    Position,
     DataDisplayer,
-    GridUtils,
     Button,
     DataDisplayObject,
+    Grid,
 } from "../../../core";
 import { Action } from "../../../Model/Action";
 import { FightScene } from "../fight.scene";
@@ -80,19 +79,25 @@ export class ActionDisplayer extends FightSceneDisplayer {
             opacity: 0.5,
         });
 
-        const actionGrid = GridUtils.uiGrid(
-            0,
-            0,
-            actionPanel.width,
-            actionPanel.height,
-        );
+        const actionGrid = new Grid({
+            size: {
+                width: actionPanel.width,
+                height: actionPanel.height,
+            },
+        });
         const actionListArea = actionGrid.getArea(0, 1, 7, 7);
 
         this.actionsList = new DataDisplayer(this.scene, {
-            position: new Position(
-                actionPanel.x - actionPanel.width / 2 + actionListArea.centerX,
-                actionPanel.y - actionPanel.height / 2 + actionListArea.centerY,
-            ),
+            position: {
+                x:
+                    actionPanel.x -
+                    actionPanel.width / 2 +
+                    actionListArea.center.x,
+                y:
+                    actionPanel.y -
+                    actionPanel.height / 2 +
+                    actionListArea.center.y,
+            },
             width: actionListArea.width,
             height: actionListArea.height,
             cols: 7,
@@ -102,8 +107,8 @@ export class ActionDisplayer extends FightSceneDisplayer {
         const endTurnArea = actionGrid.getArea(7, 1, 1.9, 7);
 
         this.endTurnButton = new Button(this.scene, {
-            x: actionPanel.x - actionPanel.width / 2 + endTurnArea.centerX,
-            y: actionPanel.y - actionPanel.height / 2 + endTurnArea.centerY,
+            x: actionPanel.x - actionPanel.width / 2 + endTurnArea.center.x,
+            y: actionPanel.y - actionPanel.height / 2 + endTurnArea.center.y,
             width: endTurnArea.width,
             height: endTurnArea.height,
             text: "Fin du tour",

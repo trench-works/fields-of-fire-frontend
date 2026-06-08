@@ -1,17 +1,4 @@
-export interface UiGridArea {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    centerX: number;
-    centerY: number;
-}
+import { Position, Size } from "./Sizing";
 
-export interface UiGrid {
-    x: number;
-    y: number;
-    cellW: number;
-    cellH: number;
-    getArea: (c: number, r: number, w: number, h: number) => UiGridArea;
-}
+export type GridArea = Position & Size & { center: Position };
 
