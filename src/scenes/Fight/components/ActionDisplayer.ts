@@ -1,6 +1,6 @@
 import { ActionAsset, ActionAssetId } from "../../../assets/ActionAsset";
 import { Color } from "../../../config/ColorConfig";
-import { CustomContainer, List, Button } from "../../../core";
+import { CustomContainer, List, Button, ScaleUtils } from "../../../core";
 import { Action } from "../../../Model/Action";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/GameStore";
@@ -91,7 +91,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
                     horizontal: 9,
                     vertical: 1,
                 },
-                padding: 20,
+                padding: 5,
             },
         );
 
@@ -120,11 +120,21 @@ export class ActionDisplayer extends FightSceneDisplayer {
 
     render(): this {
         this.playerStore.playerClass.actionList.forEach((action, index) => {
-            const iconObj = this.actionsList.placeButton(
+            const iconObj = this.actionsList.place(
                 { x: index, y: 0 },
-                {
-                    icon: ActionAsset.getAssetKey(action.id),
-                    onClick: () => this.handleActionClick(action),
+                (area) => {
+                    const size = ScaleUtils.fitFromScale(
+                        area,
+                        ActionAsset.getAssetScale(action.id),
+                    );
+                    return new Button(this.scene, {
+                        x: area.position.x,
+                        y: area.position.y,
+                        width: size.width,
+                        height: size.height,
+                        image: ActionAsset.getAssetKey(action.id),
+                        onClick: () => this.handleActionClick(action),
+                    });
                 },
             );
             if (iconObj) {

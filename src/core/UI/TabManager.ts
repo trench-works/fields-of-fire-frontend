@@ -1,91 +1,73 @@
-import { Grid } from "../Utils";
+import { BaseScene } from "../Objects";
+import { Grid, GridArea } from "../Utils";
 import { Button } from "./Button";
 import { CustomContainer } from "./Container";
+import { DisplayRoot } from "./DisplayRoot";
 
 export type TabConfig = {
     label: string;
-    build: (container: Phaser.GameObjects.Container) => void;
+    build: (root: DisplayRoot, area: GridArea) => void;
 };
 
-export class TabManager extends Phaser.GameObjects.Container {
-    public scene: Phaser.Scene;
+export class TabManager {
     public tabs: Button[];
-    public contents: Phaser.GameObjects.Container[];
+    public contents: DisplayRoot[];
     public activeTab: number | null;
 
-    constructor(scene: Phaser.Scene, tabsConfig: TabConfig[]) {
-        super(scene, 0, 0);
+    constructor(
+        protected readonly scene: BaseScene,
+        protected readonly rootGrid: Grid,
+        tabsConfig: TabConfig[],
+    ) {
         this.scene = scene;
         this.tabs = [];
         this.contents = [];
         this.activeTab = null;
 
-        scene.add.existing(this);
-
         this.createTabs(tabsConfig);
     }
 
     private createTabs(tabsConfig: TabConfig[]) {
-        const grid = new Grid();
-        const barWidth = grid.cell.width * 6;
-        const barHeight = 40;
-
-        const bar = this.scene.add.container(0, 0);
-        this.add(bar);
-
-        const btnWidth = barWidth / tabsConfig.length;
-        const btnHeight = barHeight;
+        const contentArea = this.rootGrid.getArea({
+            x: 1,
+            y: 2,
+            width: 3,
+            height: this.rootGrid.options.division.vertical - 1,
+        });
 
         tabsConfig.forEach((tab, index) => {
+            const tabRoot = new DisplayRoot();
+            const btnArea = this.rootGrid.getArea({
+                x: index + 1,
+                y: 1,
+                width: 1,
+                height: 1,
+            });
             const btn = new Button(this.scene, {
-                x: index * btnWidth,
-                y: 0,
-                width: btnWidth,
-                height: btnHeight,
+                x: btnArea.center.x,
+                y: btnArea.center.y,
+                width: btnArea.width,
+                height: btnArea.height,
                 text: tab.label,
                 borderWidth: 5,
                 borderColor: "#2A4237",
                 onClick: () => this.switchTo(index),
             });
 
-            bar.add(btn);
-
-            const contentArea = new Grid().getArea({
-                x: 0,
-                y: 0,
-                width: 6,
-                height: 8,
-            }); // <-- 6 colonnes × 7 lignes
-
-            // Container de contenu
-            const offsetX = -btnWidth / 2;
-            const offsetY = btnHeight / 2;
-            const content = this.scene.add.container(
-                contentArea.x + offsetX,
-                contentArea.y + offsetY,
+            tabRoot.add(
+                new CustomContainer(this.scene, {
+                    x: contentArea.center.x,
+                    y: contentArea.center.y,
+                    width: contentArea.width,
+                    height: contentArea.height,
+                }),
             );
 
-            content.setSize(contentArea.width, contentArea.height);
-            content.setVisible(false);
-
-            // --- DEBUG VISUEL : CustomContainer en fond ---
-            const debugBg = new CustomContainer(this.scene, {
-                title: "",
-                x: contentArea.width / 2,
-                y: contentArea.height / 2,
-                width: contentArea.width,
-                height: contentArea.height,
-            });
-
-            content.add(debugBg);
-
             // Construire le contenu réel
-            tab.build(content);
-
-            this.add(content);
+            tab.build(tabRoot, contentArea);
 
             this.tabs.push(btn);
-            this.contents.push(content);
+            this.contents.push(tabRoot);
         });
 
         this.switchTo(0);

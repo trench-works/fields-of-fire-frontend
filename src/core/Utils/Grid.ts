@@ -72,6 +72,8 @@ export class Grid implements Position, Size {
 
     cell: Size;
 
+    public readonly options: { division: TwoAxis };
+
     get center() {
         return {
             x: this.x + this.width / 2,
@@ -96,6 +98,8 @@ export class Grid implements Position, Size {
         const margin: FourAxis = options?.margin
             ? AxisUtils.fromTwoOrFourAxis(options.margin)
             : { top: 0, bottom: 0, right: 0, left: 0 };
+
+        this.options = { division: this.division };
 
         this.width = size.width - margin.left - margin.right;
         this.height = size.height - margin.top - margin.bottom;

@@ -73,8 +73,8 @@ export abstract class ImageAssetManager<
         );
     }
 
-    getAssetScale(id: AssetId): number {
-        const size = this.assetScale[id];
+    getAssetScale(id: string): number {
+        const size = this.assetScale[id as AssetId];
         return size.width / size.height;
     }
 }

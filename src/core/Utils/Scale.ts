@@ -1,4 +1,4 @@
-import { ScaleAndCenterParams, ScaleAndCenterResult } from "../Types";
+import { ScaleAndCenterParams, ScaleAndCenterResult, Size } from "../Types";
 
 export function scaleAndCenter({
     parent,
@@ -35,3 +35,12 @@ export function computeScaleFactor(
     );
 }
 
+export function fitFromScale(size: Size, scale: number): Size {
+    const sizingRef =
+        Math.min(size.width, size.height) === size.width ? "WIDTH" : "HEIGHT";
+
+    return {
+        width: sizingRef === "WIDTH" ? size.width : size.height * scale,
+        height: sizingRef === "HEIGHT" ? size.height : size.width / scale,
+    };
+}

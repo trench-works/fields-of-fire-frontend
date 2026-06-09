@@ -4,11 +4,18 @@ import {
     TabManager,
     MenuButton,
     BaseScene,
-    Grid,
+    GridArea,
+    DisplayRoot,
+    ScaleUtils,
+    Text,
 } from "../../core";
 import { Color } from "../../config/ColorConfig";
 import { LobbySocket } from "./repositories/lobby.socket";
-import { CharacterCloseupAsset, CharacterIconAsset } from "../../assets";
+import {
+    CharacterAssetId,
+    CharacterCloseupAsset,
+    CharacterIconAsset,
+} from "../../assets";
 import { FightScene } from "../Fight/fight.scene";
 import { ClassesRepository } from "./repositories/classes.repository";
 import { MainMenu } from "../MainMenu/main-menu.scene";
@@ -22,9 +29,8 @@ export type LobbySceneInit = {
 };
 
 export class LobbyScene extends BaseScene {
-    private selectClassId: string = "entente_fantassin";
-    private tabWidth!: number;
-    private tabHeight!: number;
+    private selectClassId: CharacterAssetId =
+        CharacterAssetId.ENTENTE_FANTASSIN;
     private playerImageContainer!: CustomContainer;
     private playerClassName!: CustomContainer;
     public lobbySocket!: LobbySocket;
@@ -75,86 +81,82 @@ export class LobbyScene extends BaseScene {
         });
 
         //title BOX
-        const titleBox = new Grid();
 
         this.add
-            .text(this.scale.width / 2, titleBox.y + 20, "LOBBY", {
+            .text(this.scale.width / 2, this.rootGrid.y + 20, "LOBBY", {
                 fontSize: "48px",
                 color: "#ffffff",
             })
             .setOrigin(0.5, 0);
 
         //tab BOX
-        const tabArea = this.rootGrid.getSubGrid({ x: 1, y: 2 });
+        const tabGrid = this.rootGrid.getSubGrid(
+            {
+                x: 1,
+                y: 2,
+                width: 6,
+                height: 8,
+            },
+            {
+                division: {
+                    horizontal: 3,
+                    vertical: 12,
+                },
+            },
+        );
 
-        this.tabWidth = tabArea.cell.width * 2; // colonnes 0 et 1
-        this.tabHeight = this.scale.height - tabArea.cell.height; // lignes 1 à 8
-
-        const tabManager = new TabManager(this, [
+        new TabManager(this, tabGrid, [
             {
                 label: "Classes",
-                build: (container) => {
+                build: (root, area) => {
                     //container.add(this.add.text(50, 0, "not implemented yet"));
-                    this.buildClassesTab(container);
+                    this.buildClassesTab(root, area);
                 },
             },
             {
                 label: "Maitrises",
-                build: (container) => {
-                    container.add(
-                        this.add.text(50, 0, "not implemented yet", {
-                            fontSize: "48px",
-                            color: "#ffffff",
-                        }),
+                build: (root, area) => {
+                    root.add(
+                        new Text(this, area).setText("not implemented yet"),
                     );
                 },
             },
             {
                 label: "Réglages",
-                build: (container) => {
-                    container.add(
-                        this.add.text(50, 0, "not implemented yet", {
-                            fontSize: "48px",
-                            color: "#ffffff",
-                        }),
+                build: (root, area) => {
+                    root.add(
+                        new Text(this, area).setText("not implemented yet"),
                     );
                 },
             },
         ]);
-        tabManager.setPosition(tabArea.x + this.tabWidth / 2, tabArea.y + 20);
-
         //Selected character info BOX
-        const area = this.rootGrid.getSubGrid({ x: 7, y: 2 });
-        const playerPanelWidth = area.cell.width * 3;
-        const playerPanelHeight = this.scale.height - area.cell.height;
-        const currentPlayerInfoPosition = {
-            x: area.x + playerPanelWidth / 2,
-            y: area.y + playerPanelHeight / 2,
-        };
-        const playerPanel = new CustomContainer(this, {
-            x: currentPlayerInfoPosition.x,
-            y: currentPlayerInfoPosition.y,
-            width: playerPanelWidth,
-            height: playerPanelHeight,
+        const playerGrid = this.rootGrid.getSubGrid(
+            {
+                x: 7,
+                y: 2,
+                width: 3,
+                height: 8,
+            },
+            { division: { horizontal: 9, vertical: 9 } },
+        );
+
+        new CustomContainer(this, {
+            x: playerGrid.center.x,
+            y: playerGrid.center.y,
+            width: playerGrid.width,
+            height: playerGrid.height,
             borderWidth: 5,
         });
 
-        const playerpanelgrid = this.rootGrid.getSubGrid(
-            {
-                x: 1,
-                y: 1,
-            },
-            {},
-        );
-
-        const imgArea = playerpanelgrid.getArea({
+        const imgArea = playerGrid.getArea({
             x: 1,
             y: 1,
-            width: 5,
+            width: 9,
             height: 5,
         });
 
-        const classNameArea = playerpanelgrid.getArea({
+        const classNameArea = playerGrid.getArea({
             x: 1,
             y: 6,
             width: 9,
@@ -163,41 +165,42 @@ export class LobbyScene extends BaseScene {
 
         const playerNameContainer = new CustomContainer(this, {
             title: this.classStore.getClass(this.selectClassId).name,
-            x: classNameArea.center.x - playerPanelWidth / 2,
-            y: classNameArea.center.y - playerPanelHeight / 2 + 10,
+            x: classNameArea.center.x,
+            y: classNameArea.center.y,
             width: classNameArea.width,
             height: classNameArea.height,
             bgColor: Color.containerBorder,
             borderWidth: 5,
         });
-
-        playerPanel.add(playerNameContainer);
         this.playerClassName = playerNameContainer;
 
+        const imageSize = ScaleUtils.fitFromScale(
+            imgArea,
+            CharacterIconAsset.getAssetScale(this.selectClassId),
+        );
+
         const playerImageContainer = new CustomContainer(this, {
-            x: imgArea.center.x - playerPanelWidth / 2 + 10,
-            y: imgArea.center.y - playerPanelHeight / 2 + 10,
-            width: imgArea.width,
-            height: imgArea.height,
+            x: imgArea.x + imageSize.width / 2,
+            y: imgArea.y + imgArea.height - imageSize.height / 2,
+            ...imageSize,
             backgroundImage: CharacterCloseupAsset.getAssetKey(
                 this.selectClassId,
             ),
             borderWidth: 5,
         });
-        playerPanel.add(playerImageContainer);
 
         this.playerImageContainer = playerImageContainer;
 
-        const buttonArea = playerpanelgrid.getArea({
+        const buttonArea = playerGrid.getArea({
             x: 1,
             y: 9,
             width: 4,
             height: 1,
         });
 
-        const fightButton = new Button(this, {
-            x: buttonArea.center.x - playerPanelWidth / 2 + 10,
-            y: buttonArea.center.y - playerPanelHeight / 2 - 10,
+        new Button(this, {
+            x: buttonArea.center.x,
+            y: buttonArea.center.y,
             width: buttonArea.width,
             height: buttonArea.height,
             text: "Combattre",
@@ -209,7 +212,6 @@ export class LobbyScene extends BaseScene {
                 }
             },
         });
-        playerPanel.add(fightButton);
 
         // Créer le bouton Menu
         new MenuButton(this, {
@@ -226,48 +228,48 @@ export class LobbyScene extends BaseScene {
         });
     }
 
-    private buildClassesTab(container: Phaser.GameObjects.Container) {
+    private buildClassesTab(root: DisplayRoot, area: GridArea) {
+        console.log(area);
         const classes = this.classStore.classes.filter(
             (charClass) => charClass.playable,
         );
         const classesPerRow = 3;
         const rows = 2;
-        const padding = 100;
-
-        const grid = new Grid({
-            size: {
-                width: container.width,
-                height: this.tabHeight,
-            },
-            division: {
-                horizontal: classesPerRow,
-                vertical: rows,
-            },
+        const grid = area.getGrid({
+            division: { horizontal: classesPerRow, vertical: rows },
+            padding: 20,
         });
 
         classes.slice(0, classesPerRow * rows).forEach((charClass, index) => {
-            const col = index % classesPerRow;
-            const row = Math.floor(index / classesPerRow);
+            const col = (index % classesPerRow) + 1;
+            const row = Math.floor(index / classesPerRow) + 1;
 
             const area = grid.getArea({ x: col, y: row, width: 1, height: 1 });
 
-            const classContainer = new CustomContainer(this, {
-                title: charClass.name,
-                x: area.center.x,
-                y: area.center.y,
-                width: area.width - padding,
-                height: area.height - padding,
-                backgroundImage: CharacterIconAsset.getAssetKey(charClass.id),
-                borderWidth: 7,
-                onClick: () => {
-                    this.updatePlayerImage(charClass.id);
-                },
-            });
-            container.add(classContainer);
+            const size = ScaleUtils.fitFromScale(
+                area,
+                CharacterIconAsset.getAssetScale(charClass.id),
+            );
+
+            root.add(
+                new CustomContainer(this, {
+                    title: charClass.name,
+                    x: area.center.x,
+                    y: area.center.y,
+                    ...size,
+                    backgroundImage: CharacterIconAsset.getAssetKey(
+                        charClass.id,
+                    ),
+                    borderWidth: 7,
+                    onClick: () => {
+                        this.updatePlayerImage(charClass.id);
+                    },
+                }),
+            );
         });
     }
 
-    updatePlayerImage(classId: string) {
+    updatePlayerImage(classId: CharacterAssetId) {
         this.selectClassId = classId;
         this.lobbySocket.changeClass({
             classId,
@@ -279,7 +281,7 @@ export class LobbyScene extends BaseScene {
         );
 
         // Met à jour le nom
-        this.playerClassName.setTitle(this.classStore.getClass(classId).name);
+        this.playerClassName.setText(this.classStore.getClass(classId).name);
     }
 }
 

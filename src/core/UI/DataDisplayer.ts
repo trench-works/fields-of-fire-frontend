@@ -1,7 +1,7 @@
 import { Position, Size, TwoAxis } from "../Types";
 import { Grid } from "../Utils";
-import { Button } from "./Button";
 import { CustomContainer } from "./Container";
+import { Displayable } from "./DisplayRoot";
 
 export type CellValue = string | number | { icon: string };
 
@@ -55,19 +55,12 @@ export class List extends CustomContainer {
         }
     }
 
-    public placeButton(
+    public place<T extends Displayable>(
         { x, y }: Position,
-        { icon, onClick }: { icon: string; onClick: () => void },
-    ): Button {
+        place: (area: CellArea) => T,
+    ): T {
         const area = this.cellAreas[y]?.[x];
-        return new Button(this.scene, {
-            x: area.position.x,
-            y: area.position.y,
-            width: area.width,
-            height: area.height,
-            image: icon,
-            onClick,
-        });
+        return place(area);
     }
 
     public placeText(

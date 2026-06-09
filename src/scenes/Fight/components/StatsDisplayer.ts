@@ -1,9 +1,10 @@
 import { CharacterCloseupAsset, IconAsset } from "../../../assets";
 import { Color } from "../../../config/ColorConfig";
-import { CustomContainer, List } from "../../../core";
+import { CustomContainer, Grid, Text } from "../../../core";
+import { Image } from "../../../core/UI/Image";
 import { CharacterClass } from "../../../Model/CharacterClass";
 import { Entity } from "../../../Model/Entity";
-import { StatsUtils } from "../../../Model/Stats";
+import { Stats, StatsUtils } from "../../../Model/Stats";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/GameStore";
 import { FightSceneDisplayer } from "./FightSceneDisplayer";
@@ -32,19 +33,12 @@ const statDescriptions: Record<string, string> = {
 
 export class StatsDisplayer extends FightSceneDisplayer {
     private statsPanel!: CustomContainer;
-    private statsTable!: List;
     private statsImage!: CustomContainer;
     private statsClassName!: CustomContainer;
     private statsName!: CustomContainer;
+    private statsValuesGrid!: Grid;
 
-    private lifeStat!: Phaser.GameObjects.Text;
-    private strengthStat!: Phaser.GameObjects.Text;
-    private armorStat!: Phaser.GameObjects.Text;
-    private energyStat!: Phaser.GameObjects.Text;
-    private initiativeStat!: Phaser.GameObjects.Text;
-    private precisionStat!: Phaser.GameObjects.Text;
-    private dodgingStat!: Phaser.GameObjects.Text;
-    private mouvementStat!: Phaser.GameObjects.Text;
+    protected statTexts: Map<string, { text: Text; image: Image }>;
 
     /**
      * Data
@@ -68,6 +62,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
         private readonly position: { x: number; y: number },
     ) {
         super(scene, gameStore);
+        this.statTexts = new Map();
     }
 
     setEntity(entity: Entity): this {
@@ -130,7 +125,6 @@ export class StatsDisplayer extends FightSceneDisplayer {
             height: classNameArea.height,
             borderWidth: 2,
             bgColor: Color.containerBorder,
-            fontSize: 18,
         });
         const playerNameArea = statsGrid.getArea({
             x: 1,
@@ -147,75 +141,81 @@ export class StatsDisplayer extends FightSceneDisplayer {
             height: playerNameArea.height,
             borderWidth: 2,
             bgColor: Color.containerBorder,
-            fontSize: 18,
         });
 
-        const statValuesArea = statsGrid.getSubGrid(
+        this.statsValuesGrid = statsGrid.getSubGrid(
             {
-                x: 5.5,
-                y: 4,
+                x: 4,
+                y: 2,
                 width: 6,
                 height: 8,
+                margin: 10,
             },
             {
                 division: {
-                    horizontal: 4,
+                    horizontal: 2,
                     vertical: 4,
                 },
             },
         );
-
-        this.statsTable = new List(this.scene, statValuesArea);
 
         return this;
     }
 
     render(): this {
         allExistingStats.forEach((icon, index) => {
-            const row = Math.floor(index / 2);
-            const col = (index % 2) * 2;
+            const row = Math.floor(index / 2) + 1;
+            const col = (index % 2) + 1;
 
-            const iconObj = this.statsTable.placeContent(col, row, {
-                icon: IconAsset.getAssetKey(icon),
+            const statGrid = this.statsValuesGrid.getSubGrid(
+                {
+                    x: col,
+                    y: row,
+                },
+                { division: { horizontal: 2, vertical: 1 }, padding: 10 },
+            );
+
+            // Image
+            const imageArea = statGrid.getArea({
+                x: 1,
+                y: 1,
             });
-
-            if (iconObj) {
-                iconObj.setInteractive();
+            const image = new Image(this.scene, imageArea).setImage(
+                IconAsset.getAssetKey(icon),
+                IconAsset.getAssetScale(icon),
+            );
+            if (image) {
+                image.setInteractive(true);
                 this.scene.tooltip.attachTo(
-                    iconObj,
+                    image.getObject(),
                     statDescriptions[icon] ?? icon,
                     icon,
                 );
             }
+
+            // Text
+            const textArea = statGrid.getArea({
+                x: 2,
+                y: 1,
+            });
+            this.statTexts.set(icon, {
+                text: new Text(this.scene, textArea).setText("N/A"),
+                image,
+            });
         });
 
-        this.lifeStat = this.statsTable.placeText(1, 0, "N/A");
-        this.strengthStat = this.statsTable.placeText(1, 1, "N/A");
-        this.armorStat = this.statsTable.placeText(1, 2, "N/A");
-        this.energyStat = this.statsTable.placeText(1, 3, "N/A");
-
-        // second column
-        this.initiativeStat = this.statsTable.placeText(3, 0, "N/A");
-        this.precisionStat = this.statsTable.placeText(3, 1, "N/A");
-        this.dodgingStat = this.statsTable.placeText(3, 2, "N/A");
-        this.mouvementStat = this.statsTable.placeText(3, 3, "N/A");
         return this;
     }
 
     update(): this {
         const stats = StatsUtils.fromEntity(this.entity);
 
-        this.lifeStat.setText(String(stats.life));
-        this.strengthStat.setText(String(stats.strength));
-        this.armorStat.setText(String(stats.armor));
-        this.energyStat.setText(String(stats.energy));
-        this.initiativeStat.setText(String(stats.initiative));
-        this.precisionStat.setText(String(stats.precision));
-        this.dodgingStat.setText(String(stats.dodging));
-        this.mouvementStat.setText(String(stats.mouvement));
+        this.statTexts.forEach(({ text }, key) =>
+            text.setText(String(stats[key as keyof Stats]), { fontSize: 20 }),
+        );
 
-        this.statsName.setTitle(this.name);
-        this.statsClassName.setTitle(this.characterClass.name);
+        this.statsName.setText(this.name);
+        this.statsClassName.setText(this.characterClass.name);
         this.statsImage.setBackgroundImage(
             CharacterCloseupAsset.getAssetKey(this.entity.classId),
         );
@@ -226,19 +226,14 @@ export class StatsDisplayer extends FightSceneDisplayer {
         this.show = isShow;
 
         this.statsPanel.setVisible(isShow);
-        this.statsTable.setVisible(isShow);
         this.statsImage.setVisible(isShow);
         this.statsClassName.setVisible(isShow);
         this.statsName.setVisible(isShow);
 
-        this.lifeStat.setVisible(isShow);
-        this.strengthStat.setVisible(isShow);
-        this.armorStat.setVisible(isShow);
-        this.energyStat.setVisible(isShow);
-        this.initiativeStat.setVisible(isShow);
-        this.precisionStat.setVisible(isShow);
-        this.dodgingStat.setVisible(isShow);
-        this.mouvementStat.setVisible(isShow);
+        this.statTexts.forEach(({ text, image }) => {
+            text.setVisible(isShow);
+            image.setVisible(isShow);
+        });
 
         return this;
     }

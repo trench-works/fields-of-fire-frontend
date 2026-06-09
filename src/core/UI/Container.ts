@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import { Color } from "../../config/ColorConfig";
 import { ColorUtils } from "../Utils";
 import { Position, Size } from "../Types";
+import { Displayable } from "./DisplayRoot";
 
 type ContainerConfig = Size &
     Position & {
@@ -19,23 +20,29 @@ type ContainerConfig = Size &
         alpha?: number;
     };
 
-export class CustomContainer extends Phaser.GameObjects.Container {
+export class CustomContainer
+    extends Phaser.GameObjects.Container
+    implements Displayable
+{
     private background:
         | Phaser.GameObjects.Graphics
         | Phaser.GameObjects.Image
         | null = null;
     private borderGraphics?: Phaser.GameObjects.Graphics;
-    private titleText: Phaser.GameObjects.Text;
+    private titleText?: Phaser.GameObjects.Text;
     public onClick: (() => void) | undefined;
     private bgColor: string;
     private bgOpacity: number;
     private hoverTint: number | undefined;
 
+    getObject(): Phaser.GameObjects.GameObject {
+        throw new Error("Method not implemented.");
+    }
+
     constructor(scene: Phaser.Scene, config: ContainerConfig) {
         const {
             title = "",
             bgColor = Color.containerBg,
-            titleColor = "#FFFFFF",
             x,
             y,
             height,
@@ -44,10 +51,8 @@ export class CustomContainer extends Phaser.GameObjects.Container {
             borderColor = Color.containerBorder,
             backgroundImage,
             opacity = 1,
-            fontSize = 24,
             alpha,
             onClick,
-            textPosition = { x: 0, y: -height / 2 + 15 },
             hoverTint,
         } = config;
 
@@ -62,18 +67,12 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         }
 
         // --- TEXTE ---
-        this.titleText = scene.add
-            .text(0, 0, title, {
-                fontFamily: "MyFont",
-                fontSize: fontSize,
-                color: titleColor,
-            })
-            .setOrigin(0.5);
 
         // IMPORTANT : définir la taille AVANT le fond
         this.setSize(width, height);
 
         // --- FOND (refactorisé) ---
+        this.setText(title);
         this.setBackgroundImage(backgroundImage ?? null);
 
         // --- BORDURE ---
@@ -90,8 +89,6 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         }
 
         // --- TITRE ---
-        this.titleText.setPosition(textPosition.x, textPosition.y);
-        this.add(this.titleText);
 
         // --- INTERACTIVITÉ ---
         if (onClick) {
@@ -103,6 +100,27 @@ export class CustomContainer extends Phaser.GameObjects.Container {
         this.setupEvents();
 
         scene.add.existing(this);
+    }
+
+    public setText(text: string) {
+        const fontSize = Math.min(
+            this.height / 2,
+            (this.width / text.length) * 1.5,
+        );
+        if (!this.titleText) {
+            this.titleText = this.scene.add
+                .text(0, 0, text, {
+                    fontFamily: "MyFont",
+                    fontSize: fontSize,
+                    color: "#FFFFFF",
+                })
+                .setOrigin(0.5);
+            const textPosition = { x: 0, y: -this.height / 2 + 15 };
+            this.titleText.setPosition(textPosition.x, textPosition.y);
+            this.add(this.titleText);
+        } else {
+            this.titleText.setText(text);
+        }
     }
 
     public manageBorder(
@@ -131,13 +149,7 @@ export class CustomContainer extends Phaser.GameObjects.Container {
 
             this.background.clear();
             this.background.fillStyle(ColorUtils.parseColor(color), alpha);
-            this.background.fillRoundedRect(
-                -width / 2,
-                -height / 2,
-                width,
-                height,
-                10,
-            );
+            this.background.fillRoundedRect(this.x, this.y, width, height, 10);
         }
     }
 
@@ -188,11 +200,6 @@ export class CustomContainer extends Phaser.GameObjects.Container {
                 this.background.clearTint();
             }
         });
-    }
-
-    public setTitle(newTitle: string) {
-        this.titleText.setText(newTitle);
-        this.titleText.setPosition(0, -this.height / 2 + 15);
     }
 }
 
