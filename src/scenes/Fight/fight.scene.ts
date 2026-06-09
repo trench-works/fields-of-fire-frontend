@@ -1,11 +1,4 @@
-import {
-    GridUtils,
-    Position,
-    PositionUtils,
-    MenuButton,
-    BaseScene,
-    EventQueue,
-} from "../../core";
+import { Position, MenuButton, BaseScene, EventQueue } from "../../core";
 import { SceneConfig } from "../../config/SceneConfig";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
 import {
@@ -40,6 +33,7 @@ import { AttackDisplayer } from "./components/attack/AttackDisplayer";
 import { MenuSocket } from "../LobbyList/repositories/menu.socket";
 import { LobbyScene } from "../Lobby/lobby.scene";
 import { EffectAsset } from "../../assets/EffectAsset";
+import { PositionUtils } from "../../core/Utils/Sizing";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -71,7 +65,6 @@ export type FightSceneInit = {
 
 export class FightScene extends BaseScene {
     public renderConfig: SceneRenderConfig;
-    public sceneGrid = GridUtils.uiGrid(0, 0);
 
     /**
      * Stores
@@ -143,12 +136,12 @@ export class FightScene extends BaseScene {
         this.character = new CharactersDisplayer(this, this.gameStore);
         this.turns = new TurnDisplayer(this, this.gameStore, this.classStore);
         this.playerStats = new StatsDisplayer(this, this.gameStore, {
-            x: 0,
-            y: 6,
+            x: 1,
+            y: 7,
         });
         this.inspectStats = new StatsDisplayer(this, this.gameStore, {
-            x: 7,
-            y: 6,
+            x: 8,
+            y: 7,
         });
         this.attacks = new AttackDisplayer(this, this.gameStore);
 
@@ -170,7 +163,7 @@ export class FightScene extends BaseScene {
         this.renderConfig = {
             tileSize: config.render_config.tile_size,
             renderType: config.render_config.render_type,
-            offset: new Position(),
+            offset: { x: 0, y: 0 },
         };
         this.renderConfig.offset = PositionUtils.getMapOffset(
             this.renderConfig,
@@ -302,7 +295,7 @@ export class FightScene extends BaseScene {
                 console.log("Options - À implémenter");
             },
             onMainMenuClick: () => {
-                this.scene.start("mainMenuScene");
+                MainMenu.start(this);
             },
         });
 

@@ -1,5 +1,4 @@
 import Phaser from "phaser";
-import { CustomContainer } from "./Container";
 import { Button } from "./Button";
 import { Color } from "../../config/ColorConfig";
 
@@ -26,7 +25,7 @@ export class MenuPanel extends Phaser.GameObjects.Container {
             scene.scale.width * 2,
             scene.scale.height * 2,
             0x000000,
-            0.7
+            0.7,
         );
         this.overlay.setInteractive();
         this.overlay.setScrollFactor(0);
@@ -39,7 +38,7 @@ export class MenuPanel extends Phaser.GameObjects.Container {
             scene.scale.height / 2,
             600,
             500,
-            Phaser.Display.Color.HexStringToColor(Color.containerBg).color
+            Phaser.Display.Color.HexStringToColor(Color.containerBg).color,
         );
         this.panel.setScrollFactor(0);
         this.panel.setDepth(10002);
@@ -52,10 +51,10 @@ export class MenuPanel extends Phaser.GameObjects.Container {
             scene.scale.height / 2 - 180,
             "MENU",
             {
-                fontFamily: 'MyFont',
+                fontFamily: "MyFont",
                 fontSize: "60px",
                 color: "#FFFFFF",
-            }
+            },
         );
         titleText.setOrigin(0.5);
         titleText.setScrollFactor(0);
@@ -66,8 +65,10 @@ export class MenuPanel extends Phaser.GameObjects.Container {
         const resumeButton = new Button(scene, {
             x: scene.scale.width / 2,
             y: scene.scale.height / 2 - 80,
+            width: 300,
+            height: 50,
             text: "Reprendre",
-            fontSize: "24px",
+            fontSize: 24,
             onClick: () => {
                 this.hide();
                 if (config.onResumeClick) {
@@ -83,8 +84,10 @@ export class MenuPanel extends Phaser.GameObjects.Container {
         const settingsButton = new Button(scene, {
             x: scene.scale.width / 2,
             y: scene.scale.height / 2,
+            width: 300,
+            height: 50,
             text: "Options",
-            fontSize: "24px",
+            fontSize: 24,
             onClick: () => {
                 this.hide();
                 if (config.onSettingsClick) {
@@ -100,8 +103,10 @@ export class MenuPanel extends Phaser.GameObjects.Container {
         const mainMenuButton = new Button(scene, {
             x: scene.scale.width / 2,
             y: scene.scale.height / 2 + 80,
+            width: 300,
+            height: 50,
             text: "Retour au Menu",
-            fontSize: "24px",
+            fontSize: 24,
             onClick: () => {
                 this.hide();
                 if (config.onMainMenuClick) {
@@ -139,3 +144,4 @@ export class MenuPanel extends Phaser.GameObjects.Container {
         return this.isVisible;
     }
 }
+

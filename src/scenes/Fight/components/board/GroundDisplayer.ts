@@ -1,7 +1,7 @@
 import { MiscAsset, MiscAssetId } from "../../../../assets";
-import { Position } from "../../../../core";
 import { Diamond } from "../../../../core/Objects/Diamond";
 import { scaleAndCenter } from "../../../../core/Utils/Scale";
+import { PositionUtils } from "../../../../core/Utils/Sizing";
 import { EntityType } from "../../../../Model/Entity";
 import { FightScene } from "../../fight.scene";
 import { ClassStore } from "../../stores/ClassStore";
@@ -25,6 +25,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
     preRender(): this {
         return this;
     }
+
     render(): this {
         const map = this.scene.make.tilemap({
             key: this.scene.fightMap,
@@ -35,10 +36,8 @@ export class GroundDisplayer extends FightSceneDisplayer {
         );
 
         const centerMap = scaleAndCenter({
-            parentHeight: this.scene.scale.height,
-            parentWidth: this.scene.scale.width,
-            childHeight: map.heightInPixels,
-            childWidth: map.widthInPixels,
+            parent: this.scene.scale,
+            child: { width: map.widthInPixels, height: map.heightInPixels },
             isometricVariation: true,
         });
 
@@ -46,16 +45,17 @@ export class GroundDisplayer extends FightSceneDisplayer {
             throw new Error("Render config not defined");
         }
 
-        this.scene.renderConfig.offset.add(
-            new Position(centerMap.offsetX, centerMap.offsetY),
+        this.scene.renderConfig.offset = PositionUtils.add(
+            this.scene.renderConfig.offset,
+            { x: centerMap.offset.x, y: centerMap.offset.y },
         );
         this.scene.scaleFactor = centerMap.scaleFactor;
 
         this.groundLayer = map.createLayer(
             "Ground",
             tileset!,
-            centerMap.offsetX,
-            centerMap.offsetY,
+            centerMap.offset.x,
+            centerMap.offset.y,
         );
 
         if (!this.groundLayer) {
@@ -82,7 +82,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
                 const caseTile = this.gameStore.game.plateau[x][y];
                 // Ground part
-                const tile = this.groundLayer.getTileAt(x, y);
+                const tile = this.groundLayer?.getTileAt?.(x, y);
                 if (tile) {
                     if (caseTile.isHole) {
                         tile.setVisible(false);
@@ -150,11 +150,11 @@ export class GroundDisplayer extends FightSceneDisplayer {
                     }
 
                     this.scene.gridPositions[x][y] = {
-                        gridPosition: new Position(x, y),
-                        pixelPosition: new Position(
-                            worldX,
-                            worldY - 16 * this.scene.scaleFactor,
-                        ),
+                        gridPosition: { x, y },
+                        pixelPosition: {
+                            x: worldX,
+                            y: worldY - 16 * this.scene.scaleFactor,
+                        },
                         zone,
                         hoverGraphics,
                     };
@@ -162,13 +162,9 @@ export class GroundDisplayer extends FightSceneDisplayer {
                     zone.on("pointerdown", () => {
                         if (this.scene.actionManager.currentAction) {
                             if (
-                                this.scene.rangeVisualizer.isInRange(
-                                    new Position(x, y),
-                                )
+                                this.scene.rangeVisualizer.isInRange({ x, y })
                             ) {
-                                this.scene.actionManager.launchAction(
-                                    new Position(x, y),
-                                );
+                                this.scene.actionManager.launchAction({ x, y });
                             }
                         } else {
                             const tile = this.gameStore.game.plateau[x][y];
@@ -256,14 +252,14 @@ export class GroundDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    manageToolTip(x?: number, y?: number) {
+    manageToolTip(x: number, y: number) {
         const action = this.scene.actionManager.currentAction;
         if (!action) return;
 
-        const zoneCells = this.scene.rangeVisualizer.spellZonePreview(
-            action,
-            new Position(x, y),
-        );
+        const zoneCells = this.scene.rangeVisualizer.spellZonePreview(action, {
+            x,
+            y,
+        });
         if (!zoneCells || action.id === "walk") return;
 
         // ✅ collecte tous les tooltips à afficher
