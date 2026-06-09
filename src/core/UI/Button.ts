@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import { Color } from "../../config/ColorConfig";
 import { FourAxis, Position, Size } from "../Types";
 import { IGridArea } from "../Utils";
+import { Displayable } from "./DisplayRoot";
 
 const CLICKABLE_ALPHA = 1;
 const UNCLICKABLE_ALPHA = 0.5;
@@ -18,7 +19,10 @@ type ButtonConfig = ((Position & Size & { center?: never }) | IGridArea) & {
     depth?: number;
 };
 
-export class Button extends Phaser.GameObjects.Container {
+export class Button
+    extends Phaser.GameObjects.Container
+    implements Displayable
+{
     protected textDisplay?: Phaser.GameObjects.Text;
     protected imageDisplay?: Phaser.GameObjects.Image;
     protected background?: Phaser.GameObjects.Rectangle;
@@ -94,6 +98,9 @@ export class Button extends Phaser.GameObjects.Container {
 
         // Ajoute le bouton à la scène
         scene.add.existing(this);
+    }
+    getObject(): Phaser.GameObjects.GameObject {
+        throw new Error("Method not implemented.");
     }
 
     displayImage(imageKey: string | undefined): this {

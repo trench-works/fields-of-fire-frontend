@@ -50,7 +50,7 @@ export class TurnDisplayer extends FightSceneDisplayer {
             },
             {
                 division: {
-                    horizontal: 10,
+                    horizontal: 14,
                     vertical: 1,
                 },
             },
@@ -85,7 +85,7 @@ export class TurnDisplayer extends FightSceneDisplayer {
                 new CustomContainer(this.scene, {
                     title: player?.name ?? charClass?.name?.split(" ")[0],
                     x: cellArea.center.x,
-                    y: cellArea.center.y,
+                    y: cellArea.center.y - (isFirstCell ? 0 : 5),
                     width: imageSize.width,
                     height: imageSize.height,
                     borderWidth: isFirstCell ? 5 : 2,
