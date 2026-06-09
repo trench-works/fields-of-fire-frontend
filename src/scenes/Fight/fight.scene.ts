@@ -150,7 +150,7 @@ export class FightScene extends BaseScene {
             x: 7,
             y: 6,
         });
-        this.attacks = new AttackDisplayer(this, this.gameStore);
+        this.attacks = new AttackDisplayer(this);
 
         /**
          * Utils
