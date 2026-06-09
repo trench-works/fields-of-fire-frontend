@@ -2,7 +2,7 @@ import { BaseScene } from "../Objects";
 import { GridArea } from "../Utils";
 import { Displayable } from "./DisplayRoot";
 
-export class Text implements Displayable {
+export class DisplayText implements Displayable {
     protected text: Phaser.GameObjects.Text;
 
     constructor(

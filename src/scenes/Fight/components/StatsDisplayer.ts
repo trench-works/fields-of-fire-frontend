@@ -1,7 +1,7 @@
 import { CharacterCloseupAsset, IconAsset } from "../../../assets";
 import { Color } from "../../../config/ColorConfig";
-import { CustomContainer, Grid, Text } from "../../../core";
-import { Image } from "../../../core/UI/Image";
+import { CustomContainer, Grid, DisplayText } from "../../../core";
+import { DisplayImage } from "../../../core/UI/Image";
 import { CharacterClass } from "../../../Model/CharacterClass";
 import { Entity } from "../../../Model/Entity";
 import { Stats, StatsUtils } from "../../../Model/Stats";
@@ -38,7 +38,10 @@ export class StatsDisplayer extends FightSceneDisplayer {
     private statsName!: CustomContainer;
     private statsValuesGrid!: Grid;
 
-    protected statTexts: Map<string, { text: Text; image: Image }>;
+    protected statTexts: Map<
+        string,
+        { text: DisplayText; image: DisplayImage }
+    >;
 
     /**
      * Data
@@ -180,7 +183,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 x: 1,
                 y: 1,
             });
-            const image = new Image(this.scene, imageArea).setImage(
+            const image = new DisplayImage(this.scene, imageArea).setImage(
                 IconAsset.getAssetKey(icon),
                 IconAsset.getAssetScale(icon),
             );
@@ -199,7 +202,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 y: 1,
             });
             this.statTexts.set(icon, {
-                text: new Text(this.scene, textArea).setText("N/A"),
+                text: new DisplayText(this.scene, textArea).setText("N/A"),
                 image,
             });
         });

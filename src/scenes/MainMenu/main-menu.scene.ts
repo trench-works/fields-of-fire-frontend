@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { BaseScene, Button } from "../../core";
+import { BaseScene, Button, DisplayText } from "../../core";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { LobbyListScene } from "../LobbyList/lobby-list.scene";
 import { PopupInput } from "./objects/LoginPopup";
@@ -33,13 +33,13 @@ export class MainMenu extends BaseScene {
     create() {
         super.create();
         // Créer un titre du menu
-        this.add
-            .text(this.scale.width / 2, 200, "Les Mémoires Oubliées", {
-                fontFamily: "MyFont",
-                fontSize: "48px",
-                color: "#FFFFFF",
-            })
-            .setOrigin(0.5);
+        const titleBox = this.rootGrid.getArea({
+            x: 1,
+            y: 2,
+            width: 5,
+            height: 1,
+        });
+        new DisplayText(this, titleBox).setText("Les Mémoires Oubliées");
 
         // Créer une grille interne pour les boutons (3 boutons: 1 colonne, 3 lignes)
         const buttonsGrid = this.rootGrid.getSubGrid(

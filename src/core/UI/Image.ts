@@ -3,7 +3,7 @@ import { Size } from "../Types";
 import { GridArea, ScaleUtils } from "../Utils";
 import { Displayable } from "./DisplayRoot";
 
-export class Image implements Displayable {
+export class DisplayImage implements Displayable {
     protected image: Phaser.GameObjects.Image;
 
     constructor(

@@ -25,6 +25,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
     preRender(): this {
         return this;
     }
+
     render(): this {
         const map = this.scene.make.tilemap({
             key: this.scene.fightMap,

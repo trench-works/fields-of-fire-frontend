@@ -1,6 +1,12 @@
 import { MenuSocket } from "./repositories/menu.socket";
 import { LobbyScene } from "../Lobby/lobby.scene";
-import { BaseScene, Button, CustomContainer, MenuButton } from "../../core";
+import {
+    BaseScene,
+    Button,
+    CustomContainer,
+    MenuButton,
+    DisplayText,
+} from "../../core";
 import { FightScene } from "../Fight/fight.scene";
 import { MainMenu } from "../MainMenu/main-menu.scene";
 import { LobbyRow } from "./objects/LobbyRow";
@@ -122,14 +128,9 @@ export class LobbyListScene extends BaseScene {
             x: 1,
             y: 2,
             width: 9,
-            height: 2,
+            height: 1,
         });
-        this.add
-            .text(this.scale.width / 2, titleBox.y + 20, "Liste des Lobby", {
-                fontSize: "48px",
-                color: "#ffffff",
-            })
-            .setOrigin(0.5, 0);
+        new DisplayText(this, titleBox).setText("Liste des Lobby");
 
         //lobby list
         const lobbyListArea = this.rootGrid.getArea({
@@ -139,8 +140,8 @@ export class LobbyListScene extends BaseScene {
             height: 6,
         });
         new CustomContainer(this, {
-            x: lobbyListArea.x + lobbyListArea.width / 2,
-            y: lobbyListArea.y + lobbyListArea.height / 2,
+            x: lobbyListArea.center.x,
+            y: lobbyListArea.center.y,
             width: lobbyListArea.width,
             height: lobbyListArea.height,
             opacity: 0.25,

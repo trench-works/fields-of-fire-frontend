@@ -7,7 +7,7 @@ import {
     GridArea,
     DisplayRoot,
     ScaleUtils,
-    Text,
+    DisplayText,
 } from "../../core";
 import { Color } from "../../config/ColorConfig";
 import { LobbySocket } from "./repositories/lobby.socket";
@@ -81,13 +81,13 @@ export class LobbyScene extends BaseScene {
         });
 
         //title BOX
-
-        this.add
-            .text(this.scale.width / 2, this.rootGrid.y + 20, "LOBBY", {
-                fontSize: "48px",
-                color: "#ffffff",
-            })
-            .setOrigin(0.5, 0);
+        const titleBox = this.rootGrid.getArea({
+            x: 1,
+            y: 1,
+            width: 9,
+            height: 1,
+        });
+        new DisplayText(this, titleBox).setText("Lobby");
 
         //tab BOX
         const tabGrid = this.rootGrid.getSubGrid(
@@ -117,7 +117,9 @@ export class LobbyScene extends BaseScene {
                 label: "Maitrises",
                 build: (root, area) => {
                     root.add(
-                        new Text(this, area).setText("not implemented yet"),
+                        new DisplayText(this, area).setText(
+                            "not implemented yet",
+                        ),
                     );
                 },
             },
@@ -125,7 +127,9 @@ export class LobbyScene extends BaseScene {
                 label: "Réglages",
                 build: (root, area) => {
                     root.add(
-                        new Text(this, area).setText("not implemented yet"),
+                        new DisplayText(this, area).setText(
+                            "not implemented yet",
+                        ),
                     );
                 },
             },

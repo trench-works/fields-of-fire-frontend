@@ -46,13 +46,14 @@ export class TurnDisplayer extends FightSceneDisplayer {
                 y: 1,
                 width: 7,
                 height: 1,
-                margin: 10,
+                margin: 5,
             },
             {
                 division: {
                     horizontal: 14,
                     vertical: 1,
                 },
+                padding: 5,
             },
         );
 
