@@ -149,7 +149,13 @@ export class CustomContainer
 
             this.background.clear();
             this.background.fillStyle(ColorUtils.parseColor(color), alpha);
-            this.background.fillRoundedRect(this.x, this.y, width, height, 10);
+            this.background.fillRoundedRect(
+                -width / 2,
+                -height / 2,
+                width,
+                height,
+                10,
+            );
         }
     }
 

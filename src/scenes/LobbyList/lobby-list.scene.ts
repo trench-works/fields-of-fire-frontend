@@ -10,22 +10,17 @@ import {
 import { FightScene } from "../Fight/fight.scene";
 import { MainMenu } from "../MainMenu/main-menu.scene";
 import { LobbyRow } from "./objects/LobbyRow";
-import { LobbyData } from "./interfaces/LobbyData";
-import { LobbiesRepository } from "./repositories/lobbies.repository";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
+import { LobbyStore } from "./stores/LobbyStore";
 
 export class LobbyListScene extends BaseScene {
     public menuSocket!: MenuSocket;
 
-    private lobbyData: LobbyData[] = [];
-    private selectedLobby: LobbyData | null = null;
-
-    private selectedRow: LobbyRow | null = null;
-    private refreshButton!: Button;
+    private joinButton!: Button;
     private lobbyRows: LobbyRow[] = [];
 
-    private lobbyResetTimeout: NodeJS.Timeout | undefined;
+    protected lobbyStore: LobbyStore;
 
     static start(scene: Phaser.Scene) {
         scene.scene.start(SceneAssetId.LOBBY_LIST);
@@ -33,6 +28,8 @@ export class LobbyListScene extends BaseScene {
 
     constructor() {
         super(SceneAssetId.LOBBY_LIST, BackgroundAssetId.LOBBY);
+
+        this.lobbyStore = new LobbyStore();
     }
 
     preload() {
@@ -40,53 +37,46 @@ export class LobbyListScene extends BaseScene {
     }
 
     init() {
-        this.resetLobbies();
-    }
-
-    resetLobbies() {
-        if (this.lobbyResetTimeout) {
-            clearTimeout(this.lobbyResetTimeout);
-        }
-        this.lobbyResetTimeout = setTimeout(
-            this.resetLobbies.bind(this),
-            10 * 1000,
-        );
-        new LobbiesRepository().getLobbies().then((lobbies) => {
-            this.lobbyData = lobbies;
-            this.displayLobbyList();
-        });
-    }
-
-    create() {
-        super.create();
         this.menuSocket = new MenuSocket();
         this.menuSocket.onClose(() => MainMenu.start(this));
 
         this.menuSocket.onJoin(({ lobbyId, playerId }) => {
-            if (this.lobbyResetTimeout) {
-                clearTimeout(this.lobbyResetTimeout);
-            }
             LobbyScene.start(this, {
                 lobbyId,
                 playerId,
             });
         });
 
-        this.menuSocket.onReconnect(({ game, player }) => {
-            if (this.lobbyResetTimeout) {
-                clearTimeout(this.lobbyResetTimeout);
+        this.menuSocket.onUpdate(({ lobbies }) => {
+            this.lobbyStore.setLobbies(lobbies);
+
+            if (
+                this.lobbyStore.selectedLobbyId &&
+                !lobbies.some(
+                    (lobby) => lobby.id === this.lobbyStore.selectedLobbyId,
+                )
+            ) {
+                // reset selected lobby id if its not in the list anymore
+                this.lobbyStore.setSelectedLobbyId(null);
+                this.joinButton.setIsActivated(false);
             }
+            this.displayLobbyList();
+        });
+
+        this.menuSocket.onReconnect(({ game, player }) => {
             FightScene.start(this, {
                 game,
                 player,
             });
         });
+    }
+
+    create() {
+        super.create();
         this.createDisplay();
     }
 
     displayLobbyList() {
-        this.selectedLobby = null;
-        this.selectedRow = null;
         this.lobbyRows.forEach((row) => row.destroy()); // destroy all rows
         const listGrid = this.rootGrid.getSubGrid(
             {
@@ -103,7 +93,7 @@ export class LobbyListScene extends BaseScene {
             },
         );
 
-        this.lobbyData.forEach((lobby, i) => {
+        this.lobbyStore.lobbies.forEach((lobby, i) => {
             const rowArea = listGrid.getArea({
                 x: 1,
                 y: i + 1,
@@ -111,13 +101,27 @@ export class LobbyListScene extends BaseScene {
                 height: 1,
             });
             this.lobbyRows.push(
-                new LobbyRow(this, rowArea, lobby, (row) => {
-                    this.refreshButton.setIsActivated(true);
-                    this.selectedRow?.setSelected(false); // désélectionne l'ancienne
-                    this.selectedLobby = lobby;
-                    this.selectedRow = row;
-                    row.setSelected(true); // sélectionne la nouvelle
-                }),
+                new LobbyRow(
+                    this,
+                    rowArea,
+                    {
+                        id: lobby.id,
+                        name: lobby.name ?? "NO_NAME",
+                        creator: lobby.creator ?? "NO_NAME",
+                        playersNum: lobby.players.length,
+                        maxPlayers: lobby.maxPlayers,
+                    },
+                    () => {
+                        this.joinButton.setIsActivated(true);
+                        this.lobbyStore.setSelectedLobbyId(lobby.id);
+                        this.lobbyRows.forEach((lobbyRow) => {
+                            lobbyRow.setSelected(
+                                lobbyRow.id === this.lobbyStore.selectedLobbyId,
+                            );
+                        });
+                    },
+                    lobby.id === this.lobbyStore.selectedLobbyId,
+                ),
             );
         });
     }
@@ -164,11 +168,8 @@ export class LobbyListScene extends BaseScene {
             },
         );
 
-        buttonGrid.getArea({ x: 0, y: 0, width: 9, height: 9 });
-
-        const cell0 = buttonGrid.getArea({ x: 2, y: 1, width: 3, height: 7 }); // bouton gauche
-        const cell1 = buttonGrid.getArea({ x: 6, y: 1, width: 3, height: 7 }); // bouton centre
-        const cell2 = buttonGrid.getArea({ x: 10, y: 1, width: 3, height: 7 }); // bouton droit
+        const cell0 = buttonGrid.getArea({ x: 2, y: 2, width: 5, height: 7 }); // bouton gauche
+        const cell2 = buttonGrid.getArea({ x: 8, y: 2, width: 5, height: 7 }); // bouton droit
 
         new Button(this, {
             text: "Créer un Lobby",
@@ -181,27 +182,16 @@ export class LobbyListScene extends BaseScene {
             },
         });
 
-        new Button(this, {
-            text: "Actualiser",
-            x: cell1.center.x,
-            y: cell1.center.y,
-            width: cell1.width,
-            height: cell1.height,
-            onClick: () => {
-                this.resetLobbies();
-            },
-        });
-
-        this.refreshButton = new Button(this, {
+        this.joinButton = new Button(this, {
             text: "Rejoindre un Lobby",
             x: cell2.center.x,
             y: cell2.center.y,
             width: cell2.width,
             height: cell2.height,
             onClick: () => {
-                if (this.selectedLobby) {
+                if (this.lobbyStore.selectedLobbyId) {
                     this.menuSocket.joinLobby({
-                        lobbyId: this.selectedLobby.id,
+                        lobbyId: this.lobbyStore.selectedLobbyId,
                     });
                 }
             },
@@ -217,9 +207,6 @@ export class LobbyListScene extends BaseScene {
                 console.log("Options - À implémenter");
             },
             onMainMenuClick: () => {
-                if (this.lobbyResetTimeout) {
-                    clearTimeout(this.lobbyResetTimeout);
-                }
                 MainMenu.start(this);
             },
         });

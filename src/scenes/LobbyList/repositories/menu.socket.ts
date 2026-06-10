@@ -1,5 +1,6 @@
 import { Socket, SocketListener } from "../../../core";
 import { Game } from "../../../Model/Game";
+import { LobbyData } from "../interfaces/LobbyData";
 
 const MENU_TOPIC = "menu";
 
@@ -17,6 +18,10 @@ type Reconnect = {
     player: { playerId: string; classId: string };
 };
 
+type Update = {
+    lobbies: LobbyData[];
+};
+
 enum LobbyActions {
     CREATE = "create",
     JOIN = "join",
@@ -25,6 +30,7 @@ enum LobbyActions {
 enum LobbyEvents {
     JOIN = "join",
     RECONNECT = "reconnect",
+    UPDATE = "update",
 }
 /**
  * Game Defautl Socket (only for testing purpose, should be removed later)
@@ -38,6 +44,10 @@ export class MenuSocket extends Socket<object, LobbyActions, LobbyEvents> {
 
     onJoin(listener: SocketListener<JoinedLobby>) {
         this.on(LobbyEvents.JOIN, listener);
+    }
+
+    onUpdate(listener: SocketListener<Update>) {
+        this.on(LobbyEvents.UPDATE, listener);
     }
 
     onReconnect(listener: SocketListener<Reconnect>) {

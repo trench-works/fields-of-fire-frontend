@@ -50,8 +50,8 @@ export class MainMenu extends BaseScene {
                 height: 5,
             },
             {
-                division: { vertical: 6, horizontal: 1 },
-                padding: { vertical: 5, horizontal: 0 },
+                division: { vertical: 3, horizontal: 1 },
+                padding: { vertical: 60, horizontal: 0 },
             },
         );
 

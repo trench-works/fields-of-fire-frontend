@@ -44,7 +44,7 @@ export class GridArea implements Position, Size, IGridArea {
         }: Position & Partial<Size> & { margin: FourAxis },
     ) {
         this.x = grid.x + (x - 1) * grid.cell.width + margin.left;
-        this.y = grid.y + (y - 1) * grid.cell.height + margin.right;
+        this.y = grid.y + (y - 1) * grid.cell.height + margin.top;
 
         this.width = width * grid.cell.width - margin.left - margin.right;
         this.height = height * grid.cell.height - margin.top - margin.bottom;

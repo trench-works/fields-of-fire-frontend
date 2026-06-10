@@ -227,13 +227,12 @@ export class LobbyScene extends BaseScene {
                 console.log("Options - À implémenter");
             },
             onMainMenuClick: () => {
-                this.scene.start("mainMenuScene");
+                MainMenu.start(this);
             },
         });
     }
 
     private buildClassesTab(root: DisplayRoot, area: GridArea) {
-        console.log(area);
         const classes = this.classStore.classes.filter(
             (charClass) => charClass.playable,
         );
