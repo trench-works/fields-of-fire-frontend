@@ -6,7 +6,7 @@ import { BaseScene, Displayer } from "../../../../core";
 
 export enum ParticleDirectionEnum {
     UP = "up",
-    DOWN = "down"
+    DOWN = "down",
 }
 
 export class ParticleDisplayer extends Displayer {
@@ -28,27 +28,40 @@ export class ParticleDisplayer extends Displayer {
         return this;
     }
 
-    async animate(particleKey: string): Promise<this> {
+    async animate(
+        particleKey: ParticleAssetId,
+        x: number,
+        y: number,
+    ): Promise<this> {
         console.log("ANIMATE INTIMIDATION");
-        switch(particleKey){
-            case ParticleAssetId.BOOST : 
-                this.ParticleAnimation(ParticleAssetId.BOOST, ParticleDirectionEnum.UP);
-                break
-
+        switch (particleKey) {
+            case ParticleAssetId.BOOST:
+                this.ParticleAnimation(
+                    ParticleAssetId.BOOST,
+                    ParticleDirectionEnum.UP,
+                    x,
+                    y,
+                );
+                break;
         }
         return this;
     }
 
-    async ParticleAnimation(particleSpriteKey : string, direction : string){
+    async ParticleAnimation(
+        particleSpriteKey: ParticleAssetId,
+        direction: string,
+        x: number,
+        y: number,
+    ) {
         this.buffEmitter = this.scene.add.particles(
-            window.innerWidth / 2,
-            window.innerHeight / 2,
+            x,
+            y,
             ParticleAsset.getAssetKey(particleSpriteKey),
             {
-                
-                speedY: direction === ParticleDirectionEnum.UP ? 
-                    { min: -200, max: -350 } :
-                    { min: 200, max: 350 },
+                speedY:
+                    direction === ParticleDirectionEnum.UP
+                        ? { min: -200, max: -350 }
+                        : { min: 200, max: 350 },
                 speedX: { min: -30, max: 30 },
 
                 scale: { start: 2, end: 0.5 },

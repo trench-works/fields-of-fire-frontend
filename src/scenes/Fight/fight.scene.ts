@@ -19,6 +19,7 @@ import { ClassesRepository } from "../Lobby/repositories/classes.repository";
 import { MainMenu } from "../MainMenu/main-menu.scene";
 import { ActionDisplayer } from "./components/ActionDisplayer";
 import {
+    ActionAnimationAsset,
     ActionAsset,
     CharacterCloseupAsset,
     CharacterSpriteAsset,
@@ -150,7 +151,7 @@ export class FightScene extends BaseScene {
             x: 7,
             y: 6,
         });
-        this.attacks = new AttackDisplayer(this);
+        this.attacks = new AttackDisplayer(this, this.gameStore);
 
         /**
          * Utils
@@ -257,6 +258,7 @@ export class FightScene extends BaseScene {
     preload() {
         super.preload();
         ActionAsset.loadAll(this.load);
+        ActionAnimationAsset.loadAll(this.load);
 
         this.load.tilemapTiledJSON(
             this.fightMap,

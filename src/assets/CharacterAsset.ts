@@ -65,8 +65,36 @@ class CharacterSpriteAssetManager extends SpriteAssetManager<
 
     constructor() {
         super("characters_sprite", CharacterAssetEntries, {
-            frameWidth: 96,
-            frameHeight: 128,
+            [CharacterAssetId.ENTENTE_FANTASSIN]: {
+                frameWidth: 96,
+                frameHeight: 128,
+                frameTime: [],
+            },
+            [CharacterAssetId.ENTENTE_MEDIC]: {
+                frameWidth: 96,
+                frameHeight: 128,
+                frameTime: [],
+            },
+            [CharacterAssetId.ENTENTE_CAPORAL]: {
+                frameWidth: 96,
+                frameHeight: 128,
+                frameTime: [],
+            },
+            [CharacterAssetId.ALLIANCE_FANTASSIN]: {
+                frameWidth: 96,
+                frameHeight: 128,
+                frameTime: [],
+            },
+            [CharacterAssetId.ALLIANCE_MEDIC]: {
+                frameWidth: 96,
+                frameHeight: 128,
+                frameTime: [],
+            },
+            [CharacterAssetId.ALLIANCE_CAPORAL]: {
+                frameWidth: 96,
+                frameHeight: 128,
+                frameTime: [],
+            },
         });
     }
 }
