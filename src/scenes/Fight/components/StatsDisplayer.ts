@@ -1,25 +1,15 @@
-import { CharacterCloseupAsset, IconAsset } from "../../../assets";
-import { EffectAsset } from "../../../assets/EffectAsset";
+import { CharacterCloseupAsset, IconAsset, IconAssetId } from "../../../assets";
+import { EffectAsset, EffectAssetId } from "../../../assets/EffectAsset";
 import { Color } from "../../../config/ColorConfig";
 import { CustomContainer, Grid, DisplayText, List } from "../../../core";
 import { DisplayImage } from "../../../core/UI/Image";
 import { CharacterClass } from "../../../Model/CharacterClass";
+import { Effect } from "../../../Model/Effect";
 import { Entity } from "../../../Model/Entity";
 import { Stats, StatsUtils } from "../../../Model/Stats";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/GameStore";
 import { FightSceneDisplayer } from "./FightSceneDisplayer";
-
-const allExistingStats: string[] = [
-    "life",
-    "initiative",
-    "strength",
-    "precision",
-    "armor",
-    "dodging",
-    "energy",
-    "mouvement",
-];
 
 const statDescriptions: Record<string, string> = {
     life: "Points de vie. S'ils tombent à 0, vous mourrez.",
@@ -164,29 +154,28 @@ export class StatsDisplayer extends FightSceneDisplayer {
             },
         );
 
-        const effectListArea = statsGrid.getArea({
-            x: 1,
-            y: 6,
-            width: 3,
-            height: 4,
-        });
-
-        this.EffectList = new List(this.scene, {
-            position: {
-                x: effectListArea.center.x,
-                y: effectListArea.center.y,
+        const effectListArea = statsGrid.getSubGrid(
+            {
+                x: 1,
+                y: 6,
+                width: 3,
+                height: 4,
             },
-            width: effectListArea.width,
-            height: effectListArea.height,
-            cols: 3,
-            rows: 4,
-        });
+            {
+                division: {
+                    horizontal: 3,
+                    vertical: 4,
+                },
+            },
+        );
+
+        this.EffectList = new List(this.scene, effectListArea);
 
         return this;
     }
 
     render(): this {
-        allExistingStats.forEach((icon, index) => {
+        Object.values(IconAssetId).forEach((icon, index) => {
             const row = Math.floor(index / 2) + 1;
             const col = (index % 2) + 1;
 
@@ -271,7 +260,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
             }
             acc.get(effect.id)!.push(effect);
             return acc;
-        }, new Map<string, typeof this.entity.effects>());
+        }, new Map<EffectAssetId, Effect[]>());
 
         Array.from(groupedEffects.entries()).forEach(([id, effects], index) => {
             const iconObj = this.EffectList.placeContent(

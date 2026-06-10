@@ -1,3 +1,4 @@
+import { EffectAssetId } from "../assets/EffectAsset";
 import { Stats } from "./Stats";
 
 export enum EffectType {
@@ -6,7 +7,7 @@ export enum EffectType {
 }
 
 export type Effect = {
-    id: string;
+    id: EffectAssetId;
     name: string;
     type: EffectType;
     duration: number;
