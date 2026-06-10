@@ -11,13 +11,13 @@ class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
     }
 
     protected getAssetFileLink(assetKey: string, asset: string): string {
-        return `assets/action/${asset}.png`;
+        return `assets/action/icons/${asset}.png`;
     }
 
     constructor() {
         super("effect", {
-            [EffectAssetId.AMPUTATED]: "action_image_amputate",
-            [EffectAssetId.INTIMIDATED]: "action_image_intimidation"
+            [EffectAssetId.AMPUTATED]: "amputate",
+            [EffectAssetId.INTIMIDATED]: "intimidation",
         });
     }
 }

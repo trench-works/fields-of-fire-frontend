@@ -17,26 +17,29 @@ class ActionAssetManager extends ImageAssetManager<ActionAssetId, string> {
     }
 
     protected getAssetFileLink(assetKey: string, asset: string): string {
-        return `assets/${assetKey}/${asset}.png`;
+        return `assets/action/icons/${asset}.png`;
     }
 
     constructor() {
         super("action", {
-            [ActionAssetId.WALK]: "action_image_moove",
-            [ActionAssetId.SHOOT]: "action_image_shoot",
-            [ActionAssetId.HEAL]: "action_image_heal",
-            [ActionAssetId.ARTILLERY_SUPPORT]: "action_image_artillerySupport",
-            [ActionAssetId.AMPUTATE]: "action_image_amputate",
-            [ActionAssetId.BAYONET]: "action_image_bayonet",
-            [ActionAssetId.INTIMIDATION]: "action_image_intimidation",
-            [ActionAssetId.SNEAKY]: "action_image_sneaky",
+            [ActionAssetId.WALK]: "walk",
+            [ActionAssetId.SHOOT]: "shoot",
+            [ActionAssetId.HEAL]: "heal",
+            [ActionAssetId.ARTILLERY_SUPPORT]: "artillery_support",
+            [ActionAssetId.AMPUTATE]: "amputate",
+            [ActionAssetId.BAYONET]: "bayonet",
+            [ActionAssetId.INTIMIDATION]: "intimidation",
+            [ActionAssetId.SNEAKY]: "sneaky",
         });
     }
 }
 
 export const ActionAsset = new ActionAssetManager();
 
-class ActionAnimationAssetManager extends ImageAssetManager<ActionAssetId, string> {
+class ActionAnimationAssetManager extends ImageAssetManager<
+    ActionAssetId,
+    string
+> {
     protected getIds(): ActionAssetId[] {
         return Object.values(ActionAssetId);
     }
@@ -47,18 +50,17 @@ class ActionAnimationAssetManager extends ImageAssetManager<ActionAssetId, strin
 
     constructor() {
         super("action_animation", {
-            [ActionAssetId.WALK]: "action_image_moove",
-            [ActionAssetId.SHOOT]: "action_image_shoot",
-            [ActionAssetId.HEAL]: "action_image_heal",
-            [ActionAssetId.ARTILLERY_SUPPORT]: "action_image_artillerySupport",
-            [ActionAssetId.AMPUTATE]: "action_image_amputate",
-            [ActionAssetId.BAYONET]: "action_image_bayonet",
-            [ActionAssetId.INTIMIDATION]: "action_image_intimidation",
-            [ActionAssetId.SNEAKY]: "action_image_sneaky",
+            [ActionAssetId.WALK]: "walk",
+            [ActionAssetId.SHOOT]: "shoot",
+            [ActionAssetId.HEAL]: "heal",
+            [ActionAssetId.ARTILLERY_SUPPORT]: "artillery_support",
+            [ActionAssetId.AMPUTATE]: "amputate",
+            [ActionAssetId.BAYONET]: "bayonet",
+            [ActionAssetId.INTIMIDATION]: "intimidation",
+            [ActionAssetId.SNEAKY]: "sneaky",
         });
     }
 }
 
-
-
 export const ActionAnimationAsset = new ActionAnimationAssetManager();
+
