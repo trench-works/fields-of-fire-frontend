@@ -1,24 +1,22 @@
 import { Color } from "../../../config/ColorConfig";
-import { CustomContainer, UiGrid, UiGridArea } from "../../../core";
-import { uiGrid } from "../../../core/Utils/Grid";
+import { CustomContainer, Grid, GridArea } from "../../../core";
 import { LobbyData } from "../interfaces/LobbyData";
 
 // LobbyRow.ts
 export class LobbyRow {
     private container: CustomContainer;
-    private rowGrid: UiGrid;
+    private rowGrid: Grid;
     private texts: Phaser.GameObjects.Text[] = [];
 
     constructor(
         scene: Phaser.Scene,
-        area: UiGridArea,
+        area: GridArea,
         lobby: LobbyData,
         onClick: (row: LobbyRow) => void,
     ) {
         this.container = new CustomContainer(scene, {
-            title: "",
-            x: area.centerX,
-            y: area.centerY,
+            x: area.center.x,
+            y: area.center.y,
             width: area.width,
             height: area.height,
             opacity: 0.15,
@@ -29,31 +27,47 @@ export class LobbyRow {
         this.container.on("pointerdown", () => onClick(this));
 
         // Sous-grille locale à la ligne
-        this.rowGrid = uiGrid(
-            0,
-            0,
-            area.width,
-            area.height,
-            10,
-            1,
-            area.x,
-            area.y,
-        );
+        this.rowGrid = area.getGrid({
+            division: {
+                vertical: 10,
+                horizontal: 1,
+            },
+        });
 
         this.buildCells(scene, lobby);
     }
 
     private buildCells(scene: Phaser.Scene, lobby: LobbyData) {
-        const nameCell = this.rowGrid.getArea(0, 0, 4, 1);
-        const playersCell = this.rowGrid.getArea(4, 0, 2, 1);
-        const creatorCell = this.rowGrid.getArea(6, 0, 2, 1);
-        const statusCell = this.rowGrid.getArea(8, 0, 2, 1);
+        const nameCell = this.rowGrid.getArea({
+            x: 1,
+            y: 1,
+            width: 4,
+            height: 1,
+        });
+        const playersCell = this.rowGrid.getArea({
+            x: 5,
+            y: 1,
+            width: 2,
+            height: 1,
+        });
+        const creatorCell = this.rowGrid.getArea({
+            x: 7,
+            y: 1,
+            width: 2,
+            height: 1,
+        });
+        const statusCell = this.rowGrid.getArea({
+            x: 9,
+            y: 1,
+            width: 2,
+            height: 1,
+        });
 
         this.texts.push(
             scene.add
                 .text(
                     nameCell.x + 10,
-                    nameCell.centerY,
+                    nameCell.center.y + 20,
                     `Lobby : ${lobby.id}`,
                     {
                         fontSize: "18px",
@@ -66,8 +80,8 @@ export class LobbyRow {
         this.texts.push(
             scene.add
                 .text(
-                    playersCell.centerX,
-                    playersCell.centerY,
+                    playersCell.center.x,
+                    playersCell.center.y + 20,
                     `${lobby.players.length}/${lobby.maxPlayers}`,
                     {
                         fontSize: "18px",
@@ -80,8 +94,8 @@ export class LobbyRow {
         this.texts.push(
             scene.add
                 .text(
-                    creatorCell.centerX,
-                    creatorCell.centerY,
+                    creatorCell.center.x,
+                    creatorCell.center.y + 20,
                     `Creator : ${lobby.creatorId}`,
                     {
                         fontSize: "18px",
@@ -95,7 +109,7 @@ export class LobbyRow {
             scene.add
                 .text(
                     statusCell.x + statusCell.width - 10,
-                    statusCell.centerY,
+                    statusCell.center.y + 20,
                     lobby.players.length < lobby.maxPlayers ? "Open" : "Full",
                     {
                         fontSize: "18px",

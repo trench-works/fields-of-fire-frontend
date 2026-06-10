@@ -26,7 +26,14 @@ class CharacterIconAssetManager extends ImageAssetManager<
     }
 
     constructor() {
-        super("characters_icons", CharacterAssetEntries);
+        super("characters_icons", CharacterAssetEntries, {
+            [CharacterAssetId.ENTENTE_FANTASSIN]: { width: 1, height: 1 },
+            [CharacterAssetId.ENTENTE_MEDIC]: { width: 1, height: 1 },
+            [CharacterAssetId.ENTENTE_CAPORAL]: { width: 1, height: 1 },
+            [CharacterAssetId.ALLIANCE_FANTASSIN]: { width: 1, height: 1 },
+            [CharacterAssetId.ALLIANCE_MEDIC]: { width: 1, height: 1 },
+            [CharacterAssetId.ALLIANCE_CAPORAL]: { width: 1, height: 1 },
+        });
     }
 }
 
@@ -45,7 +52,14 @@ class CharacterCloseupAssetManager extends ImageAssetManager<
     }
 
     constructor() {
-        super("characters_closeup", CharacterAssetEntries);
+        super("characters_closeup", CharacterAssetEntries, {
+            [CharacterAssetId.ENTENTE_FANTASSIN]: { width: 1, height: 1 },
+            [CharacterAssetId.ENTENTE_MEDIC]: { width: 1, height: 1 },
+            [CharacterAssetId.ENTENTE_CAPORAL]: { width: 1, height: 1 },
+            [CharacterAssetId.ALLIANCE_FANTASSIN]: { width: 1, height: 1 },
+            [CharacterAssetId.ALLIANCE_MEDIC]: { width: 1, height: 1 },
+            [CharacterAssetId.ALLIANCE_CAPORAL]: { width: 1, height: 1 },
+        });
     }
 }
 

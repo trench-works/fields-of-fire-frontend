@@ -1,3 +1,5 @@
+import { Size } from "../Types";
+
 export abstract class AssetManager<AssetId extends string, AssetType> {
     constructor(
         protected readonly assetKey: string,
@@ -52,7 +54,11 @@ export abstract class ImageAssetManager<
     AssetId extends string,
     AssetType,
 > extends AssetManager<AssetId, AssetType> {
-    constructor(assetKey: string, assets: Partial<Record<AssetId, AssetType>>) {
+    constructor(
+        assetKey: string,
+        assets: Partial<Record<AssetId, AssetType>>,
+        protected readonly assetScale: Record<AssetId, Size>,
+    ) {
         super(assetKey, assets);
     }
 
@@ -65,6 +71,11 @@ export abstract class ImageAssetManager<
             this.getAssetKey(id),
             this.getAssetFileLink(this.assetKey, asset),
         );
+    }
+
+    getAssetScale(id: string): number {
+        const size = this.assetScale[id as AssetId];
+        return size.width / size.height;
     }
 }
 
@@ -80,7 +91,7 @@ export type AnimationConfiguration = {
 export abstract class SpriteAssetManager<
     AssetId extends string,
     AssetType,
-> extends ImageAssetManager<AssetId, AssetType> {
+> extends AssetManager<AssetId, AssetType> {
     constructor(
         assetKey: string,
         assets: Partial<Record<AssetId, AssetType>>,

@@ -1,6 +1,6 @@
 import { CharacterCloseupAsset } from "../../../assets";
 import { Color } from "../../../config/ColorConfig";
-import { CustomContainer, GridUtils } from "../../../core";
+import { CustomContainer, ScaleUtils } from "../../../core";
 import { FightScene } from "../fight.scene";
 import { ClassStore } from "../stores/ClassStore";
 import { GameStore } from "../stores/GameStore";
@@ -20,11 +20,15 @@ export class TurnDisplayer extends FightSceneDisplayer {
     }
 
     preRender(): this {
-        const turndisplay = this.scene.sceneGrid.getArea(0, 0, 6, 2);
+        const turndisplay = this.scene.rootGrid.getArea({
+            x: 1,
+            y: 1,
+            width: 7,
+            height: 1,
+        });
         this.turnPanel = new CustomContainer(this.scene, {
-            title: "",
-            x: turndisplay.x + turndisplay.width / 2,
-            y: turndisplay.y + turndisplay.height / 2,
+            x: turndisplay.center.x,
+            y: turndisplay.center.y,
             width: turndisplay.width,
             height: turndisplay.height,
             opacity: 0.25,
@@ -36,23 +40,22 @@ export class TurnDisplayer extends FightSceneDisplayer {
     }
 
     render(): this {
-        const actualTurnCellH = 7;
-        const turnCellH = 5;
-        const turnCellW = 4;
-
-        const otherCellW = turnCellW * 0.75;
-        const otherStartCol = turnCellW + 1;
-
-        const turnGrid = GridUtils.uiGrid(
-            0,
-            0,
-            this.turnPanel.width,
-            this.turnPanel.height,
-            this.gameStore.game.playerTurns.length * 10,
-            9,
+        const turnGrid = this.scene.rootGrid.getSubGrid(
+            {
+                x: 1,
+                y: 1,
+                width: 7,
+                height: 1,
+                margin: 5,
+            },
+            {
+                division: {
+                    horizontal: 14,
+                    vertical: 1,
+                },
+                padding: 5,
+            },
         );
-
-        const firstCell = turnGrid.getArea(1, 1, turnCellW, actualTurnCellH);
 
         this.gameStore.game.playerTurns.forEach((entityId, index) => {
             const entity = this.gameStore.game.entities.find(
@@ -66,23 +69,26 @@ export class TurnDisplayer extends FightSceneDisplayer {
             );
             const isFirstCell = index === 0;
 
-            const col = otherStartCol + (index - 1) * (otherCellW + 1);
-            const otherCell = turnGrid.getArea(col, 1, otherCellW, turnCellH);
+            const cellArea = turnGrid.getArea({
+                x: index + 1,
+                y: 1,
+                width: 1,
+                height: 1,
+                margin: isFirstCell ? 0 : 5,
+            });
+
+            const imageSize = ScaleUtils.fitFromScale(
+                cellArea,
+                CharacterCloseupAsset.getAssetScale(entity.classId),
+            );
 
             this.icons.push(
                 new CustomContainer(this.scene, {
-                    title: player?.name ?? charClass?.name?.split(" ")[0] ?? "",
-                    x:
-                        this.turnPanel.x -
-                        this.turnPanel.width / 2 +
-                        (isFirstCell ? firstCell : otherCell).centerX +
-                        (isFirstCell ? 0 : 50),
-                    y:
-                        this.turnPanel.y -
-                        this.turnPanel.height / 2 +
-                        (isFirstCell ? firstCell : otherCell).centerY,
-                    width: (isFirstCell ? firstCell : otherCell).width,
-                    height: (isFirstCell ? firstCell : otherCell).height,
+                    title: player?.name ?? charClass?.name?.split(" ")[0],
+                    x: cellArea.center.x,
+                    y: cellArea.center.y - (isFirstCell ? 0 : 5),
+                    width: imageSize.width,
+                    height: imageSize.height,
                     borderWidth: isFirstCell ? 5 : 2,
                     borderColor: isFirstCell
                         ? Color.actualTurnBorder

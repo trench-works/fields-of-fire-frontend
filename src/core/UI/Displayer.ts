@@ -1,5 +1,7 @@
+import { BaseScene } from "../Objects";
+
 export abstract class Displayer {
-    constructor(protected readonly scene: Phaser.Scene) {}
+    constructor(protected readonly scene: BaseScene) {}
 
     abstract preRender(): this;
     abstract render(): this;

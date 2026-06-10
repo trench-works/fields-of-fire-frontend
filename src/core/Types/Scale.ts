@@ -1,14 +1,13 @@
+import { Position, Size } from "./Sizing";
+
 export interface ScaleAndCenterParams {
-    parentHeight: number;
-    parentWidth: number;
-    childHeight: number;
-    childWidth: number;
+    parent: Size;
+    child: Size;
     scaleFactor?: number;
     isometricVariation?: boolean;
 }
 export interface ScaleAndCenterResult {
-    offsetX: number;
-    offsetY: number;
+    offset: Position;
     scaleFactor: number;
 }
 

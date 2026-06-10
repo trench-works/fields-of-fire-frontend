@@ -1,8 +1,3 @@
-import { MiscAsset, MiscAssetId } from "../../../../assets";
-import { Position } from "../../../../core";
-import { Diamond } from "../../../../core/Objects/Diamond";
-import { scaleAndCenter } from "../../../../core/Utils/Scale";
-import { EntityType } from "../../../../Model/Entity";
 import { FightScene } from "../../fight.scene";
 import { ClassStore } from "../../stores/ClassStore";
 import { GameStore } from "../../stores/GameStore";

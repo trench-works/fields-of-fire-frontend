@@ -25,7 +25,20 @@ class ActionAssetManager extends ImageAssetManager<ActionAssetId, string> {
     }
 
     constructor() {
-        super("action", ActionAssetEntries);
+        super(
+            "action",
+            { ActionAssetEntries },
+            {
+                [ActionAssetId.WALK]: { width: 1, height: 1 },
+                [ActionAssetId.SHOOT]: { width: 1, height: 1 },
+                [ActionAssetId.HEAL]: { width: 1, height: 1 },
+                [ActionAssetId.ARTILLERY_SUPPORT]: { width: 1, height: 1 },
+                [ActionAssetId.AMPUTATE]: { width: 1, height: 1 },
+                [ActionAssetId.BAYONET]: { width: 1, height: 1 },
+                [ActionAssetId.INTIMIDATION]: { width: 1, height: 1 },
+                [ActionAssetId.SNEAKY]: { width: 1, height: 1 },
+            },
+        );
     }
 }
 

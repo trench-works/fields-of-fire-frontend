@@ -1,8 +1,9 @@
+import { CharacterAssetId } from "../assets";
 import { Action } from "./Action";
 import { Stats } from "./Stats";
 
 export class CharacterClass {
-    id!: string;
+    id!: CharacterAssetId;
     name!: string;
     playable!: boolean;
     stats!: Stats;
