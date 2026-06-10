@@ -1,7 +1,7 @@
 import { FightSceneDisplayer } from "../FightSceneDisplayer";
 import { FightScene } from "../../fight.scene";
 import { GameStore } from "../../stores/GameStore";
-import { CharacterSpriteAsset } from "../../../../assets";
+import { CharacterAssetId, CharacterSpriteAsset } from "../../../../assets";
 import { GameMoveAnimation } from "../../repositories/player.socket";
 import { Game } from "../../../../Model/Game";
 
@@ -53,7 +53,7 @@ export class Character extends FightSceneDisplayer {
         return this;
     }
 
-    private createAnimations(classId: string) {
+    private createAnimations(classId: CharacterAssetId) {
         const assetKey = CharacterSpriteAsset.getAssetKey(classId);
         if (!this.scene.anims.exists(`${assetKey}-idle-DR`)) {
             this.loadIdleAnimation(assetKey, `${assetKey}-idle-DR`, 0, 1);
