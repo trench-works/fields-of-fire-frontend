@@ -1,4 +1,5 @@
 import { ActionAnimationAsset, ActionAssetId } from "../../../../assets";
+import { ParticleAssetId } from "../../../../assets/ParticleAsset";
 import { BaseScene, Displayer } from "../../../../core";
 import { Game } from "../../../../Model/Game";
 import { GameAttackAnimation } from "../../repositories/player.socket";
@@ -20,7 +21,7 @@ export class AttackDisplayer extends Displayer {
         switch (animation.data.actionId) {
             case "intimidation":
                 this.loadIntimidationAnimation(ActionAnimationAsset.getAssetKey(ActionAssetId.INTIMIDATION),0,5);
-                await this.particleDisplayer.animate();
+                await this.particleDisplayer.animate(ParticleAssetId.BOOST);
                 break;
             
         }

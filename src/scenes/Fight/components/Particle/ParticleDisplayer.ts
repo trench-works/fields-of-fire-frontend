@@ -4,6 +4,11 @@ import {
 } from "../../../../assets/ParticleAsset";
 import { BaseScene, Displayer } from "../../../../core";
 
+export enum ParticleDirectionEnum {
+    UP = "up",
+    DOWN = "down"
+}
+
 export class ParticleDisplayer extends Displayer {
     protected buffEmitter!: Phaser.GameObjects.Particles.ParticleEmitter;
 
@@ -23,14 +28,27 @@ export class ParticleDisplayer extends Displayer {
         return this;
     }
 
-    async animate(): Promise<this> {
+    async animate(particleKey: string): Promise<this> {
         console.log("ANIMATE INTIMIDATION");
+        switch(particleKey){
+            case ParticleAssetId.BOOST : 
+                this.ParticleAnimation(ParticleAssetId.BOOST, ParticleDirectionEnum.UP);
+                break
+
+        }
+        return this;
+    }
+
+    async ParticleAnimation(particleSpriteKey : string, direction : string){
         this.buffEmitter = this.scene.add.particles(
             window.innerWidth / 2,
             window.innerHeight / 2,
-            ParticleAsset.getAssetKey(ParticleAssetId.BOOST),
+            ParticleAsset.getAssetKey(particleSpriteKey),
             {
-                speedY: { min: -200, max: -350 },
+                
+                speedY: direction === ParticleDirectionEnum.UP ? 
+                    { min: -200, max: -350 } :
+                    { min: 200, max: 350 },
                 speedX: { min: -30, max: 30 },
 
                 scale: { start: 2, end: 0.5 },
@@ -64,7 +82,6 @@ export class ParticleDisplayer extends Displayer {
                 resolve();
             }, 2 * 1000);
         });
-        return this;
     }
 }
 
