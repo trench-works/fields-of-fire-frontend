@@ -69,7 +69,7 @@ class ActionAnimationAssetManager extends SpriteAssetManager<
                 [ActionAssetId.INTIMIDATION]: {
                     frameWidth: 192,
                     frameHeight: 192,
-                    frameTime: [250, 250, 250, 500, 500, 500],
+                    frameTime: [50, 50, 50, 500, 125, 500],
                 },
             },
         );
