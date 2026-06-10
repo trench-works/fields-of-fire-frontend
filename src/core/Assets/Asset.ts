@@ -1,7 +1,7 @@
 export abstract class AssetManager<AssetId extends string, AssetType> {
     constructor(
         protected readonly assetKey: string,
-        protected readonly assets: Record<AssetId, AssetType>,
+        protected readonly assets: Partial<Record<AssetId, AssetType>>,
     ) {}
 
     protected abstract getIds(): AssetId[];
@@ -10,8 +10,8 @@ export abstract class AssetManager<AssetId extends string, AssetType> {
         asset: AssetType,
     ): string;
 
-    protected isAssetId(id: string): id is AssetId {
-        return this.getIds().includes(id as AssetId);
+    protected isAssetId(id: AssetId): id is AssetId {
+        return this.assets[id] !== undefined;
     }
 
     loadAll(load: Phaser.Loader.LoaderPlugin): void {
@@ -20,7 +20,7 @@ export abstract class AssetManager<AssetId extends string, AssetType> {
         }
     }
 
-    load(load: Phaser.Loader.LoaderPlugin, id: string): void {
+    load(load: Phaser.Loader.LoaderPlugin, id: AssetId): void {
         if (!this.isAssetId(id)) {
             console.error(`${id} not an asset id`);
             return;
@@ -39,7 +39,7 @@ export abstract class AssetManager<AssetId extends string, AssetType> {
         asset: Record<AssetId, AssetType>[AssetId],
     ): void;
 
-    getAssetKey(id: string): string {
+    getAssetKey(id: AssetId): string {
         if (!this.isAssetId(id)) {
             console.error(`${id} not a action asset id`);
             return "";
@@ -52,13 +52,13 @@ export abstract class ImageAssetManager<
     AssetId extends string,
     AssetType,
 > extends AssetManager<AssetId, AssetType> {
-    constructor(assetKey: string, assets: Record<AssetId, AssetType>) {
+    constructor(assetKey: string, assets: Partial<Record<AssetId, AssetType>>) {
         super(assetKey, assets);
     }
 
     loader(
         load: Phaser.Loader.LoaderPlugin,
-        id: string,
+        id: AssetId,
         asset: Record<AssetId, AssetType>[AssetId],
     ) {
         load.image(
@@ -68,27 +68,42 @@ export abstract class ImageAssetManager<
     }
 }
 
+export type AnimationConfiguration = {
+    frameWidth: number;
+    frameHeight: number;
+    /**
+     * Time of each frame in index order in ms, this will also define the number of displayed frames
+     */
+    frameTime: number[];
+};
+
 export abstract class SpriteAssetManager<
     AssetId extends string,
     AssetType,
 > extends ImageAssetManager<AssetId, AssetType> {
     constructor(
         assetKey: string,
-        assets: Record<AssetId, AssetType>,
-        protected readonly frameConfig: Phaser.Types.Loader.FileTypes.ImageFrameConfig,
+        assets: Partial<Record<AssetId, AssetType>>,
+        protected readonly frameConfigs: Partial<
+            Record<AssetId, AnimationConfiguration>
+        >,
     ) {
         super(assetKey, assets);
     }
 
+    getFrameConfig(assetId: AssetId): AnimationConfiguration {
+        return this.frameConfigs[assetId]!;
+    }
+
     loader(
         load: Phaser.Loader.LoaderPlugin,
-        id: string,
+        id: AssetId,
         asset: Record<AssetId, AssetType>[AssetId],
     ) {
         load.spritesheet(
             this.getAssetKey(id),
             this.getAssetFileLink(this.assetKey, asset),
-            this.frameConfig,
+            this.frameConfigs[id],
         );
     }
 }

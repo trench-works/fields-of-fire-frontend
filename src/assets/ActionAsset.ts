@@ -1,4 +1,4 @@
-import { ImageAssetManager } from "../core/Assets/Asset";
+import { ImageAssetManager, SpriteAssetManager } from "../core/Assets/Asset";
 
 export enum ActionAssetId {
     WALK = "walk",
@@ -11,6 +11,10 @@ export enum ActionAssetId {
     SNEAKY = "sneaky",
 }
 
+const ActionAssetEntries = Object.fromEntries(
+    Object.values(ActionAssetId).map((value) => [value, value]),
+) as Record<ActionAssetId, string>;
+
 class ActionAssetManager extends ImageAssetManager<ActionAssetId, string> {
     protected getIds(): ActionAssetId[] {
         return Object.values(ActionAssetId);
@@ -21,22 +25,13 @@ class ActionAssetManager extends ImageAssetManager<ActionAssetId, string> {
     }
 
     constructor() {
-        super("action", {
-            [ActionAssetId.WALK]: "walk",
-            [ActionAssetId.SHOOT]: "shoot",
-            [ActionAssetId.HEAL]: "heal",
-            [ActionAssetId.ARTILLERY_SUPPORT]: "artillery_support",
-            [ActionAssetId.AMPUTATE]: "amputate",
-            [ActionAssetId.BAYONET]: "bayonet",
-            [ActionAssetId.INTIMIDATION]: "intimidation",
-            [ActionAssetId.SNEAKY]: "sneaky",
-        });
+        super("action", ActionAssetEntries);
     }
 }
 
 export const ActionAsset = new ActionAssetManager();
 
-class ActionAnimationAssetManager extends ImageAssetManager<
+class ActionAnimationAssetManager extends SpriteAssetManager<
     ActionAssetId,
     string
 > {
@@ -49,16 +44,26 @@ class ActionAnimationAssetManager extends ImageAssetManager<
     }
 
     constructor() {
-        super("action_animation", {
-            [ActionAssetId.WALK]: "walk",
-            [ActionAssetId.SHOOT]: "shoot",
-            [ActionAssetId.HEAL]: "heal",
-            [ActionAssetId.ARTILLERY_SUPPORT]: "artillery_support",
-            [ActionAssetId.AMPUTATE]: "amputate",
-            [ActionAssetId.BAYONET]: "bayonet",
-            [ActionAssetId.INTIMIDATION]: "intimidation",
-            [ActionAssetId.SNEAKY]: "sneaky",
-        });
+        super(
+            "action_animation",
+            {
+                [ActionAssetId.ARTILLERY_SUPPORT]:
+                    ActionAssetId.ARTILLERY_SUPPORT,
+                [ActionAssetId.INTIMIDATION]: ActionAssetId.INTIMIDATION,
+            },
+            {
+                [ActionAssetId.ARTILLERY_SUPPORT]: {
+                    frameWidth: 128,
+                    frameHeight: 160,
+                    frameTime: [500, 500, 500, 500, 500, 500, 500, 500, 500],
+                },
+                [ActionAssetId.INTIMIDATION]: {
+                    frameWidth: 192,
+                    frameHeight: 192,
+                    frameTime: [250, 250, 250, 500, 500, 500],
+                },
+            },
+        );
     }
 }
 

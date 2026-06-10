@@ -23,11 +23,11 @@ export class ParticleDisplayer extends Displayer {
         return this;
     }
 
-    async animate(): Promise<this> {
+    async animate(x: number, y: number): Promise<this> {
         console.log("ANIMATE INTIMIDATION");
         this.buffEmitter = this.scene.add.particles(
-            window.innerWidth / 2,
-            window.innerHeight / 2,
+            x,
+            y,
             ParticleAsset.getAssetKey(ParticleAssetId.BOOST),
             {
                 speedY: { min: -200, max: -350 },
