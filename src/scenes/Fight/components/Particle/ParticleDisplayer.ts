@@ -50,6 +50,14 @@ export class ParticleDisplayer extends Displayer<FightScene> {
                     ParticleDirectionEnum.DOWN,
                     x,
                     y
+                );
+                break;
+            case ParticleAssetId.HEAL: 
+                this.ParticleAnimation(
+                    ParticleAssetId.HEAL,
+                    ParticleDirectionEnum.UP,
+                    x,
+                    y
                 )
         }
         return this;
