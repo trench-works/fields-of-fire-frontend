@@ -25,10 +25,10 @@ export class AttackDisplayer extends FightSceneDisplayer {
         }: GameAttackAnimation,
         newGame: Game,
     ): Promise<this> {
+        const cell = this.scene.gridPositions[x][y];
         switch (actionId) {
             case ActionAssetId.INTIMIDATION:
                 {
-                    const cell = this.scene.gridPositions[x][y];
                     this.loadActionAnimation(ActionAssetId.INTIMIDATION);
                     await this.playActionAnimation(ActionAssetId.INTIMIDATION, {
                         x,
@@ -38,8 +38,25 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         ParticleAssetId.DEBUFF,
                         cell.pixelPosition.x,
                         cell.pixelPosition.y,
-                        
                     );
+                }
+                break;
+            case ActionAssetId.HEAL: 
+                {
+                    await this.particleDisplayer.animate(
+                        ParticleAssetId.HEAL,
+                        cell.pixelPosition.x,
+                        cell.pixelPosition.y,
+                    )
+                }
+                break;
+             case ActionAssetId.ARTILLERY_SUPPORT: 
+                {
+                    this.loadActionAnimation(ActionAssetId.ARTILLERY_SUPPORT);
+                    await this.playActionAnimation(ActionAssetId.ARTILLERY_SUPPORT, {
+                        x,
+                        y,
+                    });
                 }
                 break;
         }
@@ -72,6 +89,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
     private async playActionAnimation(
         animationId: ActionAssetId,
         { x, y }: { x: number; y: number },
+        offset  : { x: number; y: number } = { x: 0.5, y: 0.95 }
     ) {
         return new Promise<void>((resolve) => {
             const animationName = ActionAnimationAsset.getAssetKey(animationId);
@@ -86,7 +104,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
             );
 
             sprite.setDepth(Math.max(x * 10, y * 10) + 1);
-            sprite.setOrigin(0.5, 0.95);
+            sprite.setOrigin(offset.x, offset.y);
             sprite.setScale(this.scene.scaleFactor / 1.5);
             sprite.play(animationName);
 
