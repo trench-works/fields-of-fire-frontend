@@ -35,9 +35,10 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         y,
                     });
                     await this.particleDisplayer.animate(
-                        ParticleAssetId.BOOST,
+                        ParticleAssetId.DEBUFF,
                         cell.pixelPosition.x,
                         cell.pixelPosition.y,
+                        
                     );
                 }
                 break;

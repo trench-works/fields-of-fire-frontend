@@ -2,17 +2,18 @@ import {
     ParticleAsset,
     ParticleAssetId,
 } from "../../../../assets/ParticleAsset";
-import { BaseScene, Displayer } from "../../../../core";
+import { Displayer } from "../../../../core";
+import { FightScene } from "../../fight.scene";
 
 export enum ParticleDirectionEnum {
     UP = "up",
     DOWN = "down",
 }
 
-export class ParticleDisplayer extends Displayer {
+export class ParticleDisplayer extends Displayer<FightScene> {
     protected buffEmitter!: Phaser.GameObjects.Particles.ParticleEmitter;
 
-    constructor(scene: BaseScene) {
+    constructor(scene: FightScene) {
         super(scene);
     }
 
@@ -43,6 +44,13 @@ export class ParticleDisplayer extends Displayer {
                     y,
                 );
                 break;
+            case ParticleAssetId.DEBUFF:
+                this.ParticleAnimation(
+                    ParticleAssetId.DEBUFF,
+                    ParticleDirectionEnum.DOWN,
+                    x,
+                    y
+                )
         }
         return this;
     }
@@ -55,7 +63,7 @@ export class ParticleDisplayer extends Displayer {
     ) {
         this.buffEmitter = this.scene.add.particles(
             x,
-            y,
+            direction === ParticleDirectionEnum.UP ? y : y - (128 * this.scene.scaleFactor / 1.5),
             ParticleAsset.getAssetKey(particleSpriteKey),
             {
                 speedY:
@@ -67,9 +75,9 @@ export class ParticleDisplayer extends Displayer {
                 scale: { start: 2, end: 0.5 },
                 alpha: { start: 1, end: 0 },
 
-                lifespan: 800,
-                frequency: 40,
-                quantity: { min: 2, max: 4 },
+                lifespan: 750,
+                frequency: 120,
+                quantity: { min: 1, max: 2 },
 
                 angle: { min: -100, max: -80 },
 
@@ -77,6 +85,7 @@ export class ParticleDisplayer extends Displayer {
             },
         );
 
+        this.buffEmitter.setDepth((Math.max(x,y) * 10) + 1)
         await new Promise<void>((resolve) => {
             this.buffEmitter.addEmitZone(
                 new Phaser.GameObjects.Particles.Zones.RandomZone({
