@@ -8,6 +8,7 @@ import {
     DisplayRoot,
     ScaleUtils,
     DisplayText,
+    PlacementOrigin,
 } from "../../core";
 import { Color } from "../../config/ColorConfig";
 import { LobbySocket } from "./repositories/lobby.socket";
@@ -145,13 +146,19 @@ export class LobbyScene extends BaseScene {
             { division: { horizontal: 9, vertical: 9 } },
         );
 
-        new CustomContainer(this, {
-            x: playerGrid.center.x,
-            y: playerGrid.center.y,
-            width: playerGrid.width,
-            height: playerGrid.height,
-            borderWidth: 5,
-        });
+        new CustomContainer(
+            this,
+            {
+                x: playerGrid.center.x,
+                y: playerGrid.center.y,
+                width: playerGrid.width,
+                height: playerGrid.height,
+            },
+            PlacementOrigin.CENTER,
+            {
+                borderWidth: 5,
+            },
+        );
 
         const imgArea = playerGrid.getArea({
             x: 1,
@@ -167,15 +174,21 @@ export class LobbyScene extends BaseScene {
             height: 0.5,
         });
 
-        const playerNameContainer = new CustomContainer(this, {
-            title: this.classStore.getClass(this.selectClassId).name,
-            x: classNameArea.center.x,
-            y: classNameArea.center.y,
-            width: classNameArea.width,
-            height: classNameArea.height,
-            bgColor: Color.containerBorder,
-            borderWidth: 5,
-        });
+        const playerNameContainer = new CustomContainer(
+            this,
+            {
+                x: classNameArea.center.x,
+                y: classNameArea.center.y,
+                width: classNameArea.width,
+                height: classNameArea.height,
+            },
+            PlacementOrigin.CENTER,
+            {
+                title: this.classStore.getClass(this.selectClassId).name,
+                bgColor: Color.containerBorder,
+                borderWidth: 5,
+            },
+        );
         this.playerClassName = playerNameContainer;
 
         const imageSize = ScaleUtils.fitFromScale(
@@ -183,15 +196,21 @@ export class LobbyScene extends BaseScene {
             CharacterIconAsset.getAssetScale(this.selectClassId),
         );
 
-        const playerImageContainer = new CustomContainer(this, {
-            x: imgArea.x + imageSize.width / 2,
-            y: imgArea.y + imgArea.height - imageSize.height / 2,
-            ...imageSize,
-            backgroundImage: CharacterCloseupAsset.getAssetKey(
-                this.selectClassId,
-            ),
-            borderWidth: 5,
-        });
+        const playerImageContainer = new CustomContainer(
+            this,
+            {
+                x: imgArea.x + imageSize.width / 2,
+                y: imgArea.y + imgArea.height - imageSize.height / 2,
+                ...imageSize,
+            },
+            PlacementOrigin.CENTER,
+            {
+                backgroundImage: CharacterCloseupAsset.getAssetKey(
+                    this.selectClassId,
+                ),
+                borderWidth: 5,
+            },
+        );
 
         this.playerImageContainer = playerImageContainer;
 
@@ -255,19 +274,25 @@ export class LobbyScene extends BaseScene {
             );
 
             root.add(
-                new CustomContainer(this, {
-                    title: charClass.name,
-                    x: area.center.x,
-                    y: area.center.y,
-                    ...size,
-                    backgroundImage: CharacterIconAsset.getAssetKey(
-                        charClass.id,
-                    ),
-                    borderWidth: 7,
-                    onClick: () => {
-                        this.updatePlayerImage(charClass.id);
+                new CustomContainer(
+                    this,
+                    {
+                        x: area.center.x,
+                        y: area.center.y,
+                        ...size,
                     },
-                }),
+                    PlacementOrigin.CENTER,
+                    {
+                        title: charClass.name,
+                        backgroundImage: CharacterIconAsset.getAssetKey(
+                            charClass.id,
+                        ),
+                        borderWidth: 7,
+                        onClick: () => {
+                            this.updatePlayerImage(charClass.id);
+                        },
+                    },
+                ),
             );
         });
     }

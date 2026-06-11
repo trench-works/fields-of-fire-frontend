@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { Button, CustomContainer } from "../../../core";
+import { Button, CustomContainer, PlacementOrigin } from "../../../core";
 
 interface PopupInputConfig {
     title: string;
@@ -39,17 +39,23 @@ export class PopupInput {
             });
 
         // --- CONTAINER ---
-        this.container = new CustomContainer(scene, {
-            title,
-            x: cx,
-            y: cy,
-            width: popupW,
-            height: popupH,
-            borderWidth: 2,
-            opacity: 0.95,
-            fontSize: 20,
-            textPosition: { x: 0, y: -popupH / 2 + 25 },
-        });
+        this.container = new CustomContainer(
+            scene,
+            {
+                x: cx,
+                y: cy,
+                width: popupW,
+                height: popupH,
+            },
+            PlacementOrigin.CENTER,
+            {
+                title,
+                borderWidth: 2,
+                opacity: 0.95,
+                fontSize: 20,
+                textPosition: { x: 0, y: -popupH / 2 + 25 },
+            },
+        );
         this.container.setDepth(11);
         this.container
             .setDepth(11)
