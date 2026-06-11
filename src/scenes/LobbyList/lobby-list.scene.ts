@@ -6,6 +6,7 @@ import {
     CustomContainer,
     MenuButton,
     DisplayText,
+    PlacementOrigin,
 } from "../../core";
 import { FightScene } from "../Fight/fight.scene";
 import { MainMenu } from "../MainMenu/main-menu.scene";
@@ -143,14 +144,20 @@ export class LobbyListScene extends BaseScene {
             width: 9,
             height: 6,
         });
-        new CustomContainer(this, {
-            x: lobbyListArea.center.x,
-            y: lobbyListArea.center.y,
-            width: lobbyListArea.width,
-            height: lobbyListArea.height,
-            opacity: 0.25,
-            borderWidth: 2,
-        });
+        new CustomContainer(
+            this,
+            {
+                x: lobbyListArea.center.x,
+                y: lobbyListArea.center.y,
+                width: lobbyListArea.width,
+                height: lobbyListArea.height,
+            },
+            PlacementOrigin.CENTER,
+            {
+                opacity: 0.25,
+                borderWidth: 2,
+            },
+        );
         //buttons
 
         const buttonGrid = this.rootGrid.getSubGrid(

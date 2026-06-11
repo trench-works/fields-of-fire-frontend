@@ -1,24 +1,28 @@
 import Phaser from "phaser";
 import { Color } from "../../config/ColorConfig";
-import { ColorUtils } from "../Utils";
+import { ColorUtils, GridArea } from "../Utils";
 import { Position, Size } from "../Types";
 import { Displayable } from "./DisplayRoot";
 
-type ContainerConfig = Size &
-    Position & {
-        title?: string;
-        bgColor?: string;
-        titleColor?: string;
-        borderWidth?: number;
-        borderColor?: string;
-        backgroundImage?: string;
-        opacity?: number;
-        fontSize?: number;
-        onClick?: () => void;
-        textPosition?: { x: number; y: number };
-        hoverTint?: number;
-        alpha?: number;
-    };
+type ContainerConfig = {
+    title?: string;
+    bgColor?: string;
+    titleColor?: string;
+    borderWidth?: number;
+    borderColor?: string;
+    backgroundImage?: string;
+    opacity?: number;
+    fontSize?: number;
+    onClick?: () => void;
+    textPosition?: { x: number; y: number };
+    hoverTint?: number;
+    alpha?: number;
+};
+
+export enum PlacementOrigin {
+    CENTER = "center",
+    UPPER_LEFT_CORNER = "ul_corner",
+}
 
 export class CustomContainer
     extends Phaser.GameObjects.Container
@@ -39,14 +43,16 @@ export class CustomContainer
         throw new Error("Method not implemented.");
     }
 
-    constructor(scene: Phaser.Scene, config: ContainerConfig) {
+    constructor(
+        scene: Phaser.Scene,
+        position: (Size & Position) | GridArea,
+        origin: PlacementOrigin,
+        config: ContainerConfig,
+    ) {
+        const { x, y, height, width } = position;
         const {
             title = "",
             bgColor = Color.containerBg,
-            x,
-            y,
-            height,
-            width,
             borderWidth = 0,
             borderColor = Color.containerBorder,
             backgroundImage,

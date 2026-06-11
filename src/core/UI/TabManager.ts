@@ -1,7 +1,7 @@
 import { BaseScene } from "../Objects";
 import { Grid, GridArea } from "../Utils";
 import { Button } from "./Button";
-import { CustomContainer } from "./Container";
+import { CustomContainer, PlacementOrigin } from "./Container";
 import { DisplayRoot } from "./DisplayRoot";
 
 export type TabConfig = {
@@ -55,12 +55,17 @@ export class TabManager {
             });
 
             tabRoot.add(
-                new CustomContainer(this.scene, {
-                    x: contentArea.center.x,
-                    y: contentArea.center.y,
-                    width: contentArea.width,
-                    height: contentArea.height,
-                }),
+                new CustomContainer(
+                    this.scene,
+                    {
+                        x: contentArea.center.x,
+                        y: contentArea.center.y,
+                        width: contentArea.width,
+                        height: contentArea.height,
+                    },
+                    PlacementOrigin.CENTER,
+                    {},
+                ),
             );
 
             // Construire le contenu réel

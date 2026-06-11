@@ -1,6 +1,6 @@
 import { Position, Size, TwoAxis } from "../Types";
 import { Grid } from "../Utils";
-import { CustomContainer } from "./Container";
+import { CustomContainer, PlacementOrigin } from "./Container";
 import { Displayable } from "./DisplayRoot";
 
 export type CellValue = string | number | { icon: string };
@@ -24,13 +24,19 @@ export class List extends CustomContainer {
     private cellAreas: CellArea[][] = [];
 
     constructor(scene: Phaser.Scene, grid: Grid) {
-        super(scene, {
-            x: grid.center.x,
-            y: grid.center.y,
-            width: grid.width,
-            height: grid.height,
-            opacity: 0,
-        });
+        super(
+            scene,
+            {
+                x: grid.center.x,
+                y: grid.center.y,
+                width: grid.width,
+                height: grid.height,
+            },
+            PlacementOrigin.CENTER,
+            {
+                opacity: 0,
+            },
+        );
 
         for (let r = 0; r < grid.division.vertical; r++) {
             this.cellAreas[r] = [];
@@ -122,8 +128,8 @@ export class List extends CustomContainer {
 
     public clear(): void {
         const toRemove = this.getAll().slice(2);
-        toRemove.forEach(child => {
-            this.remove(child, true); 
+        toRemove.forEach((child) => {
+            this.remove(child, true);
         });
     }
 }
