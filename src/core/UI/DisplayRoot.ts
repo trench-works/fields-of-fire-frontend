@@ -1,10 +1,13 @@
+import { PlacementOrigin, Position, Size } from "../Types";
+
 export interface Displayable {
     setVisible(visible: boolean): void;
     destroy(): void;
     getObject(): Phaser.GameObjects.GameObject;
+    place(position: Position, size: Size, origin: PlacementOrigin): void;
 }
 
-export class DisplayRoot implements Omit<Displayable, "getObject"> {
+export class DisplayRoot implements Omit<Displayable, "getObject" | "place"> {
     protected displayables: Displayable[];
 
     constructor() {

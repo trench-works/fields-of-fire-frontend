@@ -1,6 +1,6 @@
 import { Position, Size, TwoAxis } from "../Types";
 import { Grid } from "../Utils";
-import { CustomContainer, PlacementOrigin } from "./Container";
+import { CustomContainer } from "./Container";
 import { Displayable } from "./DisplayRoot";
 
 export type CellValue = string | number | { icon: string };
@@ -32,7 +32,6 @@ export class List extends CustomContainer {
                 width: grid.width,
                 height: grid.height,
             },
-            PlacementOrigin.CENTER,
             {
                 opacity: 0,
             },
@@ -61,7 +60,7 @@ export class List extends CustomContainer {
         }
     }
 
-    public place<T extends Displayable>(
+    public placeElement<T extends Displayable>(
         { x, y }: Position,
         place: (area: CellArea) => T,
     ): T {

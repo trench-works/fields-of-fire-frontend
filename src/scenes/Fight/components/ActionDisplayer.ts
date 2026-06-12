@@ -1,12 +1,6 @@
 import { ActionAsset, ActionAssetId } from "../../../assets/ActionAsset";
 import { Color } from "../../../config/ColorConfig";
-import {
-    CustomContainer,
-    List,
-    Button,
-    ScaleUtils,
-    PlacementOrigin,
-} from "../../../core";
+import { CustomContainer, List, Button, ScaleUtils } from "../../../core";
 import { Action } from "../../../Model/Action";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/GameStore";
@@ -72,20 +66,10 @@ export class ActionDisplayer extends FightSceneDisplayer {
             height: 1,
         });
 
-        new CustomContainer(
-            this.scene,
-            {
-                x: actionArea.center.x,
-                y: actionArea.center.y,
-                width: actionArea.width,
-                height: actionArea.height,
-            },
-            PlacementOrigin.CENTER,
-            {
-                borderWidth: 2,
-                opacity: 0.5,
-            },
-        );
+        new CustomContainer(this.scene, actionArea, {
+            borderWidth: 2,
+            opacity: 0.5,
+        });
 
         const actionGrid = actionArea.getGrid({
             division: { vertical: 1, horizontal: 9 },
@@ -132,7 +116,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
 
     render(): this {
         this.playerStore.playerClass.actionList.forEach((action, index) => {
-            const iconObj = this.actionsList.place(
+            const iconObj = this.actionsList.placeElement(
                 { x: index, y: 0 },
                 (area) => {
                     const size = ScaleUtils.fitFromScale(

@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { Color } from "../../config/ColorConfig";
-import { FourAxis, Position, Size } from "../Types";
+import { FourAxis, PlacementOrigin, Position, Size } from "../Types";
 import { IGridArea } from "../Utils";
 import { Displayable } from "./DisplayRoot";
 
@@ -99,6 +99,11 @@ export class Button
         // Ajoute le bouton à la scène
         scene.add.existing(this);
     }
+
+    place(position: Position, size: Size, origin: PlacementOrigin): void {
+        throw new Error("Method not implemented.");
+    }
+
     getObject(): Phaser.GameObjects.GameObject {
         throw new Error("Method not implemented.");
     }
