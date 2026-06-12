@@ -53,10 +53,21 @@ export class AttackDisplayer extends FightSceneDisplayer {
              case ActionAssetId.ARTILLERY_SUPPORT: 
                 {
                     this.loadActionAnimation(ActionAssetId.ARTILLERY_SUPPORT);
-                    await this.playActionAnimation(ActionAssetId.ARTILLERY_SUPPORT, {
-                        x,
-                        y,
-                    });
+                    await this.playActionAnimation(ActionAssetId.ARTILLERY_SUPPORT, 
+                        {
+                            x,
+                            y,
+                        },
+                        {
+                            x : 0.5,
+                            y : 0.70
+                        }
+                    );
+                    await this.particleDisplayer.animate(
+                        ParticleAssetId.SMOKE,
+                        cell.pixelPosition.x,
+                        cell.pixelPosition.y,
+                    );
                 }
                 break;
         }

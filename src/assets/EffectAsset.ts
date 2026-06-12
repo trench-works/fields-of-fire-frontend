@@ -18,7 +18,12 @@ class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
         super("effect", {
             [EffectAssetId.AMPUTATED]: "amputate",
             [EffectAssetId.INTIMIDATED]: "intimidation",
-        });
+        },
+        {
+            [EffectAssetId.AMPUTATED]: {width : 512, height: 512},
+            [EffectAssetId.INTIMIDATED]: {width : 512, height: 512},
+        }
+        );
     }
 }
 

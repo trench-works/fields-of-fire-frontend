@@ -62,9 +62,16 @@ class ActionAnimationAssetManager extends SpriteAssetManager<
             },
             {
                 [ActionAssetId.ARTILLERY_SUPPORT]: {
-                    frameWidth: 128,
-                    frameHeight: 160,
-                    frameTime: [500, 500, 500, 500, 50, 100, 100, 100,],
+                    frameWidth: 192,
+                    frameHeight: 254,
+                    frameTime: 
+                    [
+                        500, 500, 500, 500, 40,
+                        40, 40, 30, 30, 30,
+                        30, 30, 20, 20, 20,
+                        10, 10, 20, 20, 20,
+                        20, 30, 30, 30, 40,
+                    ],
                 },
                 [ActionAssetId.INTIMIDATION]: {
                     frameWidth: 192,

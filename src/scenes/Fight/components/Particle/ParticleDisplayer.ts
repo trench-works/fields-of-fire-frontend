@@ -4,6 +4,7 @@ import {
 } from "../../../../assets/ParticleAsset";
 import { Displayer } from "../../../../core";
 import { FightScene } from "../../fight.scene";
+import { ParticleAnimationProps } from "./ParticleAnimation";
 
 export enum ParticleDirectionEnum {
     UP = "up",
@@ -42,6 +43,7 @@ export class ParticleDisplayer extends Displayer<FightScene> {
                     ParticleDirectionEnum.UP,
                     x,
                     y,
+                    {}
                 );
                 break;
             case ParticleAssetId.DEBUFF:
@@ -49,7 +51,8 @@ export class ParticleDisplayer extends Displayer<FightScene> {
                     ParticleAssetId.DEBUFF,
                     ParticleDirectionEnum.DOWN,
                     x,
-                    y
+                    y,
+                    {}
                 );
                 break;
             case ParticleAssetId.HEAL: 
@@ -57,7 +60,23 @@ export class ParticleDisplayer extends Displayer<FightScene> {
                     ParticleAssetId.HEAL,
                     ParticleDirectionEnum.UP,
                     x,
-                    y
+                    y,
+                    {}
+                )
+                break;
+            case ParticleAssetId.SMOKE:
+                this.ParticleAnimation(
+                    ParticleAssetId.SMOKE,
+                    ParticleDirectionEnum.UP,
+                    x,
+                    y,
+                    {
+                        speedY : {min : 20, max : 60},
+                        speedX: {min: -30, max : 30},
+                        scale : {start: 2, end : 8},
+                        lifespan : 2000,
+                        frequency : 200
+                    }
                 )
         }
         return this;
@@ -68,7 +87,20 @@ export class ParticleDisplayer extends Displayer<FightScene> {
         direction: string,
         x: number,
         y: number,
+        props : ParticleAnimationProps
     ) {
+        props.speedY ??= { min: 200, max: 350 };
+        props.speedX ??= { min: -30, max: 30 };
+        props.scale ??= { start: 2, end: 0.5 };
+        props.lifespan ??= 750;
+        props.frequency ??= 120;
+        props.quantity ??= { min: 2, max: 0.5 };
+
+        if(this.buffEmitter) {
+            this.buffEmitter.stop();
+            this.buffEmitter.destroy();
+        }
+
         this.buffEmitter = this.scene.add.particles(
             x,
             direction === ParticleDirectionEnum.UP ? y : y - (128 * this.scene.scaleFactor / 1.5),
@@ -76,16 +108,16 @@ export class ParticleDisplayer extends Displayer<FightScene> {
             {
                 speedY:
                     direction === ParticleDirectionEnum.UP
-                        ? { min: -200, max: -350 }
-                        : { min: 200, max: 350 },
-                speedX: { min: -30, max: 30 },
+                        ? { min: props.speedY.min* -1, max: props.speedY.max * -1 }
+                        : { min: props.speedY.min, max: props.speedY.max },
+                speedX: props.speedX,
 
-                scale: { start: 2, end: 0.5 },
+                scale: props.scale,
                 alpha: { start: 1, end: 0 },
 
-                lifespan: 750,
-                frequency: 120,
-                quantity: { min: 1, max: 2 },
+                lifespan: props.lifespan,
+                frequency: props.frequency,
+                quantity: props.quantity,
 
                 angle: { min: -100, max: -80 },
 
