@@ -27,6 +27,13 @@ export class GroundDisplayer extends FightSceneDisplayer {
     }
 
     render(): this {
+        this.renderGroundLayer();
+        this.generatePlayGrid();
+        this.displayEntitiesHighlights();
+        return this;
+    }
+
+    renderGroundLayer() {
         const map = this.scene.make.tilemap({
             key: this.scene.fightMap,
         });
@@ -64,15 +71,11 @@ export class GroundDisplayer extends FightSceneDisplayer {
 
         this.groundLayer.setScale(this.scene.scaleFactor);
         this.groundLayer.setDepth(0);
-
-        this.generatePlayGrid();
-        this.displayEntitiesHighlights();
-        return this;
     }
 
     private displayEntitiesHighlights() {
         if (!this.groundLayer) {
-            return;
+            this.renderGroundLayer();
         }
         for (const highlightEntity of this.tileHighlights) {
             highlightEntity.destroy();

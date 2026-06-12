@@ -93,23 +93,21 @@ export class ActionDisplayer extends FightSceneDisplayer {
 
         this.actionsList = new List(this.scene, actionListGrid);
 
-        const endTurnArea = actionGrid.getArea({
-            x: 8,
-            y: 1,
-            width: 2,
-            height: 1,
-        });
-
-        this.endTurnButton = new Button(this.scene, {
-            x: endTurnArea.center.x,
-            y: endTurnArea.center.y,
-            width: endTurnArea.width,
-            height: endTurnArea.height,
-            text: "Fin du tour",
-            borderColor: Color.containerBorder,
-            borderWidth: 2,
-            onClick: () => {},
-        }).setIsActivated(false);
+        this.endTurnButton = new Button(
+            this.scene,
+            actionGrid.getArea({
+                x: 8,
+                y: 1,
+                width: 2,
+                height: 1,
+            }),
+            {
+                text: "Fin du tour",
+                borderColor: Color.containerBorder,
+                borderWidth: 2,
+                onClick: () => {},
+            },
+        ).setIsActivated(false);
 
         return this;
     }
@@ -123,14 +121,19 @@ export class ActionDisplayer extends FightSceneDisplayer {
                         area,
                         ActionAsset.getAssetScale(action.id),
                     );
-                    return new Button(this.scene, {
-                        x: area.position.x,
-                        y: area.position.y,
-                        width: size.width,
-                        height: size.height,
-                        image: ActionAsset.getAssetKey(action.id),
-                        onClick: () => this.handleActionClick(action),
-                    });
+                    return new Button(
+                        this.scene,
+                        {
+                            x: area.position.x - size.width / 2,
+                            y: area.position.y - size.height / 2,
+                            width: size.width,
+                            height: size.height,
+                        },
+                        {
+                            image: ActionAsset.getAssetKey(action.id),
+                            onClick: () => this.handleActionClick(action),
+                        },
+                    );
                 },
             );
             if (iconObj) {

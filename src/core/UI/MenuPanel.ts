@@ -62,58 +62,73 @@ export class MenuPanel extends Phaser.GameObjects.Container {
         this.add(titleText);
 
         // Bouton Reprendre
-        const resumeButton = new Button(scene, {
-            x: scene.scale.width / 2,
-            y: scene.scale.height / 2 - 80,
-            width: 300,
-            height: 50,
-            text: "Reprendre",
-            fontSize: 24,
-            onClick: () => {
-                this.hide();
-                if (config.onResumeClick) {
-                    config.onResumeClick();
-                }
+        const resumeButton = new Button(
+            scene,
+            {
+                x: scene.scale.width / 2 - 150,
+                y: scene.scale.height / 2 - 80 - 25,
+                width: 300,
+                height: 50,
             },
-        });
+            {
+                text: "Reprendre",
+                fontSize: 24,
+                onClick: () => {
+                    this.hide();
+                    if (config.onResumeClick) {
+                        config.onResumeClick();
+                    }
+                },
+            },
+        );
         resumeButton.setDepth(10003);
         resumeButton.setScrollFactor(0);
         this.add(resumeButton);
 
         // Bouton Paramètres
-        const settingsButton = new Button(scene, {
-            x: scene.scale.width / 2,
-            y: scene.scale.height / 2,
-            width: 300,
-            height: 50,
-            text: "Options",
-            fontSize: 24,
-            onClick: () => {
-                this.hide();
-                if (config.onSettingsClick) {
-                    config.onSettingsClick();
-                }
+        const settingsButton = new Button(
+            scene,
+            {
+                x: scene.scale.width / 2 - 150,
+                y: scene.scale.height / 2 - 25,
+                width: 300,
+                height: 50,
             },
-        });
+            {
+                text: "Options",
+                fontSize: 24,
+                onClick: () => {
+                    this.hide();
+                    if (config.onSettingsClick) {
+                        config.onSettingsClick();
+                    }
+                },
+            },
+        );
         settingsButton.setDepth(10003);
         settingsButton.setScrollFactor(0);
         this.add(settingsButton);
 
         // Bouton Retour au Menu Principal
-        const mainMenuButton = new Button(scene, {
-            x: scene.scale.width / 2,
-            y: scene.scale.height / 2 + 80,
-            width: 300,
-            height: 50,
-            text: "Retour au Menu",
-            fontSize: 24,
-            onClick: () => {
-                this.hide();
-                if (config.onMainMenuClick) {
-                    config.onMainMenuClick();
-                }
+        const mainMenuButton = new Button(
+            scene,
+            {
+                x: scene.scale.width / 2 - 150,
+                y: scene.scale.height / 2 + 80 - 25,
+                width: 300,
+                height: 50,
             },
-        });
+            {
+                text: "Retour au Menu",
+                fontSize: 24,
+                onClick: () => {
+                    this.hide();
+                    if (config.onMainMenuClick) {
+                        config.onMainMenuClick();
+                    }
+                },
+            },
+        );
         mainMenuButton.setDepth(10003);
         mainMenuButton.setScrollFactor(0);
         this.add(mainMenuButton);

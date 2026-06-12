@@ -204,11 +204,7 @@ export class LobbyScene extends BaseScene {
             height: 1,
         });
 
-        new Button(this, {
-            x: buttonArea.center.x,
-            y: buttonArea.center.y,
-            width: buttonArea.width,
-            height: buttonArea.height,
+        new Button(this, buttonArea, {
             text: "Combattre",
             borderWidth: 2,
             borderColor: "#ffffff",
