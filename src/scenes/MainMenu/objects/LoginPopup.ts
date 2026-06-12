@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { Button, CustomContainer, PlacementOrigin } from "../../../core";
+import { Button, CustomContainer } from "../../../core";
 
 interface PopupInputConfig {
     title: string;
@@ -47,13 +47,11 @@ export class PopupInput {
                 width: popupW,
                 height: popupH,
             },
-            PlacementOrigin.CENTER,
             {
                 title,
                 borderWidth: 2,
                 opacity: 0.95,
                 fontSize: 20,
-                textPosition: { x: 0, y: -popupH / 2 + 25 },
             },
         );
         this.container.setDepth(11);

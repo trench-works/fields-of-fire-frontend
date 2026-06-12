@@ -5,7 +5,6 @@ import {
     DisplayText,
     Grid,
     GridArea,
-    PlacementOrigin,
 } from "../../../core";
 
 type LobbyInfos = {
@@ -29,20 +28,10 @@ export class LobbyRow {
         isSelected: boolean = false,
     ) {
         this.id = lobby.id;
-        this.container = new CustomContainer(
-            scene,
-            {
-                x: area.center.x,
-                y: area.center.y,
-                width: area.width,
-                height: area.height,
-            },
-            PlacementOrigin.CENTER,
-            {
-                opacity: 0.15,
-                borderWidth: 1,
-            },
-        );
+        this.container = new CustomContainer(scene, area, {
+            opacity: 0.15,
+            borderWidth: 1,
+        });
 
         this.container.setInteractive();
         this.container.on("pointerdown", () => onClick(this));

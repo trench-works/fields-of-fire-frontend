@@ -1,4 +1,5 @@
 import { BaseScene } from "../Objects";
+import { Size, Position, PlacementOrigin } from "../Types";
 import { GridArea } from "../Utils";
 import { Displayable } from "./DisplayRoot";
 
@@ -16,6 +17,9 @@ export class DisplayText implements Displayable {
                 color: "#FFFFFF",
             })
             .setOrigin(0.5);
+    }
+    place(position: Position, size: Size, origin: PlacementOrigin): void {
+        throw new Error("Method not implemented.");
     }
 
     setText(

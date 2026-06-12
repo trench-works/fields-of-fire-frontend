@@ -1,13 +1,7 @@
 import { CharacterCloseupAsset, IconAsset, IconAssetId } from "../../../assets";
 import { EffectAsset, EffectAssetId } from "../../../assets/EffectAsset";
 import { Color } from "../../../config/ColorConfig";
-import {
-    CustomContainer,
-    Grid,
-    DisplayText,
-    List,
-    PlacementOrigin,
-} from "../../../core";
+import { CustomContainer, Grid, DisplayText, List } from "../../../core";
 import { DisplayImage } from "../../../core/UI/Image";
 import { CharacterClass } from "../../../Model/CharacterClass";
 import { Effect } from "../../../Model/Effect";
@@ -89,39 +83,19 @@ export class StatsDisplayer extends FightSceneDisplayer {
             height: 3,
         });
 
-        this.statsPanel = new CustomContainer(
-            this.scene,
-            {
-                x: statsArea.center.x,
-                y: statsArea.center.y,
-                width: statsArea.width,
-                height: statsArea.height,
-            },
-            PlacementOrigin.CENTER,
-            {
-                borderWidth: 6,
-                opacity: 0.5,
-            },
-        );
+        this.statsPanel = new CustomContainer(this.scene, statsArea, {
+            borderWidth: 6,
+            opacity: 0.5,
+        });
 
         const statsGrid = statsArea.getGrid();
 
         const imgArea = statsGrid.getArea({ x: 1, y: 1, width: 3, height: 4 });
 
-        this.statsImage = new CustomContainer(
-            this.scene,
-            {
-                x: imgArea.center.x,
-                y: imgArea.center.y,
-                width: imgArea.width,
-                height: imgArea.height,
-            },
-            PlacementOrigin.CENTER,
-            {
-                borderWidth: 7,
-                backgroundImage: "unknown",
-            },
-        );
+        this.statsImage = new CustomContainer(this.scene, imgArea, {
+            borderWidth: 7,
+            backgroundImage: "unknown",
+        });
 
         const classNameArea = statsGrid.getArea({
             x: 4,
@@ -130,21 +104,11 @@ export class StatsDisplayer extends FightSceneDisplayer {
             height: 1,
         });
 
-        this.statsClassName = new CustomContainer(
-            this.scene,
-            {
-                x: classNameArea.center.x,
-                y: classNameArea.center.y,
-                width: classNameArea.width,
-                height: classNameArea.height,
-            },
-            PlacementOrigin.CENTER,
-            {
-                title: "N/A",
-                borderWidth: 2,
-                bgColor: Color.containerBorder,
-            },
-        );
+        this.statsClassName = new CustomContainer(this.scene, classNameArea, {
+            title: "N/A",
+            borderWidth: 2,
+            bgColor: Color.containerBorder,
+        });
         const playerNameArea = statsGrid.getArea({
             x: 1,
             y: 5,
@@ -152,21 +116,11 @@ export class StatsDisplayer extends FightSceneDisplayer {
             height: 1,
         });
 
-        this.statsName = new CustomContainer(
-            this.scene,
-            {
-                x: playerNameArea.center.x,
-                y: playerNameArea.center.y,
-                width: playerNameArea.width,
-                height: playerNameArea.height,
-            },
-            PlacementOrigin.CENTER,
-            {
-                title: "N/A",
-                borderWidth: 2,
-                bgColor: Color.containerBorder,
-            },
-        );
+        this.statsName = new CustomContainer(this.scene, playerNameArea, {
+            title: "N/A",
+            borderWidth: 2,
+            bgColor: Color.containerBorder,
+        });
 
         this.statsValuesGrid = statsGrid.getSubGrid(
             {

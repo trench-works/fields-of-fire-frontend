@@ -1,6 +1,6 @@
 import { CharacterCloseupAsset } from "../../../assets";
 import { Color } from "../../../config/ColorConfig";
-import { CustomContainer, PlacementOrigin, ScaleUtils } from "../../../core";
+import { CustomContainer, ScaleUtils } from "../../../core";
 import { FightScene } from "../fight.scene";
 import { ClassStore } from "../stores/ClassStore";
 import { GameStore } from "../stores/GameStore";
@@ -26,19 +26,9 @@ export class TurnDisplayer extends FightSceneDisplayer {
             width: 7,
             height: 1,
         });
-        this.turnPanel = new CustomContainer(
-            this.scene,
-            {
-                x: turndisplay.center.x,
-                y: turndisplay.center.y,
-                width: turndisplay.width,
-                height: turndisplay.height,
-            },
-            PlacementOrigin.CENTER,
-            {
-                opacity: 0.25,
-            },
-        );
+        this.turnPanel = new CustomContainer(this.scene, turndisplay, {
+            opacity: 0.25,
+        });
 
         this.turnPanel.setDepth(0);
 
@@ -92,12 +82,10 @@ export class TurnDisplayer extends FightSceneDisplayer {
                 new CustomContainer(
                     this.scene,
                     {
-                        x: cellArea.center.x,
-                        y: cellArea.center.y - (isFirstCell ? 0 : 5),
-                        width: imageSize.width,
-                        height: imageSize.height,
+                        x: cellArea.x,
+                        y: cellArea.y - (isFirstCell ? 0 : 5),
+                        ...imageSize,
                     },
-                    PlacementOrigin.CENTER,
                     {
                         title: player?.name ?? charClass?.name?.split(" ")[0],
                         borderWidth: isFirstCell ? 5 : 2,

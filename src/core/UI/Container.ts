@@ -14,15 +14,9 @@ type ContainerConfig = {
     opacity?: number;
     fontSize?: number;
     onClick?: () => void;
-    textPosition?: { x: number; y: number };
     hoverTint?: number;
     alpha?: number;
 };
-
-export enum PlacementOrigin {
-    CENTER = "center",
-    UPPER_LEFT_CORNER = "ul_corner",
-}
 
 export class CustomContainer
     extends Phaser.GameObjects.Container
@@ -43,10 +37,15 @@ export class CustomContainer
         throw new Error("Method not implemented.");
     }
 
+    place({ x, y }: Position, { width, height }: Size): void {
+        this.setSize(width, height);
+        this.setX(x + width / 2);
+        this.setY(y + height / 2);
+    }
+
     constructor(
         scene: Phaser.Scene,
         position: (Size & Position) | GridArea,
-        origin: PlacementOrigin,
         config: ContainerConfig,
     ) {
         const { x, y, height, width } = position;
@@ -64,6 +63,8 @@ export class CustomContainer
 
         super(scene, x, y);
 
+        this.place({ x, y }, { width, height });
+
         this.bgColor = bgColor; // <--- IMPORTANT
         this.bgOpacity = opacity;
         this.onClick = onClick;
@@ -75,7 +76,6 @@ export class CustomContainer
         // --- TEXTE ---
 
         // IMPORTANT : définir la taille AVANT le fond
-        this.setSize(width, height);
 
         // --- FOND (refactorisé) ---
         this.setText(title);
@@ -84,13 +84,7 @@ export class CustomContainer
         // --- BORDURE ---
         if (borderColor && borderWidth > 0) {
             this.borderGraphics = scene.make.graphics({}, false);
-            this.manageBorder(
-                this.borderGraphics,
-                ColorUtils.parseColor(borderColor),
-                borderWidth,
-                width,
-                height,
-            );
+            this.manageBorder(ColorUtils.parseColor(borderColor), borderWidth);
             this.add(this.borderGraphics);
         }
 
@@ -121,7 +115,10 @@ export class CustomContainer
                     color: "#FFFFFF",
                 })
                 .setOrigin(0.5);
-            const textPosition = { x: 0, y: -this.height / 2 + 15 };
+            const textPosition = {
+                x: 0,
+                y: -this.height / 2 + 15,
+            };
             this.titleText.setPosition(textPosition.x, textPosition.y);
             this.add(this.titleText);
         } else {
@@ -129,22 +126,33 @@ export class CustomContainer
         }
     }
 
-    public manageBorder(
-        g: Phaser.GameObjects.Graphics,
-        borderColor: number,
-        borderWidth: number,
-        width: number,
-        height: number,
-    ) {
-        g.clear();
-        g.lineStyle(borderWidth, borderColor, 1);
-        g.strokeRoundedRect(-width / 2, -height / 2, width, height, 10);
+    public manageBorder(borderColor: number, borderWidth: number) {
+        if (this.borderGraphics) {
+            const width = this.width;
+            const height = this.height;
+            this.borderGraphics.clear();
+            this.borderGraphics.lineStyle(borderWidth, borderColor, 1);
+            this.borderGraphics.strokeRoundedRect(
+                -width / 2,
+                -height / 2,
+                width,
+                height,
+                10,
+            );
+        }
     }
 
     public setBackgroundColor(color: string, alpha = 1) {
-        // Si le fond actuel est une image → on repasse en mode couleur
+        // Sinon on met à jour le Graphics existant
+        if (this.background instanceof Phaser.GameObjects.Graphics) {
+            this.background.clear();
+            this.background.fillStyle(ColorUtils.parseColor(color), alpha);
+            this.drawBackground();
+        }
+    }
+
+    private drawBackground() {
         if (this.background instanceof Phaser.GameObjects.Image) {
-            this.setBackgroundImage(null);
             return;
         }
 
@@ -152,9 +160,6 @@ export class CustomContainer
         if (this.background instanceof Phaser.GameObjects.Graphics) {
             const width = this.width;
             const height = this.height;
-
-            this.background.clear();
-            this.background.fillStyle(ColorUtils.parseColor(color), alpha);
             this.background.fillRoundedRect(
                 -width / 2,
                 -height / 2,
@@ -184,12 +189,13 @@ export class CustomContainer
             this.background = img;
             this.addAt(img, 0);
         } else {
-            const bg = this.scene.make.graphics({}, false);
-            bg.fillStyle(ColorUtils.parseColor(this.bgColor), this.bgOpacity);
-            bg.fillRoundedRect(-width / 2, -height / 2, width, height, 10);
-
-            this.background = bg;
-            this.addAt(bg, 0);
+            this.background = this.scene.make.graphics({}, false);
+            this.background.fillStyle(
+                ColorUtils.parseColor(this.bgColor),
+                this.bgOpacity,
+            );
+            this.drawBackground();
+            this.addAt(this.background, 0);
         }
     }
 

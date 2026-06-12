@@ -8,7 +8,6 @@ import {
     DisplayRoot,
     ScaleUtils,
     DisplayText,
-    PlacementOrigin,
 } from "../../core";
 import { Color } from "../../config/ColorConfig";
 import { LobbySocket } from "./repositories/lobby.socket";
@@ -54,17 +53,20 @@ export class LobbyScene extends BaseScene {
     }
 
     init({ lobbyId, playerId }: LobbySceneInit) {
+        console.log("init");
         this.lobbyId = lobbyId;
         this.playerId = playerId;
     }
 
     preload() {
+        console.log("preload");
         super.preload();
         CharacterIconAsset.loadAll(this.load);
         CharacterCloseupAsset.loadAll(this.load);
     }
 
     create() {
+        console.log("create");
         super.create();
         this.lobbySocket = new LobbySocket(this.lobbyId);
         this.lobbySocket.onClose(() => MainMenu.start(this));
@@ -146,19 +148,9 @@ export class LobbyScene extends BaseScene {
             { division: { horizontal: 9, vertical: 9 } },
         );
 
-        new CustomContainer(
-            this,
-            {
-                x: playerGrid.center.x,
-                y: playerGrid.center.y,
-                width: playerGrid.width,
-                height: playerGrid.height,
-            },
-            PlacementOrigin.CENTER,
-            {
-                borderWidth: 5,
-            },
-        );
+        new CustomContainer(this, playerGrid, {
+            borderWidth: 5,
+        });
 
         const imgArea = playerGrid.getArea({
             x: 1,
@@ -167,22 +159,14 @@ export class LobbyScene extends BaseScene {
             height: 5,
         });
 
-        const classNameArea = playerGrid.getArea({
-            x: 1,
-            y: 6,
-            width: 9,
-            height: 0.5,
-        });
-
         const playerNameContainer = new CustomContainer(
             this,
-            {
-                x: classNameArea.center.x,
-                y: classNameArea.center.y,
-                width: classNameArea.width,
-                height: classNameArea.height,
-            },
-            PlacementOrigin.CENTER,
+            playerGrid.getArea({
+                x: 1,
+                y: 6,
+                width: 9,
+                height: 0.5,
+            }),
             {
                 title: this.classStore.getClass(this.selectClassId).name,
                 bgColor: Color.containerBorder,
@@ -199,11 +183,10 @@ export class LobbyScene extends BaseScene {
         const playerImageContainer = new CustomContainer(
             this,
             {
-                x: imgArea.x + imageSize.width / 2,
-                y: imgArea.y + imgArea.height - imageSize.height / 2,
+                x: imgArea.x,
+                y: imgArea.y,
                 ...imageSize,
             },
-            PlacementOrigin.CENTER,
             {
                 backgroundImage: CharacterCloseupAsset.getAssetKey(
                     this.selectClassId,
@@ -277,11 +260,10 @@ export class LobbyScene extends BaseScene {
                 new CustomContainer(
                     this,
                     {
-                        x: area.center.x,
-                        y: area.center.y,
+                        x: area.x,
+                        y: area.y,
                         ...size,
                     },
-                    PlacementOrigin.CENTER,
                     {
                         title: charClass.name,
                         backgroundImage: CharacterIconAsset.getAssetKey(
