@@ -30,23 +30,19 @@ export class MainMenu extends BaseScene {
         super.preload();
         MiscAsset.load(this.load, MiscAssetId.BUTTON);
         MusicAsset.load(this.load, MusicAssetId.MENU);
-        try {
-            this.sound.add(MusicAsset.getAssetKey(MusicAssetId.MENU));
-        } catch (err) {
-            console.error(err);
-        }
     }
 
     init() {
         this.sound.unlock();
-        try {
-            this.sound.play(MusicAsset.getAssetKey(MusicAssetId.MENU));
-        } catch (err) {
-            console.error(err);
-        }
     }
 
     create() {
+        const backgroundSound = this.sound.add(
+            MusicAsset.getAssetKey(MusicAssetId.MENU),
+        );
+        backgroundSound.setLoop(true);
+        backgroundSound.play();
+        this.sound.unlock();
         super.create();
         // Créer un titre du menu
         const titleBox = this.rootGrid.getArea({
