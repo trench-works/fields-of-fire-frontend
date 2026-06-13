@@ -117,7 +117,7 @@ export class CustomContainer
                 .setOrigin(0.5);
             const textPosition = {
                 x: 0,
-                y: -this.height / 2 + 15,
+                y: -this.height / 2 + 22,
             };
             this.titleText.setPosition(textPosition.x, textPosition.y);
             this.add(this.titleText);

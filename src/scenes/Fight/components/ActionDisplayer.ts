@@ -117,7 +117,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
             const iconObj = this.actionsList.placeElement(
                 { x: index, y: 0 },
                 (area) => {
-                    const size = ScaleUtils.fitFromScale(
+                    const size = ScaleUtils.fillFromScale(
                         area,
                         ActionAsset.getAssetScale(action.id),
                     );

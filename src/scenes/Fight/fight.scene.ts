@@ -209,7 +209,7 @@ export class FightScene extends BaseScene {
         this.playerStats
             .setEntity(this.playerStore.playerEntity)
             .setCharacterClass(this.playerStore.playerClass)
-            .setName(user.username)
+            .setName(user?.username ?? "NO_NAME")
             .update();
         if (this.inspectStats.isShow) {
             this.inspectCharacter(this.inspectStats.entityId);
@@ -282,7 +282,7 @@ export class FightScene extends BaseScene {
         this.playerStats
             .setEntity(this.playerStore.playerEntity)
             .setCharacterClass(this.playerStore.playerClass)
-            .setName(user.username)
+            .setName(user?.username ?? "NO_NAME")
             .render()
             .update();
         this.inspectStats.render().setIsShow(false);

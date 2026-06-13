@@ -79,6 +79,26 @@ export abstract class ImageAssetManager<
     }
 }
 
+export abstract class SoundAssetManager<
+    AssetId extends string,
+    AssetType,
+> extends AssetManager<AssetId, AssetType> {
+    constructor(assetKey: string, assets: Partial<Record<AssetId, AssetType>>) {
+        super(assetKey, assets);
+    }
+
+    loader(
+        load: Phaser.Loader.LoaderPlugin,
+        id: AssetId,
+        asset: Record<AssetId, AssetType>[AssetId],
+    ) {
+        load.audio(
+            this.getAssetKey(id),
+            this.getAssetFileLink(this.assetKey, asset),
+        );
+    }
+}
+
 export type AnimationConfiguration = {
     frameWidth: number;
     frameHeight: number;

@@ -7,3 +7,4 @@ export * from "./MenuButton";
 export * from "./Displayer";
 export * from "./DisplayRoot";
 export * from "./Text";
+export * from "./DebugRect";

@@ -73,7 +73,7 @@ export class TurnDisplayer extends FightSceneDisplayer {
                 margin: isFirstCell ? 0 : 5,
             });
 
-            const imageSize = ScaleUtils.fitFromScale(
+            const imageSize = ScaleUtils.fillFromScale(
                 cellArea,
                 CharacterCloseupAsset.getAssetScale(entity.classId),
             );

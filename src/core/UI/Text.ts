@@ -1,6 +1,5 @@
 import { BaseScene } from "../Objects";
 import { Size, Position, PlacementOrigin } from "../Types";
-import { GridArea } from "../Utils";
 import { Displayable } from "./DisplayRoot";
 
 export class DisplayText implements Displayable {
@@ -8,16 +7,17 @@ export class DisplayText implements Displayable {
 
     constructor(
         protected readonly scene: BaseScene,
-        protected readonly area: GridArea,
+        protected readonly area: Position & Size,
     ) {
         this.text = this.scene.add
-            .text(area.center.x, area.center.y, "", {
+            .text(area.x + area.width / 2, area.y + area.height / 2, "", {
                 fontFamily: "MyFont",
                 fontSize: `${0}px`,
                 color: "#FFFFFF",
             })
             .setOrigin(0.5);
     }
+
     place(position: Position, size: Size, origin: PlacementOrigin): void {
         throw new Error("Method not implemented.");
     }
@@ -46,6 +46,11 @@ export class DisplayText implements Displayable {
 
     getObject(): Phaser.GameObjects.GameObject {
         return this.text;
+    }
+
+    setDepth(depth: number): this {
+        this.text.setDepth(depth);
+        return this;
     }
 }
 

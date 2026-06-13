@@ -18,7 +18,7 @@ export class DisplayImage implements Displayable {
         //size
         let size: Size;
         if (scale) {
-            size = ScaleUtils.fitFromScale(this.area, scale);
+            size = ScaleUtils.fillFromScale(this.area, scale);
         } else {
             size = this.area;
         }

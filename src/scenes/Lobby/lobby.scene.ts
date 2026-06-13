@@ -247,7 +247,7 @@ export class LobbyScene extends BaseScene {
 
             const area = grid.getArea({ x: col, y: row, width: 1, height: 1 });
 
-            const size = ScaleUtils.fitFromScale(
+            const size = ScaleUtils.fillFromScale(
                 area,
                 CharacterIconAsset.getAssetScale(charClass.id),
             );

@@ -2,6 +2,8 @@ import Phaser from "phaser";
 import { Color } from "../../config/ColorConfig";
 import { FourAxis, PlacementOrigin, Position, Size } from "../Types";
 import { Displayable } from "./DisplayRoot";
+import { DisplayText } from "./Text";
+import { BaseScene } from "../Objects";
 
 const CLICKABLE_ALPHA = 1;
 const UNCLICKABLE_ALPHA = 0.5;
@@ -22,7 +24,8 @@ export class Button
     extends Phaser.GameObjects.Container
     implements Displayable
 {
-    protected textDisplay?: Phaser.GameObjects.Text;
+    declare scene: BaseScene;
+    protected textDisplay?: DisplayText;
     protected imageDisplay?: Phaser.GameObjects.Image;
     protected background?: Phaser.GameObjects.Rectangle;
 
@@ -35,8 +38,8 @@ export class Button
     protected color = Color.btnBg;
 
     constructor(
-        scene: Phaser.Scene,
-        area: Position & Size,
+        scene: BaseScene,
+        protected readonly area: Position & Size,
         {
             text,
             onClick,
@@ -48,6 +51,7 @@ export class Button
         }: ButtonConfig,
     ) {
         super(scene, area.x + area.width / 2, area.y + area.height / 2);
+        this.scene = scene;
         this.setSize(area.width, area.height);
         this.setDepth(depth);
 
@@ -120,7 +124,6 @@ export class Button
         this.imageDisplay.setOrigin(0.5);
 
         this.addAt(this.imageDisplay);
-
         return this;
     }
 
@@ -128,19 +131,21 @@ export class Button
         text: string | undefined,
         options?: { color?: string; fontSize?: number },
     ): this {
+        this.textDisplay?.destroy?.();
         if (!text) {
-            this.textDisplay?.destroy?.();
             delete this.textDisplay;
             return this;
         }
-        this.textDisplay = this.scene.add
-            .text(0, 0, text, {
-                fontFamily: "MyFont",
-                fontSize: `${options?.fontSize ?? this.height / 3}px`,
-                color: options?.color ?? "#FFFFFF",
-            })
-            .setOrigin(0.5);
-        this.add(this.textDisplay);
+        this.textDisplay = new DisplayText(this.scene, {
+            x: -this.width / 2,
+            y: -this.height / 2,
+            width: this.width,
+            height: this.height,
+        }).setText(text, {
+            fontSize: options?.fontSize ?? this.height / 3,
+            color: options?.color ?? "#FFFFFF",
+        });
+        this.add(this.textDisplay.getObject());
         return this;
     }
 
