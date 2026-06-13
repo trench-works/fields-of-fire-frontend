@@ -59,6 +59,7 @@ export class CustomContainer
             alpha,
             onClick,
             hoverTint,
+            fontSize,
         } = config;
 
         super(scene, x, y);
@@ -78,7 +79,7 @@ export class CustomContainer
         // IMPORTANT : définir la taille AVANT le fond
 
         // --- FOND (refactorisé) ---
-        this.setText(title);
+        this.setText(title, { fontSize });
         this.setBackgroundImage(backgroundImage ?? null);
 
         // --- BORDURE ---
@@ -102,11 +103,10 @@ export class CustomContainer
         scene.add.existing(this);
     }
 
-    public setText(text: string) {
-        const fontSize = Math.min(
-            this.height / 2,
-            (this.width / text.length) * 1.5,
-        );
+    public setText(text: string, options?: { fontSize?: number }) {
+        const fontSize =
+            options?.fontSize ??
+            Math.min(this.height / 2, (this.width / text.length) * 1.5);
         if (!this.titleText) {
             this.titleText = this.scene.add
                 .text(0, 0, text, {

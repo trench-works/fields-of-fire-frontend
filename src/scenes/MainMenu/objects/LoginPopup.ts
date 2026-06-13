@@ -42,8 +42,8 @@ export class PopupInput {
         this.container = new CustomContainer(
             scene,
             {
-                x: cx,
-                y: cy,
+                x: cx - 200,
+                y: cy - 110,
                 width: popupW,
                 height: popupH,
             },
@@ -51,7 +51,7 @@ export class PopupInput {
                 title,
                 borderWidth: 2,
                 opacity: 0.95,
-                fontSize: 20,
+                fontSize: 30,
             },
         );
         this.container.setDepth(11);
@@ -93,20 +93,25 @@ export class PopupInput {
         this.inputElement.focus();
 
         // --- BOUTON VALIDER (positionné dans le container) ---
-        this.validateButton = new Button(scene, {
-            text: "Valider",
-            x: cx,
-            y: cy + 70,
-            width: 160,
-            height: 40,
-            onClick: () => {
-                onValidate(this.inputElement.value).then((retour) => {
-                    if (retour) {
-                        this.destroy();
-                    }
-                });
+        this.validateButton = new Button(
+            scene,
+            {
+                x: cx - 80,
+                y: cy + 70 - 20,
+                width: 160,
+                height: 40,
             },
-        });
+            {
+                text: "Valider",
+                onClick: () => {
+                    onValidate(this.inputElement.value).then((retour) => {
+                        if (retour) {
+                            this.destroy();
+                        }
+                    });
+                },
+            },
+        );
         this.validateButton.setDepth(12);
 
         this.validateButton

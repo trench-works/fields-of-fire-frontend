@@ -167,34 +167,31 @@ export class LobbyListScene extends BaseScene {
             },
         );
 
-        const cell0 = buttonGrid.getArea({ x: 2, y: 2, width: 5, height: 7 }); // bouton gauche
-        const cell2 = buttonGrid.getArea({ x: 8, y: 2, width: 5, height: 7 }); // bouton droit
-
-        new Button(this, {
-            text: "Créer un Lobby",
-            x: cell0.center.x,
-            y: cell0.center.y,
-            width: cell0.width,
-            height: cell0.height,
-            onClick: () => {
-                this.menuSocket.createLobby();
+        new Button(
+            this,
+            buttonGrid.getArea({ x: 2, y: 2, width: 5, height: 7 }),
+            {
+                text: "Créer un Lobby",
+                onClick: () => {
+                    this.menuSocket.createLobby();
+                },
             },
-        });
+        );
 
-        this.joinButton = new Button(this, {
-            text: "Rejoindre un Lobby",
-            x: cell2.center.x,
-            y: cell2.center.y,
-            width: cell2.width,
-            height: cell2.height,
-            onClick: () => {
-                if (this.lobbyStore.selectedLobbyId) {
-                    this.menuSocket.joinLobby({
-                        lobbyId: this.lobbyStore.selectedLobbyId,
-                    });
-                }
+        this.joinButton = new Button(
+            this,
+            buttonGrid.getArea({ x: 8, y: 2, width: 5, height: 7 }),
+            {
+                text: "Rejoindre un Lobby",
+                onClick: () => {
+                    if (this.lobbyStore.selectedLobbyId) {
+                        this.menuSocket.joinLobby({
+                            lobbyId: this.lobbyStore.selectedLobbyId,
+                        });
+                    }
+                },
             },
-        }).setIsActivated(false);
+        ).setIsActivated(false);
 
         // Créer le bouton Menu
         new MenuButton(this, {

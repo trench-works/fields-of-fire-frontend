@@ -1,13 +1,12 @@
 import Phaser from "phaser";
 import { Color } from "../../config/ColorConfig";
 import { FourAxis, PlacementOrigin, Position, Size } from "../Types";
-import { IGridArea } from "../Utils";
 import { Displayable } from "./DisplayRoot";
 
 const CLICKABLE_ALPHA = 1;
 const UNCLICKABLE_ALPHA = 0.5;
 
-type ButtonConfig = ((Position & Size & { center?: never }) | IGridArea) & {
+type ButtonConfig = {
     text?: string;
     onClick: () => void;
     fontSize?: number;
@@ -37,6 +36,7 @@ export class Button
 
     constructor(
         scene: Phaser.Scene,
+        area: Position & Size,
         {
             text,
             onClick,
@@ -45,13 +45,10 @@ export class Button
             textColor,
             borderWidth = 0,
             depth = 1,
-            padding,
-            borderColor,
-            ...pos
         }: ButtonConfig,
     ) {
-        super(scene, pos.center?.x ?? pos.x, pos.center?.x ?? pos.y);
-        this.setSize(pos.width, pos.height);
+        super(scene, area.x + area.width / 2, area.y + area.height / 2);
+        this.setSize(area.width, area.height);
         this.setDepth(depth);
 
         this.onClick = onClick;

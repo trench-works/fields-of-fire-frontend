@@ -28,17 +28,22 @@ export class MenuButton {
         const positionConfig = this.getPosition(config.position);
 
         // Créer le bouton Menu
-        this.button = new Button(scene, {
-            x: positionConfig.x,
-            y: positionConfig.y,
-            width: 50,
-            height: 50,
-            text: "☰",
-            fontSize: 32,
-            onClick: () => {
-                this.menuPanel.toggle();
+        this.button = new Button(
+            scene,
+            {
+                x: positionConfig.x - 25,
+                y: positionConfig.y - 25,
+                width: 50,
+                height: 50,
             },
-        });
+            {
+                text: "☰",
+                fontSize: 32,
+                onClick: () => {
+                    this.menuPanel.toggle();
+                },
+            },
+        );
 
         this.button.setScrollFactor(0);
         this.button.setDepth(9999);

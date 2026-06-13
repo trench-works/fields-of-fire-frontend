@@ -43,11 +43,7 @@ export class TabManager {
                 width: 1,
                 height: 1,
             });
-            const btn = new Button(this.scene, {
-                x: btnArea.center.x,
-                y: btnArea.center.y,
-                width: btnArea.width,
-                height: btnArea.height,
+            const btn = new Button(this.scene, btnArea, {
                 text: tab.label,
                 borderWidth: 5,
                 borderColor: "#2A4237",

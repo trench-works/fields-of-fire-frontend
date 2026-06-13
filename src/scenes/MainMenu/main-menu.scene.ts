@@ -9,7 +9,8 @@ import { MiscAsset, MiscAssetId } from "../../assets";
 
 export class MainMenu extends BaseScene {
     private playButton!: Button;
-    private connectButton!: Button;
+    private registerButton!: Button;
+    private logginButton!: Button;
 
     constructor() {
         super(SceneAssetId.MENU, BackgroundAssetId.MAIN_MENU, {
@@ -62,18 +63,24 @@ export class MainMenu extends BaseScene {
             width: 1,
             height: 1,
         });
-        this.playButton = new Button(this, {
-            text: "Jouer",
-            x: playArea.center.x,
-            y: playArea.center.y,
-            width:
-                playArea.height * MiscAsset.getAssetScale(MiscAssetId.BUTTON),
-            height: playArea.height,
-            image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
-            onClick: () => {
-                LobbyListScene.start(this);
+        this.playButton = new Button(
+            this,
+            {
+                x: playArea.x,
+                y: playArea.y,
+                width:
+                    playArea.height *
+                    MiscAsset.getAssetScale(MiscAssetId.BUTTON),
+                height: playArea.height,
             },
-        }).setIsActivated(Boolean(global.user));
+            {
+                text: "Jouer",
+                image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
+                onClick: () => {
+                    LobbyListScene.start(this);
+                },
+            },
+        ).setIsActivated(Boolean(global.user));
 
         // Bouton Paramètres (ligne 1)
         const settingsArea = buttonsGrid.getArea({
@@ -82,18 +89,69 @@ export class MainMenu extends BaseScene {
             width: 1,
             height: 1,
         });
-        new Button(this, {
-            text: "Paramètres",
-            x: settingsArea.center.x,
-            y: settingsArea.center.y,
-            width:
-                playArea.height * MiscAsset.getAssetScale(MiscAssetId.BUTTON),
-            height: settingsArea.height,
-            image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
-            onClick: () => {
-                console.log("Paramètres - À implémenter");
+        new Button(
+            this,
+            {
+                x: settingsArea.x,
+                y: settingsArea.y,
+                width:
+                    playArea.height *
+                    MiscAsset.getAssetScale(MiscAssetId.BUTTON),
+                height: settingsArea.height,
             },
+            {
+                text: "Paramètres",
+                image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
+                onClick: () => {
+                    console.log("Paramètres - À implémenter");
+                },
+            },
+        );
+
+        const registerArea = this.rootGrid.getArea({
+            x: 4,
+            y: 1,
+            width: 1,
+            height: 1,
+            margin: 20,
         });
+        this.registerButton = new Button(
+            this,
+            {
+                x: registerArea.x,
+                y: registerArea.y,
+                width: registerArea.width,
+                height:
+                    registerArea.width /
+                    MiscAsset.getAssetScale(MiscAssetId.BUTTON),
+            },
+            {
+                text: global.user?.username ?? "Register",
+                image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
+                onClick: () => {
+                    new PopupInput(this, {
+                        title: "S'enregistrer",
+                        placeholder: "Entrez votre pseudo...",
+                        onValidate: async (value: string) => {
+                            await new UserRepository().authenticate(value);
+                            if (global.user) {
+                                this.playButton.alpha = 1;
+                                this.registerButton.setIsActivated(false);
+                                this.registerButton.displayText(
+                                    global.user.username,
+                                );
+                                localStorage.setItem(
+                                    "user",
+                                    JSON.stringify(global.user),
+                                );
+                                return true;
+                            }
+                            return false;
+                        },
+                    });
+                },
+            },
+        ).setIsActivated(!global.user);
 
         //bouton login
         const loginArea = this.rootGrid.getArea({
@@ -103,37 +161,48 @@ export class MainMenu extends BaseScene {
             height: 1,
             margin: 20,
         });
-        this.connectButton = new Button(this, {
-            text: global.user?.username ?? "Login",
-            x: loginArea.center.x,
-            y: loginArea.center.y,
-            width: loginArea.width,
-            height:
-                loginArea.width / MiscAsset.getAssetScale(MiscAssetId.BUTTON),
-            image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
-            onClick: () => {
-                new PopupInput(this, {
-                    title: "Connexion",
-                    placeholder: "Entrez votre pseudo...",
-                    onValidate: async (value: string) => {
-                        await new UserRepository().authenticate(value);
-                        if (global.user) {
-                            this.playButton.alpha = 1;
-                            this.connectButton.setIsActivated(false);
-                            this.connectButton.displayText(
-                                global.user.username,
-                            );
-                            localStorage.setItem(
-                                "user",
-                                JSON.stringify(global.user),
-                            );
-                            return true;
-                        }
-                        return false;
-                    },
-                });
+        this.logginButton = new Button(
+            this,
+            {
+                x: loginArea.x,
+                y: loginArea.y,
+                width: loginArea.width,
+                height:
+                    loginArea.width /
+                    MiscAsset.getAssetScale(MiscAssetId.BUTTON),
             },
-        }).setIsActivated(!global.user);
+            {
+                text: global.user ? "Disconnect" : "Login",
+                image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
+                onClick: () => {
+                    if (global.user) {
+                        localStorage.removeItem("user");
+                        global.user = undefined;
+                    } else {
+                        new PopupInput(this, {
+                            title: "Connexion",
+                            placeholder: "Entrez votre pseudo...",
+                            onValidate: async (value: string) => {
+                                await new UserRepository().authenticate(value);
+                                if (global.user) {
+                                    this.playButton.alpha = 1;
+                                    this.registerButton.setIsActivated(false);
+                                    this.registerButton.displayText(
+                                        global.user.username,
+                                    );
+                                    localStorage.setItem(
+                                        "user",
+                                        JSON.stringify(global.user),
+                                    );
+                                    return true;
+                                }
+                                return false;
+                            },
+                        });
+                    }
+                },
+            },
+        ).setIsActivated(true);
     }
 }
 
