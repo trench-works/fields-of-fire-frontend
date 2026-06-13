@@ -70,6 +70,16 @@ export class AttackDisplayer extends FightSceneDisplayer {
                     );
                 }
                 break;
+                case ActionAssetId.DOPAGE: 
+                    {
+                        await this.particleDisplayer.animate(
+                            ParticleAssetId.BOOST,
+                            cell.pixelPosition.x,
+                            cell.pixelPosition.y,
+                        )
+                    }
+                    break;
+                
         }
         return this;
     }
