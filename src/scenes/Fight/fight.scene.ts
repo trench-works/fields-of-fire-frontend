@@ -66,7 +66,7 @@ export type FightSceneInit = {
     player: { playerId: string };
 };
 
-export class FightScene extends BaseScene {
+export class FightScene extends BaseScene<FightSceneInit> {
     public renderConfig: SceneRenderConfig;
 
     /**
@@ -174,7 +174,7 @@ export class FightScene extends BaseScene {
     }
 
     static start(scene: BaseScene, data: FightSceneInit) {
-        scene.stopBackgroundMusic();
+        scene.close();
         scene.scene.start(SceneAssetId.FIGHT, data);
     }
 
@@ -186,7 +186,6 @@ export class FightScene extends BaseScene {
          * Do animations !!!!!
          */
         for (const animation of animations) {
-            console.log(animation); //TODO: instead filter and handle those animations in their respective displayers
             switch (animation.key) {
                 case "move":
                     await this.character.animate(animation, game);
@@ -222,6 +221,7 @@ export class FightScene extends BaseScene {
     }
 
     init({ game, player: { playerId } }: FightSceneInit) {
+        super.init();
         this.gameStore.setGame(game);
         this.playerStore.setPlayerId(playerId);
 

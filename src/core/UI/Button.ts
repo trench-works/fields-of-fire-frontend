@@ -116,6 +116,8 @@ export class Button
             return this;
         }
 
+        this.background?.destroy();
+
         this.imageDisplay = this.scene.make.image(
             { x: 0, y: 0, key: imageKey },
             false,
