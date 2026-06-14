@@ -1,4 +1,10 @@
-import { BaseScene, Button, DisplayText, ScaleMode } from "../../core";
+import {
+    BaseScene,
+    Button,
+    DisplayText,
+    ScaleMode,
+    StartSceneConfig,
+} from "../../core";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { LobbyListScene } from "../LobbyList/lobby-list.scene";
 import { PopupInput } from "./objects/LoginPopup";
@@ -21,8 +27,11 @@ export class MainMenu extends BaseScene {
         }
     }
 
-    static start(scene: BaseScene) {
-        super.startScene(scene, SceneAssetId.MENU, { data: null });
+    static start(scene: BaseScene, config?: StartSceneConfig | undefined) {
+        super.startScene(scene, SceneAssetId.MENU, {
+            data: null,
+            config,
+        });
     }
 
     preload() {

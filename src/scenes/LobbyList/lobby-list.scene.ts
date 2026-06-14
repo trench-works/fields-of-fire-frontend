@@ -6,6 +6,8 @@ import {
     CustomContainer,
     MenuButton,
     DisplayText,
+    BaseSceneInit,
+    StartSceneConfig,
 } from "../../core";
 import { FightScene } from "../Fight/fight.scene";
 import { MainMenu } from "../MainMenu/main-menu.scene";
@@ -23,9 +25,10 @@ export class LobbyListScene extends BaseScene {
 
     protected lobbyStore: LobbyStore;
 
-    static start(scene: BaseScene) {
+    static start(scene: BaseScene, config?: StartSceneConfig | undefined) {
         super.startScene(scene, SceneAssetId.LOBBY_LIST, {
             data: null,
+            config,
         });
     }
 
@@ -40,8 +43,8 @@ export class LobbyListScene extends BaseScene {
         MusicAsset.load(this.load, MusicAssetId.MENU);
     }
 
-    init() {
-        super.init();
+    init(data: BaseSceneInit) {
+        super.init(data);
         this.lobbyStore.setSelectedLobbyId(null);
         this.menuSocket = new MenuSocket();
         this.menuSocket.onClose(() => MainMenu.start(this));

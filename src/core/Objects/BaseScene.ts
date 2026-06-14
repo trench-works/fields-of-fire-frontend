@@ -46,14 +46,17 @@ export class BaseScene<InitData = any> extends Scene {
         data: BaseSceneInit<InitData>,
     ) {
         if (data.config?.keepMusic ?? true) {
+            console.log("KEEP MUSIC");
             data.config ??= {};
             data.config.backgroundMusic = scene.backgroundSound;
+            console.log(scene.backgroundSound);
         }
         scene.close(data.config?.keepMusic);
         scene.scene.start(id, data);
     }
 
-    init(init?: BaseSceneInit<InitData>) {
+    init(init: BaseSceneInit<InitData>) {
+        console.log("INIT", init);
         this.isOpen = true;
         this.startConfig = init?.config ?? {};
         if (init?.config?.backgroundMusic) {
@@ -62,6 +65,7 @@ export class BaseScene<InitData = any> extends Scene {
                 this.backgroundSound.destroy();
             }
             this.backgroundSound = init?.config?.backgroundMusic;
+            console.log("INIT", this.backgroundSound);
         }
     }
 
@@ -78,6 +82,7 @@ export class BaseScene<InitData = any> extends Scene {
     }
 
     playBackgroundMusic(id: MusicAssetId) {
+        console.log("PLAY", this.backgroundSound);
         if (this.isOpen) {
             if (!this.backgroundSound) {
                 this.backgroundSound = this.sound.add(
@@ -88,8 +93,8 @@ export class BaseScene<InitData = any> extends Scene {
             }
             if (!this.backgroundSound.isPlaying) {
                 this.backgroundSound.play();
+                this.sound.unlock();
             }
-            this.sound.unlock();
         }
     }
 
