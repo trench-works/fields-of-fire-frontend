@@ -50,7 +50,6 @@ export class BaseScene<InitData = any> extends Scene {
             data.config.backgroundMusic = scene.backgroundSound;
         }
         scene.close(data.config?.keepMusic);
-        console.log(data);
         scene.scene.start(id, data);
     }
 

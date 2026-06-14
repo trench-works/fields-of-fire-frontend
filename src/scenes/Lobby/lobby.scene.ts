@@ -55,10 +55,13 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         super.startScene(scene, SceneAssetId.LOBBY, data);
     }
 
-    init({ data: { lobbyId, playerId } }: BaseSceneInit<LobbySceneInit>) {
+    init(init: BaseSceneInit<LobbySceneInit>) {
         super.init();
-        this.lobbyId = lobbyId;
-        this.playerId = playerId;
+        if (init?.data) {
+            const { lobbyId, playerId } = init.data;
+            this.lobbyId = lobbyId;
+            this.playerId = playerId;
+        }
     }
 
     preload() {

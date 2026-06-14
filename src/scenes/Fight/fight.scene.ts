@@ -59,7 +59,7 @@ export type RenderResult = {
 export type Cell = {
     gridPosition: Position;
     pixelPosition: Position;
-    zone: Phaser.GameObjects.Zone;
+    zone?: Phaser.GameObjects.Zone;
     hoverGraphics?: Phaser.GameObjects.Graphics;
     highlight?: Phaser.GameObjects.Graphics;
 };
@@ -155,7 +155,11 @@ export class FightScene extends BaseScene<FightSceneInit> {
             y: 7,
         });
         this.attacks = new AttackDisplayer(this, this.gameStore);
-        this.endFight = new EndFightDisplayer(this, this.gameStore,this.playerStore);
+        this.endFight = new EndFightDisplayer(
+            this,
+            this.gameStore,
+            this.playerStore,
+        );
 
         /**
          * Utils
