@@ -1,7 +1,11 @@
-import { Button, CustomContainer, DisplayText, List } from "../../../core";
-import { Game } from "../../../Model/Game";
+import {
+    Button,
+    CustomContainer,
+    DisplayRoot,
+    DisplayText,
+    List,
+} from "../../../core";
 import { FightScene } from "../fight.scene";
-import { GameEventAnimation } from "../repositories/player.socket";
 import { GameStore } from "../stores/GameStore";
 import { PlayerStore } from "../stores/PlayerStore";
 import { FightSceneDisplayer } from "./FightSceneDisplayer";
@@ -15,9 +19,8 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     protected actionsList!: List;
     protected entityList!: List;
 
-    protected blur!: CustomContainer;
-    protected endGamePopup!: CustomContainer;
-    protected endGamePopupTitle!: CustomContainer;
+    protected root: DisplayRoot;
+
     protected titleText!: DisplayText;
 
     constructor(
@@ -25,21 +28,26 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         gameStore: GameStore,
         private readonly playerStore: PlayerStore,
     ) {
-        super(scene, gameStore );
+        super(scene, gameStore);
+        this.root = new DisplayRoot();
     }
 
     preRender(): this {
-        const blurArea = this.scene.rootGrid.getArea({
-            x: 1,
-            y: 1,
-            width: 9,
-            height: 9,
-        });
-
-        this.blur = new CustomContainer(this.scene, blurArea, {
-            borderWidth: 6,
-            opacity: 0.5,
-        });
+        this.root.add(
+            new CustomContainer(
+                this.scene,
+                this.scene.rootGrid.getArea({
+                    x: 1,
+                    y: 1,
+                    width: 9,
+                    height: 9,
+                }),
+                {
+                    borderWidth: 6,
+                    opacity: 0.5,
+                },
+            ).setDepth(49),
+        );
 
         const endGameArea = this.scene.rootGrid.getArea({
             x: 3,
@@ -48,33 +56,38 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             height: 3,
         });
 
-        this.endGamePopup = new CustomContainer(this.scene, endGameArea, {
-            borderWidth: 6,
-            opacity: 1,
-        });
+        this.root.add(
+            new CustomContainer(this.scene, endGameArea, {
+                borderWidth: 6,
+                opacity: 1,
+            }).setDepth(50),
+        );
 
         const titleEndgameGrid = endGameArea.getGrid();
 
-        const titleEndgameArea= titleEndgameGrid.getArea({
+        const titleEndgameArea = titleEndgameGrid.getArea({
             x: 3,
             y: 0,
             width: 5,
             height: 2,
         });
 
-        this.endGamePopupTitle = new CustomContainer(this.scene, titleEndgameArea, {
-            borderWidth: 6,
-            opacity: 1,
-        });
+        this.root.add(
+            new CustomContainer(this.scene, titleEndgameArea, {
+                borderWidth: 6,
+                opacity: 1,
+            }).setDepth(51),
+        );
 
-        this.titleText = new DisplayText(this.scene, titleEndgameArea)
-        
+        this.titleText = new DisplayText(this.scene, titleEndgameArea);
+        this.root.add(this.titleText);
+
         const entities = this.gameStore.game.entities;
         const rowCount = entities.length + 1; // +1 pour le header
 
-        console.log("taille liste : " , endGameArea)
-        
-        const entityListGrid =  this.scene.rootGrid.getSubGrid(
+        console.log("taille liste : ", endGameArea);
+
+        const entityListGrid = this.scene.rootGrid.getSubGrid(
             {
                 x: 3,
                 y: 3,
@@ -88,67 +101,72 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 },
                 padding: 5,
             },
-        )
+        );
         //console.log('area : ', entityListGrid)
-        const listArea = entityListGrid.getArea({
-            x: 1,
-            y: 1,
-            width: 4, 
-            height: 2,
-            margin : { top : 50, bottom : 0, right:0, left:0}
-        })
-
-        
-
         this.entityList = new List(this.scene, entityListGrid);
 
-        const testContainer  = new CustomContainer(this.scene, listArea, {
-            borderWidth: 6,
-            opacity: 1,
-        });
-        this.entityList.placeElement({ x: 0, y: 0 }, (area) =>
-            new DisplayText(this.scene, {
-                x: area.x - area.width / 2,
-                y: area.y - area.height / 2,
-                width: area.width,
-                height: area.height,
-            }).setText("Nom")
+        this.root.add(
+            new CustomContainer(
+                this.scene,
+                entityListGrid.getArea({
+                    x: 1,
+                    y: 1,
+                    width: 4,
+                    height: 2,
+                    margin: { top: 50, bottom: 0, right: 0, left: 0 },
+                }),
+                {
+                    borderWidth: 6,
+                    opacity: 1,
+                },
+            ).setDepth(54),
         );
-        this.entityList.placeElement({ x: 1, y: 0 }, (area) =>
-            new DisplayText(this.scene, {
-                x: area.x - area.width / 2,
-                y: area.y - area.height / 2,
-                width: area.width,
-                height: area.height,
-            }).setText("Classe")
-        );
-
-    entities.forEach((entity, index) => {
-        const iconObj = this.entityList.placeElement(
-            { x: index, y: 0 },
-            (area) => {
-                return  new DisplayText(this.scene, {
+        this.root.add(
+            this.entityList.placeElement({ x: 0, y: 0 }, (area) =>
+                new DisplayText(this.scene, {
                     x: area.x - area.width / 2,
                     y: area.y - area.height / 2,
                     width: area.width,
                     height: area.height,
-                }).setText(entity.classId)
-            },
+                }).setText("Nom"),
+            ),
         );
-    });
+        this.root.add(
+            this.entityList.placeElement({ x: 1, y: 0 }, (area) =>
+                new DisplayText(this.scene, {
+                    x: area.x - area.width / 2,
+                    y: area.y - area.height / 2,
+                    width: area.width,
+                    height: area.height,
+                }).setText("Classe"),
+            ),
+        );
+
+        entities.forEach((entity, index) => {
+            const iconObj = this.entityList.placeElement(
+                { x: index, y: 0 },
+                (area) => {
+                    return new DisplayText(this.scene, {
+                        x: area.x - area.width / 2,
+                        y: area.y - area.height / 2,
+                        width: area.width,
+                        height: area.height,
+                    }).setText(entity.classId);
+                },
+            );
+            this.root.add(iconObj);
+        });
 
         // --- Depths ---
-        this.blur.setDepth(49);
-        this.endGamePopup.setDepth(50);
-        this.endGamePopupTitle.setDepth(51);
         this.titleText.setDepth(52);
         this.entityList.setDepth(53);
-        testContainer.setDepth(54)
+
+        this.root.setVisible(false);
 
         return this;
     }
 
-    render( ): this {
+    render(): this {
         return this;
     }
 
@@ -157,12 +175,12 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     }
 
     show(playerWin: boolean) {
-
-        this.titleText.setText( playerWin ? "Victoire !" : "Défaite ")
-
+        this.titleText.setText(playerWin ? "Victoire !" : "Défaite ");
+        this.root.setVisible(true);
     }
 
     async animate(): Promise<this> {
         return this;
     }
 }
+
