@@ -108,44 +108,6 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         );
         this.entityList = new List(this.scene, entityListGrid);
 
-        this.root.add(
-            new DisplayContainer(
-                this.scene,
-                entityListGrid.getArea({
-                    x: 1,
-                    y: 1,
-                    width: 4,
-                    height: 2,
-                    margin: { top: 50, bottom: 0, right: 0, left: 0 },
-                }),
-                {
-                    borderWidth: 6,
-                    opacity: 1,
-                },
-            ).setDepth(54),
-        );
-        this.root.add(
-            this.entityList.placeElement({ x: 0, y: 0 }, (area) =>
-                new DisplayText(this.scene, {
-                    x: area.x - area.width / 2,
-                    y: area.y - area.height / 2,
-                    width: area.width,
-                    height: area.height,
-                }).setText("Nom"),
-            ),
-        );
-        this.root.add(
-            this.entityList.placeElement({ x: 1, y: 0 }, (area) =>
-                new DisplayText(this.scene, {
-                    x: area.x - area.width / 2,
-                    y: area.y - area.height / 2,
-                    width: area.width,
-                    height: area.height,
-                }).setText("Classe"),
-            ),
-        );
-        this.entityList = new List(this.scene, entityListGrid);
-
         entities.forEach((entity, index) => {
             const cardGrid = entityListGrid.getSubGrid(
                 { x: index + 1, y: 1, width: 1, height: 1 },
@@ -185,21 +147,6 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-
-    // entityCard(title : string, imageKey : string, entityListGrid : Grid, ) {
-    //     this.root.add(
-    //         new DisplayContainer(this.scene, entityListGrid.getArea({
-    //                 x: 1,
-    //                 y: 1,
-    //                 width: 4,
-    //                 height: 2,
-    //                 margin: { top: 50, bottom: 0, right: 0, left: 0 },
-    //             }), {
-    //             borderWidth: 6,
-    //             opacity: 1,
-    //         }).setDepth(51),
-    //     );
-    // }
     entityCard(entityName: string, imageKey: string, entityListGrid: Grid): void {
 
         // Conteneur de la card
