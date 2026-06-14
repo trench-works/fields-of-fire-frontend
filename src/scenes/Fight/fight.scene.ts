@@ -28,6 +28,8 @@ import {
     MusicAsset,
     MusicAssetId,
     SoundEffectAsset,
+    MiscAnimationId,
+    MiscAnimationAsset,
 } from "../../assets";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { ClassStore } from "./stores/ClassStore";
@@ -300,6 +302,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
         EffectAsset.loadAll(this.load);
         MusicAsset.load(this.load, MusicAssetId.FIGHT);
         SoundEffectAsset.loadAll(this.load);
+        MiscAnimationAsset.load(this.load, MiscAnimationId.BLOOD_SPLATTER);
     }
 
     create() {

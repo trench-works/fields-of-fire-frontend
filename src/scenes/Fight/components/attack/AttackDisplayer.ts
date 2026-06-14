@@ -1,11 +1,13 @@
 import {
     ActionAnimationAsset,
     ActionAssetId,
+    MiscAnimationAsset,
+    MiscAnimationId,
     SoundEffectAsset,
     SoundEffectAssetId,
 } from "../../../../assets";
 import { ParticleAssetId } from "../../../../assets/ParticleAsset";
-import { AnimationUtils, SoundEffect } from "../../../../core";
+import { DisplayAnimation, Position, SoundEffect } from "../../../../core";
 import { Game } from "../../../../Model/Game";
 import { FightScene } from "../../fight.scene";
 import { GameAttackAnimation } from "../../repositories/player.socket";
@@ -31,6 +33,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
         newGame: Game,
     ): Promise<this> {
         const cell = this.scene.gridPositions[x][y];
+        const tile = this.gameStore.game.plateau[x][y];
         switch (actionId) {
             case ActionAssetId.SHOOT:
                 {
@@ -42,6 +45,9 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         this.scene,
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.HURT),
                     ).play();
+                    if (tile.entityId) {
+                        await this.playBloodSplatter({ x, y });
+                    }
                 }
                 break;
             case ActionAssetId.AMPUTATE:
@@ -52,11 +58,13 @@ export class AttackDisplayer extends FightSceneDisplayer {
                             SoundEffectAssetId.AMPUTATE,
                         ),
                     ).play();
+                    if (tile.entityId) {
+                        await this.playBloodSplatter({ x, y });
+                    }
                 }
                 break;
             case ActionAssetId.INTIMIDATION:
                 {
-                    this.loadActionAnimation(ActionAssetId.INTIMIDATION);
                     new SoundEffect(
                         this.scene,
                         SoundEffectAsset.getAssetKey(
@@ -85,7 +93,6 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.ARTILLERY_SUPPORT:
                 {
-                    this.loadActionAnimation(ActionAssetId.ARTILLERY_SUPPORT);
                     await this.playActionAnimation(
                         ActionAssetId.ARTILLERY_SUPPORT,
                         {
@@ -96,7 +103,12 @@ export class AttackDisplayer extends FightSceneDisplayer {
                             x: 0.5,
                             y: 0.7,
                         },
+                        -1,
                     );
+                    if (tile.entityId) {
+                        //TODO: handle multiple victims
+                        await this.playBloodSplatter({ x, y });
+                    }
                     await this.particleDisplayer.animate(
                         ParticleAssetId.SMOKE,
                         cell.pixelPosition.x,
@@ -117,66 +129,44 @@ export class AttackDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    private loadActionAnimation(animationId: ActionAssetId) {
-        const animationName = ActionAnimationAsset.getAssetKey(animationId);
-
-        if (!this.scene.anims.get(animationName)) {
-            const frames: Phaser.Types.Animations.AnimationFrame[] = [];
-            const { frameTime } =
-                ActionAnimationAsset.getFrameConfig(animationId);
-
-            for (let i = 0; i < frameTime.length; i++) {
-                frames.push({
-                    key: animationName,
-                    frame: i,
-                    duration: frameTime[i],
-                });
-            }
-
-            this.scene.anims.create({
-                key: animationName,
-                frames,
-            });
-        }
-    }
-
     private async playActionAnimation(
         animationId: ActionAssetId,
-        { x, y }: { x: number; y: number },
-        offset: { x: number; y: number } = { x: 0.5, y: 0.95 },
+        { x, y }: Position,
+        offset: Position = { x: 0.5, y: 0.95 },
+        depth: number = 1,
     ) {
-        return new Promise<void>((resolve) => {
-            const animationName = ActionAnimationAsset.getAssetKey(animationId);
-            const { frameTime } =
-                ActionAnimationAsset.getFrameConfig(animationId);
+        const cell = this.scene.gridPositions[x][y];
+        return await new DisplayAnimation(
+            this.scene,
+            {
+                x: cell.pixelPosition.x,
+                y: cell.pixelPosition.y,
+                depth: Math.max(x * 10, y * 10) + depth,
+                scale: this.scene.scaleFactor / 1.5,
+                offset,
+            },
+            ActionAnimationAsset.getAssetKey(animationId),
+            ActionAnimationAsset.getFrameConfig(animationId),
+        ).animate();
+    }
 
-            const cell = this.scene.gridPositions[x][y];
-            const sprite = this.scene.physics.add.sprite(
-                cell.pixelPosition.x,
-                cell.pixelPosition.y,
-                animationName,
-            );
-
-            sprite.setDepth(Math.max(x * 10, y * 10) + 1);
-            sprite.setOrigin(offset.x, offset.y);
-            sprite.setScale(this.scene.scaleFactor / 1.5);
-            sprite.play(animationName);
-
-            setTimeout(() => {
-                sprite.stop();
-                sprite.destroy();
-                resolve();
-            }, AnimationUtils.getFullAnimationTime(frameTime));
-            setTimeout(
-                () => {
-                    new SoundEffect(
-                        this.scene,
-                        SoundEffectAsset.getAssetKey(SoundEffectAssetId.CANNON),
-                    ).play();
-                },
-                AnimationUtils.getFullAnimationTime(frameTime.slice(0, 10)),
-            );
-        });
+    private async playBloodSplatter(
+        { x, y }: Position,
+        offset: Position = { x: 0.5, y: 0.95 },
+    ) {
+        const cell = this.scene.gridPositions[x][y];
+        return await new DisplayAnimation(
+            this.scene,
+            {
+                x: cell.pixelPosition.x,
+                y: cell.pixelPosition.y,
+                depth: Math.max(x * 10, y * 10) + 1,
+                scale: 0.2 * this.scene.scaleFactor,
+                offset,
+            },
+            MiscAnimationAsset.getAssetKey(MiscAnimationId.BLOOD_SPLATTER),
+            MiscAnimationAsset.getFrameConfig(MiscAnimationId.BLOOD_SPLATTER),
+        ).animate();
     }
 
     preRender(): this {
