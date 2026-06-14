@@ -187,6 +187,8 @@ export class FightScene extends BaseScene<FightSceneInit> {
     }
 
     static start(scene: BaseScene, data: BaseSceneInit<FightSceneInit>) {
+        data.config ??= {};
+        data.config.keepMusic = false;
         super.startScene(scene, SceneAssetId.FIGHT, data);
     }
 
@@ -252,16 +254,21 @@ export class FightScene extends BaseScene<FightSceneInit> {
         this.endFight.preRender();
 
         this.playerSocket = new GamePlayerSocket(game.id, playerId);
-        this.playerSocket.onClose(() => MainMenu.start(this));
+        this.playerSocket.onClose(() =>
+            MainMenu.start(this, { keepMusic: false }),
+        );
         this.playerSocket.onUpdate((event) => this.gameUpdateQueue.add(event));
         this.playerSocket.onGameEnd((event) => {
             //TODO: DISPLAY POPUP WITH INFO event.playerWin (true|false)
             this.endFight.show(event.playerWin);
             const menuSocket = new MenuSocket();
-            menuSocket.onClose(() => MainMenu.start(this));
+            menuSocket.onClose(() =>
+                MainMenu.start(this, { keepMusic: false }),
+            );
             menuSocket.onJoin(({ lobbyId, playerId }) => {
                 LobbyScene.start(this, {
                     data: { lobbyId, playerId },
+                    config: { keepMusic: false },
                 });
             });
             menuSocket.onSubscribed(() => {
@@ -287,12 +294,12 @@ export class FightScene extends BaseScene<FightSceneInit> {
         CharacterSpriteAsset.loadAll(this.load);
         StatsIconAsset.loadAll(this.load);
         EffectAsset.loadAll(this.load);
-        MusicAsset.load(this.load, MusicAssetId.MENU);
+        MusicAsset.load(this.load, MusicAssetId.FIGHT);
     }
 
     create() {
         super.create();
-        this.playBackgroundMusic(MusicAssetId.MENU);
+        this.playBackgroundMusic(MusicAssetId.FIGHT);
         this.tooltip = Tooltip.getInstance(this, {
             textColor: "#000000",
             fontSize: 14,
@@ -321,7 +328,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
                 console.log("Options - À implémenter");
             },
             onMainMenuClick: () => {
-                MainMenu.start(this);
+                MainMenu.start(this, { keepMusic: false });
             },
         });
 

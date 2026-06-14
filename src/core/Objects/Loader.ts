@@ -33,7 +33,7 @@ export class Loader {
                 {
                     bgColor: "#000000",
                 },
-            ),
+            ).setDepth(10000000),
         );
         this.text = new DisplayText(
             this.scene,
@@ -43,7 +43,9 @@ export class Loader {
                 width: 1,
                 height: 1,
             }),
-        ).setText(`Loading ... : ${0}%`);
+        )
+            .setText(`Loading ... : ${0}%`)
+            .setDepth(10000000);
         this.root.add(this.text);
     }
 

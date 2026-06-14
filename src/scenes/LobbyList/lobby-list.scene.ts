@@ -34,7 +34,6 @@ export class LobbyListScene extends BaseScene {
 
     constructor() {
         super(SceneAssetId.LOBBY_LIST, BackgroundAssetId.LOBBY);
-
         this.lobbyStore = new LobbyStore();
     }
 

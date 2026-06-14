@@ -2,6 +2,7 @@ import { SoundAssetManager } from "../core/Assets/Asset";
 
 export enum MusicAssetId {
     MENU = "menu",
+    FIGHT = "fight",
 }
 
 class MusicAssetManager extends SoundAssetManager<MusicAssetId, string> {
@@ -16,6 +17,7 @@ class MusicAssetManager extends SoundAssetManager<MusicAssetId, string> {
     constructor() {
         super("musics", {
             [MusicAssetId.MENU]: "lobby",
+            [MusicAssetId.FIGHT]: "fight",
         });
     }
 }

@@ -87,7 +87,11 @@ export class BaseScene<InitData = any> extends Scene {
     playBackgroundMusic(id: MusicAssetId) {
         console.log("PLAY", this.backgroundSound);
         if (this.isOpen) {
-            if (!this.backgroundSound) {
+            if (
+                !this.backgroundSound ||
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                !(this.backgroundSound as any)?.["currentConfig"] //FIXME: ptn de magie noire pour détecter si l'objet musique est corrompu à la réception
+            ) {
                 this.backgroundSound = this.sound.add(
                     MusicAsset.getAssetKey(id),
                 );
