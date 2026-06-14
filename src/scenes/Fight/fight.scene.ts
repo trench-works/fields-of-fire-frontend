@@ -37,6 +37,7 @@ import { MenuSocket } from "../LobbyList/repositories/menu.socket";
 import { LobbyScene } from "../Lobby/lobby.scene";
 import { EffectAsset } from "../../assets/EffectAsset";
 import { PositionUtils } from "../../core/Utils/Sizing";
+import { EndFightDisplayer } from "./components/EndFightDisplayer";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -86,6 +87,7 @@ export class FightScene extends BaseScene {
     private playerStats: StatsDisplayer;
     private inspectStats: StatsDisplayer;
     private attacks: AttackDisplayer;
+    private endFight: EndFightDisplayer;
 
     /**
      * Sockets
@@ -147,6 +149,7 @@ export class FightScene extends BaseScene {
             y: 7,
         });
         this.attacks = new AttackDisplayer(this, this.gameStore);
+        this.endFight = new EndFightDisplayer(this, this.gameStore,this.playerStore);
 
         /**
          * Utils
@@ -231,12 +234,14 @@ export class FightScene extends BaseScene {
         this.character.preRender();
         this.playerStats.preRender();
         this.inspectStats.preRender();
+        this.endFight.preRender();
 
         this.playerSocket = new GamePlayerSocket(game.id, playerId);
         this.playerSocket.onClose(() => MainMenu.start(this));
         this.playerSocket.onUpdate((event) => this.gameUpdateQueue.add(event));
         this.playerSocket.onGameEnd((event) => {
             //TODO: DISPLAY POPUP WITH INFO event.playerWin (true|false)
+            this.endFight.show(event.playerWin);
             const menuSocket = new MenuSocket();
             menuSocket.onClose(() => MainMenu.start(this));
             menuSocket.onJoin(({ lobbyId, playerId }) => {
