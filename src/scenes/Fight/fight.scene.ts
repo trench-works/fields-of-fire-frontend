@@ -208,6 +208,9 @@ export class FightScene extends BaseScene<FightSceneInit> {
                 case "attack":
                     await this.attacks.animate(animation, game);
                     break;
+                case "death":
+                    await this.character.kill(animation.data.entityId);
+                    break;
             }
         }
 

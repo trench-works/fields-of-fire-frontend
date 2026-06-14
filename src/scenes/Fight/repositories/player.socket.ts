@@ -40,8 +40,17 @@ export type GameAttackAnimation = GameAnimation<
         target: { x: number; y: number };
     }
 >;
+export type GameDeathAnimation = GameAnimation<
+    "death",
+    {
+        entityId: string;
+    }
+>;
 
-export type GameEventAnimation = GameMoveAnimation | GameAttackAnimation;
+export type GameEventAnimation =
+    | GameMoveAnimation
+    | GameAttackAnimation
+    | GameDeathAnimation;
 
 export type GameUpdateEvent = AnimatedPayload<Game, GameEventAnimation>;
 

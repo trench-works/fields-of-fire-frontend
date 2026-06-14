@@ -30,21 +30,28 @@ export class CharactersDisplayer extends FightSceneDisplayer {
     }
 
     update(): this {
-        for (let i = 0; i < this.characters.length; i++) {
-            const character = this.characters[i];
-            const entity = this.gameStore.getEntity(character.entityId);
-            if (entity.dead) {
+        for (const character of this.characters) {
+            character.update();
+        }
+        return this;
+    }
+
+    async kill(entityId: string): Promise<this> {
+        return new Promise((resolve) => {
+            const i = this.characters.findIndex(
+                (character) => character.entityId === entityId,
+            );
+            if (i >= 0) {
+                const character = this.characters[i];
                 this.characters.splice(i, 1);
                 new SoundEffect(
                     this.scene,
                     SoundEffectAsset.getAssetKey(SoundEffectAssetId.DEATH),
                 ).play();
                 character.destroy();
-            } else {
-                character.update();
             }
-        }
-        return this;
+            setTimeout(() => resolve(this), 1000);
+        });
     }
 
     async animate(animation: GameMoveAnimation, newGame: Game): Promise<this> {
