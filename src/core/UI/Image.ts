@@ -1,5 +1,5 @@
 import { BaseScene } from "../Objects";
-import { Size } from "../Types";
+import { PlacementOrigin, Position, Size } from "../Types";
 import { GridArea, ScaleUtils } from "../Utils";
 import { Displayable } from "./DisplayRoot";
 
@@ -13,12 +13,16 @@ export class DisplayImage implements Displayable {
         this.image = this.scene.add.image(area.center.x, area.center.y, "");
     }
 
+    place(position: Position, size: Size, origin: PlacementOrigin): void {
+        throw new Error("Method not implemented.");
+    }
+
     setImage(texture: string, scale?: number): this {
         this.image.setTexture(texture);
         //size
         let size: Size;
         if (scale) {
-            size = ScaleUtils.fillFromScale(this.area, scale);
+            size = ScaleUtils.fitFromScale(this.area, scale);
         } else {
             size = this.area;
         }

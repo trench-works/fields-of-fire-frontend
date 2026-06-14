@@ -1,5 +1,5 @@
 import { Position, Size, TwoAxis } from "../Types";
-import { Grid } from "../Utils";
+import { Grid, GridArea } from "../Utils";
 import { CustomContainer } from "./Container";
 import { Displayable } from "./DisplayRoot";
 
@@ -11,17 +11,11 @@ export interface DataDisplayerConfig {
     division: TwoAxis;
 }
 
-export interface CellArea {
-    position: Position;
-    width: number;
-    height: number;
-}
-
 export type DataDisplayObject = Phaser.GameObjects.GameObject &
     Phaser.GameObjects.Components.Alpha;
 
 export class List extends CustomContainer {
-    private cellAreas: CellArea[][] = [];
+    private cellAreas: GridArea[][] = [];
 
     constructor(scene: Phaser.Scene, grid: Grid) {
         super(
@@ -41,28 +35,19 @@ export class List extends CustomContainer {
             this.cellAreas[r] = [];
 
             for (let c = 0; c < grid.division.horizontal; c++) {
-                const area = grid.getArea({
+                this.cellAreas[r][c] = grid.getArea({
                     x: c + 1,
                     y: r + 1,
                     width: 1,
                     height: 1,
                 });
-
-                this.cellAreas[r][c] = {
-                    position: {
-                        x: area.center.x,
-                        y: area.center.y,
-                    },
-                    width: area.width,
-                    height: area.height,
-                };
             }
         }
     }
 
     public placeElement<T extends Displayable>(
         { x, y }: Position,
-        place: (area: CellArea) => T,
+        place: (area: GridArea) => T,
     ): T {
         const area = this.cellAreas[y]?.[x];
         return place(area);
@@ -80,7 +65,7 @@ export class List extends CustomContainer {
                 color: "#fff",
             })
             .setOrigin(0.5);
-        obj.setPosition(area.position.x, area.position.y);
+        obj.setPosition(area.x, area.y);
         this.add(obj);
         return obj;
     }
@@ -119,7 +104,7 @@ export class List extends CustomContainer {
             throw new Error("Invalid value type");
         }
 
-        obj.setPosition(area.position.x, area.position.y);
+        obj.setPosition(area.x, area.y);
         this.add(obj);
 
         return obj;

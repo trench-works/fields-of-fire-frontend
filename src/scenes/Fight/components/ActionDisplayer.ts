@@ -1,6 +1,6 @@
 import { ActionAsset, ActionAssetId } from "../../../assets/ActionAsset";
 import { Color } from "../../../config/ColorConfig";
-import { CustomContainer, List, Button, ScaleUtils } from "../../../core";
+import { CustomContainer, List, Button, ScaleMode } from "../../../core";
 import { Action } from "../../../Model/Action";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/GameStore";
@@ -118,18 +118,12 @@ export class ActionDisplayer extends FightSceneDisplayer {
             const iconObj = this.actionsList.placeElement(
                 { x: index, y: 0 },
                 (area) => {
-                    const size = ScaleUtils.fillFromScale(
-                        area,
-                        ActionAsset.getAssetScale(action.id),
-                    );
                     return new Button(
                         this.scene,
-                        {
-                            x: area.position.x - size.width / 2,
-                            y: area.position.y - size.height / 2,
-                            width: size.width,
-                            height: size.height,
-                        },
+                        area.scaleFromCenter(
+                            ActionAsset.getAssetScale(action.id),
+                            ScaleMode.FIT,
+                        ),
                         {
                             image: ActionAsset.getAssetKey(action.id),
                             onClick: () => this.handleActionClick(action),
@@ -156,8 +150,8 @@ export class ActionDisplayer extends FightSceneDisplayer {
         const isPlayerTurn =
             this.gameStore.game.playerTurns[0] ===
             this.playerStore.playerEntity.entityId;
-        const hasMovement = this.playerStore.playerEntity.stats.mouvement > 0;
         const hasEnergy = this.playerStore.playerEntity.stats.energy > 0;
+        const hasMovement = this.playerStore.playerEntity.stats.mouvement > 0;
 
         this.playerStore.playerClass.actionList.forEach((action) => {
             const actionObject = this.actionElements.get(action.id)!;

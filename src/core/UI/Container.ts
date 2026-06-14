@@ -164,7 +164,6 @@ export class CustomContainer
             this.innerRadius ?? this.radius,
         );
         if (this.outterRadius !== undefined) {
-            console.log(this.outterRadius);
             if (!this.outterBorder) {
                 this.outterBorder = this.scene.make.graphics({}, false);
                 this.add(this.outterBorder);

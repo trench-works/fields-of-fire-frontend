@@ -16,7 +16,7 @@ import {
     ActionAsset,
     CharacterCloseupAsset,
     CharacterSpriteAsset,
-    IconAsset,
+    StatsIconAsset,
     MiscAsset,
     MiscAssetId,
     MusicAsset,
@@ -266,7 +266,7 @@ export class FightScene extends BaseScene {
         MiscAsset.load(this.load, MiscAssetId.WALL);
         CharacterCloseupAsset.loadAll(this.load);
         CharacterSpriteAsset.loadAll(this.load);
-        IconAsset.loadAll(this.load);
+        StatsIconAsset.loadAll(this.load);
         EffectAsset.loadAll(this.load);
         MusicAsset.load(this.load, MusicAssetId.MENU);
     }

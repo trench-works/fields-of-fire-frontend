@@ -1,6 +1,6 @@
 import { CharacterCloseupAsset } from "../../../assets";
 import { Color } from "../../../config/ColorConfig";
-import { CustomContainer, ScaleUtils } from "../../../core";
+import { CustomContainer, ScaleMode } from "../../../core";
 import { FightScene } from "../fight.scene";
 import { ClassStore } from "../stores/ClassStore";
 import { GameStore } from "../stores/GameStore";
@@ -69,26 +69,25 @@ export class TurnDisplayer extends FightSceneDisplayer {
             );
             const isFirstCell = index === 0;
 
-            const cellArea = turnGrid.getArea({
-                x: index + 1,
-                y: 1,
-                width: 1,
-                height: 1,
-                margin: isFirstCell ? 0 : 5,
-            });
-
-            const imageSize = ScaleUtils.fillFromScale(
-                cellArea,
-                CharacterCloseupAsset.getAssetScale(entity.classId),
-            );
+            const cellArea = turnGrid
+                .getArea({
+                    x: index + 1,
+                    y: 1,
+                    width: 1,
+                    height: 1,
+                    margin: isFirstCell ? 0 : 5,
+                })
+                .scaleFromCenter(
+                    CharacterCloseupAsset.getAssetScale(entity.classId),
+                    ScaleMode.FIT,
+                );
 
             this.icons.push(
                 new CustomContainer(
                     this.scene,
                     {
-                        x: cellArea.x,
+                        ...cellArea,
                         y: cellArea.y - (isFirstCell ? 0 : 5),
-                        ...imageSize,
                     },
                     {
                         title: player?.name ?? charClass?.name?.split(" ")[0],

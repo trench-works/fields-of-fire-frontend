@@ -1,4 +1,8 @@
-import { CharacterCloseupAsset, IconAsset, IconAssetId } from "../../../assets";
+import {
+    CharacterCloseupAsset,
+    StatsIconAsset,
+    StatsAssetId,
+} from "../../../assets";
 import { EffectAsset, EffectAssetId } from "../../../assets/EffectAsset";
 import { Color } from "../../../config/ColorConfig";
 import { CustomContainer, Grid, DisplayText, List } from "../../../core";
@@ -170,7 +174,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
     }
 
     render(): this {
-        Object.values(IconAssetId).forEach((icon, index) => {
+        Object.values(StatsAssetId).forEach((icon, index) => {
             const row = Math.floor(index / 2) + 1;
             const col = (index % 2) + 1;
 
@@ -190,8 +194,8 @@ export class StatsDisplayer extends FightSceneDisplayer {
                     y: 1,
                 }),
             ).setImage(
-                IconAsset.getAssetKey(icon),
-                IconAsset.getAssetScale(icon),
+                StatsIconAsset.getAssetKey(icon),
+                StatsIconAsset.getAssetScale(icon),
             );
             if (image) {
                 image.setInteractive(true);

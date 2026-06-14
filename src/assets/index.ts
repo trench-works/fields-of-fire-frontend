@@ -1,5 +1,6 @@
 export * from "./ActionAsset";
 export * from "./MiscAsset";
-export * from "./IconAsset";
+export * from "./StatsAsset";
 export * from "./CharacterAsset";
 export * from "./MusicAsset";
+
