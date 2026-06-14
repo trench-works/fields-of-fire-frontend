@@ -4,7 +4,7 @@ import { BaseScene } from "./BaseScene";
 
 export class Loader {
     root: DisplayRoot;
-    text: DisplayText;
+    text!: DisplayText;
 
     constructor(private readonly scene: BaseScene) {
         this.root = new DisplayRoot();
