@@ -96,7 +96,7 @@ export class Character extends FightSceneDisplayer {
         const cell = this.scene.gridPositions[x][y];
 
         this.sprite.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
-        this.sprite.setDepth(Math.max(x, y));
+        this.sprite.setDepth(Math.max(x, y) * 10);
 
         return this;
     }
