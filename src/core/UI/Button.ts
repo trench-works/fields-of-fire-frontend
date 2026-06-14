@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { Color } from "../../config/ColorConfig";
 import { FourAxis, PlacementOrigin, Position, Size } from "../Types";
 import { Displayable } from "./DisplayRoot";
-import { DisplayText } from "./Text";
+import { DisplayText } from "./DisplayText";
 import { BaseScene } from "../Objects";
 
 const CLICKABLE_ALPHA = 1;

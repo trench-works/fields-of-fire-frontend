@@ -1,4 +1,4 @@
-import { CustomContainer, DisplayRoot, DisplayText } from "../UI";
+import { DisplayContainer, DisplayRoot, DisplayText } from "../UI";
 import { Grid } from "../Utils";
 import { BaseScene } from "./BaseScene";
 
@@ -22,7 +22,7 @@ export class Loader {
         });
 
         this.root.add(
-            new CustomContainer(
+            new DisplayContainer(
                 this.scene,
                 screenGrid.getArea({
                     x: 1,

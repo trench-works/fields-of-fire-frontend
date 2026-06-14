@@ -2,7 +2,7 @@ import { DisplayRoot, GridArea } from "../../../../core";
 import { FightScene } from "../../fight.scene";
 import { GameStore } from "../../stores/GameStore";
 import { FightSceneDisplayer } from "../FightSceneDisplayer";
-import { DisplayImage } from "../../../../core/UI/Image";
+import { DisplayImage } from "../../../../core/UI/DisplayImage";
 import { MiscAsset, MiscAssetId } from "../../../../assets";
 
 export class WallDisplayer extends FightSceneDisplayer {

@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { Button, CustomContainer } from "../../../core";
+import { Button, DisplayContainer } from "../../../core";
 
 interface PopupInputConfig {
     title: string;
@@ -10,7 +10,7 @@ interface PopupInputConfig {
 
 export class PopupInput {
     private overlay: Phaser.GameObjects.Rectangle;
-    private container: CustomContainer;
+    private container: DisplayContainer;
     private validateButton: Button;
     private inputElement: HTMLInputElement;
 
@@ -39,7 +39,7 @@ export class PopupInput {
             });
 
         // --- CONTAINER ---
-        this.container = new CustomContainer(
+        this.container = new DisplayContainer(
             scene,
             {
                 x: cx - 200,

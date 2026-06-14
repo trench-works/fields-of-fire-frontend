@@ -1,6 +1,6 @@
 import { ActionAsset, ActionAssetId } from "../../../assets/ActionAsset";
 import { Color } from "../../../config/ColorConfig";
-import { CustomContainer, List, Button, ScaleMode } from "../../../core";
+import { DisplayContainer, List, Button, ScaleMode } from "../../../core";
 import { Action } from "../../../Model/Action";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/GameStore";
@@ -66,7 +66,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
             height: 1,
         });
 
-        new CustomContainer(this.scene, actionArea, {
+        new DisplayContainer(this.scene, actionArea, {
             borderWidth: 7,
             opacity: 0.5,
             outterRadius: { tl: 0, bl: 0, tr: 10, br: 10 },

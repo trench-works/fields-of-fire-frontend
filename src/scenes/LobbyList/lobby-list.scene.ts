@@ -3,7 +3,7 @@ import { LobbyScene } from "../Lobby/lobby.scene";
 import {
     BaseScene,
     Button,
-    CustomContainer,
+    DisplayContainer,
     MenuButton,
     DisplayText,
     BaseSceneInit,
@@ -153,7 +153,7 @@ export class LobbyListScene extends BaseScene {
             width: 9,
             height: 6,
         });
-        new CustomContainer(this, lobbyListArea, {
+        new DisplayContainer(this, lobbyListArea, {
             opacity: 0.25,
             borderWidth: 2,
         });

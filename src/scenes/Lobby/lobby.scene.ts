@@ -1,6 +1,6 @@
 import {
     Button,
-    CustomContainer,
+    DisplayContainer,
     TabManager,
     MenuButton,
     BaseScene,
@@ -34,8 +34,8 @@ export type LobbySceneInit = {
 export class LobbyScene extends BaseScene<LobbySceneInit> {
     private selectClassId: CharacterAssetId =
         CharacterAssetId.ENTENTE_FANTASSIN;
-    private playerImageContainer!: CustomContainer;
-    private playerClassName!: CustomContainer;
+    private playerImageContainer!: DisplayContainer;
+    private playerClassName!: DisplayContainer;
     public lobbySocket!: LobbySocket;
 
     protected lobbyId!: string;
@@ -160,12 +160,12 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             { division: { horizontal: 9, vertical: 9 } },
         );
 
-        new CustomContainer(this, playerGrid, {
+        new DisplayContainer(this, playerGrid, {
             borderWidth: 5,
             outterRadius: 0,
         });
 
-        const playerNameContainer = new CustomContainer(
+        const playerNameContainer = new DisplayContainer(
             this,
             playerGrid.getArea({
                 x: 1,
@@ -194,7 +194,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 ScaleMode.FIT,
             );
 
-        const playerImageContainer = new CustomContainer(
+        const playerImageContainer = new DisplayContainer(
             this,
             {
                 ...playerImageArea,
@@ -262,7 +262,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             const row = Math.floor(index / classesPerRow) + 1;
 
             root.add(
-                new CustomContainer(
+                new DisplayContainer(
                     this,
                     grid
                         .getArea({ x: col, y: row, width: 1, height: 1 })

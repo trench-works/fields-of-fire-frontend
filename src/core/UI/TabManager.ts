@@ -1,7 +1,7 @@
 import { BaseScene } from "../Objects";
 import { Grid, GridArea } from "../Utils";
 import { Button } from "./Button";
-import { CustomContainer } from "./Container";
+import { DisplayContainer } from "./Container";
 import { DisplayRoot } from "./DisplayRoot";
 
 export type TabConfig = {
@@ -54,7 +54,7 @@ export class TabManager {
             );
 
             tabRoot.add(
-                new CustomContainer(this.scene, contentArea, {
+                new DisplayContainer(this.scene, contentArea, {
                     borderWidth: 5,
                     outterRadius: 0,
                 }),

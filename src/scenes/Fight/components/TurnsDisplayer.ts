@@ -1,15 +1,15 @@
 import { CharacterCloseupAsset } from "../../../assets";
 import { Color } from "../../../config/ColorConfig";
-import { CustomContainer, ScaleMode } from "../../../core";
+import { DisplayContainer, ScaleMode } from "../../../core";
 import { FightScene } from "../fight.scene";
 import { ClassStore } from "../stores/ClassStore";
 import { GameStore } from "../stores/GameStore";
 import { FightSceneDisplayer } from "./FightSceneDisplayer";
 
 export class TurnDisplayer extends FightSceneDisplayer {
-    private turnPanel!: CustomContainer;
+    private turnPanel!: DisplayContainer;
 
-    private icons: CustomContainer[] = [];
+    private icons: DisplayContainer[] = [];
 
     constructor(
         scene: FightScene,
@@ -20,7 +20,7 @@ export class TurnDisplayer extends FightSceneDisplayer {
     }
 
     preRender(): this {
-        this.turnPanel = new CustomContainer(
+        this.turnPanel = new DisplayContainer(
             this.scene,
             this.scene.rootGrid.getArea({
                 x: 1,
@@ -83,7 +83,7 @@ export class TurnDisplayer extends FightSceneDisplayer {
                 );
 
             this.icons.push(
-                new CustomContainer(
+                new DisplayContainer(
                     this.scene,
                     {
                         ...cellArea,

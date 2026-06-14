@@ -1,7 +1,7 @@
 import { Color } from "../../../config/ColorConfig";
 import {
     BaseScene,
-    CustomContainer,
+    DisplayContainer,
     DisplayText,
     Grid,
     GridArea,
@@ -15,7 +15,7 @@ type LobbyInfos = {
     creator: string;
 };
 export class LobbyRow {
-    private container: CustomContainer;
+    private container: DisplayContainer;
     private texts: Phaser.GameObjects.Text[] = [];
 
     public id: string;
@@ -28,7 +28,7 @@ export class LobbyRow {
         isSelected: boolean = false,
     ) {
         this.id = lobby.id;
-        this.container = new CustomContainer(scene, area, {
+        this.container = new DisplayContainer(scene, area, {
             opacity: 0.15,
             borderWidth: 1,
         });

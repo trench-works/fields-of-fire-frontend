@@ -5,8 +5,8 @@ import {
 } from "../../../assets";
 import { EffectAsset, EffectAssetId } from "../../../assets/EffectAsset";
 import { Color } from "../../../config/ColorConfig";
-import { CustomContainer, Grid, DisplayText, List } from "../../../core";
-import { DisplayImage } from "../../../core/UI/Image";
+import { DisplayContainer, Grid, DisplayText, List } from "../../../core";
+import { DisplayImage } from "../../../core/UI/DisplayImage";
 import { CharacterClass } from "../../../Model/CharacterClass";
 import { Effect } from "../../../Model/Effect";
 import { Entity } from "../../../Model/Entity";
@@ -27,11 +27,11 @@ const statDescriptions: Record<string, string> = {
 };
 
 export class StatsDisplayer extends FightSceneDisplayer {
-    private statsPanel!: CustomContainer;
+    private statsPanel!: DisplayContainer;
     private effectList!: List;
-    private statsImage!: CustomContainer;
-    private statsClassName!: CustomContainer;
-    private playerName!: CustomContainer;
+    private statsImage!: DisplayContainer;
+    private statsClassName!: DisplayContainer;
+    private playerName!: DisplayContainer;
     private statsValuesGrid!: Grid;
 
     protected statTexts: Map<
@@ -87,7 +87,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
             height: 3,
         });
 
-        this.statsPanel = new CustomContainer(this.scene, statsArea, {
+        this.statsPanel = new DisplayContainer(this.scene, statsArea, {
             borderWidth: 7,
             opacity: 0.5,
             outterRadius: { tl: 10, tr: 10, bl: 0, br: 0 },
@@ -95,7 +95,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
 
         const statsGrid = statsArea.getGrid();
 
-        this.statsImage = new CustomContainer(
+        this.statsImage = new DisplayContainer(
             this.scene,
             statsGrid.getArea({ x: 1, y: 1, width: 3, height: 4 }),
             {
@@ -105,7 +105,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
             },
         );
 
-        this.statsClassName = new CustomContainer(
+        this.statsClassName = new DisplayContainer(
             this.scene,
             statsGrid.getArea({
                 x: 4,
@@ -121,7 +121,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
             },
         );
 
-        this.playerName = new CustomContainer(
+        this.playerName = new DisplayContainer(
             this.scene,
             statsGrid.getArea({
                 x: 1,

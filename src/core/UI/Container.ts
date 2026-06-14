@@ -21,7 +21,7 @@ type ContainerConfig = {
     innerRadius?: Phaser.Types.GameObjects.Graphics.RoundedRectRadius | number;
 };
 
-export class CustomContainer
+export class DisplayContainer
     extends Phaser.GameObjects.Container
     implements Displayable
 {

@@ -1,6 +1,6 @@
 import {
     Button,
-    CustomContainer,
+    DisplayContainer,
     DisplayRoot,
     DisplayText,
     List,
@@ -34,7 +34,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
 
     preRender(): this {
         this.root.add(
-            new CustomContainer(
+            new DisplayContainer(
                 this.scene,
                 this.scene.rootGrid.getArea({
                     x: 1,
@@ -57,7 +57,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         });
 
         this.root.add(
-            new CustomContainer(this.scene, endGameArea, {
+            new DisplayContainer(this.scene, endGameArea, {
                 borderWidth: 6,
                 opacity: 1,
             }).setDepth(50),
@@ -73,7 +73,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         });
 
         this.root.add(
-            new CustomContainer(this.scene, titleEndgameArea, {
+            new DisplayContainer(this.scene, titleEndgameArea, {
                 borderWidth: 6,
                 opacity: 1,
             }).setDepth(51),
@@ -106,7 +106,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.entityList = new List(this.scene, entityListGrid);
 
         this.root.add(
-            new CustomContainer(
+            new DisplayContainer(
                 this.scene,
                 entityListGrid.getArea({
                     x: 1,

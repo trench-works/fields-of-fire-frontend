@@ -1,6 +1,6 @@
 import { Position, Size, TwoAxis } from "../Types";
 import { Grid, GridArea } from "../Utils";
-import { CustomContainer } from "./Container";
+import { DisplayContainer } from "./Container";
 import { Displayable } from "./DisplayRoot";
 
 export type CellValue = string | number | { icon: string };
@@ -14,7 +14,7 @@ export interface DataDisplayerConfig {
 export type DataDisplayObject = Phaser.GameObjects.GameObject &
     Phaser.GameObjects.Components.Alpha;
 
-export class List extends CustomContainer {
+export class List extends DisplayContainer {
     private cellAreas: GridArea[][] = [];
 
     constructor(scene: Phaser.Scene, grid: Grid) {
