@@ -19,6 +19,8 @@ import {
     IconAsset,
     MiscAsset,
     MiscAssetId,
+    MusicAsset,
+    MusicAssetId,
 } from "../../assets";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { ClassStore } from "./stores/ClassStore";
@@ -171,7 +173,8 @@ export class FightScene extends BaseScene {
         );
     }
 
-    static start(scene: Phaser.Scene, data: FightSceneInit) {
+    static start(scene: BaseScene, data: FightSceneInit) {
+        scene.stopBackgroundMusic();
         scene.scene.start(SceneAssetId.FIGHT, data);
     }
 
@@ -265,10 +268,12 @@ export class FightScene extends BaseScene {
         CharacterSpriteAsset.loadAll(this.load);
         IconAsset.loadAll(this.load);
         EffectAsset.loadAll(this.load);
+        MusicAsset.load(this.load, MusicAssetId.MENU);
     }
 
     create() {
         super.create();
+        this.playBackgroundMusic(MusicAssetId.MENU);
         this.tooltip = Tooltip.getInstance(this, {
             textColor: "#000000",
             fontSize: 14,

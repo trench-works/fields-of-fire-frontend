@@ -6,8 +6,8 @@ import {
     BaseScene,
     GridArea,
     DisplayRoot,
-    ScaleUtils,
     DisplayText,
+    ScaleMode,
 } from "../../core";
 import { Color } from "../../config/ColorConfig";
 import { LobbySocket } from "./repositories/lobby.socket";
@@ -15,6 +15,8 @@ import {
     CharacterAssetId,
     CharacterCloseupAsset,
     CharacterIconAsset,
+    MusicAsset,
+    MusicAssetId,
 } from "../../assets";
 import { FightScene } from "../Fight/fight.scene";
 import { ClassesRepository } from "./repositories/classes.repository";
@@ -48,26 +50,26 @@ export class LobbyScene extends BaseScene {
         });
     }
 
-    static start(scene: Phaser.Scene, data: LobbySceneInit) {
+    static start(scene: BaseScene, data: LobbySceneInit) {
+        scene.stopBackgroundMusic();
         scene.scene.start(SceneAssetId.LOBBY, data);
     }
 
     init({ lobbyId, playerId }: LobbySceneInit) {
-        console.log("init");
         this.lobbyId = lobbyId;
         this.playerId = playerId;
     }
 
     preload() {
-        console.log("preload");
         super.preload();
         CharacterIconAsset.loadAll(this.load);
         CharacterCloseupAsset.loadAll(this.load);
+        MusicAsset.load(this.load, MusicAssetId.MENU);
     }
 
     create() {
-        console.log("create");
         super.create();
+        this.playBackgroundMusic(MusicAssetId.MENU);
         this.lobbySocket = new LobbySocket(this.lobbyId);
         this.lobbySocket.onClose(() => MainMenu.start(this));
 
@@ -84,59 +86,63 @@ export class LobbyScene extends BaseScene {
         });
 
         //title BOX
-        const titleBox = this.rootGrid.getArea({
-            x: 1,
-            y: 1,
-            width: 9,
-            height: 1,
-        });
-        new DisplayText(this, titleBox).setText("Lobby");
+        new DisplayText(
+            this,
+            this.rootGrid.getArea({
+                x: 1,
+                y: 1,
+                width: 9,
+                height: 1,
+            }),
+        ).setText("Lobby");
 
         //tab BOX
-        const tabGrid = this.rootGrid.getSubGrid(
-            {
-                x: 1,
-                y: 2,
-                width: 6,
-                height: 8,
-            },
-            {
-                division: {
-                    horizontal: 3,
-                    vertical: 12,
+        new TabManager(
+            this,
+            this.rootGrid.getSubGrid(
+                {
+                    x: 1,
+                    y: 2,
+                    width: 6,
+                    height: 8,
                 },
-            },
+                {
+                    division: {
+                        horizontal: 3,
+                        vertical: 12,
+                    },
+                },
+            ),
+            [
+                {
+                    label: "Classes",
+                    build: (root, area) => {
+                        //container.add(this.add.text(50, 0, "not implemented yet"));
+                        this.buildClassesTab(root, area);
+                    },
+                },
+                {
+                    label: "Maitrises",
+                    build: (root, area) => {
+                        root.add(
+                            new DisplayText(this, area).setText(
+                                "not implemented yet",
+                            ),
+                        );
+                    },
+                },
+                {
+                    label: "Réglages",
+                    build: (root, area) => {
+                        root.add(
+                            new DisplayText(this, area).setText(
+                                "not implemented yet",
+                            ),
+                        );
+                    },
+                },
+            ],
         );
-
-        new TabManager(this, tabGrid, [
-            {
-                label: "Classes",
-                build: (root, area) => {
-                    //container.add(this.add.text(50, 0, "not implemented yet"));
-                    this.buildClassesTab(root, area);
-                },
-            },
-            {
-                label: "Maitrises",
-                build: (root, area) => {
-                    root.add(
-                        new DisplayText(this, area).setText(
-                            "not implemented yet",
-                        ),
-                    );
-                },
-            },
-            {
-                label: "Réglages",
-                build: (root, area) => {
-                    root.add(
-                        new DisplayText(this, area).setText(
-                            "not implemented yet",
-                        ),
-                    );
-                },
-            },
-        ]);
         //Selected character info BOX
         const playerGrid = this.rootGrid.getSubGrid(
             {
@@ -150,13 +156,6 @@ export class LobbyScene extends BaseScene {
 
         new CustomContainer(this, playerGrid, {
             borderWidth: 5,
-        });
-
-        const imgArea = playerGrid.getArea({
-            x: 1,
-            y: 1,
-            width: 9,
-            height: 5,
         });
 
         const playerNameContainer = new CustomContainer(
@@ -175,17 +174,23 @@ export class LobbyScene extends BaseScene {
         );
         this.playerClassName = playerNameContainer;
 
-        const imageSize = ScaleUtils.fitFromScale(
-            imgArea,
-            CharacterIconAsset.getAssetScale(this.selectClassId),
-        );
+        const playerImageArea = playerGrid
+            .getArea({
+                x: 1,
+                y: 1,
+                width: 9,
+                height: 5,
+            })
+            .scaleFromCenter(
+                CharacterIconAsset.getAssetScale(this.selectClassId),
+                ScaleMode.FIT,
+            );
 
         const playerImageContainer = new CustomContainer(
             this,
             {
-                x: imgArea.x,
-                y: imgArea.y,
-                ...imageSize,
+                ...playerImageArea,
+                x: playerGrid.x,
             },
             {
                 backgroundImage: CharacterCloseupAsset.getAssetKey(
@@ -197,23 +202,25 @@ export class LobbyScene extends BaseScene {
 
         this.playerImageContainer = playerImageContainer;
 
-        const buttonArea = playerGrid.getArea({
-            x: 1,
-            y: 9,
-            width: 4,
-            height: 1,
-        });
-
-        new Button(this, buttonArea, {
-            text: "Combattre",
-            borderWidth: 2,
-            borderColor: "#ffffff",
-            onClick: () => {
-                if (this.selectClassId) {
-                    this.lobbySocket.startGame();
-                }
+        new Button(
+            this,
+            playerGrid.getArea({
+                x: 1,
+                y: 9,
+                width: 4,
+                height: 1,
+            }),
+            {
+                text: "Combattre",
+                borderWidth: 2,
+                borderColor: "#ffffff",
+                onClick: () => {
+                    if (this.selectClassId) {
+                        this.lobbySocket.startGame();
+                    }
+                },
             },
-        });
+        );
 
         // Créer le bouton Menu
         new MenuButton(this, {
@@ -245,21 +252,15 @@ export class LobbyScene extends BaseScene {
             const col = (index % classesPerRow) + 1;
             const row = Math.floor(index / classesPerRow) + 1;
 
-            const area = grid.getArea({ x: col, y: row, width: 1, height: 1 });
-
-            const size = ScaleUtils.fillFromScale(
-                area,
-                CharacterIconAsset.getAssetScale(charClass.id),
-            );
-
             root.add(
                 new CustomContainer(
                     this,
-                    {
-                        x: area.x,
-                        y: area.y,
-                        ...size,
-                    },
+                    grid
+                        .getArea({ x: col, y: row, width: 1, height: 1 })
+                        .scaleFromCenter(
+                            CharacterIconAsset.getAssetScale(charClass.id),
+                            ScaleMode.FIT,
+                        ),
                     {
                         title: charClass.name,
                         backgroundImage: CharacterIconAsset.getAssetKey(

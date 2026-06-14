@@ -1,4 +1,3 @@
-import Phaser from "phaser";
 import { BaseScene, Button, DisplayText, ScaleMode } from "../../core";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { LobbyListScene } from "../LobbyList/lobby-list.scene";
@@ -22,7 +21,8 @@ export class MainMenu extends BaseScene {
         }
     }
 
-    static start(scene: Phaser.Scene) {
+    static start(scene: BaseScene) {
+        scene.stopBackgroundMusic();
         scene.scene.start(SceneAssetId.MENU);
     }
 
@@ -32,18 +32,9 @@ export class MainMenu extends BaseScene {
         MusicAsset.load(this.load, MusicAssetId.MENU);
     }
 
-    init() {
-        this.sound.unlock();
-    }
-
     create() {
-        const backgroundSound = this.sound.add(
-            MusicAsset.getAssetKey(MusicAssetId.MENU),
-        );
-        backgroundSound.setLoop(true);
-        backgroundSound.play();
-        this.sound.unlock();
         super.create();
+        this.playBackgroundMusic(MusicAssetId.MENU);
         // Créer un titre du menu
         const titleBox = this.rootGrid.getArea({
             x: 1,

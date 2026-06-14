@@ -37,18 +37,21 @@ export class TabManager {
 
         tabsConfig.forEach((tab, index) => {
             const tabRoot = new DisplayRoot();
-            const btnArea = this.rootGrid.getArea({
-                x: index + 1,
-                y: 1,
-                width: 1,
-                height: 1,
-            });
-            const btn = new Button(this.scene, btnArea, {
-                text: tab.label,
-                borderWidth: 5,
-                borderColor: "#2A4237",
-                onClick: () => this.switchTo(index),
-            });
+            const btn = new Button(
+                this.scene,
+                this.rootGrid.getArea({
+                    x: index + 1,
+                    y: 1,
+                    width: 1,
+                    height: 1,
+                }),
+                {
+                    text: tab.label,
+                    borderWidth: 5,
+                    borderColor: "#2A4237",
+                    onClick: () => this.switchTo(index),
+                },
+            );
 
             tabRoot.add(new CustomContainer(this.scene, contentArea, {}));
 

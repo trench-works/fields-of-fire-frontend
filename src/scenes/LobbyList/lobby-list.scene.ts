@@ -13,6 +13,7 @@ import { LobbyRow } from "./objects/LobbyRow";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { LobbyStore } from "./stores/LobbyStore";
+import { MusicAsset, MusicAssetId } from "../../assets";
 
 export class LobbyListScene extends BaseScene {
     public menuSocket!: MenuSocket;
@@ -22,7 +23,8 @@ export class LobbyListScene extends BaseScene {
 
     protected lobbyStore: LobbyStore;
 
-    static start(scene: Phaser.Scene) {
+    static start(scene: BaseScene) {
+        scene.stopBackgroundMusic();
         scene.scene.start(SceneAssetId.LOBBY_LIST);
     }
 
@@ -33,12 +35,11 @@ export class LobbyListScene extends BaseScene {
     }
 
     preload() {
-        console.log("preload");
         super.preload();
+        MusicAsset.load(this.load, MusicAssetId.MENU);
     }
 
     init() {
-        console.log("init");
         this.menuSocket = new MenuSocket();
         this.menuSocket.onClose(() => MainMenu.start(this));
 
@@ -74,8 +75,8 @@ export class LobbyListScene extends BaseScene {
     }
 
     create() {
-        console.log("create");
         super.create();
+        this.playBackgroundMusic(MusicAssetId.MENU);
         this.createDisplay();
     }
 
