@@ -1,4 +1,4 @@
-import { CharacterAssetId } from "../../../../assets";
+import { CharacterAssetId, CharacterSpriteAsset } from "../../../../assets";
 import {
     Button,
     DisplayContainer,
@@ -87,7 +87,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.root.add(this.titleText);
 
         const entities = this.gameStore.game.entities;
-        const rowCount = entities.length + 1; // +1 pour le header
+        const rowCount = entities.length;
 
         console.log("taille liste : ", endGameArea);
 
@@ -96,7 +96,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 x: 3,
                 y: 3,
                 width: 5,
-                height: 1,
+                height: 9,
             },
             {
                 division: {
@@ -116,8 +116,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
 
             this.entityCard(
                 entity.entityId,
-                entity.entityId,
+                entity.classId,
                 cardGrid,
+                rowCount
             );
         });
 
@@ -125,7 +126,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.titleText.setDepth(52);
         this.entityList.setDepth(53);
 
-        this.root.setVisible(false);
+        this.root.setVisible(true);
 
         return this;
     }
@@ -147,7 +148,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    entityCard(entityName: string, imageKey: string, entityListGrid: Grid): void {
+    entityCard(entityName: string, imageKey: string, entityListGrid: Grid, width: number): void {
 
         // Conteneur de la card
         this.root.add(
@@ -156,19 +157,20 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 entityListGrid.getArea({
                     x: 1,
                     y: 1,
-                    width: 4,
-                    height: 2,
+                    width: width ,
+                    height: 4,
                     margin: { top: 50, bottom: 0, right: 0, left: 0 },
                 }),
-                { borderWidth: 3, opacity: 0.8 },
+                { borderWidth: 3, opacity: 1},
             ).setDepth(55),
         );
 
         // Image (lignes 1-2)
-        const imageArea = entityListGrid.getArea({ x: 1, y: 1, width: 1, height: 2 });
+        const imageArea = entityListGrid.getArea({ x: 2, y: 1, width: 1, height: 3});
+        const imageAssetKey = CharacterSpriteAsset.getAssetKey(imageKey as CharacterAssetId);
         this.root.add(
             new DisplayImage(this.scene, imageArea)
-                .setImage(imageKey, 1)
+                .setImage(imageAssetKey, 1)
                 .setDepth(56),
         );
 

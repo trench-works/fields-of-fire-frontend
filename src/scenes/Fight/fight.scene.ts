@@ -46,7 +46,7 @@ import { MenuSocket } from "../LobbyList/repositories/menu.socket";
 import { LobbyScene } from "../Lobby/lobby.scene";
 import { EffectAsset } from "../../assets/EffectAsset";
 import { PositionUtils } from "../../core/Utils/Sizing";
-import { EndFightDisplayer } from "./components/EndFightDisplayer";
+import { EndFightDisplayer } from "./components/EndFightDisplayer/EndFightDisplayer";
 
 export type SceneRenderConfig = {
     tileSize: number;
