@@ -1,10 +1,14 @@
+import { CharacterAssetId } from "../../../../assets";
 import {
     Button,
-    CustomContainer,
+    DisplayContainer,
     DisplayRoot,
     DisplayText,
+    Grid,
+    GridArea,
     List,
 } from "../../../../core";
+import { DisplayImage } from "../../../../core/UI/DisplayImage";
 import { FightScene } from "../../fight.scene";
 import { GameStore } from "../../stores/GameStore";
 import { PlayerStore } from "../../stores/PlayerStore";
@@ -34,7 +38,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
 
     preRender(): this {
         this.root.add(
-            new CustomContainer(
+            new DisplayContainer(
                 this.scene,
                 this.scene.rootGrid.getArea({
                     x: 1,
@@ -57,7 +61,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         });
 
         this.root.add(
-            new CustomContainer(this.scene, endGameArea, {
+            new DisplayContainer(this.scene, endGameArea, {
                 borderWidth: 6,
                 opacity: 1,
             }).setDepth(50),
@@ -73,7 +77,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         });
 
         this.root.add(
-            new CustomContainer(this.scene, titleEndgameArea, {
+            new DisplayContainer(this.scene, titleEndgameArea, {
                 borderWidth: 6,
                 opacity: 1,
             }).setDepth(51),
@@ -97,15 +101,15 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             {
                 division: {
                     horizontal: rowCount,
-                    vertical: 2,
+                    vertical: 4,
                 },
-                padding: 5,
+                padding: 10,
             },
         );
         this.entityList = new List(this.scene, entityListGrid);
 
         this.root.add(
-            new CustomContainer(
+            new DisplayContainer(
                 this.scene,
                 entityListGrid.getArea({
                     x: 1,
@@ -140,20 +144,19 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 }).setText("Classe"),
             ),
         );
+        this.entityList = new List(this.scene, entityListGrid);
 
         entities.forEach((entity, index) => {
-            const iconObj = this.entityList.placeElement(
-                { x: index, y: 0 },
-                (area) => {
-                    return new DisplayText(this.scene, {
-                        x: area.x - area.width / 2,
-                        y: area.y - area.height / 2,
-                        width: area.width,
-                        height: area.height,
-                    }).setText(entity.classId);
-                },
+            const cardGrid = entityListGrid.getSubGrid(
+                { x: index + 1, y: 1, width: 1, height: 1 },
+                { division: { horizontal: 4, vertical: 3 } },
             );
-            this.root.add(iconObj);
+
+            this.entityCard(
+                entity.entityId,
+                entity.entityId,
+                cardGrid,
+            );
         });
 
         // --- Depths ---
@@ -181,5 +184,53 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     async animate(): Promise<this> {
         return this;
     }
-}
 
+
+    // entityCard(title : string, imageKey : string, entityListGrid : Grid, ) {
+    //     this.root.add(
+    //         new DisplayContainer(this.scene, entityListGrid.getArea({
+    //                 x: 1,
+    //                 y: 1,
+    //                 width: 4,
+    //                 height: 2,
+    //                 margin: { top: 50, bottom: 0, right: 0, left: 0 },
+    //             }), {
+    //             borderWidth: 6,
+    //             opacity: 1,
+    //         }).setDepth(51),
+    //     );
+    // }
+    entityCard(entityName: string, imageKey: string, entityListGrid: Grid): void {
+
+        // Conteneur de la card
+        this.root.add(
+            new DisplayContainer(
+                this.scene,
+                entityListGrid.getArea({
+                    x: 1,
+                    y: 1,
+                    width: 4,
+                    height: 2,
+                    margin: { top: 50, bottom: 0, right: 0, left: 0 },
+                }),
+                { borderWidth: 3, opacity: 0.8 },
+            ).setDepth(55),
+        );
+
+        // Image (lignes 1-2)
+        const imageArea = entityListGrid.getArea({ x: 1, y: 1, width: 1, height: 2 });
+        this.root.add(
+            new DisplayImage(this.scene, imageArea)
+                .setImage(imageKey, 1)
+                .setDepth(56),
+        );
+
+        // Nom (ligne 3)
+        const nameArea = entityListGrid.getArea({ x: 1, y: 3, width: 1, height: 1 });
+        this.root.add(
+            new DisplayText(this.scene, nameArea)
+                .setText(entityName)
+                .setDepth(56),
+        );
+    }
+}

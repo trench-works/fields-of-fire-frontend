@@ -265,19 +265,19 @@ export class FightScene extends BaseScene<FightSceneInit> {
         this.playerSocket.onGameEnd((event) => {
             //TODO: DISPLAY POPUP WITH INFO event.playerWin (true|false)
             this.endFight.show(event.playerWin);
-            const menuSocket = new MenuSocket();
-            menuSocket.onClose(() =>
-                MainMenu.start(this, { keepMusic: false }),
-            );
-            menuSocket.onJoin(({ lobbyId, playerId }) => {
-                LobbyScene.start(this, {
-                    data: { lobbyId, playerId },
-                    config: { keepMusic: false },
-                });
-            });
-            menuSocket.onSubscribed(() => {
-                menuSocket.joinLobby({ lobbyId: event.lobbyId });
-            });
+            // const menuSocket = new MenuSocket();
+            // menuSocket.onClose(() =>
+            //     MainMenu.start(this, { keepMusic: false }),
+            // );
+            // menuSocket.onJoin(({ lobbyId, playerId }) => {
+            //     LobbyScene.start(this, {
+            //         data: { lobbyId, playerId },
+            //         config: { keepMusic: false },
+            //     });
+            // });
+            // menuSocket.onSubscribed(() => {
+            //     menuSocket.joinLobby({ lobbyId: event.lobbyId });
+            // });
         });
     }
 
