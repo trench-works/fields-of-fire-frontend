@@ -53,7 +53,12 @@ export class TabManager {
                 },
             );
 
-            tabRoot.add(new CustomContainer(this.scene, contentArea, {}));
+            tabRoot.add(
+                new CustomContainer(this.scene, contentArea, {
+                    borderWidth: 5,
+                    outterRadius: 0,
+                }),
+            );
 
             // Construire le contenu réel
             tab.build(tabRoot, contentArea);

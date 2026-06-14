@@ -40,6 +40,7 @@ export class LobbyListScene extends BaseScene {
     }
 
     init() {
+        this.lobbyStore.setSelectedLobbyId(null);
         this.menuSocket = new MenuSocket();
         this.menuSocket.onClose(() => MainMenu.start(this));
 

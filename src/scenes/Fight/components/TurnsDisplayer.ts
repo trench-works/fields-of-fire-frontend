@@ -20,15 +20,19 @@ export class TurnDisplayer extends FightSceneDisplayer {
     }
 
     preRender(): this {
-        const turndisplay = this.scene.rootGrid.getArea({
-            x: 1,
-            y: 1,
-            width: 7,
-            height: 1,
-        });
-        this.turnPanel = new CustomContainer(this.scene, turndisplay, {
-            opacity: 0.25,
-        });
+        this.turnPanel = new CustomContainer(
+            this.scene,
+            this.scene.rootGrid.getArea({
+                x: 1,
+                y: 1,
+                width: 7,
+                height: 1,
+            }),
+            {
+                opacity: 0.25,
+                outterRadius: { tr: 0, bl: 0, tl: 0, br: 10 },
+            },
+        );
 
         this.turnPanel.setDepth(0);
 

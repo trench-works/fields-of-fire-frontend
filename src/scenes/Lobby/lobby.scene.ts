@@ -156,6 +156,7 @@ export class LobbyScene extends BaseScene {
 
         new CustomContainer(this, playerGrid, {
             borderWidth: 5,
+            outterRadius: 0,
         });
 
         const playerNameContainer = new CustomContainer(
@@ -170,6 +171,7 @@ export class LobbyScene extends BaseScene {
                 title: this.classStore.getClass(this.selectClassId).name,
                 bgColor: Color.containerBorder,
                 borderWidth: 5,
+                outterRadius: 0,
             },
         );
         this.playerClassName = playerNameContainer;
@@ -197,6 +199,7 @@ export class LobbyScene extends BaseScene {
                     this.selectClassId,
                 ),
                 borderWidth: 5,
+                outterRadius: 0,
             },
         );
 

@@ -24,10 +24,10 @@ const statDescriptions: Record<string, string> = {
 
 export class StatsDisplayer extends FightSceneDisplayer {
     private statsPanel!: CustomContainer;
-    private EffectList!: List;
+    private effectList!: List;
     private statsImage!: CustomContainer;
     private statsClassName!: CustomContainer;
-    private statsName!: CustomContainer;
+    private playerName!: CustomContainer;
     private statsValuesGrid!: Grid;
 
     protected statTexts: Map<
@@ -84,43 +84,54 @@ export class StatsDisplayer extends FightSceneDisplayer {
         });
 
         this.statsPanel = new CustomContainer(this.scene, statsArea, {
-            borderWidth: 6,
+            borderWidth: 7,
             opacity: 0.5,
+            outterRadius: { tl: 10, tr: 10, bl: 0, br: 0 },
         });
 
         const statsGrid = statsArea.getGrid();
 
-        const imgArea = statsGrid.getArea({ x: 1, y: 1, width: 3, height: 4 });
+        this.statsImage = new CustomContainer(
+            this.scene,
+            statsGrid.getArea({ x: 1, y: 1, width: 3, height: 4 }),
+            {
+                borderWidth: 7,
+                backgroundImage: "unknown",
+                outterRadius: { tl: 10, tr: 0, bl: 0, br: 0 },
+            },
+        );
 
-        this.statsImage = new CustomContainer(this.scene, imgArea, {
-            borderWidth: 7,
-            backgroundImage: "unknown",
-        });
+        this.statsClassName = new CustomContainer(
+            this.scene,
+            statsGrid.getArea({
+                x: 4,
+                y: 1,
+                width: 6,
+                height: 1,
+            }),
+            {
+                title: "N/A",
+                borderWidth: 2,
+                bgColor: Color.containerBorder,
+                outterRadius: { tl: 0, tr: 10, bl: 0, br: 0 },
+            },
+        );
 
-        const classNameArea = statsGrid.getArea({
-            x: 4,
-            y: 1,
-            width: 6,
-            height: 1,
-        });
-
-        this.statsClassName = new CustomContainer(this.scene, classNameArea, {
-            title: "N/A",
-            borderWidth: 2,
-            bgColor: Color.containerBorder,
-        });
-        const playerNameArea = statsGrid.getArea({
-            x: 1,
-            y: 5,
-            width: 3,
-            height: 1,
-        });
-
-        this.statsName = new CustomContainer(this.scene, playerNameArea, {
-            title: "N/A",
-            borderWidth: 2,
-            bgColor: Color.containerBorder,
-        });
+        this.playerName = new CustomContainer(
+            this.scene,
+            statsGrid.getArea({
+                x: 1,
+                y: 5,
+                width: 3,
+                height: 1,
+            }),
+            {
+                title: "N/A",
+                borderWidth: 7,
+                bgColor: Color.containerBorder,
+                outterRadius: { tl: 0, tr: 0, bl: 0, br: 10 },
+            },
+        );
 
         this.statsValuesGrid = statsGrid.getSubGrid(
             {
@@ -153,7 +164,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
             },
         );
 
-        this.EffectList = new List(this.scene, effectListArea);
+        this.effectList = new List(this.scene, effectListArea);
 
         return this;
     }
@@ -172,11 +183,13 @@ export class StatsDisplayer extends FightSceneDisplayer {
             );
 
             // Image
-            const imageArea = statGrid.getArea({
-                x: 1,
-                y: 1,
-            });
-            const image = new DisplayImage(this.scene, imageArea).setImage(
+            const image = new DisplayImage(
+                this.scene,
+                statGrid.getArea({
+                    x: 1,
+                    y: 1,
+                }),
+            ).setImage(
                 IconAsset.getAssetKey(icon),
                 IconAsset.getAssetScale(icon),
             );
@@ -190,12 +203,14 @@ export class StatsDisplayer extends FightSceneDisplayer {
             }
 
             // Text
-            const textArea = statGrid.getArea({
-                x: 2,
-                y: 1,
-            });
             this.statTexts.set(icon, {
-                text: new DisplayText(this.scene, textArea).setText("N/A"),
+                text: new DisplayText(
+                    this.scene,
+                    statGrid.getArea({
+                        x: 2,
+                        y: 1,
+                    }),
+                ).setText("N/A"),
                 image,
             });
         });
@@ -210,7 +225,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
             text.setText(String(stats[key as keyof Stats]), { fontSize: 20 }),
         );
 
-        this.statsName.setText(this.name);
+        this.playerName.setText(this.name);
         this.statsClassName.setText(this.characterClass.name);
         this.statsImage.setBackgroundImage(
             CharacterCloseupAsset.getAssetKey(this.entity.classId),
@@ -225,7 +240,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
         this.statsPanel.setVisible(isShow);
         this.statsImage.setVisible(isShow);
         this.statsClassName.setVisible(isShow);
-        this.statsName.setVisible(isShow);
+        this.playerName.setVisible(isShow);
 
         this.statTexts.forEach(({ text, image }) => {
             text.setVisible(isShow);
@@ -236,7 +251,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
     }
 
     displayEffects() {
-        this.EffectList.clear();
+        this.effectList.clear();
 
         const groupedEffects = this.entity.effects.reduce((acc, effect) => {
             if (!acc.has(effect.id)) {
@@ -247,7 +262,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
         }, new Map<EffectAssetId, Effect[]>());
 
         Array.from(groupedEffects.entries()).forEach(([id, effects], index) => {
-            const iconObj = this.EffectList.placeContent(
+            const iconObj = this.effectList.placeContent(
                 index,
                 0,
                 {

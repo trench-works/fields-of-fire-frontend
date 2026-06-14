@@ -16,6 +16,9 @@ type ContainerConfig = {
     onClick?: () => void;
     hoverTint?: number;
     alpha?: number;
+    radius?: Phaser.Types.GameObjects.Graphics.RoundedRectRadius | number;
+    outterRadius?: Phaser.Types.GameObjects.Graphics.RoundedRectRadius | number;
+    innerRadius?: Phaser.Types.GameObjects.Graphics.RoundedRectRadius | number;
 };
 
 export class CustomContainer
@@ -26,12 +29,23 @@ export class CustomContainer
         | Phaser.GameObjects.Graphics
         | Phaser.GameObjects.Image
         | null = null;
-    private borderGraphics?: Phaser.GameObjects.Graphics;
+    private border?: Phaser.GameObjects.Graphics;
+    private outterBorder?: Phaser.GameObjects.Graphics;
     private titleText?: Phaser.GameObjects.Text;
     public onClick: (() => void) | undefined;
     private bgColor: string;
     private bgOpacity: number;
     private hoverTint: number | undefined;
+
+    protected radius:
+        | Phaser.Types.GameObjects.Graphics.RoundedRectRadius
+        | number;
+    protected outterRadius?:
+        | Phaser.Types.GameObjects.Graphics.RoundedRectRadius
+        | number;
+    protected innerRadius?:
+        | Phaser.Types.GameObjects.Graphics.RoundedRectRadius
+        | number;
 
     getObject(): Phaser.GameObjects.GameObject {
         throw new Error("Method not implemented.");
@@ -60,6 +74,9 @@ export class CustomContainer
             onClick,
             hoverTint,
             fontSize,
+            radius = 10,
+            outterRadius,
+            innerRadius,
         } = config;
 
         super(scene, x, y);
@@ -70,6 +87,12 @@ export class CustomContainer
         this.bgOpacity = opacity;
         this.onClick = onClick;
         this.hoverTint = hoverTint;
+
+        // Radius
+        this.radius = radius;
+        this.outterRadius = outterRadius;
+        this.innerRadius = innerRadius;
+
         if (alpha) {
             this.alpha = alpha;
         }
@@ -84,9 +107,7 @@ export class CustomContainer
 
         // --- BORDURE ---
         if (borderColor && borderWidth > 0) {
-            this.borderGraphics = scene.make.graphics({}, false);
             this.manageBorder(ColorUtils.parseColor(borderColor), borderWidth);
-            this.add(this.borderGraphics);
         }
 
         // --- TITRE ---
@@ -127,17 +148,37 @@ export class CustomContainer
     }
 
     public manageBorder(borderColor: number, borderWidth: number) {
-        if (this.borderGraphics) {
+        if (!this.border) {
+            this.border = this.scene.make.graphics({}, false);
+            this.add(this.border);
+        }
+        const width = this.width;
+        const height = this.height;
+        this.border.clear();
+        this.border.lineStyle(borderWidth, borderColor, 1);
+        this.border.strokeRoundedRect(
+            -width / 2,
+            -height / 2,
+            width,
+            height,
+            this.innerRadius ?? this.radius,
+        );
+        if (this.outterRadius !== undefined) {
+            console.log(this.outterRadius);
+            if (!this.outterBorder) {
+                this.outterBorder = this.scene.make.graphics({}, false);
+                this.add(this.outterBorder);
+            }
             const width = this.width;
             const height = this.height;
-            this.borderGraphics.clear();
-            this.borderGraphics.lineStyle(borderWidth, borderColor, 1);
-            this.borderGraphics.strokeRoundedRect(
+            this.outterBorder.clear();
+            this.outterBorder.lineStyle(borderWidth, borderColor, 1);
+            this.outterBorder.strokeRoundedRect(
                 -width / 2,
                 -height / 2,
                 width,
                 height,
-                10,
+                this.outterRadius,
             );
         }
     }
@@ -165,7 +206,7 @@ export class CustomContainer
                 -height / 2,
                 width,
                 height,
-                10,
+                this.outterRadius ?? this.radius,
             );
         }
     }

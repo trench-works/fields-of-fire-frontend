@@ -67,8 +67,9 @@ export class ActionDisplayer extends FightSceneDisplayer {
         });
 
         new CustomContainer(this.scene, actionArea, {
-            borderWidth: 2,
+            borderWidth: 7,
             opacity: 0.5,
+            outterRadius: { tl: 0, bl: 0, tr: 10, br: 10 },
         });
 
         const actionGrid = actionArea.getGrid({
