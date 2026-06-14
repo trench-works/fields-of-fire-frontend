@@ -108,11 +108,13 @@ export class RangeVisualizer {
          * 1 - determinate forbidden angles ranges on distance like -> "cant shoot from angle 185 to 190 starting from 30 pixel away"
          */
         const result: Cell[] = [];
+        const board = this.gameStore.game.plateau;
 
         for (let x = 0; x < this.scene.gridPositions.length; x++) {
             for (let y = 0; y < this.scene.gridPositions[x].length; y++) {
+                const cell = board[x]?.[y];
                 const dist = Math.abs(start.x - x) + Math.abs(start.y - y);
-                if (dist <= range) {
+                if (dist <= range && cell && !cell.isHole && !cell.isWall) {
                     result.push(this.scene.gridPositions[x]?.[y]);
                 }
             }

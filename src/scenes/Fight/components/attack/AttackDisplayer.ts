@@ -45,6 +45,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         this.scene,
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.HURT),
                     ).play();
+                    this.scene.cameras.main.shake(200, 0.001);
                     if (tile.entityId) {
                         await this.playBloodSplatter({ x, y });
                     }
@@ -105,9 +106,15 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         },
                         -1,
                     );
+
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(SoundEffectAssetId.CANNON),
+                    ).play();
+                    this.scene.cameras.main.shake(200, 0.005);
                     if (tile.entityId) {
                         //TODO: handle multiple victims
-                        await this.playBloodSplatter({ x, y });
+                        await this.playBloodSplatter({ x, y }); //TODO: make particle blood splatter
                     }
                     await this.particleDisplayer.animate(
                         ParticleAssetId.SMOKE,
