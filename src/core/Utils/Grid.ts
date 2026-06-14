@@ -97,7 +97,6 @@ export class GridArea implements Position, Size, IGridArea {
      * @returns a new grid area
      */
     scaleFromCenter(scale: number, scaleMode: ScaleMode): GridArea {
-        //TODO: implement ScaleMode
         let newSize: Size;
         switch (scaleMode) {
             case ScaleMode.FILL:

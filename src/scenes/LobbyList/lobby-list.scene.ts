@@ -24,7 +24,7 @@ export class LobbyListScene extends BaseScene {
     protected lobbyStore: LobbyStore;
 
     static start(scene: BaseScene) {
-        scene.stopBackgroundMusic();
+        scene.close();
         scene.scene.start(SceneAssetId.LOBBY_LIST);
     }
 
@@ -40,6 +40,7 @@ export class LobbyListScene extends BaseScene {
     }
 
     init() {
+        super.init();
         this.lobbyStore.setSelectedLobbyId(null);
         this.menuSocket = new MenuSocket();
         this.menuSocket.onClose(() => MainMenu.start(this));

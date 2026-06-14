@@ -22,7 +22,7 @@ export class MainMenu extends BaseScene {
     }
 
     static start(scene: BaseScene) {
-        scene.stopBackgroundMusic();
+        scene.close();
         scene.scene.start(SceneAssetId.MENU);
     }
 

@@ -30,7 +30,7 @@ export type LobbySceneInit = {
     playerId: string;
 };
 
-export class LobbyScene extends BaseScene {
+export class LobbyScene extends BaseScene<LobbySceneInit> {
     private selectClassId: CharacterAssetId =
         CharacterAssetId.ENTENTE_FANTASSIN;
     private playerImageContainer!: CustomContainer;
@@ -51,11 +51,12 @@ export class LobbyScene extends BaseScene {
     }
 
     static start(scene: BaseScene, data: LobbySceneInit) {
-        scene.stopBackgroundMusic();
+        scene.close();
         scene.scene.start(SceneAssetId.LOBBY, data);
     }
 
     init({ lobbyId, playerId }: LobbySceneInit) {
+        super.init();
         this.lobbyId = lobbyId;
         this.playerId = playerId;
     }
