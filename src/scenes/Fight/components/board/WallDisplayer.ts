@@ -35,11 +35,17 @@ export class WallDisplayer extends FightSceneDisplayer {
                                 cell.pixelPosition.x -
                                     32 * this.scene.scaleFactor,
                                 cell.pixelPosition.y -
-                                    32 * this.scene.scaleFactor,
+                                    32 * this.scene.scaleFactor -
+                                    16 * this.scene.scaleFactor,
                                 64 * this.scene.scaleFactor,
                                 64 * this.scene.scaleFactor,
                             ),
-                        ).setImage(MiscAsset.getAssetKey(MiscAssetId.WALL), 1),
+                        )
+                            .setImage(
+                                MiscAsset.getAssetKey(MiscAssetId.WALL),
+                                1,
+                            )
+                            .setDepth(Math.max(x, y) * 10),
                     );
                 }
             }

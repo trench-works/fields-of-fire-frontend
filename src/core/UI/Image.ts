@@ -13,6 +13,11 @@ export class DisplayImage implements Displayable {
         this.image = this.scene.add.image(area.center.x, area.center.y, "");
     }
 
+    setDepth(depth: number): this {
+        this.image.setDepth(depth);
+        return this;
+    }
+
     place(position: Position, size: Size, origin: PlacementOrigin): void {
         throw new Error("Method not implemented.");
     }

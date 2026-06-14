@@ -5,9 +5,13 @@ export interface Displayable {
     destroy(): void;
     getObject(): Phaser.GameObjects.GameObject;
     place(position: Position, size: Size, origin: PlacementOrigin): void;
+    setDepth(depth: number): this;
 }
 
-export class DisplayRoot implements Omit<Displayable, "getObject" | "place"> {
+export class DisplayRoot implements Omit<
+    Displayable,
+    "getObject" | "place" | "setDepth"
+> {
     protected displayables: Displayable[];
 
     constructor() {
