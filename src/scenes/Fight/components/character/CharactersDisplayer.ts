@@ -19,11 +19,13 @@ export class CharactersDisplayer extends FightSceneDisplayer {
     }
 
     render(): this {
-        this.characters = this.gameStore.game.entities.map((entity) =>
-            new Character(this.scene, this.gameStore, entity.entityId)
-                .preRender()
-                .render(),
-        );
+        this.characters = this.gameStore.game.entities
+            .filter((entity) => !entity.dead)
+            .map((entity) =>
+                new Character(this.scene, this.gameStore, entity.entityId)
+                    .preRender()
+                    .render(),
+            );
         return this;
     }
 
