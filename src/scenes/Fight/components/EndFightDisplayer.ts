@@ -1,9 +1,11 @@
+import { SoundEffectAsset, SoundEffectAssetId } from "../../../assets";
 import {
     Button,
     DisplayContainer,
     DisplayRoot,
     DisplayText,
     List,
+    SoundEffect,
 } from "../../../core";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/GameStore";
@@ -176,6 +178,13 @@ export class EndFightDisplayer extends FightSceneDisplayer {
 
     show(playerWin: boolean) {
         this.titleText.setText(playerWin ? "Victoire !" : "Défaite ");
+
+        if (playerWin) {
+            new SoundEffect(
+                this.scene,
+                SoundEffectAsset.getAssetKey(SoundEffectAssetId.VICTORY),
+            ).play();
+        }
         this.root.setVisible(true);
     }
 

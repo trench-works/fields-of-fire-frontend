@@ -27,6 +27,7 @@ import {
     MiscAssetId,
     MusicAsset,
     MusicAssetId,
+    SoundEffectAsset,
 } from "../../assets";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { ClassStore } from "./stores/ClassStore";
@@ -279,14 +280,14 @@ export class FightScene extends BaseScene<FightSceneInit> {
 
     preload() {
         super.preload();
-        ActionAsset.loadAll(this.load);
-        ActionAnimationAsset.loadAll(this.load);
 
         this.load.tilemapTiledJSON(
             this.fightMap,
             `assets/${this.fightMap}.json`,
         );
 
+        ActionAsset.loadAll(this.load);
+        ActionAnimationAsset.loadAll(this.load);
         ParticleAsset.loadAll(this.load);
         MiscAsset.load(this.load, MiscAssetId.GROUND);
         MiscAsset.load(this.load, MiscAssetId.WALL);
@@ -295,6 +296,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
         StatsIconAsset.loadAll(this.load);
         EffectAsset.loadAll(this.load);
         MusicAsset.load(this.load, MusicAssetId.FIGHT);
+        SoundEffectAsset.loadAll(this.load);
     }
 
     create() {

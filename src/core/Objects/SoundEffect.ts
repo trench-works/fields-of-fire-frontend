@@ -1,4 +1,3 @@
-import { Position } from "../Types";
 import { Sound } from "../Types/Sound";
 import { BaseScene } from "./BaseScene";
 
@@ -8,13 +7,13 @@ export class SoundEffect {
     constructor(
         private readonly scene: BaseScene,
         assetKey: string,
-        { x, y }: Position,
+        //{ x, y }: Position,
     ) {
         this.sound = this.scene.sound.add(assetKey, {
-            source: {
-                x,
-                y,
-            },
+            // source: { //FIXME: c'est buggé ca marche pas
+            //     x,
+            //     y,
+            // },
         });
         this.sound.setVolume(0.4);
     }

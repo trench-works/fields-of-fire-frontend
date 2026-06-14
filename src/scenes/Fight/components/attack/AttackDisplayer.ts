@@ -1,6 +1,11 @@
-import { ActionAnimationAsset, ActionAssetId } from "../../../../assets";
+import {
+    ActionAnimationAsset,
+    ActionAssetId,
+    SoundEffectAsset,
+    SoundEffectAssetId,
+} from "../../../../assets";
 import { ParticleAssetId } from "../../../../assets/ParticleAsset";
-import { AnimationUtils } from "../../../../core";
+import { AnimationUtils, SoundEffect } from "../../../../core";
 import { Game } from "../../../../Model/Game";
 import { FightScene } from "../../fight.scene";
 import { GameAttackAnimation } from "../../repositories/player.socket";
@@ -27,9 +32,37 @@ export class AttackDisplayer extends FightSceneDisplayer {
     ): Promise<this> {
         const cell = this.scene.gridPositions[x][y];
         switch (actionId) {
+            case ActionAssetId.SHOOT:
+                {
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(SoundEffectAssetId.SHOT),
+                    ).play();
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(SoundEffectAssetId.HURT),
+                    ).play();
+                }
+                break;
+            case ActionAssetId.AMPUTATE:
+                {
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(
+                            SoundEffectAssetId.AMPUTATE,
+                        ),
+                    ).play();
+                }
+                break;
             case ActionAssetId.INTIMIDATION:
                 {
                     this.loadActionAnimation(ActionAssetId.INTIMIDATION);
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(
+                            SoundEffectAssetId.INTIMIDATION,
+                        ),
+                    ).play();
                     await this.playActionAnimation(ActionAssetId.INTIMIDATION, {
                         x,
                         y,
@@ -41,27 +74,28 @@ export class AttackDisplayer extends FightSceneDisplayer {
                     );
                 }
                 break;
-            case ActionAssetId.HEAL: 
+            case ActionAssetId.HEAL:
                 {
                     await this.particleDisplayer.animate(
                         ParticleAssetId.HEAL,
                         cell.pixelPosition.x,
                         cell.pixelPosition.y,
-                    )
+                    );
                 }
                 break;
-             case ActionAssetId.ARTILLERY_SUPPORT: 
+            case ActionAssetId.ARTILLERY_SUPPORT:
                 {
                     this.loadActionAnimation(ActionAssetId.ARTILLERY_SUPPORT);
-                    await this.playActionAnimation(ActionAssetId.ARTILLERY_SUPPORT, 
+                    await this.playActionAnimation(
+                        ActionAssetId.ARTILLERY_SUPPORT,
                         {
                             x,
                             y,
                         },
                         {
-                            x : 0.5,
-                            y : 0.70
-                        }
+                            x: 0.5,
+                            y: 0.7,
+                        },
                     );
                     await this.particleDisplayer.animate(
                         ParticleAssetId.SMOKE,
@@ -70,16 +104,15 @@ export class AttackDisplayer extends FightSceneDisplayer {
                     );
                 }
                 break;
-                case ActionAssetId.DOPAGE: 
-                    {
-                        await this.particleDisplayer.animate(
-                            ParticleAssetId.BOOST,
-                            cell.pixelPosition.x,
-                            cell.pixelPosition.y,
-                        )
-                    }
-                    break;
-                
+            case ActionAssetId.DOPAGE:
+                {
+                    await this.particleDisplayer.animate(
+                        ParticleAssetId.BOOST,
+                        cell.pixelPosition.x,
+                        cell.pixelPosition.y,
+                    );
+                }
+                break;
         }
         return this;
     }
@@ -110,7 +143,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
     private async playActionAnimation(
         animationId: ActionAssetId,
         { x, y }: { x: number; y: number },
-        offset  : { x: number; y: number } = { x: 0.5, y: 0.95 }
+        offset: { x: number; y: number } = { x: 0.5, y: 0.95 },
     ) {
         return new Promise<void>((resolve) => {
             const animationName = ActionAnimationAsset.getAssetKey(animationId);
@@ -134,6 +167,15 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 sprite.destroy();
                 resolve();
             }, AnimationUtils.getFullAnimationTime(frameTime));
+            setTimeout(
+                () => {
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(SoundEffectAssetId.CANNON),
+                    ).play();
+                },
+                AnimationUtils.getFullAnimationTime(frameTime.slice(0, 10)),
+            );
         });
     }
 
