@@ -1,6 +1,6 @@
-import Phaser from "phaser";
 import { Button } from "./Button";
 import { MenuPanel } from "./MenuPanel";
+import { BaseScene } from "../Objects";
 
 interface MenuButtonConfig {
     onResumeClick?: () => void;
@@ -12,9 +12,9 @@ interface MenuButtonConfig {
 export class MenuButton {
     private button!: Button;
     private menuPanel!: MenuPanel;
-    private scene: Phaser.Scene;
+    private scene: BaseScene;
 
-    constructor(scene: Phaser.Scene, config: MenuButtonConfig) {
+    constructor(scene: BaseScene, config: MenuButtonConfig) {
         this.scene = scene;
 
         // Créer le panneau du menu

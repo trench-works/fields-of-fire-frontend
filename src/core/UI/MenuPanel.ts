@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { Button } from "./Button";
 import { Color } from "../../config/ColorConfig";
+import { BaseScene } from "../Objects";
 
 interface MenuPanelConfig {
     onResumeClick?: () => void;
@@ -13,7 +14,7 @@ export class MenuPanel extends Phaser.GameObjects.Container {
     private panel!: Phaser.GameObjects.Rectangle;
     private isVisible: boolean = false;
 
-    constructor(scene: Phaser.Scene, config: MenuPanelConfig) {
+    constructor(scene: BaseScene, config: MenuPanelConfig) {
         super(scene, 0, 0);
         scene.add.existing(this);
         this.setDepth(10000);

@@ -22,7 +22,7 @@ export class MainMenu extends BaseScene {
     }
 
     static start(scene: BaseScene) {
-        super.startScene(scene, SceneAssetId.LOBBY, { data: null });
+        super.startScene(scene, SceneAssetId.MENU, { data: null });
     }
 
     preload() {
