@@ -8,6 +8,7 @@ import { Grid } from "../Utils";
 import { TwoAxis } from "../Types";
 import { MusicAsset, MusicAssetId } from "../../assets";
 import { Sound } from "../Types/Sound";
+import { Loader } from "./Loader";
 
 export type BaseSceneInit<InitData = never> = {
     data: InitData;
@@ -71,6 +72,8 @@ export class BaseScene<InitData = any> extends Scene {
 
     preload() {
         BackgroundAsset.load(this.load, this.background);
+
+        new Loader(this);
     }
 
     create() {

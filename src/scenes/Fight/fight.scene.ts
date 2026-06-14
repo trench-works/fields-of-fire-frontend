@@ -232,13 +232,14 @@ export class FightScene extends BaseScene<FightSceneInit> {
         await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
-    init({
-        data: {
-            game,
-            player: { playerId },
-        },
-    }: BaseSceneInit<FightSceneInit>) {
-        super.init();
+    init(init: BaseSceneInit<FightSceneInit>) {
+        super.init(init);
+        const {
+            data: {
+                game,
+                player: { playerId },
+            },
+        } = init;
         this.gameStore.setGame(game);
         this.playerStore.setPlayerId(playerId);
 
