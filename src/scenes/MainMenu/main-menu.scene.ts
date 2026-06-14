@@ -22,8 +22,7 @@ export class MainMenu extends BaseScene {
     }
 
     static start(scene: BaseScene) {
-        scene.close();
-        scene.scene.start(SceneAssetId.MENU);
+        super.startScene(scene, SceneAssetId.LOBBY, { data: null });
     }
 
     preload() {
@@ -36,13 +35,15 @@ export class MainMenu extends BaseScene {
         super.create();
         this.playBackgroundMusic(MusicAssetId.MENU);
         // Créer un titre du menu
-        const titleBox = this.rootGrid.getArea({
-            x: 1,
-            y: 2,
-            width: 5,
-            height: 1,
-        });
-        new DisplayText(this, titleBox).setText("Les Mémoires Oubliées");
+        new DisplayText(
+            this,
+            this.rootGrid.getArea({
+                x: 1,
+                y: 2,
+                width: 5,
+                height: 1,
+            }),
+        ).setText("Les Mémoires Oubliées");
 
         // Créer une grille interne pour les boutons (3 boutons: 1 colonne, 3 lignes)
         const buttonsGrid = this.rootGrid.getSubGrid(

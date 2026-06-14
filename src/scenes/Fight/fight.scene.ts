@@ -1,4 +1,10 @@
-import { Position, MenuButton, BaseScene, EventQueue } from "../../core";
+import {
+    Position,
+    MenuButton,
+    BaseScene,
+    EventQueue,
+    BaseSceneInit,
+} from "../../core";
 import { SceneConfig } from "../../config/SceneConfig";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
 import {
@@ -176,9 +182,8 @@ export class FightScene extends BaseScene<FightSceneInit> {
         );
     }
 
-    static start(scene: BaseScene, data: FightSceneInit) {
-        scene.close();
-        scene.scene.start(SceneAssetId.FIGHT, data);
+    static start(scene: BaseScene, data: BaseSceneInit<FightSceneInit>) {
+        super.startScene(scene, SceneAssetId.FIGHT, data);
     }
 
     private async handleUpdate({
@@ -223,7 +228,12 @@ export class FightScene extends BaseScene<FightSceneInit> {
         await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
-    init({ game, player: { playerId } }: FightSceneInit) {
+    init({
+        data: {
+            game,
+            player: { playerId },
+        },
+    }: BaseSceneInit<FightSceneInit>) {
         super.init();
         this.gameStore.setGame(game);
         this.playerStore.setPlayerId(playerId);
@@ -246,8 +256,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
             menuSocket.onClose(() => MainMenu.start(this));
             menuSocket.onJoin(({ lobbyId, playerId }) => {
                 LobbyScene.start(this, {
-                    lobbyId,
-                    playerId,
+                    data: { lobbyId, playerId },
                 });
             });
             menuSocket.onSubscribed(() => {

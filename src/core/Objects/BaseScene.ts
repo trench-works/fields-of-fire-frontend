@@ -7,17 +7,27 @@ import {
 import { Grid } from "../Utils";
 import { TwoAxis } from "../Types";
 import { MusicAsset, MusicAssetId } from "../../assets";
+import { Sound } from "../Types/Sound";
+
+export type BaseSceneInit<InitData = never> = {
+    data: InitData;
+    config?: StartSceneConfig;
+};
+
+export type StartSceneConfig = {
+    keepMusic?: boolean;
+    backgroundMusic?: Sound;
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class BaseScene<InitData = any> extends Scene {
     public rootGrid: Grid;
 
-    protected backgroundSound?:
-        | Phaser.Sound.NoAudioSound
-        | Phaser.Sound.HTML5AudioSound
-        | Phaser.Sound.WebAudioSound;
+    protected backgroundSound?: Sound;
 
     protected isOpen: boolean;
+
+    protected startConfig: StartSceneConfig;
 
     constructor(
         key: SceneAssetId,
@@ -27,11 +37,33 @@ export class BaseScene<InitData = any> extends Scene {
         super({ key });
         this.isOpen = false;
         this.rootGrid = new Grid(rootGridOptions);
+        this.startConfig = {};
     }
 
-    // eslint-disable-next-line unused-imports/no-unused-vars, @typescript-eslint/no-unused-vars
-    init(data?: InitData) {
+    static startScene<InitData = never>(
+        scene: BaseScene,
+        id: SceneAssetId,
+        data: BaseSceneInit<InitData>,
+    ) {
+        if (data.config?.keepMusic ?? true) {
+            data.config ??= {};
+            data.config.backgroundMusic = scene.backgroundSound;
+        }
+        scene.close(data.config?.keepMusic);
+        console.log(data);
+        scene.scene.start(id, data);
+    }
+
+    init(init?: BaseSceneInit<InitData>) {
         this.isOpen = true;
+        this.startConfig = init?.config ?? {};
+        if (init?.config?.backgroundMusic) {
+            if (this.backgroundSound) {
+                this.backgroundSound.stop();
+                this.backgroundSound.destroy();
+            }
+            this.backgroundSound = init?.config?.backgroundMusic;
+        }
     }
 
     preload() {
@@ -55,7 +87,9 @@ export class BaseScene<InitData = any> extends Scene {
                 this.backgroundSound.setLoop(true);
                 this.backgroundSound.setVolume(0.4);
             }
-            this.backgroundSound.play();
+            if (!this.backgroundSound.isPlaying) {
+                this.backgroundSound.play();
+            }
             this.sound.unlock();
         }
     }
@@ -66,9 +100,11 @@ export class BaseScene<InitData = any> extends Scene {
         }
     }
 
-    close() {
+    close(keepMusic: boolean = true) {
         this.isOpen = false;
-        this.stopBackgroundMusic();
+        if (!keepMusic) {
+            this.stopBackgroundMusic();
+        }
     }
 }
 

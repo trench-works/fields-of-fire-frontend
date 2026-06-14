@@ -24,8 +24,9 @@ export class LobbyListScene extends BaseScene {
     protected lobbyStore: LobbyStore;
 
     static start(scene: BaseScene) {
-        scene.close();
-        scene.scene.start(SceneAssetId.LOBBY_LIST);
+        super.startScene(scene, SceneAssetId.LOBBY_LIST, {
+            data: null,
+        });
     }
 
     constructor() {
@@ -47,8 +48,7 @@ export class LobbyListScene extends BaseScene {
 
         this.menuSocket.onJoin(({ lobbyId, playerId }) => {
             LobbyScene.start(this, {
-                lobbyId,
-                playerId,
+                data: { lobbyId, playerId },
             });
         });
 
@@ -70,8 +70,10 @@ export class LobbyListScene extends BaseScene {
 
         this.menuSocket.onReconnect(({ game, player }) => {
             FightScene.start(this, {
-                game,
-                player,
+                data: {
+                    game,
+                    player,
+                },
             });
         });
     }

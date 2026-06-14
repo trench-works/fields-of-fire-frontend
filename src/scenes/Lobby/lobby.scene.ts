@@ -8,6 +8,7 @@ import {
     DisplayRoot,
     DisplayText,
     ScaleMode,
+    BaseSceneInit,
 } from "../../core";
 import { Color } from "../../config/ColorConfig";
 import { LobbySocket } from "./repositories/lobby.socket";
@@ -50,12 +51,11 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         });
     }
 
-    static start(scene: BaseScene, data: LobbySceneInit) {
-        scene.close();
-        scene.scene.start(SceneAssetId.LOBBY, data);
+    static start(scene: BaseScene, data: BaseSceneInit<LobbySceneInit>) {
+        super.startScene(scene, SceneAssetId.LOBBY, data);
     }
 
-    init({ lobbyId, playerId }: LobbySceneInit) {
+    init({ data: { lobbyId, playerId } }: BaseSceneInit<LobbySceneInit>) {
         super.init();
         this.lobbyId = lobbyId;
         this.playerId = playerId;
@@ -81,8 +81,10 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 (player) => player.userId === global.user?.id,
             )!;
             FightScene.start(this, {
-                game,
-                player,
+                data: {
+                    game,
+                    player,
+                },
             });
         });
 
