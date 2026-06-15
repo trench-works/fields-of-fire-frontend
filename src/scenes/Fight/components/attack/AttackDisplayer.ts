@@ -183,7 +183,6 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         hitCell.pixelPosition,
                     );
                 }
-                console.log(direction);
                 const tile = this.gameStore.game.plateau[x][y];
                 if (tile.entityId) {
                     return new DisplayAnimation(

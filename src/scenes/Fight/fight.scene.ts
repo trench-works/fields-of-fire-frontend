@@ -214,6 +214,11 @@ export class FightScene extends BaseScene<FightSceneInit> {
                     await this.attacks.animate(animation, game);
                     break;
                 case "death":
+                    if (
+                        animation.data.entityId === this.inspectStats.entityId
+                    ) {
+                        this.inspectStats.setIsShow(false);
+                    }
                     await this.character.kill(animation.data.entityId);
                     break;
             }
@@ -279,15 +284,15 @@ export class FightScene extends BaseScene<FightSceneInit> {
                 this,
                 SoundEffectAsset.getAssetKey(SoundEffectAssetId.VICTORY),
             ).play();
+            this.playBackgroundMusic(MusicAssetId.MENU, true);
             this.endFight.show(event.playerWin);
             // const menuSocket = new MenuSocket();
             // menuSocket.onClose(() =>
-            //     MainMenu.start(this, { keepMusic: false }),
+            //     MainMenu.start(this),
             // );
             // menuSocket.onJoin(({ lobbyId, playerId }) => {
             //     LobbyScene.start(this, {
             //         data: { lobbyId, playerId },
-            //         config: { keepMusic: false },
             //     });
             // });
             // menuSocket.onSubscribed(() => {

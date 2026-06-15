@@ -47,7 +47,6 @@ export class BaseScene<InitData = any> extends Scene {
         data: BaseSceneInit<InitData>,
     ) {
         if (data.config?.keepMusic ?? true) {
-            console.log("KEEP MUSIC");
             data.config ??= {};
             data.config.backgroundMusic = scene.backgroundSound;
             console.log(scene.backgroundSound);
@@ -57,7 +56,6 @@ export class BaseScene<InitData = any> extends Scene {
     }
 
     init(init: BaseSceneInit<InitData>) {
-        console.log("INIT", init);
         this.isOpen = true;
         this.startConfig = init?.config ?? {};
         if (init?.config?.backgroundMusic) {
@@ -66,7 +64,6 @@ export class BaseScene<InitData = any> extends Scene {
                 this.backgroundSound.destroy();
             }
             this.backgroundSound = init?.config?.backgroundMusic;
-            console.log("INIT", this.backgroundSound);
         }
     }
 
@@ -84,14 +81,16 @@ export class BaseScene<InitData = any> extends Scene {
         bg.setDisplaySize(this.scale.width, this.scale.height);
     }
 
-    playBackgroundMusic(id: MusicAssetId) {
-        console.log("PLAY", this.backgroundSound);
+    playBackgroundMusic(id: MusicAssetId, force: boolean = false) {
         if (this.isOpen) {
             if (
+                force ||
                 !this.backgroundSound ||
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 !(this.backgroundSound as any)?.["currentConfig"] //FIXME: ptn de magie noire pour détecter si l'objet musique est corrompu à la réception
             ) {
+                this.backgroundSound?.stop();
+                this.backgroundSound?.destroy();
                 this.backgroundSound = this.sound.add(
                     MusicAsset.getAssetKey(id),
                 );
