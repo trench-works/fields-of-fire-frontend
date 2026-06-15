@@ -142,7 +142,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
 
         this.endTurnButton
             .setOnClick(() => {
-                this.scene.playerSocket.finishTurn();
+                this.scene.finishTurn();
             })
             .setIsActivated(true);
 

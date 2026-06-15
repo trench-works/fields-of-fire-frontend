@@ -293,6 +293,12 @@ export class FightScene extends BaseScene<FightSceneInit> {
         });
     }
 
+    public finishTurn() {
+        this.playerSocket.finishTurn();
+        this.rangeVisualizer.clearRange();
+        this.rangeVisualizer.clearZonePreview();
+    }
+
     preload() {
         super.preload();
 
