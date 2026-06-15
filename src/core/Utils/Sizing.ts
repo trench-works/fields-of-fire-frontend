@@ -36,6 +36,13 @@ export class PositionUtils {
     static getMapOffset(_renderConfig: SceneRenderConfig): Position {
         return { x: 0, y: 0 };
     }
+
+    static divide({ x, y }: Position, divider: number): Position {
+        return {
+            x: x / divider,
+            y: y / divider,
+        };
+    }
 }
 
 export class AxisUtils {

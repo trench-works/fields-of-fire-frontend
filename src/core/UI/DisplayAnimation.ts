@@ -6,11 +6,6 @@ import { AnimationUtils } from "../Utils";
 export class DisplayAnimation {
     constructor(
         protected readonly scene: BaseScene,
-        protected readonly sizing: Position & {
-            scale?: number;
-            depth: number;
-            offset?: Position;
-        },
         protected readonly assetKey: string,
         protected readonly frameConfig: AnimationConfiguration,
         protected readonly keys?: number[],
@@ -36,24 +31,33 @@ export class DisplayAnimation {
         }
     }
 
-    async animate(): Promise<this> {
+    async animate(
+        { x, y }: Position,
+        position?: {
+            scale?: number;
+            depth: number;
+            origin?: Position;
+            direction?: number;
+        },
+    ): Promise<this> {
         return new Promise<this>((resolve) => {
             const { frameTime } = this.frameConfig;
 
-            const sprite = this.scene.physics.add.sprite(
-                this.sizing.x,
-                this.sizing.y,
-                this.assetKey,
-            );
+            const sprite = this.scene.physics.add.sprite(x, y, this.assetKey);
 
             this.scene.anims.get(this.assetKey);
 
-            sprite.setDepth(this.sizing.depth);
-            if (this.sizing.scale) {
-                sprite.setScale(this.sizing.scale);
+            if (position?.direction !== undefined) {
+                sprite.setAngle(position?.direction);
             }
-            if (this.sizing.offset) {
-                sprite.setOrigin(this.sizing.offset.x, this.sizing.offset.y);
+            if (position?.depth !== undefined) {
+                sprite.setDepth(position?.depth);
+            }
+            if (position?.scale !== undefined) {
+                sprite.setScale(position?.scale);
+            }
+            if (position?.origin) {
+                sprite.setOrigin(position.origin.x, position.origin.y);
             }
             sprite.play(this.assetKey);
 
