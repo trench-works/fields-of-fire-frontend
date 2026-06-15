@@ -265,6 +265,10 @@ export class FightScene extends BaseScene<FightSceneInit> {
             MainMenu.start(this, { keepMusic: false }),
         );
         this.playerSocket.onUpdate((event) => this.gameUpdateQueue.add(event));
+        this.playerSocket.onActionCancel((event) => {
+            //TODO: afficher quelque part event.reason (peut être faire un mapping avec des messages plus clairs)
+            this.actions.unlock();
+        });
         this.playerSocket.onGameEnd(async (event) => {
             await this.gameUpdateQueue.waitForCompletion();
             //TODO: DISPLAY POPUP WIasync TH INFO event.playerWin (true|false)

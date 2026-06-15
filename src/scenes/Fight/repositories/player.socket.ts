@@ -14,6 +14,7 @@ enum GamePlayerActions {
 enum GamePlayerEvents {
     UPDATE = "update",
     GAME_END = "game-end",
+    CANCEL_ACTION = "cancel-action",
 }
 
 type GamePlayerKey = {
@@ -24,6 +25,10 @@ type GamePlayerKey = {
 type ActionPlayer = {
     actionId: string;
     target: Position;
+};
+
+export type PlayerCancelAction = {
+    reason: "energy" | "mouvement" | "occupied" | "target-visible";
 };
 
 export type GameMoveAnimation = GameAnimation<
@@ -76,6 +81,10 @@ export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
 
     onGameEnd(listener: SocketListener<GameEndEvent>): void {
         this.on(GamePlayerEvents.GAME_END, listener);
+    }
+
+    onActionCancel(listener: SocketListener<PlayerCancelAction>): void {
+        this.on(GamePlayerEvents.CANCEL_ACTION, listener);
     }
 }
 
