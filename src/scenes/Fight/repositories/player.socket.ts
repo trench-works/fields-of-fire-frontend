@@ -35,6 +35,7 @@ export type GameMoveAnimation = GameAnimation<
     "move",
     {
         entityId: string;
+        path: Position[];
     }
 >;
 export type GameAttackAnimation = GameAnimation<
