@@ -83,8 +83,16 @@ export abstract class SoundAssetManager<
     AssetId extends string,
     AssetType,
 > extends AssetManager<AssetId, AssetType> {
-    constructor(assetKey: string, assets: Partial<Record<AssetId, AssetType>>) {
+    constructor(
+        assetKey: string,
+        assets: Partial<Record<AssetId, AssetType>>,
+        protected readonly level: Partial<Record<AssetId, number>>,
+    ) {
         super(assetKey, assets);
+    }
+
+    getBaseSoundLevel(assetId: AssetId): number {
+        return this.level[assetId] ?? 1;
     }
 
     loader(

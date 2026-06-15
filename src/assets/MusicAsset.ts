@@ -15,10 +15,17 @@ class MusicAssetManager extends SoundAssetManager<MusicAssetId, string> {
     }
 
     constructor() {
-        super("musics", {
-            [MusicAssetId.MENU]: "lobby",
-            [MusicAssetId.FIGHT]: "fight",
-        });
+        super(
+            "musics",
+            {
+                [MusicAssetId.MENU]: "lobby",
+                [MusicAssetId.FIGHT]: "fight",
+            },
+            {
+                [MusicAssetId.MENU]: 0.8,
+                [MusicAssetId.FIGHT]: 0.1,
+            },
+        );
     }
 }
 

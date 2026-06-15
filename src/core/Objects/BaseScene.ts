@@ -95,7 +95,9 @@ export class BaseScene<InitData = any> extends Scene {
                     MusicAsset.getAssetKey(id),
                 );
                 this.backgroundSound.setLoop(true);
-                this.backgroundSound.setVolume(0.4);
+                this.backgroundSound.setVolume(
+                    0.4 * MusicAsset.getBaseSoundLevel(id),
+                );
             }
             if (!this.backgroundSound.isPlaying) {
                 this.backgroundSound.play();

@@ -4,6 +4,7 @@ import { GameStore } from "../../stores/GameStore";
 import { CharacterAssetId, CharacterSpriteAsset } from "../../../../assets";
 import { GameMoveAnimation } from "../../repositories/player.socket";
 import { Game } from "../../../../Model/Game";
+import { Position } from "../../../../core";
 
 export class Character extends FightSceneDisplayer {
     constructor(
@@ -101,7 +102,21 @@ export class Character extends FightSceneDisplayer {
         return this;
     }
 
+    setPosition({ x, y }: Position): this {
+        if (!this.sprite) return this;
+
+        const cell = this.scene.gridPositions[x][y];
+
+        this.sprite.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
+        this.sprite.setDepth(Math.max(x, y) * 10);
+        return this;
+    }
+
     async animate(animation: GameMoveAnimation, newGame: Game): Promise<this> {
+        for (const mouvement of animation.data.path) {
+            this.setPosition(mouvement);
+            await new Promise<void>((resolve) => setTimeout(resolve, 100));
+        }
         return this;
     }
 }

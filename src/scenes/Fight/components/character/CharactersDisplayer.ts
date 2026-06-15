@@ -55,6 +55,9 @@ export class CharactersDisplayer extends FightSceneDisplayer {
     }
 
     async animate(animation: GameMoveAnimation, newGame: Game): Promise<this> {
+        await this.characters
+            .find((character) => character.entityId === animation.data.entityId)
+            ?.animate(animation, newGame);
         return this;
     }
 }
