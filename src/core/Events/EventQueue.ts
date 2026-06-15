@@ -1,6 +1,8 @@
 export class EventQueue<T> {
-    private readonly events: T[];
-    private isAwaiting: boolean;
+    protected readonly events: T[];
+    protected isAwaiting: boolean;
+
+    protected completionListener: (() => void)[] = [];
 
     constructor(private readonly treate: (event: T) => Promise<void>) {
         this.events = [];
@@ -11,6 +13,15 @@ export class EventQueue<T> {
         this.events.push(event);
         this.treateEvents();
         return this;
+    }
+
+    async waitForCompletion(): Promise<void> {
+        if (!this.events.length) {
+            return;
+        }
+        return new Promise<void>((resolve) => {
+            this.completionListener.push(resolve);
+        });
     }
 
     private async treateEvents() {
@@ -28,6 +39,9 @@ export class EventQueue<T> {
 
         if (this.events.length) {
             this.treateEvents();
+        } else {
+            this.completionListener.forEach((listener) => listener());
+            this.completionListener = [];
         }
     }
 }

@@ -1,11 +1,14 @@
-import { CharacterAssetId, CharacterCloseupAsset, CharacterSpriteAsset } from "../../../../assets";
+import {
+    CharacterAssetId,
+    CharacterCloseupAsset,
+    CharacterSpriteAsset,
+} from "../../../../assets";
 import {
     Button,
     DisplayContainer,
     DisplayRoot,
     DisplayText,
     Grid,
-    GridArea,
     List,
 } from "../../../../core";
 import { DisplayImage } from "../../../../core/UI/DisplayImage";
@@ -86,10 +89,19 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.titleText = new DisplayText(this.scene, titleEndgameArea);
         this.root.add(this.titleText);
 
+        console.log("taille liste : ", endGameArea);
+
+        // --- Depths ---
+        this.titleText.setDepth(52);
+
+        this.root.setVisible(true);
+
+        return this;
+    }
+
+    render(): this {
         const entities = this.gameStore.game.entities;
         const rowCount = entities.length;
-
-        console.log("taille liste : ", endGameArea);
 
         const entityListGrid = this.scene.rootGrid.getSubGrid(
             {
@@ -107,30 +119,14 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             },
         );
         this.entityList = new List(this.scene, entityListGrid);
-
         entities.forEach((entity, index) => {
             const cardGrid = entityListGrid.getSubGrid(
                 { x: index + 1, y: 1, width: 1, height: 1 },
                 { division: { horizontal: 4, vertical: 3 } },
             );
-            this.entityCard(
-                entity.classId,
-                entity.classId,
-                cardGrid,
-                rowCount
-            );
+            this.entityCard(entity.classId, entity.classId, cardGrid, rowCount);
         });
-
-        // --- Depths ---
-        this.titleText.setDepth(52);
         this.entityList.setDepth(53);
-
-        this.root.setVisible(true);
-
-        return this;
-    }
-
-    render(): this {
         return this;
     }
 
@@ -148,8 +144,13 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    entityCard(entityName: string, imageKey: string, entityListGrid: Grid, width: number): void {
-        console.log("entityCard imKey : ",imageKey)
+    entityCard(
+        entityName: string,
+        imageKey: string,
+        entityListGrid: Grid,
+        width: number,
+    ): void {
+        console.log("entityCard imKey : ", imageKey);
         // Conteneur de la card
         this.root.add(
             new DisplayContainer(
@@ -157,21 +158,34 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 entityListGrid.getArea({
                     x: 1,
                     y: 1,
-                    width: width ,
+                    width: width,
                     height: 4,
                     margin: { top: 50, bottom: 0, right: 0, left: 0 },
                 }),
-                { borderWidth: 3, opacity: 1},
+                { borderWidth: 3, opacity: 1 },
             ).setDepth(55),
         );
-        console.log("clé closeup :", CharacterCloseupAsset.getAssetKey(imageKey as CharacterAssetId));
-        console.log("clé sprite :", CharacterSpriteAsset.getAssetKey(imageKey as CharacterAssetId));
+        console.log(
+            "clé closeup :",
+            CharacterCloseupAsset.getAssetKey(imageKey as CharacterAssetId),
+        );
+        console.log(
+            "clé sprite :",
+            CharacterSpriteAsset.getAssetKey(imageKey as CharacterAssetId),
+        );
         console.log("textures dispo :", this.scene.textures.getTextureKeys());
 
         // Image (lignes 1-2)
-        const imageArea = entityListGrid.getArea({ x: 2, y: 1, width: 1, height: 3});
-        const imageAssetKey = CharacterCloseupAsset.getAssetKey(imageKey as CharacterAssetId);
-        console.log("Exemple assetKey : ", imageAssetKey)
+        const imageArea = entityListGrid.getArea({
+            x: 2,
+            y: 1,
+            width: 1,
+            height: 3,
+        });
+        const imageAssetKey = CharacterCloseupAsset.getAssetKey(
+            imageKey as CharacterAssetId,
+        );
+        console.log("Exemple assetKey : ", imageAssetKey);
         console.log(" ASSETKEY : ", imageAssetKey);
         this.root.add(
             new DisplayImage(this.scene, imageArea)
@@ -180,10 +194,15 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         );
 
         // Nom (ligne 3)
-        const nameArea = entityListGrid.getArea({ x: 1, y: 3, width: 1, height: 1 });
+        const nameArea = entityListGrid.getArea({
+            x: 1,
+            y: 3,
+            width: 1,
+            height: 1,
+        });
         this.root.add(
             new DisplayText(this.scene, nameArea)
-                .setText(entityName, {fontSize : 10})
+                .setText(entityName, { fontSize: 10 })
                 .setDepth(56),
         );
     }

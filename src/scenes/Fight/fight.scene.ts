@@ -42,8 +42,6 @@ import { StatsDisplayer } from "./components/StatsDisplayer";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { ParticleAsset } from "../../assets/ParticleAsset";
 import { AttackDisplayer } from "./components/attack/AttackDisplayer";
-import { MenuSocket } from "../LobbyList/repositories/menu.socket";
-import { LobbyScene } from "../Lobby/lobby.scene";
 import { EffectAsset } from "../../assets/EffectAsset";
 import { PositionUtils } from "../../core/Utils/Sizing";
 import { EndFightDisplayer } from "./components/EndFightDisplayer/EndFightDisplayer";
@@ -264,8 +262,9 @@ export class FightScene extends BaseScene<FightSceneInit> {
             MainMenu.start(this, { keepMusic: false }),
         );
         this.playerSocket.onUpdate((event) => this.gameUpdateQueue.add(event));
-        this.playerSocket.onGameEnd((event) => {
-            //TODO: DISPLAY POPUP WITH INFO event.playerWin (true|false)
+        this.playerSocket.onGameEnd(async (event) => {
+            await this.gameUpdateQueue.waitForCompletion();
+            //TODO: DISPLAY POPUP WIasync TH INFO event.playerWin (true|false)
             this.endFight.show(event.playerWin);
             // const menuSocket = new MenuSocket();
             // menuSocket.onClose(() =>
@@ -325,6 +324,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
             .render()
             .update();
         this.inspectStats.render().setIsShow(false);
+        this.endFight.render();
 
         // Créer le bouton Menu
         new MenuButton(this, {
