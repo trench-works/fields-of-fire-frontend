@@ -23,15 +23,27 @@ class SoundEffectAssetManager extends SoundAssetManager<
     }
 
     constructor() {
-        super("sound_effect", {
-            [SoundEffectAssetId.DEATH]: "death",
-            [SoundEffectAssetId.HURT]: "hurt",
-            [SoundEffectAssetId.AMPUTATE]: "amputate",
-            [SoundEffectAssetId.VICTORY]: "victory",
-            [SoundEffectAssetId.CANNON]: "cannon",
-            [SoundEffectAssetId.SHOT]: "shot",
-            [SoundEffectAssetId.INTIMIDATION]: "intimidation",
-        });
+        super(
+            "sound_effect",
+            {
+                [SoundEffectAssetId.DEATH]: "death",
+                [SoundEffectAssetId.HURT]: "hurt",
+                [SoundEffectAssetId.AMPUTATE]: "amputate",
+                [SoundEffectAssetId.VICTORY]: "victory",
+                [SoundEffectAssetId.CANNON]: "cannon",
+                [SoundEffectAssetId.SHOT]: "shot",
+                [SoundEffectAssetId.INTIMIDATION]: "intimidation",
+            },
+            {
+                [SoundEffectAssetId.DEATH]: 1,
+                [SoundEffectAssetId.HURT]: 3,
+                [SoundEffectAssetId.AMPUTATE]: 1,
+                [SoundEffectAssetId.VICTORY]: 1,
+                [SoundEffectAssetId.CANNON]: 1,
+                [SoundEffectAssetId.SHOT]: 1,
+                [SoundEffectAssetId.INTIMIDATION]: 1,
+            },
+        );
     }
 }
 

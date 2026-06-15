@@ -88,6 +88,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                     game,
                     player,
                 },
+                config: { keepMusic: false },
             });
         });
 

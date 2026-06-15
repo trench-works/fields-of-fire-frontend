@@ -197,7 +197,9 @@ export class AttackDisplayer extends FightSceneDisplayer {
                     ).animate(
                         {
                             x: hitCell.pixelPosition.x,
-                            y: hitCell.pixelPosition.y - 50,
+                            y:
+                                hitCell.pixelPosition.y -
+                                40 * this.scene.scaleFactor,
                         },
                         {
                             depth: Math.max(x * 10, y * 10) + 1,
