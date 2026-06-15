@@ -66,8 +66,8 @@ export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
         return this.send(GamePlayerActions.FINISH_TURN);
     }
 
-    action(actionPlayer: ActionPlayer) {
-        return this.send(GamePlayerActions.ACTION, actionPlayer);
+    async action(actionPlayer: ActionPlayer) {
+        return await this.send(GamePlayerActions.ACTION, actionPlayer);
     }
 
     onUpdate(listener: SocketListener<GameUpdateEvent>): void {

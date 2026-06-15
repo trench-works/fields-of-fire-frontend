@@ -89,7 +89,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
     /**
      * Displayers
      */
-    private actions: ActionDisplayer;
+    public actions: ActionDisplayer;
     private board: BoardDisplayer;
     private character: CharactersDisplayer;
     private turns: TurnDisplayer;
@@ -238,6 +238,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
         }
 
         await new Promise((resolve) => setTimeout(resolve, 1000));
+        this.actions.unlock();
     }
 
     init(init: BaseSceneInit<FightSceneInit>) {

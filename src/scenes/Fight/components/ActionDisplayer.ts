@@ -15,12 +15,15 @@ export class ActionDisplayer extends FightSceneDisplayer {
     protected endTurnButton!: Button;
     protected actionsList!: List;
 
+    protected lockLevel: number;
+
     constructor(
         scene: FightScene,
         gameStore: GameStore,
         private readonly playerStore: PlayerStore,
     ) {
         super(scene, gameStore);
+        this.lockLevel = 0;
     }
 
     protected handleActionClick(action: Action) {
@@ -170,6 +173,25 @@ export class ActionDisplayer extends FightSceneDisplayer {
 
     async animate(): Promise<this> {
         return this;
+    }
+
+    lock() {
+        if (this.lockLevel === 0) {
+            this.actionElements.forEach((action) => {
+                action.setIsActivated(false);
+            });
+            this.endTurnButton.setIsActivated(false);
+        }
+        this.lockLevel++;
+    }
+
+    unlock() {
+        if (this.lockLevel > 0) {
+            this.lockLevel--;
+            if (this.lockLevel === 0) {
+                this.update();
+            }
+        }
     }
 }
 
