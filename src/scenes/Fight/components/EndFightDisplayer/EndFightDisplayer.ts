@@ -1,4 +1,4 @@
-import { CharacterAssetId, CharacterSpriteAsset } from "../../../../assets";
+import { CharacterAssetId, CharacterCloseupAsset, CharacterSpriteAsset } from "../../../../assets";
 import {
     Button,
     DisplayContainer,
@@ -113,9 +113,8 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 { x: index + 1, y: 1, width: 1, height: 1 },
                 { division: { horizontal: 4, vertical: 3 } },
             );
-
             this.entityCard(
-                entity.entityId,
+                entity.classId,
                 entity.classId,
                 cardGrid,
                 rowCount
@@ -140,6 +139,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     }
 
     show(playerWin: boolean) {
+        //console.log("show called", this.root);
         this.titleText.setText(playerWin ? "Victoire !" : "Défaite ");
         this.root.setVisible(true);
     }
@@ -149,7 +149,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     }
 
     entityCard(entityName: string, imageKey: string, entityListGrid: Grid, width: number): void {
-
+        console.log("entityCard imKey : ",imageKey)
         // Conteneur de la card
         this.root.add(
             new DisplayContainer(
@@ -164,10 +164,15 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 { borderWidth: 3, opacity: 1},
             ).setDepth(55),
         );
+        console.log("clé closeup :", CharacterCloseupAsset.getAssetKey(imageKey as CharacterAssetId));
+        console.log("clé sprite :", CharacterSpriteAsset.getAssetKey(imageKey as CharacterAssetId));
+        console.log("textures dispo :", this.scene.textures.getTextureKeys());
 
         // Image (lignes 1-2)
         const imageArea = entityListGrid.getArea({ x: 2, y: 1, width: 1, height: 3});
-        const imageAssetKey = CharacterSpriteAsset.getAssetKey(imageKey as CharacterAssetId);
+        const imageAssetKey = CharacterCloseupAsset.getAssetKey(imageKey as CharacterAssetId);
+        console.log("Exemple assetKey : ", imageAssetKey)
+        console.log(" ASSETKEY : ", imageAssetKey);
         this.root.add(
             new DisplayImage(this.scene, imageArea)
                 .setImage(imageAssetKey, 1)
@@ -178,7 +183,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         const nameArea = entityListGrid.getArea({ x: 1, y: 3, width: 1, height: 1 });
         this.root.add(
             new DisplayText(this.scene, nameArea)
-                .setText(entityName)
+                .setText(entityName, {fontSize : 10})
                 .setDepth(56),
         );
     }
