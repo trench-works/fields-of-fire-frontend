@@ -94,7 +94,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         // --- Depths ---
         this.titleText.setDepth(52);
 
-        this.root.setVisible(true);
+        this.root.setVisible(false);
 
         return this;
     }
@@ -127,6 +127,8 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             this.entityCard(entity.classId, entity.classId, cardGrid, rowCount);
         });
         this.entityList.setDepth(53);
+
+        this.root.setVisible(false);
         return this;
     }
 
@@ -207,3 +209,4 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         );
     }
 }
+

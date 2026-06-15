@@ -4,6 +4,7 @@ import {
     BaseScene,
     EventQueue,
     BaseSceneInit,
+    SoundEffect,
 } from "../../core";
 import { SceneConfig } from "../../config/SceneConfig";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
@@ -30,6 +31,7 @@ import {
     SoundEffectAsset,
     MiscAnimationId,
     MiscAnimationAsset,
+    SoundEffectAssetId,
 } from "../../assets";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { ClassStore } from "./stores/ClassStore";
@@ -265,6 +267,10 @@ export class FightScene extends BaseScene<FightSceneInit> {
         this.playerSocket.onGameEnd(async (event) => {
             await this.gameUpdateQueue.waitForCompletion();
             //TODO: DISPLAY POPUP WIasync TH INFO event.playerWin (true|false)
+            new SoundEffect(
+                this,
+                SoundEffectAsset.getAssetKey(SoundEffectAssetId.VICTORY),
+            ).play();
             this.endFight.show(event.playerWin);
             // const menuSocket = new MenuSocket();
             // menuSocket.onClose(() =>
