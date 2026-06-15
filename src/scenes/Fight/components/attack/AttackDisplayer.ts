@@ -24,14 +24,16 @@ export class AttackDisplayer extends FightSceneDisplayer {
     }
 
     async animate(
-        {
+        animation: GameAttackAnimation,
+        newGame: Game,
+    ): Promise<this> {
+        const {
             data: {
                 actionId,
                 target: { x, y },
+                hits,
             },
-        }: GameAttackAnimation,
-        newGame: Game,
-    ): Promise<this> {
+        } = animation;
         const cell = this.scene.gridPositions[x][y];
         const tile = this.gameStore.game.plateau[x][y];
         switch (actionId) {
@@ -46,6 +48,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.HURT),
                     ).play();
                     this.scene.cameras.main.shake(200, 0.001);
+                    this.scene.toaster.attackToast(animation);
                     if (tile.entityId) {
                         await this.playBloodSplatter({ x, y });
                     }
@@ -59,6 +62,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                             SoundEffectAssetId.AMPUTATE,
                         ),
                     ).play();
+                    this.scene.toaster.attackToast(animation);
                     if (tile.entityId) {
                         await this.playBloodSplatter({ x, y });
                     }
@@ -76,6 +80,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         x,
                         y,
                     });
+                    this.scene.toaster.attackToast(animation);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.DEBUFF,
                         cell.pixelPosition.x,
@@ -85,6 +90,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.HEAL:
                 {
+                    this.scene.toaster.attackToast(animation);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.HEAL,
                         cell.pixelPosition.x,
@@ -112,10 +118,10 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.CANNON),
                     ).play();
                     this.scene.cameras.main.shake(200, 0.005);
-                    if (tile.entityId) {
-                        //TODO: handle multiple victims
-                        await this.playBloodSplatter({ x, y }); //TODO: make particle blood splatter
-                    }
+                    this.scene.toaster.attackToast(animation);
+                    await Promise.all(
+                        hits.map((hit) => this.playBloodSplatter(hit)), //TODO: make particle blood splatter
+                    );
                     await this.particleDisplayer.animate(
                         ParticleAssetId.SMOKE,
                         cell.pixelPosition.x,
@@ -125,6 +131,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.DOPAGE:
                 {
+                    this.scene.toaster.attackToast(animation);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.BOOST,
                         cell.pixelPosition.x,

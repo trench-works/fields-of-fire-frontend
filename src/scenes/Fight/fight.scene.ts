@@ -47,6 +47,7 @@ import { AttackDisplayer } from "./components/attack/AttackDisplayer";
 import { EffectAsset } from "../../assets/EffectAsset";
 import { PositionUtils } from "../../core/Utils/Sizing";
 import { EndFightDisplayer } from "./components/EndFightDisplayer/EndFightDisplayer";
+import { Toaster } from "./components/Toaster";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -97,6 +98,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
     private inspectStats: StatsDisplayer;
     private attacks: AttackDisplayer;
     private endFight: EndFightDisplayer;
+    public toaster: Toaster;
 
     /**
      * Sockets
@@ -163,6 +165,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
             this.gameStore,
             this.playerStore,
         );
+        this.toaster = new Toaster(this);
 
         /**
          * Utils

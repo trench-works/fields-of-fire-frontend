@@ -42,7 +42,9 @@ export type GameAttackAnimation = GameAnimation<
     {
         entityId: string;
         actionId: string;
-        target: { x: number; y: number };
+        origin: Position;
+        target: Position;
+        hits: Position[];
     }
 >;
 export type GameDeathAnimation = GameAnimation<
