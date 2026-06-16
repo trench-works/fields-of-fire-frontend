@@ -119,7 +119,8 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 {
                     onClick: () => {
                         console.log("nextRound");
-                        this.swapToBoostCards();
+                        this.temporaryRoot.destroy;
+                        // implémenter this.displayBoostCard
                     },
                     text: "Next Fight",
                 },
@@ -337,6 +338,11 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 .setDepth(106),
         );
 
+        const nonZeroStats = Object.entries(boost.modifier)
+            .filter(([_, value]) => value !== 0)
+            .map(([key, value]) => `${key}: ${value > 0 ? "+" : ""}${value}`)
+            .join("\n");
+
         this.temporaryRoot.add(
             new DisplayText(
                 this.scene,
@@ -347,11 +353,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     height: 1,
                 }),
             )
-                .setText(boost.description ?? "")
+                .setText(nonZeroStats)
                 .setDepth(106),
         );
     }
-
-    swapToBoostCards() {}
 }
 
