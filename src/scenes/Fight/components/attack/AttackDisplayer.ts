@@ -53,6 +53,17 @@ export class AttackDisplayer extends FightSceneDisplayer {
                     await this.playBloodSplatter(hits, origin, target);
                 }
                 break;
+            case ActionAssetId.BAYONET:
+                {
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(SoundEffectAssetId.HURT),
+                    ).play();
+                    this.scene.cameras.main.shake(200, 0.001);
+                    this.scene.toaster.attackToast(animation);
+                    await this.playBloodSplatter(hits, origin, target);
+                }
+                break;
             case ActionAssetId.AMPUTATE:
                 {
                     new SoundEffect(

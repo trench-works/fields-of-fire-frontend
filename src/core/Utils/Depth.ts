@@ -1,0 +1,50 @@
+import { Position } from "../Types";
+
+//GRID DEPTH ARE BOUND BETWEEN 100 and 510
+const GRID_BASE_OFFSET = 100;
+export enum GRID_LEVELS_OFFSET {
+    HIGHTLIGHT_1 = 1,
+    HIGHTLIGHT_2 = 2,
+    HIGHTLIGHT_3 = 3,
+    ANIMATION_1 = 4,
+    OBJECT = 5,
+    ANIMATION_2 = 6,
+    ANIMATION_3 = 7,
+    ANIMATION_4 = 8,
+    TOASTER = 9,
+}
+
+const UI_BASE_OFFSET = GRID_BASE_OFFSET + 900;
+export enum UI_LEVELS_OFFSET {
+    CONTAINER = 100,
+    TITLE = 150,
+    BUTTON = 200,
+    POPUP = 500,
+    LOADER = 1000,
+}
+
+export class DepthUtils {
+    /**
+     *
+     * @param position position on grid
+     * @param offset a grid object offset level
+     * @returns a value between 100 and 410 depending on the x position
+     */
+    static getFromGridPosition(
+        { x, y }: Position,
+        level?: GRID_LEVELS_OFFSET,
+    ): number {
+        return GRID_BASE_OFFSET + (x + y) * 10 + (level ?? 0);
+    }
+
+    /**
+     *
+     * @param position position on grid
+     * @param offset a grid object offset level
+     * @returns a value between 100 and 410 depending on the x position
+     */
+    static getUIElementDepth(level?: UI_LEVELS_OFFSET): number {
+        return UI_BASE_OFFSET + (level ?? 0);
+    }
+}
+

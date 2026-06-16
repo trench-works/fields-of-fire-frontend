@@ -155,17 +155,26 @@ export class ActionDisplayer extends FightSceneDisplayer {
             this.playerStore.playerEntity.entityId;
 
         this.playerStore.playerClass.actionList.forEach((action) => {
-            const hasEnergy =
-                this.playerStore.playerEntity.stats.energy >= action.cost;
-            const hasMovement =
-                this.playerStore.playerEntity.stats.mouvement >= action.cost;
             const actionObject = this.actionElements.get(action.id)!;
             switch (action.id) {
                 case ActionAssetId.WALK:
-                    actionObject.setIsActivated(isPlayerTurn && hasMovement);
+                    {
+                        const hasMovement =
+                            this.playerStore.playerEntity.stats.mouvement > 0;
+                        actionObject.setIsActivated(
+                            isPlayerTurn && hasMovement,
+                        );
+                    }
                     break;
                 default:
-                    actionObject.setIsActivated(isPlayerTurn && hasEnergy);
+                    {
+                        const hasEnoughEnergy =
+                            this.playerStore.playerEntity.stats.energy >=
+                            action.cost;
+                        actionObject.setIsActivated(
+                            isPlayerTurn && hasEnoughEnergy,
+                        );
+                    }
                     break;
             }
         });

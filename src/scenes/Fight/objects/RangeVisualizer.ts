@@ -163,7 +163,13 @@ export class RangeVisualizer {
                             zoneSize
                         ) {
                             const cell = this.scene.gridPositions[x]?.[y];
-                            if (cell) {
+                            const boardCell =
+                                this.gameStore.game.plateau[x]?.[y];
+                            if (
+                                cell &&
+                                !boardCell.isHole &&
+                                !boardCell.isWall
+                            ) {
                                 this.zoneHighlights.push(
                                     this.highlightCell(cell, 0x42a97b),
                                 );

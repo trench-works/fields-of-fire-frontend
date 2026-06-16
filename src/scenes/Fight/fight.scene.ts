@@ -278,14 +278,14 @@ export class FightScene extends BaseScene<FightSceneInit> {
             this.actions.unlock();
         });
         this.playerSocket.onGameEnd(async (event) => {
-            await this.gameUpdateQueue.waitForCompletion();
-            //TODO: DISPLAY POPUP WIasync TH INFO event.playerWin (true|false)
             if (event.playerWin) {
                 new SoundEffect(
                     this,
                     SoundEffectAsset.getAssetKey(SoundEffectAssetId.VICTORY),
                 ).play();
             }
+            await this.gameUpdateQueue.waitForCompletion();
+            //TODO: DISPLAY POPUP WIasync TH INFO event.playerWin (true|false)
             //this.playBackgroundMusic(MusicAssetId.MENU, true);
             this.endFight.show(event.playerWin);
             // const menuSocket = new MenuSocket();
