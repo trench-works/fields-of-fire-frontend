@@ -4,6 +4,7 @@ import { FourAxis, PlacementOrigin, Position, Size } from "../Types";
 import { Displayable } from "./DisplayRoot";
 import { DisplayText } from "./DisplayText";
 import { BaseScene } from "../Objects";
+import { ColorUtils } from "../Utils";
 
 const CLICKABLE_ALPHA = 1;
 const UNCLICKABLE_ALPHA = 0.5;
@@ -28,6 +29,8 @@ export class Button
     protected textDisplay?: DisplayText;
     protected imageDisplay?: Phaser.GameObjects.Image;
     protected background?: Phaser.GameObjects.Rectangle;
+
+    private highlighter?: Phaser.GameObjects.Graphics;
 
     protected onClick: () => void;
 
@@ -99,6 +102,24 @@ export class Button
 
         // Ajoute le bouton à la scène
         scene.add.existing(this);
+    }
+
+    hightlight(highlight: boolean): this {
+        if (highlight) {
+            if (!this.highlighter) {
+                this.highlighter = this.scene.make.graphics({}, false);
+                this.add(this.highlighter);
+            }
+            const width = this.width;
+            const height = this.height;
+            this.highlighter.clear();
+            this.highlighter.lineStyle(2, ColorUtils.parseColor("#27DAF5"), 1);
+            this.highlighter.strokeRect(-width / 2, -height / 2, width, height);
+        } else {
+            this.highlighter?.destroy();
+            this.highlighter = undefined;
+        }
+        return this;
     }
 
     place(position: Position, size: Size, origin: PlacementOrigin): void {

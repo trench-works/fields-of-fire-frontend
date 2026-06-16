@@ -1,7 +1,4 @@
-import {
-    CharacterAssetId,
-    CharacterCloseupAsset,
-} from "../../../../assets";
+import { CharacterCloseupAsset } from "../../../../assets";
 import {
     Button,
     DisplayContainer,
@@ -72,7 +69,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
 
         const titleEndgameGrid = endGameArea.getGrid();
 
-        const titleEndgameArea = titleEndgameGrid.getArea({ 
+        const titleEndgameArea = titleEndgameGrid.getArea({
             x: 3,
             y: 0,
             width: 5,
@@ -99,61 +96,61 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             {
                 division: {
                     horizontal: 9,
-                    vertical:1,
+                    vertical: 1,
                 },
                 padding: 5,
             },
         );
-        
+
         this.root.add(
             new Button(
                 this.scene,
                 buttonsGrid.getArea({
-                x: 3,
-                y: 1,
-                width: 2,
-                height: 1,
-            }),
-            {
-                onClick: () => {
-                    console.log("nextRound");
+                    x: 3,
+                    y: 1,
+                    width: 2,
+                    height: 1,
+                }),
+                {
+                    onClick: () => {
+                        console.log("nextRound");
+                    },
+                    text: "Next Fight",
                 },
-                text : "Next Fight",
-            }
-            ).setDepth(104)
+            ).setDepth(104),
         );
         this.root.add(
             new Button(
                 this.scene,
                 buttonsGrid.getArea({
-                x: 6,
-                y: 1,
-                width: 2,
-                height: 1,
-            }),
-            {
-                onClick: () => {
-                    console.log("Leave");
-                    // if (config.onMainMenuClick) {
-                    //     config.onMainMenuClick();
-                    // }
+                    x: 6,
+                    y: 1,
+                    width: 2,
+                    height: 1,
+                }),
+                {
+                    onClick: () => {
+                        console.log("Leave");
+                        // if (config.onMainMenuClick) {
+                        //     config.onMainMenuClick();
+                        // }
+                    },
+                    text: "Abandonner",
                 },
-                text : "Abandonner",
-            }
-            ).setDepth(104)
+            ).setDepth(104),
         );
         this.root.add(
-        new DisplayContainer(
-            this.scene,
-            buttonsGrid.getArea({
-                x: 1,
-                y: 1,
-                width: 9,
-                height: 1,
-            }),
-            { borderWidth: 2, opacity: 0.3 },
-        ).setDepth(104),
-    )
+            new DisplayContainer(
+                this.scene,
+                buttonsGrid.getArea({
+                    x: 1,
+                    y: 1,
+                    width: 9,
+                    height: 1,
+                }),
+                { borderWidth: 2, opacity: 0.3 },
+            ).setDepth(104),
+        );
 
         console.log("taille liste : ", endGameArea);
 
@@ -179,14 +176,14 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             {
                 division: {
                     horizontal: rowCount,
-                    vertical:8,
+                    vertical: 8,
                 },
                 margin: {
                     top: 20,
-                    bottom :0,
-                    left : 10,
-                    right : 10
-                }
+                    bottom: 0,
+                    left: 10,
+                    right: 10,
+                },
             },
         );
         this.entityList = new List(this.scene, entityListGrid);
@@ -217,11 +214,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    entityCard(
-        entity: Entity,
-         entityListGrid: Grid,
-        width: number,
-    ): void {
+    entityCard(entity: Entity, entityListGrid: Grid, width: number): void {
         // Conteneur de la card
         this.root.add(
             new DisplayContainer(
@@ -233,37 +226,43 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     height: 4,
                     margin: { top: 50, bottom: 0, right: 0, left: 0 },
                 }),
-                { borderWidth: 3, opacity: 1, bgColor : entity.entityType === EntityType.ALLY ? "#396645" : "#6e3822" },
+                {
+                    borderWidth: 3,
+                    opacity: 1,
+                    bgColor:
+                        entity.entityType === EntityType.ALLY
+                            ? "#396645"
+                            : "#6e3822",
+                },
             ).setDepth(100),
         );
 
-        // Image (lignes 1-2)
-        const imageArea = entityListGrid.getArea({
-            x: 2,
-            y: 1,
-            width: 1,
-            height: 3,
-        });
-        const imageAssetKey = CharacterCloseupAsset.getAssetKey(
-            entity.classId as CharacterAssetId,
-        );
-
         this.root.add(
-            new DisplayImage(this.scene, imageArea)
-                .setImage(imageAssetKey, 1)
+            new DisplayImage(
+                this.scene,
+                entityListGrid.getArea({
+                    x: 2,
+                    y: 1,
+                    width: 1,
+                    height: 3,
+                }),
+            )
+                .setImage(CharacterCloseupAsset.getAssetKey(entity.classId), 1)
                 .setDepth(101),
         );
 
         // Nom (ligne 3)
-        const nameArea = entityListGrid.getArea({
-            x: 1,
-            y: 3,
-            width: 1,
-            height: 1,
-        });
         this.root.add(
-            new DisplayText(this.scene, nameArea)
-                .setText(entity.classId, { fontSize: 10 })
+            new DisplayText(
+                this.scene,
+                entityListGrid.getArea({
+                    x: 1,
+                    y: 3,
+                    width: 4,
+                    height: 1,
+                }),
+            )
+                .setText(entity.classId)
                 .setDepth(106),
         );
     }

@@ -219,7 +219,13 @@ export class FightScene extends BaseScene<FightSceneInit> {
                     ) {
                         this.inspectStats.setIsShow(false);
                     }
-                    await this.character.kill(animation.data.entityId);
+                    if (
+                        animation.data.entityId ===
+                        this.playerStore.playerEntity.entityId
+                    ) {
+                        this.playerStats.blurOut();
+                        this.actions.blurOut();
+                    }
                     break;
             }
         }

@@ -1,6 +1,13 @@
 import { ActionAsset, ActionAssetId } from "../../../assets/ActionAsset";
 import { Color } from "../../../config/ColorConfig";
-import { DisplayContainer, List, Button, ScaleMode } from "../../../core";
+import {
+    DisplayContainer,
+    List,
+    Button,
+    ScaleMode,
+    Blur,
+    GridArea,
+} from "../../../core";
 import { Action } from "../../../Model/Action";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/GameStore";
@@ -8,9 +15,11 @@ import { PlayerStore } from "../stores/PlayerStore";
 import { FightSceneDisplayer } from "./FightSceneDisplayer";
 
 export class ActionDisplayer extends FightSceneDisplayer {
+    protected actionArea!: GridArea;
     /**
      * Displayed Elements
      */
+    protected actionPanel!: DisplayContainer;
     protected actionElements: Map<string, Button> = new Map();
     protected endTurnButton!: Button;
     protected actionsList!: List;
@@ -26,16 +35,28 @@ export class ActionDisplayer extends FightSceneDisplayer {
         this.lockLevel = 0;
     }
 
+    protected clearAction() {
+        this.scene.rangeVisualizer.clearRange();
+        this.scene.rangeVisualizer.clearZonePreview();
+        if (this.scene.actionManager.currentAction) {
+            this.actionElements
+                .get(this.scene.actionManager.currentAction.id)
+                ?.hightlight(false);
+            this.scene.actionManager.currentAction = undefined;
+        }
+    }
+
     protected handleActionClick(action: Action) {
         const isPlayerTurn =
             this.gameStore.game.playerTurns[0] ===
             this.playerStore.playerEntity.entityId;
         const hasMovement = this.playerStore.playerEntity.stats.mouvement > 0;
-        const hasEnergy = this.playerStore.playerEntity.stats.energy > 0;
+        const hasEnergy =
+            this.playerStore.playerEntity.stats.energy >= action.cost;
         if (!isPlayerTurn) {
             return;
         }
-        this.scene.rangeVisualizer.clearRange();
+        this.clearAction();
         switch (action.id) {
             case ActionAssetId.WALK:
                 if (!hasMovement) {
@@ -58,24 +79,26 @@ export class ActionDisplayer extends FightSceneDisplayer {
         }
 
         this.scene.rangeVisualizer.showRange();
+        this.actionElements.get(action.id)?.hightlight(true);
         this.scene.actionManager.currentAction = action;
     }
 
     preRender(): this {
-        const actionArea = this.scene.rootGrid.getArea({
+        this.actionArea = this.scene.rootGrid.getArea({
             x: 3,
             y: 9,
             width: 5,
             height: 1,
         });
 
-        new DisplayContainer(this.scene, actionArea, {
+        this.actionPanel = new DisplayContainer(this.scene, this.actionArea, {
             borderWidth: 7,
             opacity: 0.5,
             outterRadius: { tl: 0, bl: 0, tr: 10, br: 10 },
+            onClick: () => this.clearAction(),
         });
 
-        const actionGrid = actionArea.getGrid({
+        const actionGrid = this.actionArea.getGrid({
             division: { vertical: 1, horizontal: 9 },
             margin: { vertical: 20, horizontal: 10 },
         });
@@ -146,6 +169,14 @@ export class ActionDisplayer extends FightSceneDisplayer {
             })
             .setIsActivated(true);
 
+        return this;
+    }
+
+    blurOut(): this {
+        new Blur(this.scene, this.actionArea, {
+            radius: this.actionPanel.outterRadius,
+            depth: 50,
+        });
         return this;
     }
 

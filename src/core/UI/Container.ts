@@ -40,7 +40,7 @@ export class DisplayContainer
     protected radius:
         | Phaser.Types.GameObjects.Graphics.RoundedRectRadius
         | number;
-    protected outterRadius?:
+    public outterRadius?:
         | Phaser.Types.GameObjects.Graphics.RoundedRectRadius
         | number;
     protected innerRadius?:

@@ -5,7 +5,14 @@ import {
 } from "../../../assets";
 import { EffectAsset, EffectAssetId } from "../../../assets/EffectAsset";
 import { Color } from "../../../config/ColorConfig";
-import { DisplayContainer, Grid, DisplayText, List } from "../../../core";
+import {
+    DisplayContainer,
+    Grid,
+    DisplayText,
+    List,
+    Blur,
+    GridArea,
+} from "../../../core";
 import { DisplayImage } from "../../../core/UI/DisplayImage";
 import { CharacterClass } from "../../../Model/CharacterClass";
 import { Effect } from "../../../Model/Effect";
@@ -27,6 +34,8 @@ const statDescriptions: Record<string, string> = {
 };
 
 export class StatsDisplayer extends FightSceneDisplayer {
+    private statsArea!: GridArea;
+
     private statsPanel!: DisplayContainer;
     private effectList!: List;
     private statsImage!: DisplayContainer;
@@ -80,20 +89,20 @@ export class StatsDisplayer extends FightSceneDisplayer {
     }
 
     preRender(): this {
-        const statsArea = this.scene.rootGrid.getArea({
+        this.statsArea = this.scene.rootGrid.getArea({
             x: this.position.x,
             y: this.position.y,
             width: 2,
             height: 3,
         });
 
-        this.statsPanel = new DisplayContainer(this.scene, statsArea, {
+        this.statsPanel = new DisplayContainer(this.scene, this.statsArea, {
             borderWidth: 7,
             opacity: 0.5,
             outterRadius: { tl: 10, tr: 10, bl: 0, br: 0 },
         });
 
-        const statsGrid = statsArea.getGrid();
+        const statsGrid = this.statsArea.getGrid();
 
         this.statsImage = new DisplayContainer(
             this.scene,
@@ -170,6 +179,14 @@ export class StatsDisplayer extends FightSceneDisplayer {
 
         this.effectList = new List(this.scene, effectListArea);
 
+        return this;
+    }
+
+    blurOut(): this {
+        new Blur(this.scene, this.statsArea, {
+            radius: this.statsPanel.outterRadius,
+            depth: 50,
+        });
         return this;
     }
 
