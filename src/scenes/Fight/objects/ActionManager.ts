@@ -17,11 +17,9 @@ export class ActionManager {
     }
 
     async launchAction(pos: Position) {
-        this.scene.rangeVisualizer.clearRange();
-        this.scene.rangeVisualizer.clearZonePreview();
         this.scene.actions.lock();
         const action = this.currentAction;
-        this.clearCurrentAction();
+        this.scene.actions.clearAction();
         await this.scene.playerSocket.action({
             actionId: action?.id ?? "",
             target: pos,

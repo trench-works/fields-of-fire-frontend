@@ -35,15 +35,11 @@ export class ActionDisplayer extends FightSceneDisplayer {
         this.lockLevel = 0;
     }
 
-    protected clearAction() {
+    clearAction() {
         this.scene.rangeVisualizer.clearRange();
         this.scene.rangeVisualizer.clearZonePreview();
-        if (this.scene.actionManager.currentAction) {
-            this.actionElements
-                .get(this.scene.actionManager.currentAction.id)
-                ?.hightlight(false);
-            this.scene.actionManager.currentAction = undefined;
-        }
+        this.scene.actionManager.clearCurrentAction();
+        this.actionElements.forEach((action) => action.hightlight(false));
     }
 
     protected handleActionClick(action: Action) {
