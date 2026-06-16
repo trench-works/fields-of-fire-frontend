@@ -92,7 +92,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
      */
     public actions: ActionDisplayer;
     private board: BoardDisplayer;
-    private character: CharactersDisplayer;
+    public character: CharactersDisplayer;
     private turns: TurnDisplayer;
     private playerStats: StatsDisplayer;
     private inspectStats: StatsDisplayer;
@@ -149,7 +149,11 @@ export class FightScene extends BaseScene<FightSceneInit> {
             this.classStore,
             this.playerStore,
         );
-        this.character = new CharactersDisplayer(this, this.gameStore);
+        this.character = new CharactersDisplayer(
+            this,
+            this.gameStore,
+            this.playerStore,
+        );
         this.turns = new TurnDisplayer(this, this.gameStore, this.classStore);
         this.playerStats = new StatsDisplayer(this, this.gameStore, {
             x: 1,

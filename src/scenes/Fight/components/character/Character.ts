@@ -103,6 +103,12 @@ export class Character extends FightSceneDisplayer {
         return this;
     }
 
+    changeDirection(horizontal: "R" | "L", vertical: "D" | "U") {
+        const entity = this.gameStore.getEntity(this.entityId);
+        const assetKey = CharacterSpriteAsset.getAssetKey(entity.classId);
+        this.playAnimation(`${assetKey}-idle-${vertical}${horizontal}`);
+    }
+
     async slide(start: Position, end: Position, steps: number) {
         if (!this.sprite) return this;
         const startCell = this.scene.gridPositions[start.x]?.[start.y];

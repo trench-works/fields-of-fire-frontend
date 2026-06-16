@@ -4,13 +4,18 @@ import { GameStore } from "../../stores/GameStore";
 import { FightSceneDisplayer } from "../FightSceneDisplayer";
 import { GameMoveAnimation } from "../../repositories/player.socket";
 import { Game } from "../../../../Model/Game";
-import { SoundEffect } from "../../../../core";
+import { Position, SoundEffect } from "../../../../core";
 import { SoundEffectAsset, SoundEffectAssetId } from "../../../../assets";
+import { PlayerStore } from "../../stores/PlayerStore";
 
 export class CharactersDisplayer extends FightSceneDisplayer {
     characters: Character[] = [];
 
-    constructor(scene: FightScene, gameStore: GameStore) {
+    constructor(
+        scene: FightScene,
+        gameStore: GameStore,
+        protected readonly playerStore: PlayerStore,
+    ) {
         super(scene, gameStore);
     }
 
@@ -52,6 +57,29 @@ export class CharactersDisplayer extends FightSceneDisplayer {
             }
             setTimeout(() => resolve(this), 1000);
         });
+    }
+
+    handleTileClick({ x, y }: Position) {
+        const character = this.characters.find(
+            (character) =>
+                character.entityId === this.playerStore.playerEntity?.entityId,
+        );
+        if (character) {
+            const playerCell =
+                this.scene.gridPositions[
+                    this.playerStore.playerEntity.position.x
+                ]?.[this.playerStore.playerEntity.position.y];
+            const clickedCell = this.scene.gridPositions[x]?.[y];
+            const horizontalDirection =
+                playerCell.pixelPosition.x - clickedCell.pixelPosition.x < 0
+                    ? "R"
+                    : "L";
+            const verticalDirection =
+                playerCell.pixelPosition.y - clickedCell.pixelPosition.y < 0
+                    ? "D"
+                    : "U";
+            character.changeDirection(horizontalDirection, verticalDirection);
+        }
     }
 
     async animate(animation: GameMoveAnimation, newGame: Game): Promise<this> {
