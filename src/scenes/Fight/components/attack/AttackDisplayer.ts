@@ -41,7 +41,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
         switch (actionId) {
             case ActionAssetId.SHOOT:
                 {
-                    this.scene.character.handleTileClick(target, entityId);
+                    this.scene.character.changeDirection(target, entityId);
                     this.scene.character.scope(entityId, 700);
                     await Timeout(200);
                     new SoundEffect(
@@ -59,7 +59,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.BAYONET:
                 {
-                    this.scene.character.handleTileClick(target, entityId);
+                    this.scene.character.changeDirection(target, entityId);
                     this.scene.character.scope(entityId, 700);
                     await Timeout(200);
                     new SoundEffect(
@@ -73,7 +73,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.AMPUTATE:
                 {
-                    this.scene.character.handleTileClick(target, entityId);
+                    this.scene.character.changeDirection(target, entityId);
                     new SoundEffect(
                         this.scene,
                         SoundEffectAsset.getAssetKey(
@@ -86,7 +86,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.INTIMIDATION:
                 {
-                    this.scene.character.handleTileClick(target, entityId);
+                    this.scene.character.changeDirection(target, entityId);
                     new SoundEffect(
                         this.scene,
                         SoundEffectAsset.getAssetKey(
@@ -107,7 +107,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.HEAL:
                 {
-                    this.scene.character.handleTileClick(target, entityId);
+                    this.scene.character.changeDirection(target, entityId);
                     this.scene.toaster.attackToast(animation);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.HEAL,
@@ -118,7 +118,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.ARTILLERY_SUPPORT:
                 {
-                    this.scene.character.handleTileClick(target, entityId);
+                    this.scene.character.changeDirection(target, entityId);
                     await this.playActionAnimation(
                         ActionAssetId.ARTILLERY_SUPPORT,
                         target,
@@ -145,7 +145,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.DOPAGE:
                 {
-                    this.scene.character.handleTileClick(target, entityId);
+                    this.scene.character.changeDirection(target, entityId);
                     this.scene.toaster.attackToast(animation);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.BOOST,

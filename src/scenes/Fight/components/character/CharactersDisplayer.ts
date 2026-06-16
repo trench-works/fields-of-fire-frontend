@@ -66,7 +66,7 @@ export class CharactersDisplayer extends FightSceneDisplayer {
             ?.scope(time);
     }
 
-    handleTileClick(target: Position, entityId?: string) {
+    changeDirection(target: Position, entityId?: string) {
         entityId ??= this.playerStore.playerEntity.entityId;
         const character = this.characters.find(
             (character) => character.entityId === entityId,
