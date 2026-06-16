@@ -7,6 +7,7 @@ import { Game } from "../../../../Model/Game";
 import { Position, SoundEffect } from "../../../../core";
 import { SoundEffectAsset, SoundEffectAssetId } from "../../../../assets";
 import { PlayerStore } from "../../stores/PlayerStore";
+import { PositionUtils } from "../../../../core/Utils/Sizing";
 
 export class CharactersDisplayer extends FightSceneDisplayer {
     characters: Character[] = [];
@@ -65,10 +66,13 @@ export class CharactersDisplayer extends FightSceneDisplayer {
             (character) => character.entityId === entityId,
         );
         if (character) {
-            character.changeDirection(
-                this.gameStore.getEntity(entityId).position,
-                target,
-            );
+            const currentPosition = this.gameStore.getEntity(entityId).position;
+            if (!PositionUtils.equals(currentPosition, target)) {
+                character.changeDirection(
+                    this.gameStore.getEntity(entityId).position,
+                    target,
+                );
+            }
         }
     }
 

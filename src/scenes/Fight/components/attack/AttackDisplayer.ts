@@ -140,6 +140,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.DOPAGE:
                 {
+                    this.scene.character.handleTileClick(target, entityId);
                     this.scene.toaster.attackToast(animation);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.BOOST,

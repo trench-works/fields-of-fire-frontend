@@ -50,6 +50,10 @@ export class PositionUtils {
             y: y / divider,
         };
     }
+
+    static equals(a: Position, b: Position): boolean {
+        return a.x === b.y && a.y === b.y;
+    }
 }
 
 export class AxisUtils {
