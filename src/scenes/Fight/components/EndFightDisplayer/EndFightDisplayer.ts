@@ -1,4 +1,5 @@
 import { CharacterCloseupAsset } from "../../../../assets";
+import { EffectAsset } from "../../../../assets/EffectAsset";
 import {
     Button,
     DisplayContainer,
@@ -8,7 +9,9 @@ import {
     List,
 } from "../../../../core";
 import { DisplayImage } from "../../../../core/UI/DisplayImage";
+import { Effect } from "../../../../Model/Effect";
 import { Entity, EntityType } from "../../../../Model/Entity";
+import { MainMenu } from "../../../MainMenu/main-menu.scene";
 import { FightScene } from "../../fight.scene";
 import { GameStore } from "../../stores/GameStore";
 import { PlayerStore } from "../../stores/PlayerStore";
@@ -24,6 +27,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     protected entityList!: List;
 
     protected root: DisplayRoot;
+    protected temporaryRoot: DisplayRoot;
 
     protected titleText!: DisplayText;
 
@@ -34,6 +38,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     ) {
         super(scene, gameStore);
         this.root = new DisplayRoot();
+        this.temporaryRoot = new DisplayRoot();
     }
 
     preRender(): this {
@@ -114,6 +119,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 {
                     onClick: () => {
                         console.log("nextRound");
+                        this.swapToBoostCards();
                     },
                     text: "Next Fight",
                 },
@@ -131,9 +137,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 {
                     onClick: () => {
                         console.log("Leave");
-                        // if (config.onMainMenuClick) {
-                        //     config.onMainMenuClick();
-                        // }
+                        MainMenu.start(this.scene, { keepMusic: false })
                     },
                     text: "Abandonner",
                 },
@@ -192,11 +196,13 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 { x: index + 1, y: 1, width: 1, height: 6 },
                 { division: { horizontal: 4, vertical: 3 } },
             );
-            this.entityCard(entity, cardGrid, rowCount);
+            this.displayeEntityCard(entity, cardGrid, rowCount);
         });
         this.entityList.setDepth(103);
 
         this.root.setVisible(false);
+        this.temporaryRoot.setVisible(false);
+
         return this;
     }
 
@@ -208,18 +214,19 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         //console.log("show called", this.root);
         this.titleText.setText(playerWin ? "Victoire !" : "Défaite ");
         this.root.setVisible(true);
+        this.temporaryRoot.setVisible(true);
     }
 
     async animate(): Promise<this> {
         return this;
     }
 
-    entityCard(entity: Entity, entityListGrid: Grid, width: number): void {
+    displayeEntityCard  (entity: Entity, ObjectListGrid: Grid, width: number): void {
         // Conteneur de la card
-        this.root.add(
+        this.temporaryRoot.add(
             new DisplayContainer(
                 this.scene,
-                entityListGrid.getArea({
+                ObjectListGrid.getArea({
                     x: 1,
                     y: 1,
                     width: width,
@@ -237,10 +244,10 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             ).setDepth(100),
         );
 
-        this.root.add(
+        this.temporaryRoot.add(
             new DisplayImage(
                 this.scene,
-                entityListGrid.getArea({
+                ObjectListGrid.getArea({
                     x: 2,
                     y: 1,
                     width: 1,
@@ -252,10 +259,10 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         );
 
         // Nom (ligne 3)
-        this.root.add(
+        this.temporaryRoot.add(
             new DisplayText(
                 this.scene,
-                entityListGrid.getArea({
+                ObjectListGrid.getArea({
                     x: 1,
                     y: 3,
                     width: 3,
@@ -265,6 +272,73 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 .setText(entity.classId)
                 .setDepth(106),
         );
+    }
+
+    displayBoostCard  (boost: Effect, entityListGrid: Grid, width: number): void {
+        // Conteneur de la card
+        this.temporaryRoot.add(
+            new DisplayContainer(
+                this.scene,
+                entityListGrid.getArea({
+                    x: 1,
+                    y: 1,
+                    width: width,
+                    height: 4,
+                    margin: { top: 50, bottom: 0, right: 0, left: 0 },
+                }),
+                {
+                    borderWidth: 3,
+                    opacity: 1
+                },
+            ).setDepth(100),
+        );
+
+        this.temporaryRoot.add(
+            new DisplayImage(
+                this.scene,
+                entityListGrid.getArea({
+                    x: 2,
+                    y: 1,
+                    width: 1,
+                    height: 3,
+                }),
+            )
+                .setImage(EffectAsset.getAssetKey(boost.id), 1)
+                .setDepth(101),
+        );
+
+        // Nom (ligne 3)
+        this.temporaryRoot.add(
+            new DisplayText(
+                this.scene,
+                entityListGrid.getArea({
+                    x: 1,
+                    y: 3,
+                    width: 3,
+                    height: 1,
+                }),
+            )
+                .setText(boost.name)
+                .setDepth(106),
+        );
+
+        this.temporaryRoot.add(
+            new DisplayText(
+                this.scene,
+                entityListGrid.getArea({
+                    x: 1,
+                    y: 3,
+                    width: 3,
+                    height: 1,
+                }),
+            )
+                .setText(boost.description ?? "")
+                .setDepth(106),
+        );
+    }
+
+    swapToBoostCards(){
+
     }
 }
 
