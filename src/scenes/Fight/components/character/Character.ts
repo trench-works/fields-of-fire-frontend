@@ -5,6 +5,7 @@ import { CharacterAssetId, CharacterSpriteAsset } from "../../../../assets";
 import { GameMoveAnimation } from "../../repositories/player.socket";
 import { Game } from "../../../../Model/Game";
 import { Position } from "../../../../core";
+import { PositionUtils } from "../../../../core/Utils/Sizing";
 
 export class Character extends FightSceneDisplayer {
     constructor(
@@ -102,10 +103,30 @@ export class Character extends FightSceneDisplayer {
         return this;
     }
 
+    async slide(start: Position, end: Position, steps: number) {
+        if (!this.sprite) return this;
+        const startCell = this.scene.gridPositions[start.x]?.[start.y];
+        const endCell = this.scene.gridPositions[end.x]?.[end.y];
+
+        const moveLine = PositionUtils.subtract(
+            endCell.pixelPosition,
+            startCell.pixelPosition,
+        );
+        const moveStep = PositionUtils.divide(moveLine, steps);
+        for (let i = 0; i < steps; i++) {
+            this.sprite.setPosition(
+                this.sprite.x + moveStep.x,
+                this.sprite.y + moveStep.y,
+            );
+            await new Promise<void>((resolve) => setTimeout(resolve, 0.5));
+        }
+
+        this.setPosition(end);
+    }
+
     setPosition({ x, y }: Position): this {
         if (!this.sprite) return this;
 
-        console.log({ x, y });
         const cell = this.scene.gridPositions[x]?.[y];
 
         this.sprite.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
@@ -114,9 +135,12 @@ export class Character extends FightSceneDisplayer {
     }
 
     async animate(animation: GameMoveAnimation, newGame: Game): Promise<this> {
-        for (const mouvement of animation.data.path) {
-            this.setPosition(mouvement);
+        for (let i = 1; i < animation.data.path.length; i++) {
+            //const precedentPosition = animation.data.path[i - 1];
+            const newPosition = animation.data.path[i];
+            this.setPosition(newPosition);
             await new Promise<void>((resolve) => setTimeout(resolve, 100));
+            //await this.slide(precedentPosition, newPosition, 150);
         }
         return this;
     }

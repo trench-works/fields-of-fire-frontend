@@ -33,6 +33,13 @@ export class PositionUtils {
         };
     }
 
+    static subtract(a: Position, b: Position): Position {
+        return {
+            x: a.x - b.x,
+            y: a.y - b.y,
+        };
+    }
+
     static getMapOffset(_renderConfig: SceneRenderConfig): Position {
         return { x: 0, y: 0 };
     }
