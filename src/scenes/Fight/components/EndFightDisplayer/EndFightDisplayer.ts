@@ -144,20 +144,6 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 },
             ).setDepth(104),
         );
-        this.root.add(
-            new DisplayContainer(
-                this.scene,
-                buttonsGrid.getArea({
-                    x: 1,
-                    y: 1,
-                    width: 9,
-                    height: 1,
-                }),
-                { borderWidth: 2, opacity: 0.3 },
-            ).setDepth(104),
-        );
-
-        console.log("taille liste : ", endGameArea);
 
         // --- Depths ---
         this.titleText.setDepth(102);
