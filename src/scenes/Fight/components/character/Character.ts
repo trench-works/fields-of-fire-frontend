@@ -105,7 +105,8 @@ export class Character extends FightSceneDisplayer {
     setPosition({ x, y }: Position): this {
         if (!this.sprite) return this;
 
-        const cell = this.scene.gridPositions[x][y];
+        console.log({ x, y });
+        const cell = this.scene.gridPositions[x]?.[y];
 
         this.sprite.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
         this.sprite.setDepth((x + y) * 10 + 2);
