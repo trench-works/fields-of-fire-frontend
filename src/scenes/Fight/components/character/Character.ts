@@ -103,10 +103,18 @@ export class Character extends FightSceneDisplayer {
         return this;
     }
 
-    changeDirection(horizontal: "R" | "L", vertical: "D" | "U") {
+    changeDirection(origin: Position, target: Position) {
+        const startCell = this.scene.gridPositions[origin.x]?.[origin.y];
+        const endCell = this.scene.gridPositions[target.x]?.[target.y];
+        const horizontalDirection =
+            startCell.pixelPosition.x - endCell.pixelPosition.x < 0 ? "R" : "L";
+        const verticalDirection =
+            startCell.pixelPosition.y - endCell.pixelPosition.y < 0 ? "D" : "U";
         const entity = this.gameStore.getEntity(this.entityId);
         const assetKey = CharacterSpriteAsset.getAssetKey(entity.classId);
-        this.playAnimation(`${assetKey}-idle-${vertical}${horizontal}`);
+        this.playAnimation(
+            `${assetKey}-idle-${verticalDirection}${horizontalDirection}`,
+        );
     }
 
     async slide(start: Position, end: Position, steps: number) {
@@ -142,8 +150,9 @@ export class Character extends FightSceneDisplayer {
 
     async animate(animation: GameMoveAnimation, newGame: Game): Promise<this> {
         for (let i = 1; i < animation.data.path.length; i++) {
-            //const precedentPosition = animation.data.path[i - 1];
+            const precedentPosition = animation.data.path[i - 1];
             const newPosition = animation.data.path[i];
+            this.changeDirection(precedentPosition, newPosition);
             this.setPosition(newPosition);
             await new Promise<void>((resolve) => setTimeout(resolve, 100));
             //await this.slide(precedentPosition, newPosition, 150);

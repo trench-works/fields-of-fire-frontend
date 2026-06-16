@@ -33,13 +33,14 @@ export class AttackDisplayer extends FightSceneDisplayer {
         newGame: Game,
     ): Promise<this> {
         const {
-            data: { actionId, target, origin, hits },
+            data: { entityId, actionId, target, origin, hits },
         } = animation;
         const { x, y } = target;
         const cell = this.scene.gridPositions[x][y];
         switch (actionId) {
             case ActionAssetId.SHOOT:
                 {
+                    this.scene.character.handleTileClick(target, entityId);
                     new SoundEffect(
                         this.scene,
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.SHOT),
@@ -55,6 +56,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.BAYONET:
                 {
+                    this.scene.character.handleTileClick(target, entityId);
                     new SoundEffect(
                         this.scene,
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.HURT),
@@ -66,6 +68,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.AMPUTATE:
                 {
+                    this.scene.character.handleTileClick(target, entityId);
                     new SoundEffect(
                         this.scene,
                         SoundEffectAsset.getAssetKey(
@@ -78,6 +81,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.INTIMIDATION:
                 {
+                    this.scene.character.handleTileClick(target, entityId);
                     new SoundEffect(
                         this.scene,
                         SoundEffectAsset.getAssetKey(
@@ -98,6 +102,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.HEAL:
                 {
+                    this.scene.character.handleTileClick(target, entityId);
                     this.scene.toaster.attackToast(animation);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.HEAL,
@@ -108,6 +113,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.ARTILLERY_SUPPORT:
                 {
+                    this.scene.character.handleTileClick(target, entityId);
                     await this.playActionAnimation(
                         ActionAssetId.ARTILLERY_SUPPORT,
                         target,

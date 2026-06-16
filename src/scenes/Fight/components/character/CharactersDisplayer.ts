@@ -59,26 +59,16 @@ export class CharactersDisplayer extends FightSceneDisplayer {
         });
     }
 
-    handleTileClick({ x, y }: Position) {
+    handleTileClick(target: Position, entityId?: string) {
+        entityId ??= this.playerStore.playerEntity.entityId;
         const character = this.characters.find(
-            (character) =>
-                character.entityId === this.playerStore.playerEntity?.entityId,
+            (character) => character.entityId === entityId,
         );
         if (character) {
-            const playerCell =
-                this.scene.gridPositions[
-                    this.playerStore.playerEntity.position.x
-                ]?.[this.playerStore.playerEntity.position.y];
-            const clickedCell = this.scene.gridPositions[x]?.[y];
-            const horizontalDirection =
-                playerCell.pixelPosition.x - clickedCell.pixelPosition.x < 0
-                    ? "R"
-                    : "L";
-            const verticalDirection =
-                playerCell.pixelPosition.y - clickedCell.pixelPosition.y < 0
-                    ? "D"
-                    : "U";
-            character.changeDirection(horizontalDirection, verticalDirection);
+            character.changeDirection(
+                this.gameStore.getEntity(entityId).position,
+                target,
+            );
         }
     }
 
