@@ -167,7 +167,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
                     // --- DEBUG VISUEL ---
                     //this.gridShower(diamond, worldX, worldY, layer);
                     zone.on("pointerdown", () => {
-                        this.scene.character.handleTileClick({ x, y });
+                        this.scene.character.changeDirection({ x, y });
                         if (this.scene.actionManager.currentAction) {
                             if (
                                 this.scene.rangeVisualizer.isInRange({ x, y })
