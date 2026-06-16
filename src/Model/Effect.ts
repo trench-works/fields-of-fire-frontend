@@ -10,7 +10,7 @@ export type Effect = {
     id: EffectAssetId;
     name: string;
     type: EffectType;
-    duration: number;
+    duration: number | null;
     modifier: Stats;
     author?: string;
 };
