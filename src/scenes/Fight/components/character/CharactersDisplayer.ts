@@ -60,6 +60,12 @@ export class CharactersDisplayer extends FightSceneDisplayer {
         });
     }
 
+    async scope(entityId: string, time: number) {
+        await this.characters
+            .find((character) => character.entityId === entityId)
+            ?.scope(time);
+    }
+
     handleTileClick(target: Position, entityId?: string) {
         entityId ??= this.playerStore.playerEntity.entityId;
         const character = this.characters.find(

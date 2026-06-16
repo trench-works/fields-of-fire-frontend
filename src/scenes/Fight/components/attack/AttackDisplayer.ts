@@ -41,6 +41,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
             case ActionAssetId.SHOOT:
                 {
                     this.scene.character.handleTileClick(target, entityId);
+                    this.scene.character.scope(entityId, 700);
                     new SoundEffect(
                         this.scene,
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.SHOT),
@@ -57,6 +58,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
             case ActionAssetId.BAYONET:
                 {
                     this.scene.character.handleTileClick(target, entityId);
+                    this.scene.character.scope(entityId, 700);
                     new SoundEffect(
                         this.scene,
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.HURT),

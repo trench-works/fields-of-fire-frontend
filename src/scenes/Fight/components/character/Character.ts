@@ -8,6 +8,8 @@ import { Position } from "../../../../core";
 import { PositionUtils } from "../../../../core/Utils/Sizing";
 
 export class Character extends FightSceneDisplayer {
+    protected direction: "UR" | "UL" | "DR" | "DL" = "DR";
+
     constructor(
         scene: FightScene,
         gameStore: GameStore,
@@ -28,10 +30,34 @@ export class Character extends FightSceneDisplayer {
     }
 
     //Joue l'animation d'idle par défaut du personnage, ou une animation spécifique si une clé est fournie
-    playAnimation(key: string) {
-        if (!this.sprite) return;
-        if (this.sprite.anims.currentAnim?.key === key) return;
+    playAnimation(key?: string) {
+        if (
+            !this.sprite ||
+            !key ||
+            this.sprite.anims.currentAnim?.key === key
+        ) {
+            return;
+        }
+
         this.sprite.play(key);
+    }
+
+    playIdleAnimation() {
+        const entity = this.gameStore.getEntity(this.entityId);
+        const assetKey = CharacterSpriteAsset.getAssetKey(entity.classId);
+        this.playAnimation(`${assetKey}-idle-${this.direction}`);
+    }
+
+    async scope(time: number): Promise<void> {
+        new Promise<void>((resolve) => {
+            const entity = this.gameStore.getEntity(this.entityId);
+            const assetKey = CharacterSpriteAsset.getAssetKey(entity.classId);
+            this.playAnimation(`${assetKey}-scope-${this.direction}`);
+            setTimeout(() => {
+                this.playAnimation(`${assetKey}-idle-${this.direction}`);
+                resolve();
+            }, time);
+        });
     }
 
     render(): this {
@@ -57,36 +83,34 @@ export class Character extends FightSceneDisplayer {
 
     private createAnimations(classId: CharacterAssetId) {
         const assetKey = CharacterSpriteAsset.getAssetKey(classId);
-        if (!this.scene.anims.exists(`${assetKey}-idle-DR`)) {
-            this.loadIdleAnimation(assetKey, `${assetKey}-idle-DR`, 0, 1);
-        }
-        if (!this.scene.anims.exists(`${assetKey}-idle-DL`)) {
-            this.loadIdleAnimation(assetKey, `${assetKey}-idle-DL`, 2, 3);
-        }
-        if (!this.scene.anims.exists(`${assetKey}-idle-UL`)) {
-            this.loadIdleAnimation(assetKey, `${assetKey}-idle-UL`, 4, 5);
-        }
-        if (!this.scene.anims.exists(`${assetKey}-idle-UR`)) {
-            this.loadIdleAnimation(assetKey, `${assetKey}-idle-UR`, 6, 7);
-        }
-        this.playAnimation(`${assetKey}-idle-DR`); // default animation direction
+        this.loadAnimation(assetKey, `${assetKey}-idle-DR`, 0, 1);
+        this.loadAnimation(assetKey, `${assetKey}-idle-DL`, 2, 3);
+        this.loadAnimation(assetKey, `${assetKey}-idle-UL`, 4, 5);
+        this.loadAnimation(assetKey, `${assetKey}-idle-UR`, 6, 7);
+        this.loadAnimation(assetKey, `${assetKey}-scope-DR`, 8, 8);
+        this.loadAnimation(assetKey, `${assetKey}-scope-DL`, 9, 9);
+        this.loadAnimation(assetKey, `${assetKey}-scope-UL`, 10, 10);
+        this.loadAnimation(assetKey, `${assetKey}-scope-UR`, 11, 11);
+        this.playIdleAnimation();
     }
 
-    private loadIdleAnimation(
+    private loadAnimation(
         assetKey: string,
         animationName: string,
         startFrame: number,
         endFrame: number,
     ) {
-        this.scene.anims.create({
-            key: `${animationName}`,
-            frames: this.scene.anims.generateFrameNumbers(assetKey, {
-                start: startFrame,
-                end: endFrame,
-            }),
-            frameRate: 2,
-            repeat: -1,
-        });
+        if (!this.scene.anims.exists(animationName)) {
+            this.scene.anims.create({
+                key: animationName,
+                frames: this.scene.anims.generateFrameNumbers(assetKey, {
+                    start: startFrame,
+                    end: endFrame,
+                }),
+                frameRate: 2,
+                repeat: -1,
+            });
+        }
     }
 
     update(): this {
@@ -110,11 +134,9 @@ export class Character extends FightSceneDisplayer {
             startCell.pixelPosition.x - endCell.pixelPosition.x < 0 ? "R" : "L";
         const verticalDirection =
             startCell.pixelPosition.y - endCell.pixelPosition.y < 0 ? "D" : "U";
-        const entity = this.gameStore.getEntity(this.entityId);
-        const assetKey = CharacterSpriteAsset.getAssetKey(entity.classId);
-        this.playAnimation(
-            `${assetKey}-idle-${verticalDirection}${horizontalDirection}`,
-        );
+
+        this.direction = `${verticalDirection}${horizontalDirection}`;
+        this.playIdleAnimation();
     }
 
     async slide(start: Position, end: Position, steps: number) {
