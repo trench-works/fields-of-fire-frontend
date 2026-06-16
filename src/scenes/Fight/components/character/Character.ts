@@ -4,7 +4,7 @@ import { GameStore } from "../../stores/GameStore";
 import { CharacterAssetId, CharacterSpriteAsset } from "../../../../assets";
 import { GameMoveAnimation } from "../../repositories/player.socket";
 import { Game } from "../../../../Model/Game";
-import { Position } from "../../../../core";
+import { Position, Timeout } from "../../../../core";
 import { PositionUtils } from "../../../../core/Utils/Sizing";
 
 export class Character extends FightSceneDisplayer {
@@ -154,7 +154,7 @@ export class Character extends FightSceneDisplayer {
                 this.sprite.x + moveStep.x,
                 this.sprite.y + moveStep.y,
             );
-            await new Promise<void>((resolve) => setTimeout(resolve, 0.5));
+            await Timeout(0.5);
         }
 
         this.setPosition(end);
@@ -176,7 +176,7 @@ export class Character extends FightSceneDisplayer {
             const newPosition = animation.data.path[i];
             this.changeDirection(precedentPosition, newPosition);
             this.setPosition(newPosition);
-            await new Promise<void>((resolve) => setTimeout(resolve, 100));
+            await Timeout(100);
             //await this.slide(precedentPosition, newPosition, 150);
         }
         return this;

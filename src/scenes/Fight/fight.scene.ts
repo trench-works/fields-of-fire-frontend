@@ -5,6 +5,7 @@ import {
     EventQueue,
     BaseSceneInit,
     SoundEffect,
+    Timeout,
 } from "../../core";
 import { SceneConfig } from "../../config/SceneConfig";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
@@ -256,7 +257,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
             this.inspectCharacter(this.inspectStats.entityId);
         }
 
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await Timeout(1000);
         this.actions.unlock();
     }
 

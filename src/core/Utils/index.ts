@@ -4,3 +4,4 @@ export * from "./Animation";
 export * from "./Grid";
 export * from "./DirectionUtils";
 export * from "./Depth";
+export * from "./Timeout";

@@ -12,6 +12,7 @@ import {
     DisplayAnimation,
     Position,
     SoundEffect,
+    Timeout,
 } from "../../../../core";
 import { Game } from "../../../../Model/Game";
 import { FightScene } from "../../fight.scene";
@@ -42,6 +43,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 {
                     this.scene.character.handleTileClick(target, entityId);
                     this.scene.character.scope(entityId, 700);
+                    await Timeout(200);
                     new SoundEffect(
                         this.scene,
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.SHOT),
@@ -59,6 +61,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 {
                     this.scene.character.handleTileClick(target, entityId);
                     this.scene.character.scope(entityId, 700);
+                    await Timeout(200);
                     new SoundEffect(
                         this.scene,
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.HURT),
