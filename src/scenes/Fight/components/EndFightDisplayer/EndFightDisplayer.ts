@@ -137,7 +137,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 {
                     onClick: () => {
                         console.log("Leave");
-                        MainMenu.start(this.scene, { keepMusic: false })
+                        MainMenu.start(this.scene, { keepMusic: false });
                     },
                     text: "Abandonner",
                 },
@@ -192,11 +192,22 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         );
         this.entityList = new List(this.scene, entityListGrid);
         entities.forEach((entity, index) => {
-            const cardGrid = entityListGrid.getSubGrid(
-                { x: index + 1, y: 1, width: 1, height: 6 },
-                { division: { horizontal: 4, vertical: 3 } },
+            this.displayeEntityCard(
+                entity,
+                entityListGrid.getSubGrid(
+                    {
+                        x: index + 1,
+                        y: 1,
+                        width: 1,
+                        height: 6,
+                        margin: { vertical: 0, horizontal: 40 },
+                    },
+                    {
+                        division: { horizontal: 3, vertical: 3 },
+                    },
+                ),
+                rowCount,
             );
-            this.displayeEntityCard(entity, cardGrid, rowCount);
         });
         this.entityList.setDepth(103);
 
@@ -221,7 +232,11 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    displayeEntityCard  (entity: Entity, ObjectListGrid: Grid, width: number): void {
+    displayeEntityCard(
+        entity: Entity,
+        ObjectListGrid: Grid,
+        width: number,
+    ): void {
         // Conteneur de la card
         this.temporaryRoot.add(
             new DisplayContainer(
@@ -274,7 +289,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         );
     }
 
-    displayBoostCard  (boost: Effect, entityListGrid: Grid, width: number): void {
+    displayBoostCard(boost: Effect, entityListGrid: Grid, width: number): void {
         // Conteneur de la card
         this.temporaryRoot.add(
             new DisplayContainer(
@@ -288,7 +303,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 }),
                 {
                     borderWidth: 3,
-                    opacity: 1
+                    opacity: 1,
                 },
             ).setDepth(100),
         );
@@ -337,8 +352,6 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         );
     }
 
-    swapToBoostCards(){
-
-    }
+    swapToBoostCards() {}
 }
 
