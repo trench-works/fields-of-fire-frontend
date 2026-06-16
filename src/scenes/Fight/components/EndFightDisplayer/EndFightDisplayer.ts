@@ -258,7 +258,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 entityListGrid.getArea({
                     x: 1,
                     y: 3,
-                    width: 4,
+                    width: 3,
                     height: 1,
                 }),
             )

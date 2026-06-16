@@ -226,6 +226,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
                         this.playerStats.blurOut();
                         this.actions.blurOut();
                     }
+                    this.character.kill(animation.data.entityId);
                     break;
             }
         }
