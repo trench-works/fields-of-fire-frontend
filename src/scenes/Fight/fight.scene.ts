@@ -49,6 +49,7 @@ import { EffectAsset } from "../../assets/EffectAsset";
 import { PositionUtils } from "../../core/Utils/Sizing";
 import { EndFightDisplayer } from "./components/EndFightDisplayer/EndFightDisplayer";
 import { Toaster } from "./components/Toaster";
+import { ParticleDisplayer } from "./components/Particle/ParticleDisplayer";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -114,10 +115,12 @@ export class FightScene extends BaseScene<FightSceneInit> {
     public rangeVisualizer: RangeVisualizer;
 
     public tooltip!: Tooltip;
+    protected windEmitter!: Phaser.GameObjects.Particles.ParticleEmitter;
 
     public fightMap = "chessmap";
     public gridPositions: Cell[][] = [];
     public scaleFactor: number = 1;
+    public particleDisplayer: ParticleDisplayer = new ParticleDisplayer(this);
 
     constructor() {
         super(SceneAssetId.FIGHT, BackgroundAssetId.FIGHT);
@@ -376,6 +379,17 @@ export class FightScene extends BaseScene<FightSceneInit> {
             },
             onMainMenuClick: () => {
                 MainMenu.start(this, { keepMusic: false });
+            },
+        });
+
+        this.time.addEvent({
+            delay: 2000,
+            loop: true,
+            callback: () => {
+                this.particleDisplayer.WindAnimation(
+                    0, // part du bord gauche
+                    Phaser.Math.Between(100, this.scale.height - 100),
+                );
             },
         });
 

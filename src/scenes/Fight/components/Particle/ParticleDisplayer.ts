@@ -78,6 +78,9 @@ export class ParticleDisplayer extends Displayer<FightScene> {
                         frequency : 200
                     }
                 )
+            case ParticleAssetId.DUST:
+                this.WindAnimation(x, y);
+                break;
         }
         return this;
     }
@@ -145,5 +148,51 @@ export class ParticleDisplayer extends Displayer<FightScene> {
             }, 2 * 1000);
         });
     }
+
+    async WindAnimation(x: number, y: number): Promise<void> {
+        if (this.buffEmitter) {
+            this.buffEmitter.stop();
+            this.buffEmitter.destroy();
+        }
+
+        this.buffEmitter = this.scene.add.particles(
+            x,
+            y,
+            ParticleAsset.getAssetKey(ParticleAssetId.DUST),
+            {
+                speedX: { min: 40, max: 100 },
+                speedY: { min: -15, max: 15 },
+                accelerationY: { min: -20, max: 20 },
+                scale: { start: 0.3, end: 1.2 },
+                alpha: { start: 0.6, end: 0 },
+                lifespan: { min: 1500, max: 3000 },
+                frequency: 80,
+                quantity: { min: 1, max: 3 },
+                rotate: { min: -15, max: 15 },
+                emitting: false,
+            },
+        );
+
+        this.buffEmitter.addEmitZone(
+            new Phaser.GameObjects.Particles.Zones.RandomZone({
+                getRandomPoint: (point: any) => {
+                    point.x = Phaser.Math.Between(-100, 0);
+                    point.y = Phaser.Math.Between(-20, 20);
+                    return point;
+                },
+            }),
+        );
+
+    this.buffEmitter.setDepth((Math.max(x, y) * 10) + 1);
+
+    await new Promise<void>((resolve) => {
+        this.buffEmitter.start();
+
+        setTimeout(() => {
+            this.buffEmitter.stop();
+            resolve();
+        }, 3000);
+    });
+}
 }
 
