@@ -153,8 +153,9 @@ export class ActionDisplayer extends FightSceneDisplayer {
                     );
                 },
             );
+            const actionDesc = `coût: ${action.cost}\naction: ${action.actionType}\nportée: ${action.range}`;
             if (iconObj) {
-                this.scene.tooltip.attachTo(iconObj, action.name ?? action.id);
+                this.scene.tooltip.attachTo(iconObj, actionDesc ?? "", action.name ?? action.id);
                 this.actionElements.set(action.id, iconObj);
             }
         });

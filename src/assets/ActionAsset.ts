@@ -10,6 +10,8 @@ export enum ActionAssetId {
     INTIMIDATION = "intimidation",
     SNEAKY = "sneaky",
     DOPAGE = "dopage",
+    CHARGE = "charge",
+    FIGHTING_DRUG = "fighting_drug",
 }
 
 const ActionAssetEntries = Object.fromEntries(
@@ -35,7 +37,9 @@ class ActionAssetManager extends ImageAssetManager<ActionAssetId, string> {
             [ActionAssetId.BAYONET]: { width: 1, height: 1 },
             [ActionAssetId.INTIMIDATION]: { width: 1, height: 1 },
             [ActionAssetId.SNEAKY]: { width: 1, height: 1 },
-            [ActionAssetId.DOPAGE]: { width: 1, height: 1}
+            [ActionAssetId.DOPAGE]: { width: 1, height: 1},
+            [ActionAssetId.CHARGE]: {width: 1, height: 1},
+            [ActionAssetId.FIGHTING_DRUG]: {width:1, height:1 } 
         });
     }
 }

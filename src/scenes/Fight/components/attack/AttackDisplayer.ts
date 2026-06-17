@@ -154,6 +154,17 @@ export class AttackDisplayer extends FightSceneDisplayer {
                     );
                 }
                 break;
+            case ActionAssetId.FIGHTING_DRUG:
+                {
+                    this.scene.character.changeDirection(target, entityId);
+                    this.scene.toaster.attackToast(animation);
+                    await this.particleDisplayer.animate(
+                        ParticleAssetId.BOOST,
+                        cell.pixelPosition.x,
+                        cell.pixelPosition.y,
+                    );
+                }
+                break;
         }
         return this;
     }

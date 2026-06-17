@@ -187,8 +187,9 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         const playerTextContainer = new DisplayText(
             this,
             playerGrid.getArea({
+                //voir si il y a un meilleur moyen de faire un padding ici
                 x: 1.05,
-                y: 7,
+                y: 6.55,
                 width: 9,
                 height: 3,
             }),
