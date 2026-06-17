@@ -36,6 +36,17 @@ export class DisplayText implements Displayable {
         return this;
     }
 
+    setDescription(text: string, options?: { color?: string; fontSize?: number }): this {
+        const fontSize = options?.fontSize ?? 14;
+        this.text.setFontSize(`${fontSize}px`);
+        this.text.setColor(options?.color ?? "#FFFFFF");
+        this.text.setWordWrapWidth(this.area.width, true);
+        this.text.setOrigin(0, 0);
+        this.text.setPosition(this.area.x, this.area.y);
+        this.text.setText(text);
+        return this;
+    }
+
     setVisible(visible: boolean): void {
         this.text.setVisible(visible);
     }
