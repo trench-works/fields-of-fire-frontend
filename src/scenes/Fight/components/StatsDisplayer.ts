@@ -1,25 +1,26 @@
-import { CharacterCloseupAsset, IconAsset } from "../../../assets";
-import { EffectAsset } from "../../../assets/EffectAsset";
+import {
+    CharacterCloseupAsset,
+    StatsIconAsset,
+    StatsAssetId,
+} from "../../../assets";
+import { EffectAsset, EffectAssetId } from "../../../assets/EffectAsset";
 import { Color } from "../../../config/ColorConfig";
-import { CustomContainer, Grid, DisplayText, List } from "../../../core";
-import { DisplayImage } from "../../../core/UI/Image";
+import {
+    DisplayContainer,
+    Grid,
+    DisplayText,
+    List,
+    Blur,
+    GridArea,
+} from "../../../core";
+import { DisplayImage } from "../../../core/UI/DisplayImage";
 import { CharacterClass } from "../../../Model/CharacterClass";
+import { Effect } from "../../../Model/Effect";
 import { Entity } from "../../../Model/Entity";
 import { Stats, StatsUtils } from "../../../Model/Stats";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/GameStore";
 import { FightSceneDisplayer } from "./FightSceneDisplayer";
-
-const allExistingStats: string[] = [
-    "life",
-    "initiative",
-    "strength",
-    "precision",
-    "armor",
-    "dodging",
-    "energy",
-    "mouvement",
-];
 
 const statDescriptions: Record<string, string> = {
     life: "Points de vie. S'ils tombent à 0, vous mourrez.",
@@ -33,11 +34,13 @@ const statDescriptions: Record<string, string> = {
 };
 
 export class StatsDisplayer extends FightSceneDisplayer {
-    private statsPanel!: CustomContainer;
-    private EffectList!: List;
-    private statsImage!: CustomContainer;
-    private statsClassName!: CustomContainer;
-    private statsName!: CustomContainer;
+    private statsArea!: GridArea;
+
+    private statsPanel!: DisplayContainer;
+    private effectList!: List;
+    private statsImage!: DisplayContainer;
+    private statsClassName!: DisplayContainer;
+    private playerName!: DisplayContainer;
     private statsValuesGrid!: Grid;
 
     protected statTexts: Map<
@@ -54,7 +57,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
     private show!: boolean;
 
     get entityId() {
-        return this.entity.entityId;
+        return this.entity?.entityId;
     }
 
     get isShow() {
@@ -86,67 +89,62 @@ export class StatsDisplayer extends FightSceneDisplayer {
     }
 
     preRender(): this {
-        const statsArea = this.scene.rootGrid.getArea({
+        this.statsArea = this.scene.rootGrid.getArea({
             x: this.position.x,
             y: this.position.y,
             width: 2,
             height: 3,
         });
 
-        this.statsPanel = new CustomContainer(this.scene, {
-            x: statsArea.center.x,
-            y: statsArea.center.y,
-            width: statsArea.width,
-            height: statsArea.height,
-            borderWidth: 6,
-            opacity: 0.5,
-        });
-
-        const statsGrid = statsArea.getGrid();
-
-        const imgArea = statsGrid.getArea({ x: 1, y: 1, width: 3, height: 4 });
-
-        this.statsImage = new CustomContainer(this.scene, {
-            x: imgArea.center.x,
-            y: imgArea.center.y,
-            width: imgArea.width,
-            height: imgArea.height,
+        this.statsPanel = new DisplayContainer(this.scene, this.statsArea, {
             borderWidth: 7,
-            backgroundImage: "unknown",
+            opacity: 0.5,
+            outterRadius: { tl: 10, tr: 10, bl: 0, br: 0 },
         });
 
-        const classNameArea = statsGrid.getArea({
-            x: 4,
-            y: 1,
-            width: 6,
-            height: 1,
-        });
+        const statsGrid = this.statsArea.getGrid();
 
-        this.statsClassName = new CustomContainer(this.scene, {
-            title: "N/A",
-            x: classNameArea.center.x,
-            y: classNameArea.center.y,
-            width: classNameArea.width,
-            height: classNameArea.height,
-            borderWidth: 2,
-            bgColor: Color.containerBorder,
-        });
-        const playerNameArea = statsGrid.getArea({
-            x: 1,
-            y: 5,
-            width: 3,
-            height: 1,
-        });
+        this.statsImage = new DisplayContainer(
+            this.scene,
+            statsGrid.getArea({ x: 1, y: 1, width: 3, height: 4 }),
+            {
+                borderWidth: 7,
+                backgroundImage: "unknown",
+                outterRadius: { tl: 10, tr: 0, bl: 0, br: 0 },
+            },
+        );
 
-        this.statsName = new CustomContainer(this.scene, {
-            title: "N/A",
-            x: playerNameArea.center.x,
-            y: playerNameArea.center.y,
-            width: playerNameArea.width,
-            height: playerNameArea.height,
-            borderWidth: 2,
-            bgColor: Color.containerBorder,
-        });
+        this.statsClassName = new DisplayContainer(
+            this.scene,
+            statsGrid.getArea({
+                x: 4,
+                y: 1,
+                width: 6,
+                height: 1,
+            }),
+            {
+                title: "N/A",
+                borderWidth: 2,
+                bgColor: Color.containerBorder,
+                outterRadius: { tl: 0, tr: 10, bl: 0, br: 0 },
+            },
+        );
+
+        this.playerName = new DisplayContainer(
+            this.scene,
+            statsGrid.getArea({
+                x: 1,
+                y: 5,
+                width: 3,
+                height: 1,
+            }),
+            {
+                title: "N/A",
+                borderWidth: 7,
+                bgColor: Color.containerBorder,
+                outterRadius: { tl: 0, tr: 0, bl: 0, br: 10 },
+            },
+        );
 
         this.statsValuesGrid = statsGrid.getSubGrid(
             {
@@ -164,29 +162,36 @@ export class StatsDisplayer extends FightSceneDisplayer {
             },
         );
 
-        const effectListArea = statsGrid.getArea({
-            x: 1,
-            y: 6,
-            width: 3,
-            height: 4,
-        });
-
-        this.EffectList = new List(this.scene, {
-            position: {
-                x: effectListArea.center.x,
-                y: effectListArea.center.y,
+        const effectListArea = statsGrid.getSubGrid(
+            {
+                x: 1,
+                y: 6,
+                width: 3,
+                height: 4,
             },
-            width: effectListArea.width,
-            height: effectListArea.height,
-            cols: 3,
-            rows: 4,
-        });
+            {
+                division: {
+                    horizontal: 3,
+                    vertical: 4,
+                },
+            },
+        );
+
+        this.effectList = new List(this.scene, effectListArea);
 
         return this;
     }
 
+    blurOut(): this {
+        new Blur(this.scene, this.statsArea, {
+            radius: this.statsPanel.outterRadius,
+            depth: 50,
+        });
+        return this;
+    }
+
     render(): this {
-        allExistingStats.forEach((icon, index) => {
+        Object.values(StatsAssetId).forEach((icon, index) => {
             const row = Math.floor(index / 2) + 1;
             const col = (index % 2) + 1;
 
@@ -199,13 +204,15 @@ export class StatsDisplayer extends FightSceneDisplayer {
             );
 
             // Image
-            const imageArea = statGrid.getArea({
-                x: 1,
-                y: 1,
-            });
-            const image = new DisplayImage(this.scene, imageArea).setImage(
-                IconAsset.getAssetKey(icon),
-                IconAsset.getAssetScale(icon),
+            const image = new DisplayImage(
+                this.scene,
+                statGrid.getArea({
+                    x: 1,
+                    y: 1,
+                }),
+            ).setImage(
+                StatsIconAsset.getAssetKey(icon),
+                StatsIconAsset.getAssetScale(icon),
             );
             if (image) {
                 image.setInteractive(true);
@@ -217,12 +224,14 @@ export class StatsDisplayer extends FightSceneDisplayer {
             }
 
             // Text
-            const textArea = statGrid.getArea({
-                x: 2,
-                y: 1,
-            });
             this.statTexts.set(icon, {
-                text: new DisplayText(this.scene, textArea).setText("N/A"),
+                text: new DisplayText(
+                    this.scene,
+                    statGrid.getArea({
+                        x: 2,
+                        y: 1,
+                    }),
+                ).setText("N/A"),
                 image,
             });
         });
@@ -237,7 +246,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
             text.setText(String(stats[key as keyof Stats]), { fontSize: 20 }),
         );
 
-        this.statsName.setText(this.name);
+        this.playerName.setText(this.name);
         this.statsClassName.setText(this.characterClass.name);
         this.statsImage.setBackgroundImage(
             CharacterCloseupAsset.getAssetKey(this.entity.classId),
@@ -252,7 +261,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
         this.statsPanel.setVisible(isShow);
         this.statsImage.setVisible(isShow);
         this.statsClassName.setVisible(isShow);
-        this.statsName.setVisible(isShow);
+        this.playerName.setVisible(isShow);
 
         this.statTexts.forEach(({ text, image }) => {
             text.setVisible(isShow);
@@ -263,7 +272,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
     }
 
     displayEffects() {
-        this.EffectList.clear();
+        this.effectList.clear();
 
         const groupedEffects = this.entity.effects.reduce((acc, effect) => {
             if (!acc.has(effect.id)) {
@@ -271,10 +280,10 @@ export class StatsDisplayer extends FightSceneDisplayer {
             }
             acc.get(effect.id)!.push(effect);
             return acc;
-        }, new Map<string, typeof this.entity.effects>());
+        }, new Map<EffectAssetId, Effect[]>());
 
         Array.from(groupedEffects.entries()).forEach(([id, effects], index) => {
-            const iconObj = this.EffectList.placeContent(
+            const iconObj = this.effectList.placeContent(
                 index,
                 0,
                 {

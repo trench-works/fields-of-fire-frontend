@@ -3,6 +3,7 @@ import { Entity } from "./Entity";
 
 export type Stats = {
     life: number;
+    maxLife: number;
     precision: number;
     strength: number;
     armor: number;

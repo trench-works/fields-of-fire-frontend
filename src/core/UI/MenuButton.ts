@@ -1,6 +1,6 @@
-import Phaser from "phaser";
 import { Button } from "./Button";
 import { MenuPanel } from "./MenuPanel";
+import { BaseScene } from "../Objects";
 
 interface MenuButtonConfig {
     onResumeClick?: () => void;
@@ -12,9 +12,9 @@ interface MenuButtonConfig {
 export class MenuButton {
     private button!: Button;
     private menuPanel!: MenuPanel;
-    private scene: Phaser.Scene;
+    private scene: BaseScene;
 
-    constructor(scene: Phaser.Scene, config: MenuButtonConfig) {
+    constructor(scene: BaseScene, config: MenuButtonConfig) {
         this.scene = scene;
 
         // Créer le panneau du menu
@@ -28,17 +28,22 @@ export class MenuButton {
         const positionConfig = this.getPosition(config.position);
 
         // Créer le bouton Menu
-        this.button = new Button(scene, {
-            x: positionConfig.x,
-            y: positionConfig.y,
-            width: 50,
-            height: 50,
-            text: "☰",
-            fontSize: 32,
-            onClick: () => {
-                this.menuPanel.toggle();
+        this.button = new Button(
+            scene,
+            {
+                x: positionConfig.x - 25,
+                y: positionConfig.y - 25,
+                width: 50,
+                height: 50,
             },
-        });
+            {
+                text: "☰",
+                fontSize: 32,
+                onClick: () => {
+                    this.menuPanel.toggle();
+                },
+            },
+        );
 
         this.button.setScrollFactor(0);
         this.button.setDepth(9999);

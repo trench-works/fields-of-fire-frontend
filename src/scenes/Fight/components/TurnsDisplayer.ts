@@ -1,15 +1,15 @@
 import { CharacterCloseupAsset } from "../../../assets";
 import { Color } from "../../../config/ColorConfig";
-import { CustomContainer, ScaleUtils } from "../../../core";
+import { DisplayContainer, ScaleMode } from "../../../core";
 import { FightScene } from "../fight.scene";
 import { ClassStore } from "../stores/ClassStore";
 import { GameStore } from "../stores/GameStore";
 import { FightSceneDisplayer } from "./FightSceneDisplayer";
 
 export class TurnDisplayer extends FightSceneDisplayer {
-    private turnPanel!: CustomContainer;
+    private turnPanel!: DisplayContainer;
 
-    private icons: CustomContainer[] = [];
+    private icons: DisplayContainer[] = [];
 
     constructor(
         scene: FightScene,
@@ -20,19 +20,19 @@ export class TurnDisplayer extends FightSceneDisplayer {
     }
 
     preRender(): this {
-        const turndisplay = this.scene.rootGrid.getArea({
-            x: 1,
-            y: 1,
-            width: 7,
-            height: 1,
-        });
-        this.turnPanel = new CustomContainer(this.scene, {
-            x: turndisplay.center.x,
-            y: turndisplay.center.y,
-            width: turndisplay.width,
-            height: turndisplay.height,
-            opacity: 0.25,
-        });
+        this.turnPanel = new DisplayContainer(
+            this.scene,
+            this.scene.rootGrid.getArea({
+                x: 1,
+                y: 1,
+                width: 7,
+                height: 1,
+            }),
+            {
+                opacity: 0.25,
+                outterRadius: { tr: 0, bl: 0, tl: 0, br: 10 },
+            },
+        );
 
         this.turnPanel.setDepth(0);
 
@@ -69,35 +69,38 @@ export class TurnDisplayer extends FightSceneDisplayer {
             );
             const isFirstCell = index === 0;
 
-            const cellArea = turnGrid.getArea({
-                x: index + 1,
-                y: 1,
-                width: 1,
-                height: 1,
-                margin: isFirstCell ? 0 : 5,
-            });
-
-            const imageSize = ScaleUtils.fitFromScale(
-                cellArea,
-                CharacterCloseupAsset.getAssetScale(entity.classId),
-            );
+            const cellArea = turnGrid
+                .getArea({
+                    x: index + 1,
+                    y: 1,
+                    width: 1,
+                    height: 1,
+                    margin: isFirstCell ? 0 : 5,
+                })
+                .scaleFromCenter(
+                    CharacterCloseupAsset.getAssetScale(entity.classId),
+                    ScaleMode.FIT,
+                );
 
             this.icons.push(
-                new CustomContainer(this.scene, {
-                    title: player?.name ?? charClass?.name?.split(" ")[0],
-                    x: cellArea.center.x,
-                    y: cellArea.center.y - (isFirstCell ? 0 : 5),
-                    width: imageSize.width,
-                    height: imageSize.height,
-                    borderWidth: isFirstCell ? 5 : 2,
-                    borderColor: isFirstCell
-                        ? Color.actualTurnBorder
-                        : Color.otherTurnBorder,
-                    backgroundImage: CharacterCloseupAsset.getAssetKey(
-                        entity.classId,
-                    ),
-                    opacity: isFirstCell ? 1 : 0.7,
-                }),
+                new DisplayContainer(
+                    this.scene,
+                    {
+                        ...cellArea,
+                        y: cellArea.y - (isFirstCell ? 0 : 5),
+                    },
+                    {
+                        title: player?.name ?? charClass?.name?.split(" ")[0],
+                        borderWidth: isFirstCell ? 5 : 2,
+                        borderColor: isFirstCell
+                            ? Color.actualTurnBorder
+                            : Color.otherTurnBorder,
+                        backgroundImage: CharacterCloseupAsset.getAssetKey(
+                            entity.classId,
+                        ),
+                        opacity: isFirstCell ? 1 : 0.7,
+                    },
+                ),
             );
         });
         return this;

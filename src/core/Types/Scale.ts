@@ -11,3 +11,7 @@ export interface ScaleAndCenterResult {
     scaleFactor: number;
 }
 
+export enum PlacementOrigin {
+    CENTER = "center",
+    UPPER_LEFT_CORNER = "ul_corner",
+}

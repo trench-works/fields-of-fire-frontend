@@ -16,12 +16,14 @@ export class ActionManager {
         this.currentAction = undefined;
     }
 
-    launchAction(pos: Position) {
-        this.scene.playerSocket.action({
-            actionId: this.currentAction?.id || "",
+    async launchAction(pos: Position) {
+        this.scene.actions.lock();
+        const action = this.currentAction;
+        this.scene.actions.clearAction();
+        await this.scene.playerSocket.action({
+            actionId: action?.id ?? "",
             target: pos,
         });
-        this.clearCurrentAction();
     }
 
     calculateDamagePreview(

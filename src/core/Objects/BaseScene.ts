@@ -6,9 +6,29 @@ import {
 } from "../../assets/BackgroundAsset";
 import { Grid } from "../Utils";
 import { TwoAxis } from "../Types";
+import { MusicAsset, MusicAssetId } from "../../assets";
+import { Sound } from "../Types/Sound";
+import { Loader } from "./Loader";
 
-export class BaseScene extends Scene {
+export type BaseSceneInit<InitData = never> = {
+    data: InitData;
+    config?: StartSceneConfig;
+};
+
+export type StartSceneConfig = {
+    keepMusic?: boolean;
+    backgroundMusic?: Sound;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export class BaseScene<InitData = any> extends Scene {
     public rootGrid: Grid;
+
+    protected backgroundSound?: Sound;
+
+    protected isOpen: boolean;
+
+    protected startConfig: StartSceneConfig;
 
     constructor(
         key: SceneAssetId,
@@ -16,11 +36,41 @@ export class BaseScene extends Scene {
         rootGridOptions?: { division: TwoAxis },
     ) {
         super({ key });
+        this.isOpen = false;
         this.rootGrid = new Grid(rootGridOptions);
+        this.startConfig = {};
+    }
+
+    static startScene<InitData = never>(
+        scene: BaseScene,
+        id: SceneAssetId,
+        data: BaseSceneInit<InitData>,
+    ) {
+        if (data.config?.keepMusic ?? true) {
+            data.config ??= {};
+            data.config.backgroundMusic = scene.backgroundSound;
+            console.log(scene.backgroundSound);
+        }
+        scene.close(data.config?.keepMusic);
+        scene.scene.start(id, data);
+    }
+
+    init(init: BaseSceneInit<InitData>) {
+        this.isOpen = true;
+        this.startConfig = init?.config ?? {};
+        if (init?.config?.backgroundMusic) {
+            if (this.backgroundSound) {
+                this.backgroundSound.stop();
+                this.backgroundSound.destroy();
+            }
+            this.backgroundSound = init?.config?.backgroundMusic;
+        }
     }
 
     preload() {
         BackgroundAsset.load(this.load, this.background);
+
+        new Loader(this);
     }
 
     create() {
@@ -29,6 +79,44 @@ export class BaseScene extends Scene {
             .setOrigin(0, 0)
             .setDepth(-1);
         bg.setDisplaySize(this.scale.width, this.scale.height);
+    }
+
+    playBackgroundMusic(id: MusicAssetId, force: boolean = false) {
+        if (this.isOpen) {
+            if (
+                force ||
+                !this.backgroundSound ||
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                !(this.backgroundSound as any)?.["currentConfig"] //FIXME: ptn de magie noire pour détecter si l'objet musique est corrompu à la réception
+            ) {
+                this.backgroundSound?.stop();
+                this.backgroundSound?.destroy();
+                this.backgroundSound = this.sound.add(
+                    MusicAsset.getAssetKey(id),
+                );
+                this.backgroundSound.setLoop(true);
+                this.backgroundSound.setVolume(
+                    0.4 * MusicAsset.getBaseSoundLevel(id),
+                );
+            }
+            if (!this.backgroundSound.isPlaying) {
+                this.backgroundSound.play();
+                this.sound.unlock();
+            }
+        }
+    }
+
+    stopBackgroundMusic() {
+        if (this.backgroundSound) {
+            this.backgroundSound.stop();
+        }
+    }
+
+    close(keepMusic: boolean = true) {
+        this.isOpen = false;
+        if (!keepMusic) {
+            this.stopBackgroundMusic();
+        }
     }
 }
 

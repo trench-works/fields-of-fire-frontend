@@ -6,18 +6,19 @@ import { EntityType } from "../../../../Model/Entity";
 import { FightScene } from "../../fight.scene";
 import { ClassStore } from "../../stores/ClassStore";
 import { GameStore } from "../../stores/GameStore";
+import { GroundStore } from "../../stores/GroundStore";
 import { PlayerStore } from "../../stores/PlayerStore";
 import { FightSceneDisplayer } from "../FightSceneDisplayer";
 
 export class GroundDisplayer extends FightSceneDisplayer {
     private tileHighlights: Phaser.GameObjects.Graphics[] = [];
-    private groundLayer: Phaser.Tilemaps.TilemapLayer | null = null;
 
     constructor(
         scene: FightScene,
         gameStore: GameStore,
         private readonly classStore: ClassStore,
         private readonly playerStore: PlayerStore,
+        private readonly groundStore: GroundStore,
     ) {
         super(scene, gameStore);
     }
@@ -27,6 +28,13 @@ export class GroundDisplayer extends FightSceneDisplayer {
     }
 
     render(): this {
+        this.renderGroundLayer();
+        this.generatePlayGrid();
+        this.displayEntitiesHighlights();
+        return this;
+    }
+
+    renderGroundLayer() {
         const map = this.scene.make.tilemap({
             key: this.scene.fightMap,
         });
@@ -51,28 +59,26 @@ export class GroundDisplayer extends FightSceneDisplayer {
         );
         this.scene.scaleFactor = centerMap.scaleFactor;
 
-        this.groundLayer = map.createLayer(
-            "Ground",
-            tileset!,
-            centerMap.offset.x,
-            centerMap.offset.y,
+        this.groundStore.setGroundLayer(
+            map.createLayer(
+                "Ground",
+                tileset!,
+                centerMap.offset.x,
+                centerMap.offset.y,
+            ),
         );
 
-        if (!this.groundLayer) {
+        if (!this.groundStore.groundLayer) {
             throw new Error("Ground layer seemingly inexistent");
         }
 
-        this.groundLayer.setScale(this.scene.scaleFactor);
-        this.groundLayer.setDepth(0);
-
-        this.generatePlayGrid();
-        this.displayEntitiesHighlights();
-        return this;
+        this.groundStore.groundLayer.setScale(this.scene.scaleFactor);
+        this.groundStore.groundLayer.setDepth(0);
     }
 
     private displayEntitiesHighlights() {
-        if (!this.groundLayer) {
-            return;
+        if (!this.groundStore.groundLayer) {
+            this.renderGroundLayer();
         }
         for (const highlightEntity of this.tileHighlights) {
             highlightEntity.destroy();
@@ -82,7 +88,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
                 const caseTile = this.gameStore.game.plateau[x][y];
                 // Ground part
-                const tile = this.groundLayer?.getTileAt?.(x, y);
+                const tile = this.groundStore.groundLayer?.getTileAt?.(x, y);
                 if (tile) {
                     if (caseTile.isHole) {
                         tile.setVisible(false);
@@ -116,13 +122,28 @@ export class GroundDisplayer extends FightSceneDisplayer {
     }
 
     private generatePlayGrid() {
-        if (!this.groundLayer) {
+        if (!this.groundStore.groundLayer) {
             return;
         }
         for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
-                const tile = this.groundLayer.getTileAt(x, y);
+                const tile = this.groundStore.groundLayer.getTileAt(x, y);
                 const caseTile = this.gameStore.game.plateau[x][y];
+
+                const worldX = tile.getCenterX();
+                const worldY = tile.getCenterY();
+                if (!this.scene.gridPositions[y]) {
+                    this.scene.gridPositions[y] = [];
+                }
+
+                this.scene.gridPositions[x][y] = {
+                    gridPosition: { x, y },
+                    pixelPosition: {
+                        x: worldX,
+                        y: worldY - 16 * this.scene.scaleFactor,
+                    },
+                };
+
                 if (caseTile.isHole) {
                     tile.setVisible(false);
                 } else if (!caseTile.isWall) {
@@ -135,31 +156,18 @@ export class GroundDisplayer extends FightSceneDisplayer {
                         depth: 2,
                     });
                     hoverGraphics.setVisible(false);
+                    this.scene.gridPositions[x][y].hoverGraphics =
+                        hoverGraphics;
 
                     const zone = this.getTileInteractiveZone(tile, {
                         diamond,
                     });
+                    this.scene.gridPositions[x][y].zone = zone;
 
                     // --- DEBUG VISUEL ---
                     //this.gridShower(diamond, worldX, worldY, layer);
-
-                    const worldX = tile.getCenterX();
-                    const worldY = tile.getCenterY();
-                    if (!this.scene.gridPositions[y]) {
-                        this.scene.gridPositions[y] = [];
-                    }
-
-                    this.scene.gridPositions[x][y] = {
-                        gridPosition: { x, y },
-                        pixelPosition: {
-                            x: worldX,
-                            y: worldY - 16 * this.scene.scaleFactor,
-                        },
-                        zone,
-                        hoverGraphics,
-                    };
-
                     zone.on("pointerdown", () => {
+                        this.scene.character.changeDirection({ x, y });
                         if (this.scene.actionManager.currentAction) {
                             if (
                                 this.scene.rangeVisualizer.isInRange({ x, y })
@@ -224,7 +232,9 @@ export class GroundDisplayer extends FightSceneDisplayer {
         graphics.lineStyle(2, props?.color ?? 0xffffff, 1);
         graphics.strokePoints(diamond.points, true);
         graphics.setPosition(worldX, worldY);
-        graphics.setDepth(this.groundLayer?.depth ?? 0 + (props?.depth ?? 1));
+        graphics.setDepth(
+            this.groundStore.groundLayer?.depth ?? 0 + (props?.depth ?? 1),
+        );
 
         return graphics;
     }
@@ -243,7 +253,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
         // Create Zone
         const zone = this.scene.add.zone(worldX, worldY, 10, 10);
         zone.setInteractive(diamond, Phaser.Geom.Polygon.Contains);
-        zone.setDepth(this.groundLayer?.depth ?? 0 + 2);
+        zone.setDepth(this.groundStore.groundLayer?.depth ?? 0 + 2);
         return zone;
     }
 

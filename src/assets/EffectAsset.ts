@@ -3,6 +3,9 @@ import { ImageAssetManager } from "../core/Assets/Asset";
 export enum EffectAssetId {
     AMPUTATED = "amputated",
     INTIMIDATED = "intimidated",
+    DOPED = "doped",
+    CHARGE = "charge",
+    FIGHTING_DRY = "enhanced_drug",
 }
 
 class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
@@ -11,14 +14,25 @@ class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
     }
 
     protected getAssetFileLink(assetKey: string, asset: string): string {
-        return `assets/action/${asset}.png`;
+        return `assets/action/icons/${asset}.png`;
     }
 
     constructor() {
         super("effect", {
-            [EffectAssetId.AMPUTATED]: "action_image_amputate",
-            [EffectAssetId.INTIMIDATED]: "action_image_intimidation"
-        });
+            [EffectAssetId.AMPUTATED]: "amputate",
+            [EffectAssetId.INTIMIDATED]: "intimidation",
+            [EffectAssetId.DOPED]: "dopage",
+            [EffectAssetId.CHARGE]: "charge",
+            [EffectAssetId.FIGHTING_DRY] : "enhanced_drug"
+        },
+        {
+            [EffectAssetId.AMPUTATED]: {width : 512, height: 512},
+            [EffectAssetId.INTIMIDATED]: {width : 512, height: 512},
+            [EffectAssetId.DOPED]: {width: 512, height: 512},
+            [EffectAssetId.CHARGE]: {width: 512, height: 512},
+            [EffectAssetId.FIGHTING_DRY] : {width: 512, height: 512},
+        }
+        );
     }
 }
 

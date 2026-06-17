@@ -1,13 +1,15 @@
 import Phaser from "phaser";
 import { Color } from "../../config/ColorConfig";
-import { FourAxis, Position, Size } from "../Types";
-import { IGridArea } from "../Utils";
+import { FourAxis, PlacementOrigin, Position, Size } from "../Types";
 import { Displayable } from "./DisplayRoot";
+import { DisplayText } from "./DisplayText";
+import { BaseScene } from "../Objects";
+import { ColorUtils } from "../Utils";
 
 const CLICKABLE_ALPHA = 1;
 const UNCLICKABLE_ALPHA = 0.5;
 
-type ButtonConfig = ((Position & Size & { center?: never }) | IGridArea) & {
+type ButtonConfig = {
     text?: string;
     onClick: () => void;
     fontSize?: number;
@@ -23,9 +25,12 @@ export class Button
     extends Phaser.GameObjects.Container
     implements Displayable
 {
-    protected textDisplay?: Phaser.GameObjects.Text;
+    declare scene: BaseScene;
+    protected textDisplay?: DisplayText;
     protected imageDisplay?: Phaser.GameObjects.Image;
     protected background?: Phaser.GameObjects.Rectangle;
+
+    private highlighter?: Phaser.GameObjects.Graphics;
 
     protected onClick: () => void;
 
@@ -36,7 +41,8 @@ export class Button
     protected color = Color.btnBg;
 
     constructor(
-        scene: Phaser.Scene,
+        scene: BaseScene,
+        protected readonly area: Position & Size,
         {
             text,
             onClick,
@@ -45,13 +51,11 @@ export class Button
             textColor,
             borderWidth = 0,
             depth = 1,
-            padding,
-            borderColor,
-            ...pos
         }: ButtonConfig,
     ) {
-        super(scene, pos.center?.x ?? pos.x, pos.center?.x ?? pos.y);
-        this.setSize(pos.width, pos.height);
+        super(scene, area.x + area.width / 2, area.y + area.height / 2);
+        this.scene = scene;
+        this.setSize(area.width, area.height);
         this.setDepth(depth);
 
         this.onClick = onClick;
@@ -99,6 +103,29 @@ export class Button
         // Ajoute le bouton à la scène
         scene.add.existing(this);
     }
+
+    hightlight(highlight: boolean): this {
+        if (highlight) {
+            if (!this.highlighter) {
+                this.highlighter = this.scene.make.graphics({}, false);
+                this.add(this.highlighter);
+            }
+            const width = this.width;
+            const height = this.height;
+            this.highlighter.clear();
+            this.highlighter.lineStyle(2, ColorUtils.parseColor("#27DAF5"), 1);
+            this.highlighter.strokeRect(-width / 2, -height / 2, width, height);
+        } else {
+            this.highlighter?.destroy();
+            this.highlighter = undefined;
+        }
+        return this;
+    }
+
+    place(position: Position, size: Size, origin: PlacementOrigin): void {
+        throw new Error("Method not implemented.");
+    }
+
     getObject(): Phaser.GameObjects.GameObject {
         throw new Error("Method not implemented.");
     }
@@ -110,6 +137,8 @@ export class Button
             return this;
         }
 
+        this.background?.destroy();
+
         this.imageDisplay = this.scene.make.image(
             { x: 0, y: 0, key: imageKey },
             false,
@@ -118,7 +147,6 @@ export class Button
         this.imageDisplay.setOrigin(0.5);
 
         this.addAt(this.imageDisplay);
-
         return this;
     }
 
@@ -126,19 +154,21 @@ export class Button
         text: string | undefined,
         options?: { color?: string; fontSize?: number },
     ): this {
+        this.textDisplay?.destroy?.();
         if (!text) {
-            this.textDisplay?.destroy?.();
             delete this.textDisplay;
             return this;
         }
-        this.textDisplay = this.scene.add
-            .text(0, 0, text, {
-                fontFamily: "MyFont",
-                fontSize: `${options?.fontSize ?? this.height / 3}px`,
-                color: options?.color ?? "#FFFFFF",
-            })
-            .setOrigin(0.5);
-        this.add(this.textDisplay);
+        this.textDisplay = new DisplayText(this.scene, {
+            x: -this.width / 2,
+            y: -this.height / 2,
+            width: this.width,
+            height: this.height,
+        }).setText(text, {
+            fontSize: options?.fontSize ?? this.height / 3,
+            color: options?.color ?? "#FFFFFF",
+        });
+        this.add(this.textDisplay.getObject());
         return this;
     }
 

@@ -1,7 +1,7 @@
 import { BaseScene } from "../Objects";
 import { Grid, GridArea } from "../Utils";
 import { Button } from "./Button";
-import { CustomContainer } from "./Container";
+import { DisplayContainer } from "./Container";
 import { DisplayRoot } from "./DisplayRoot";
 
 export type TabConfig = {
@@ -37,29 +37,26 @@ export class TabManager {
 
         tabsConfig.forEach((tab, index) => {
             const tabRoot = new DisplayRoot();
-            const btnArea = this.rootGrid.getArea({
-                x: index + 1,
-                y: 1,
-                width: 1,
-                height: 1,
-            });
-            const btn = new Button(this.scene, {
-                x: btnArea.center.x,
-                y: btnArea.center.y,
-                width: btnArea.width,
-                height: btnArea.height,
-                text: tab.label,
-                borderWidth: 5,
-                borderColor: "#2A4237",
-                onClick: () => this.switchTo(index),
-            });
+            const btn = new Button(
+                this.scene,
+                this.rootGrid.getArea({
+                    x: index + 1,
+                    y: 1,
+                    width: 1,
+                    height: 1,
+                }),
+                {
+                    text: tab.label,
+                    borderWidth: 5,
+                    borderColor: "#2A4237",
+                    onClick: () => this.switchTo(index),
+                },
+            );
 
             tabRoot.add(
-                new CustomContainer(this.scene, {
-                    x: contentArea.center.x,
-                    y: contentArea.center.y,
-                    width: contentArea.width,
-                    height: contentArea.height,
+                new DisplayContainer(this.scene, contentArea, {
+                    borderWidth: 5,
+                    outterRadius: 0,
                 }),
             );
 

@@ -35,12 +35,39 @@ export function computeScaleFactor(
     );
 }
 
-export function fitFromScale(size: Size, scale: number): Size {
+export function fillFromScale(size: Size, scale: number): Size {
     const sizingRef =
-        Math.min(size.width, size.height) === size.width ? "WIDTH" : "HEIGHT";
+        Math.min(size.height * scale, size.width / scale) ===
+        size.height * scale
+            ? "WIDTH"
+            : "HEIGHT";
 
     return {
         width: sizingRef === "WIDTH" ? size.width : size.height * scale,
         height: sizingRef === "HEIGHT" ? size.height : size.width / scale,
     };
 }
+
+export function fitFromScale(size: Size, scale: number): Size {
+    const sizingRef =
+        Math.max(size.height * scale, size.width / scale) ===
+        size.height * scale
+            ? "WIDTH"
+            : "HEIGHT";
+
+    return {
+        width: sizingRef === "WIDTH" ? size.width : size.height * scale,
+        height: sizingRef === "HEIGHT" ? size.height : size.width / scale,
+    };
+}
+
+export function conserveFromScale(size: Size, scale: number): Size {
+    const fillSize = fillFromScale(size, scale);
+    const fitSize = fitFromScale(size, scale);
+
+    return {
+        width: (fillSize.width + fitSize.width) / 2,
+        height: (fillSize.height + fitSize.height) / 2,
+    };
+}
+

@@ -1,3 +1,4 @@
+import { ScaleUtils } from ".";
 import { FourAxis, Position, Size, TwoAxis } from "../Types";
 import { AxisUtils } from "./Sizing";
 
@@ -25,15 +26,28 @@ export type IGridArea = {
     center: Position;
 };
 
-export class GridArea implements Position, Size, IGridArea {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
+export enum ScaleMode {
+    FIT = "fit",
+    FILL = "fill",
+    CONSERVE = "conserve",
+}
 
-    center: Position;
+export class GridArea implements Position, Size, IGridArea {
+    get center() {
+        return {
+            x: this.x + this.width / 2,
+            y: this.y + this.height / 2,
+        };
+    }
 
     constructor(
+        public readonly x: number,
+        public readonly y: number,
+        public readonly width: number,
+        public readonly height: number,
+    ) {}
+
+    static fromGrid(
         grid: Grid,
         {
             x,
@@ -42,17 +56,30 @@ export class GridArea implements Position, Size, IGridArea {
             height = 1,
             margin,
         }: Position & Partial<Size> & { margin: FourAxis },
-    ) {
-        this.x = grid.x + (x - 1) * grid.cell.width + margin.left;
-        this.y = grid.y + (y - 1) * grid.cell.height + margin.right;
+    ): GridArea {
+        const areaX = grid.x + (x - 1) * grid.cell.width + margin.left;
+        const areaY = grid.y + (y - 1) * grid.cell.height + margin.top;
 
-        this.width = width * grid.cell.width - margin.left - margin.right;
-        this.height = height * grid.cell.height - margin.top - margin.bottom;
+        const areaWidth = width * grid.cell.width - margin.left - margin.right;
+        const areaHeight =
+            height * grid.cell.height - margin.top - margin.bottom;
 
-        this.center = {
-            x: this.x + this.width / 2,
-            y: this.y + this.height / 2,
-        };
+        return new GridArea(areaX, areaY, areaWidth, areaHeight);
+    }
+
+    static fromPositionAndSize({
+        x,
+        y,
+        width,
+        height,
+    }: Position & Size): GridArea {
+        return new GridArea(x, y, width, height);
+    }
+
+    static fromCenter(center: Position, { width, height }: Size): GridArea {
+        const x = center.x - width / 2;
+        const y = center.y - height / 2;
+        return this.fromPositionAndSize({ x, y, width, height });
     }
 
     getGrid(options?: GetGridOptions): Grid {
@@ -61,6 +88,28 @@ export class GridArea implements Position, Size, IGridArea {
             size: { width: this.width, height: this.height },
             ...options,
         });
+    }
+
+    /**
+     *
+     * @param scale Scale is targeted report between width and height, it correspond to width / height
+     * @param scaleMode Scale mode will determine the final size of the element
+     * @returns a new grid area
+     */
+    scaleFromCenter(scale: number, scaleMode: ScaleMode): GridArea {
+        let newSize: Size;
+        switch (scaleMode) {
+            case ScaleMode.FILL:
+                newSize = ScaleUtils.fillFromScale(this, scale);
+                break;
+            case ScaleMode.FIT:
+                newSize = ScaleUtils.fitFromScale(this, scale);
+                break;
+            case ScaleMode.CONSERVE:
+                newSize = ScaleUtils.conserveFromScale(this, scale);
+                break;
+        }
+        return GridArea.fromCenter(this.center, newSize);
     }
 }
 
@@ -132,7 +181,7 @@ export class Grid implements Position, Size {
         const margin: FourAxis = options?.margin
             ? AxisUtils.fromTwoOrFourAxis(options.margin)
             : this.padding;
-        return new GridArea(this, { ...options, margin });
+        return GridArea.fromGrid(this, { ...options, margin });
     }
 }
 

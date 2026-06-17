@@ -1,26 +1,27 @@
 import Phaser from "phaser";
 import { Color } from "../../config/ColorConfig";
-import { ColorUtils } from "../Utils";
+import { ColorUtils, GridArea } from "../Utils";
 import { Position, Size } from "../Types";
 import { Displayable } from "./DisplayRoot";
 
-type ContainerConfig = Size &
-    Position & {
-        title?: string;
-        bgColor?: string;
-        titleColor?: string;
-        borderWidth?: number;
-        borderColor?: string;
-        backgroundImage?: string;
-        opacity?: number;
-        fontSize?: number;
-        onClick?: () => void;
-        textPosition?: { x: number; y: number };
-        hoverTint?: number;
-        alpha?: number;
-    };
+type ContainerConfig = {
+    title?: string;
+    bgColor?: string;
+    titleColor?: string;
+    borderWidth?: number;
+    borderColor?: string;
+    backgroundImage?: string;
+    opacity?: number;
+    fontSize?: number;
+    onClick?: () => void;
+    hoverTint?: number;
+    alpha?: number;
+    radius?: Phaser.Types.GameObjects.Graphics.RoundedRectRadius | number;
+    outterRadius?: Phaser.Types.GameObjects.Graphics.RoundedRectRadius | number;
+    innerRadius?: Phaser.Types.GameObjects.Graphics.RoundedRectRadius | number;
+};
 
-export class CustomContainer
+export class DisplayContainer
     extends Phaser.GameObjects.Container
     implements Displayable
 {
@@ -28,25 +29,43 @@ export class CustomContainer
         | Phaser.GameObjects.Graphics
         | Phaser.GameObjects.Image
         | null = null;
-    private borderGraphics?: Phaser.GameObjects.Graphics;
+    private border?: Phaser.GameObjects.Graphics;
+    private outterBorder?: Phaser.GameObjects.Graphics;
     private titleText?: Phaser.GameObjects.Text;
     public onClick: (() => void) | undefined;
     private bgColor: string;
     private bgOpacity: number;
     private hoverTint: number | undefined;
 
+    protected radius:
+        | Phaser.Types.GameObjects.Graphics.RoundedRectRadius
+        | number;
+    public outterRadius?:
+        | Phaser.Types.GameObjects.Graphics.RoundedRectRadius
+        | number;
+    protected innerRadius?:
+        | Phaser.Types.GameObjects.Graphics.RoundedRectRadius
+        | number;
+
     getObject(): Phaser.GameObjects.GameObject {
         throw new Error("Method not implemented.");
     }
 
-    constructor(scene: Phaser.Scene, config: ContainerConfig) {
+    place({ x, y }: Position, { width, height }: Size): void {
+        this.setSize(width, height);
+        this.setX(x + width / 2);
+        this.setY(y + height / 2);
+    }
+
+    constructor(
+        scene: Phaser.Scene,
+        position: (Size & Position) | GridArea,
+        config: ContainerConfig,
+    ) {
+        const { x, y, height, width } = position;
         const {
             title = "",
             bgColor = Color.containerBg,
-            x,
-            y,
-            height,
-            width,
             borderWidth = 0,
             borderColor = Color.containerBorder,
             backgroundImage,
@@ -54,14 +73,26 @@ export class CustomContainer
             alpha,
             onClick,
             hoverTint,
+            fontSize,
+            radius = 10,
+            outterRadius,
+            innerRadius,
         } = config;
 
         super(scene, x, y);
+
+        this.place({ x, y }, { width, height });
 
         this.bgColor = bgColor; // <--- IMPORTANT
         this.bgOpacity = opacity;
         this.onClick = onClick;
         this.hoverTint = hoverTint;
+
+        // Radius
+        this.radius = radius;
+        this.outterRadius = outterRadius;
+        this.innerRadius = innerRadius;
+
         if (alpha) {
             this.alpha = alpha;
         }
@@ -69,23 +100,14 @@ export class CustomContainer
         // --- TEXTE ---
 
         // IMPORTANT : définir la taille AVANT le fond
-        this.setSize(width, height);
 
         // --- FOND (refactorisé) ---
-        this.setText(title);
+        this.setText(title, { fontSize });
         this.setBackgroundImage(backgroundImage ?? null);
 
         // --- BORDURE ---
         if (borderColor && borderWidth > 0) {
-            this.borderGraphics = scene.make.graphics({}, false);
-            this.manageBorder(
-                this.borderGraphics,
-                ColorUtils.parseColor(borderColor),
-                borderWidth,
-                width,
-                height,
-            );
-            this.add(this.borderGraphics);
+            this.manageBorder(ColorUtils.parseColor(borderColor), borderWidth);
         }
 
         // --- TITRE ---
@@ -102,11 +124,10 @@ export class CustomContainer
         scene.add.existing(this);
     }
 
-    public setText(text: string) {
-        const fontSize = Math.min(
-            this.height / 2,
-            (this.width / text.length) * 1.5,
-        );
+    public setText(text: string, options?: { fontSize?: number }) {
+        const fontSize =
+            options?.fontSize ??
+            Math.min(this.height / 2, (this.width / text.length) * 1.5);
         if (!this.titleText) {
             this.titleText = this.scene.add
                 .text(0, 0, text, {
@@ -115,7 +136,10 @@ export class CustomContainer
                     color: "#FFFFFF",
                 })
                 .setOrigin(0.5);
-            const textPosition = { x: 0, y: -this.height / 2 + 15 };
+            const textPosition = {
+                x: 0,
+                y: -this.height / 2 + 22,
+            };
             this.titleText.setPosition(textPosition.x, textPosition.y);
             this.add(this.titleText);
         } else {
@@ -123,22 +147,52 @@ export class CustomContainer
         }
     }
 
-    public manageBorder(
-        g: Phaser.GameObjects.Graphics,
-        borderColor: number,
-        borderWidth: number,
-        width: number,
-        height: number,
-    ) {
-        g.clear();
-        g.lineStyle(borderWidth, borderColor, 1);
-        g.strokeRoundedRect(-width / 2, -height / 2, width, height, 10);
+    public manageBorder(borderColor: number, borderWidth: number) {
+        if (!this.border) {
+            this.border = this.scene.make.graphics({}, false);
+            this.add(this.border);
+        }
+        const width = this.width;
+        const height = this.height;
+        this.border.clear();
+        this.border.lineStyle(borderWidth, borderColor, 1);
+        this.border.strokeRoundedRect(
+            -width / 2,
+            -height / 2,
+            width,
+            height,
+            this.innerRadius ?? this.radius,
+        );
+        if (this.outterRadius !== undefined) {
+            if (!this.outterBorder) {
+                this.outterBorder = this.scene.make.graphics({}, false);
+                this.add(this.outterBorder);
+            }
+            const width = this.width;
+            const height = this.height;
+            this.outterBorder.clear();
+            this.outterBorder.lineStyle(borderWidth, borderColor, 1);
+            this.outterBorder.strokeRoundedRect(
+                -width / 2,
+                -height / 2,
+                width,
+                height,
+                this.outterRadius,
+            );
+        }
     }
 
     public setBackgroundColor(color: string, alpha = 1) {
-        // Si le fond actuel est une image → on repasse en mode couleur
+        // Sinon on met à jour le Graphics existant
+        if (this.background instanceof Phaser.GameObjects.Graphics) {
+            this.background.clear();
+            this.background.fillStyle(ColorUtils.parseColor(color), alpha);
+            this.drawBackground();
+        }
+    }
+
+    private drawBackground() {
         if (this.background instanceof Phaser.GameObjects.Image) {
-            this.setBackgroundImage(null);
             return;
         }
 
@@ -146,10 +200,13 @@ export class CustomContainer
         if (this.background instanceof Phaser.GameObjects.Graphics) {
             const width = this.width;
             const height = this.height;
-
-            this.background.clear();
-            this.background.fillStyle(ColorUtils.parseColor(color), alpha);
-            this.background.fillRoundedRect(this.x, this.y, width, height, 10);
+            this.background.fillRoundedRect(
+                -width / 2,
+                -height / 2,
+                width,
+                height,
+                this.outterRadius ?? this.radius,
+            );
         }
     }
 
@@ -172,12 +229,13 @@ export class CustomContainer
             this.background = img;
             this.addAt(img, 0);
         } else {
-            const bg = this.scene.make.graphics({}, false);
-            bg.fillStyle(ColorUtils.parseColor(this.bgColor), this.bgOpacity);
-            bg.fillRoundedRect(-width / 2, -height / 2, width, height, 10);
-
-            this.background = bg;
-            this.addAt(bg, 0);
+            this.background = this.scene.make.graphics({}, false);
+            this.background.fillStyle(
+                ColorUtils.parseColor(this.bgColor),
+                this.bgOpacity,
+            );
+            this.drawBackground();
+            this.addAt(this.background, 0);
         }
     }
 

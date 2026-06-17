@@ -1,15 +1,21 @@
-import Phaser from "phaser";
-import { BaseScene, Button, DisplayText } from "../../core";
+import {
+    BaseScene,
+    Button,
+    DisplayText,
+    ScaleMode,
+    StartSceneConfig,
+} from "../../core";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { LobbyListScene } from "../LobbyList/lobby-list.scene";
 import { PopupInput } from "./objects/LoginPopup";
 import { UserRepository } from "./repositories/user.repository";
 import { SceneAssetId } from "../../assets/ScenesAsset";
-import { MiscAsset, MiscAssetId } from "../../assets";
+import { MiscAsset, MiscAssetId, MusicAsset, MusicAssetId } from "../../assets";
 
 export class MainMenu extends BaseScene {
     private playButton!: Button;
-    private connectButton!: Button;
+    private registerButton!: Button;
+    private logginButton!: Button;
 
     constructor() {
         super(SceneAssetId.MENU, BackgroundAssetId.MAIN_MENU, {
@@ -21,25 +27,32 @@ export class MainMenu extends BaseScene {
         }
     }
 
-    static start(scene: Phaser.Scene) {
-        scene.scene.start(SceneAssetId.MENU);
+    static start(scene: BaseScene, config?: StartSceneConfig | undefined) {
+        super.startScene(scene, SceneAssetId.MENU, {
+            data: null,
+            config,
+        });
     }
 
     preload() {
         super.preload();
         MiscAsset.load(this.load, MiscAssetId.BUTTON);
+        MusicAsset.load(this.load, MusicAssetId.MENU);
     }
 
     create() {
         super.create();
+        this.playBackgroundMusic(MusicAssetId.MENU);
         // Créer un titre du menu
-        const titleBox = this.rootGrid.getArea({
-            x: 1,
-            y: 2,
-            width: 5,
-            height: 1,
-        });
-        new DisplayText(this, titleBox).setText("Les Mémoires Oubliées");
+        new DisplayText(
+            this,
+            this.rootGrid.getArea({
+                x: 1,
+                y: 2,
+                width: 5,
+                height: 1,
+            }),
+        ).setText("Les Mémoires Oubliées");
 
         // Créer une grille interne pour les boutons (3 boutons: 1 colonne, 3 lignes)
         const buttonsGrid = this.rootGrid.getSubGrid(
@@ -50,90 +63,153 @@ export class MainMenu extends BaseScene {
                 height: 5,
             },
             {
-                division: { vertical: 6, horizontal: 1 },
-                padding: { vertical: 5, horizontal: 0 },
+                division: { vertical: 3, horizontal: 1 },
+                padding: { vertical: 60, horizontal: 0 },
+            },
+        );
+        // Bouton Jouer (ligne 0)
+        this.playButton = new Button(
+            this,
+            buttonsGrid
+                .getArea({
+                    x: 1,
+                    y: 1,
+                    width: 1,
+                    height: 1,
+                })
+                .scaleFromCenter(
+                    MiscAsset.getAssetScale(MiscAssetId.BUTTON),
+                    ScaleMode.CONSERVE,
+                ),
+            {
+                text: "Jouer",
+                image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
+                onClick: () => {
+                    LobbyListScene.start(this);
+                },
+            },
+        ).setIsActivated(Boolean(global.user));
+
+        // Bouton Paramètres (ligne 1)
+        new Button(
+            this,
+            buttonsGrid
+                .getArea({
+                    x: 1,
+                    y: 2,
+                    width: 1,
+                    height: 1,
+                })
+                .scaleFromCenter(
+                    MiscAsset.getAssetScale(MiscAssetId.BUTTON),
+                    ScaleMode.CONSERVE,
+                ),
+            {
+                text: "Paramètres",
+                image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
+                onClick: () => {
+                    console.log("Paramètres - À implémenter");
+                },
             },
         );
 
-        // Bouton Jouer (ligne 0)
-        const playArea = buttonsGrid.getArea({
-            x: 1,
-            y: 1,
-            width: 1,
-            height: 1,
-        });
-        this.playButton = new Button(this, {
-            text: "Jouer",
-            x: playArea.center.x,
-            y: playArea.center.y,
-            width:
-                playArea.height * MiscAsset.getAssetScale(MiscAssetId.BUTTON),
-            height: playArea.height,
-            image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
-            onClick: () => {
-                LobbyListScene.start(this);
+        this.registerButton = new Button(
+            this,
+            this.rootGrid
+                .getArea({
+                    x: 4,
+                    y: 1,
+                    width: 1,
+                    height: 1,
+                    margin: 20,
+                })
+                .scaleFromCenter(
+                    MiscAsset.getAssetScale(MiscAssetId.BUTTON),
+                    ScaleMode.FIT,
+                ),
+            {
+                text: global.user?.username ?? "Register",
+                image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
+                onClick: () => {
+                    new PopupInput(this, {
+                        title: "S'enregistrer",
+                        placeholder: "Entrez votre pseudo...",
+                        onValidate: async (value: string) => {
+                            await new UserRepository().authenticate(value);
+                            if (global.user) {
+                                this.playButton.alpha = 1;
+                                this.registerButton.setIsActivated(false);
+                                this.registerButton.displayText(
+                                    global.user.username,
+                                );
+                                localStorage.setItem(
+                                    "user",
+                                    JSON.stringify(global.user),
+                                );
+                                this.updateLoginButtons();
+                                return true;
+                            }
+                            return false;
+                        },
+                    });
+                },
             },
-        }).setIsActivated(Boolean(global.user));
-
-        // Bouton Paramètres (ligne 1)
-        const settingsArea = buttonsGrid.getArea({
-            x: 1,
-            y: 2,
-            width: 1,
-            height: 1,
-        });
-        new Button(this, {
-            text: "Paramètres",
-            x: settingsArea.center.x,
-            y: settingsArea.center.y,
-            width:
-                playArea.height * MiscAsset.getAssetScale(MiscAssetId.BUTTON),
-            height: settingsArea.height,
-            image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
-            onClick: () => {
-                console.log("Paramètres - À implémenter");
-            },
-        });
+        ).setIsActivated(!global.user);
 
         //bouton login
-        const loginArea = this.rootGrid.getArea({
-            x: 5,
-            y: 1,
-            width: 1,
-            height: 1,
-            margin: 20,
-        });
-        this.connectButton = new Button(this, {
-            text: global.user?.username ?? "Login",
-            x: loginArea.center.x,
-            y: loginArea.center.y,
-            width: loginArea.width,
-            height:
-                loginArea.width / MiscAsset.getAssetScale(MiscAssetId.BUTTON),
-            image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
-            onClick: () => {
-                new PopupInput(this, {
-                    title: "Connexion",
-                    placeholder: "Entrez votre pseudo...",
-                    onValidate: async (value: string) => {
-                        await new UserRepository().authenticate(value);
-                        if (global.user) {
-                            this.playButton.alpha = 1;
-                            this.connectButton.setIsActivated(false);
-                            this.connectButton.displayText(
-                                global.user.username,
-                            );
-                            localStorage.setItem(
-                                "user",
-                                JSON.stringify(global.user),
-                            );
-                            return true;
-                        }
-                        return false;
-                    },
-                });
+        this.logginButton = new Button(
+            this,
+            this.rootGrid
+                .getArea({
+                    x: 5,
+                    y: 1,
+                    width: 1,
+                    height: 1,
+                    margin: 20,
+                })
+                .scaleFromCenter(
+                    MiscAsset.getAssetScale(MiscAssetId.BUTTON),
+                    ScaleMode.FIT,
+                ),
+            {
+                text: global.user ? "Disconnect" : "Login",
+                image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
+                onClick: () => {
+                    if (global.user) {
+                        localStorage.removeItem("user");
+                        global.user = undefined;
+                    } else {
+                        new PopupInput(this, {
+                            title: "Connexion",
+                            placeholder: "Entrez votre pseudo...",
+                            onValidate: async (value: string) => {
+                                await new UserRepository().authenticate(value);
+                                if (global.user) {
+                                    this.playButton.alpha = 1;
+                                    this.registerButton.setIsActivated(false);
+                                    this.registerButton.displayText(
+                                        global.user.username,
+                                    );
+                                    localStorage.setItem(
+                                        "user",
+                                        JSON.stringify(global.user),
+                                    );
+                                    return true;
+                                }
+                                return false;
+                            },
+                        });
+                    }
+                    this.updateLoginButtons();
+                },
             },
-        }).setIsActivated(!global.user);
+        ).setIsActivated(true);
+    }
+
+    updateLoginButtons() {
+        this.logginButton.displayText(global.user ? "Disconnect" : "Login");
+        this.registerButton.displayText(global.user?.username ?? "Register");
+        this.registerButton.setIsActivated(!global.user);
     }
 }
 

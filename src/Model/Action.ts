@@ -1,8 +1,9 @@
+import { ActionAssetId } from "../assets";
 import { Position } from "../core";
 import { Effect } from "./Effect";
 
 export class Action {
-    id!: string;
+    id!: ActionAssetId;
     name!: string;
     description?: string;
     damage?: { min: number; max: number };
@@ -19,7 +20,7 @@ export class Action {
 
 export enum ActionType {
     MELEE = "MELEE",
-    RANGED = "RANGED"
+    RANGED = "RANGED",
 }
 
 export enum ActionZoneType {
@@ -28,3 +29,4 @@ export enum ActionZoneType {
     PLUS = "plus",
     XCROSS = "xcross",
 }
+

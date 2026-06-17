@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { Button, CustomContainer } from "../../../core";
+import { Button, DisplayContainer } from "../../../core";
 
 interface PopupInputConfig {
     title: string;
@@ -10,7 +10,7 @@ interface PopupInputConfig {
 
 export class PopupInput {
     private overlay: Phaser.GameObjects.Rectangle;
-    private container: CustomContainer;
+    private container: DisplayContainer;
     private validateButton: Button;
     private inputElement: HTMLInputElement;
 
@@ -39,17 +39,21 @@ export class PopupInput {
             });
 
         // --- CONTAINER ---
-        this.container = new CustomContainer(scene, {
-            title,
-            x: cx,
-            y: cy,
-            width: popupW,
-            height: popupH,
-            borderWidth: 2,
-            opacity: 0.95,
-            fontSize: 20,
-            textPosition: { x: 0, y: -popupH / 2 + 25 },
-        });
+        this.container = new DisplayContainer(
+            scene,
+            {
+                x: cx - 200,
+                y: cy - 110,
+                width: popupW,
+                height: popupH,
+            },
+            {
+                title,
+                borderWidth: 2,
+                opacity: 0.95,
+                fontSize: 30,
+            },
+        );
         this.container.setDepth(11);
         this.container
             .setDepth(11)
@@ -89,20 +93,25 @@ export class PopupInput {
         this.inputElement.focus();
 
         // --- BOUTON VALIDER (positionné dans le container) ---
-        this.validateButton = new Button(scene, {
-            text: "Valider",
-            x: cx,
-            y: cy + 70,
-            width: 160,
-            height: 40,
-            onClick: () => {
-                onValidate(this.inputElement.value).then((retour) => {
-                    if (retour) {
-                        this.destroy();
-                    }
-                });
+        this.validateButton = new Button(
+            scene,
+            {
+                x: cx - 80,
+                y: cy + 70 - 20,
+                width: 160,
+                height: 40,
             },
-        });
+            {
+                text: "Valider",
+                onClick: () => {
+                    onValidate(this.inputElement.value).then((retour) => {
+                        if (retour) {
+                            this.destroy();
+                        }
+                    });
+                },
+            },
+        );
         this.validateButton.setDepth(12);
 
         this.validateButton

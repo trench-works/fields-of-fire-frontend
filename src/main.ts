@@ -9,13 +9,15 @@ import { LobbyListScene } from "./scenes/LobbyList/lobby-list.scene";
 
 declare global {
     var config: App;
-    var user: {
-        id: string;
-        username: string;
-    };
+    var user:
+        | {
+              id: string;
+              username: string;
+          }
+        | undefined;
 }
 
-const config = {
+export default new Game({
     type: Phaser.AUTO,
     width: window.innerWidth,
     height: window.innerHeight,
@@ -28,7 +30,5 @@ const config = {
         arcade: { debug: false },
     },
     scene: [MainMenu, LobbyListScene, LobbyScene, FightScene],
-};
-
-export default new Game(config);
+});
 

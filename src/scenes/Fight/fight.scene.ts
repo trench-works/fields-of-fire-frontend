@@ -1,4 +1,12 @@
-import { Position, MenuButton, BaseScene, EventQueue } from "../../core";
+import {
+    Position,
+    MenuButton,
+    BaseScene,
+    EventQueue,
+    BaseSceneInit,
+    SoundEffect,
+    Timeout,
+} from "../../core";
 import { SceneConfig } from "../../config/SceneConfig";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
 import {
@@ -12,12 +20,19 @@ import { ClassesRepository } from "../Lobby/repositories/classes.repository";
 import { MainMenu } from "../MainMenu/main-menu.scene";
 import { ActionDisplayer } from "./components/ActionDisplayer";
 import {
+    ActionAnimationAsset,
     ActionAsset,
     CharacterCloseupAsset,
     CharacterSpriteAsset,
-    IconAsset,
+    StatsIconAsset,
     MiscAsset,
     MiscAssetId,
+    MusicAsset,
+    MusicAssetId,
+    SoundEffectAsset,
+    MiscAnimationId,
+    MiscAnimationAsset,
+    SoundEffectAssetId,
 } from "../../assets";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { ClassStore } from "./stores/ClassStore";
@@ -30,10 +45,11 @@ import { StatsDisplayer } from "./components/StatsDisplayer";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { ParticleAsset } from "../../assets/ParticleAsset";
 import { AttackDisplayer } from "./components/attack/AttackDisplayer";
-import { MenuSocket } from "../LobbyList/repositories/menu.socket";
-import { LobbyScene } from "../Lobby/lobby.scene";
 import { EffectAsset } from "../../assets/EffectAsset";
 import { PositionUtils } from "../../core/Utils/Sizing";
+import { EndFightDisplayer } from "./components/EndFightDisplayer/EndFightDisplayer";
+import { Toaster } from "./components/Toaster";
+import { ParticleDisplayer } from "./components/Particle/ParticleDisplayer";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -49,7 +65,7 @@ export type RenderResult = {
 export type Cell = {
     gridPosition: Position;
     pixelPosition: Position;
-    zone: Phaser.GameObjects.Zone;
+    zone?: Phaser.GameObjects.Zone;
     hoverGraphics?: Phaser.GameObjects.Graphics;
     highlight?: Phaser.GameObjects.Graphics;
 };
@@ -63,7 +79,7 @@ export type FightSceneInit = {
     player: { playerId: string };
 };
 
-export class FightScene extends BaseScene {
+export class FightScene extends BaseScene<FightSceneInit> {
     public renderConfig: SceneRenderConfig;
 
     /**
@@ -76,13 +92,15 @@ export class FightScene extends BaseScene {
     /**
      * Displayers
      */
-    private actions: ActionDisplayer;
+    public actions: ActionDisplayer;
     private board: BoardDisplayer;
-    private character: CharactersDisplayer;
+    public character: CharactersDisplayer;
     private turns: TurnDisplayer;
     private playerStats: StatsDisplayer;
     private inspectStats: StatsDisplayer;
     private attacks: AttackDisplayer;
+    private endFight: EndFightDisplayer;
+    public toaster: Toaster;
 
     /**
      * Sockets
@@ -97,10 +115,12 @@ export class FightScene extends BaseScene {
     public rangeVisualizer: RangeVisualizer;
 
     public tooltip!: Tooltip;
+    protected windEmitter!: Phaser.GameObjects.Particles.ParticleEmitter;
 
     public fightMap = "chessmap";
     public gridPositions: Cell[][] = [];
     public scaleFactor: number = 1;
+    public particleDisplayer: ParticleDisplayer = new ParticleDisplayer(this);
 
     constructor() {
         super(SceneAssetId.FIGHT, BackgroundAssetId.FIGHT);
@@ -133,7 +153,11 @@ export class FightScene extends BaseScene {
             this.classStore,
             this.playerStore,
         );
-        this.character = new CharactersDisplayer(this, this.gameStore);
+        this.character = new CharactersDisplayer(
+            this,
+            this.gameStore,
+            this.playerStore,
+        );
         this.turns = new TurnDisplayer(this, this.gameStore, this.classStore);
         this.playerStats = new StatsDisplayer(this, this.gameStore, {
             x: 1,
@@ -144,6 +168,12 @@ export class FightScene extends BaseScene {
             y: 7,
         });
         this.attacks = new AttackDisplayer(this, this.gameStore);
+        this.endFight = new EndFightDisplayer(
+            this,
+            this.gameStore,
+            this.playerStore,
+        );
+        this.toaster = new Toaster(this);
 
         /**
          * Utils
@@ -170,8 +200,10 @@ export class FightScene extends BaseScene {
         );
     }
 
-    static start(scene: Phaser.Scene, data: FightSceneInit) {
-        scene.scene.start(SceneAssetId.FIGHT, data);
+    static start(scene: BaseScene, data: BaseSceneInit<FightSceneInit>) {
+        data.config ??= {};
+        data.config.keepMusic = false;
+        super.startScene(scene, SceneAssetId.FIGHT, data);
     }
 
     private async handleUpdate({
@@ -182,13 +214,27 @@ export class FightScene extends BaseScene {
          * Do animations !!!!!
          */
         for (const animation of animations) {
-            console.log(animation); //TODO: instead filter and handle those animations in their respective displayers
             switch (animation.key) {
                 case "move":
                     await this.character.animate(animation, game);
                     break;
                 case "attack":
                     await this.attacks.animate(animation, game);
+                    break;
+                case "death":
+                    if (
+                        animation.data.entityId === this.inspectStats.entityId
+                    ) {
+                        this.inspectStats.setIsShow(false);
+                    }
+                    if (
+                        animation.data.entityId ===
+                        this.playerStore.playerEntity.entityId
+                    ) {
+                        this.playerStats.blurOut();
+                        this.actions.blurOut();
+                    }
+                    this.character.kill(animation.data.entityId);
                     break;
             }
         }
@@ -208,16 +254,24 @@ export class FightScene extends BaseScene {
         this.playerStats
             .setEntity(this.playerStore.playerEntity)
             .setCharacterClass(this.playerStore.playerClass)
-            .setName(user.username)
+            .setName(user?.username ?? "NO_NAME")
             .update();
         if (this.inspectStats.isShow) {
             this.inspectCharacter(this.inspectStats.entityId);
         }
 
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await Timeout(1000);
+        this.actions.unlock();
     }
 
-    init({ game, player: { playerId } }: FightSceneInit) {
+    init(init: BaseSceneInit<FightSceneInit>) {
+        super.init(init);
+        const {
+            data: {
+                game,
+                player: { playerId },
+            },
+        } = init;
         this.gameStore.setGame(game);
         this.playerStore.setPlayerId(playerId);
 
@@ -227,46 +281,74 @@ export class FightScene extends BaseScene {
         this.character.preRender();
         this.playerStats.preRender();
         this.inspectStats.preRender();
+        this.endFight.preRender();
 
         this.playerSocket = new GamePlayerSocket(game.id, playerId);
-        this.playerSocket.onClose(() => MainMenu.start(this));
+        this.playerSocket.onClose(() =>
+            MainMenu.start(this, { keepMusic: false }),
+        );
         this.playerSocket.onUpdate((event) => this.gameUpdateQueue.add(event));
-        this.playerSocket.onGameEnd((event) => {
-            //TODO: DISPLAY POPUP WITH INFO event.playerWin (true|false)
-            const menuSocket = new MenuSocket();
-            menuSocket.onClose(() => MainMenu.start(this));
-            menuSocket.onJoin(({ lobbyId, playerId }) => {
-                LobbyScene.start(this, {
-                    lobbyId,
-                    playerId,
-                });
-            });
-            menuSocket.onSubscribed(() => {
-                menuSocket.joinLobby({ lobbyId: event.lobbyId });
-            });
+        this.playerSocket.onActionCancel((event) => {
+            //TODO: afficher quelque part event.reason (peut être faire un mapping avec des messages plus clairs)
+            this.actions.unlock();
         });
+        this.playerSocket.onGameEnd(async (event) => {
+            if (event.playerWin) {
+                new SoundEffect(
+                    this,
+                    SoundEffectAsset.getAssetKey(SoundEffectAssetId.VICTORY),
+                ).play();
+            }
+            await this.gameUpdateQueue.waitForCompletion();
+            //TODO: DISPLAY POPUP WIasync TH INFO event.playerWin (true|false)
+            //this.playBackgroundMusic(MusicAssetId.MENU, true);
+            this.endFight.show(event.playerWin);
+            // const menuSocket = new MenuSocket();
+            // menuSocket.onClose(() =>
+            //     MainMenu.start(this),
+            // );
+            // menuSocket.onJoin(({ lobbyId, playerId }) => {
+            //     LobbyScene.start(this, {
+            //         data: { lobbyId, playerId },
+            //     });
+            // });
+            // menuSocket.onSubscribed(() => {
+            //     menuSocket.joinLobby({ lobbyId: event.lobbyId });
+            // });
+        });
+    }
+
+    public finishTurn() {
+        this.playerSocket.finishTurn();
+        this.rangeVisualizer.clearRange();
+        this.rangeVisualizer.clearZonePreview();
     }
 
     preload() {
         super.preload();
-        ActionAsset.loadAll(this.load);
 
         this.load.tilemapTiledJSON(
             this.fightMap,
             `assets/${this.fightMap}.json`,
         );
 
+        ActionAsset.loadAll(this.load);
+        ActionAnimationAsset.loadAll(this.load);
         ParticleAsset.loadAll(this.load);
         MiscAsset.load(this.load, MiscAssetId.GROUND);
         MiscAsset.load(this.load, MiscAssetId.WALL);
         CharacterCloseupAsset.loadAll(this.load);
         CharacterSpriteAsset.loadAll(this.load);
-        IconAsset.loadAll(this.load);
+        StatsIconAsset.loadAll(this.load);
         EffectAsset.loadAll(this.load);
+        MusicAsset.load(this.load, MusicAssetId.FIGHT);
+        SoundEffectAsset.loadAll(this.load);
+        MiscAnimationAsset.load(this.load, MiscAnimationId.BLOOD_SPLATTER);
     }
 
     create() {
         super.create();
+        this.playBackgroundMusic(MusicAssetId.FIGHT);
         this.tooltip = Tooltip.getInstance(this, {
             textColor: "#000000",
             fontSize: 14,
@@ -280,10 +362,11 @@ export class FightScene extends BaseScene {
         this.playerStats
             .setEntity(this.playerStore.playerEntity)
             .setCharacterClass(this.playerStore.playerClass)
-            .setName(user.username)
+            .setName(user?.username ?? "NO_NAME")
             .render()
             .update();
         this.inspectStats.render().setIsShow(false);
+        this.endFight.render();
 
         // Créer le bouton Menu
         new MenuButton(this, {
@@ -295,7 +378,18 @@ export class FightScene extends BaseScene {
                 console.log("Options - À implémenter");
             },
             onMainMenuClick: () => {
-                MainMenu.start(this);
+                MainMenu.start(this, { keepMusic: false });
+            },
+        });
+
+        this.time.addEvent({
+            delay: 2000,
+            loop: true,
+            callback: () => {
+                this.particleDisplayer.WindAnimation(
+                    0, // part du bord gauche
+                    Phaser.Math.Between(100, this.scale.height - 100),
+                );
             },
         });
 
