@@ -35,6 +35,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
     private selectClassId: CharacterAssetId =
         CharacterAssetId.ENTENTE_FANTASSIN;
     private playerImageContainer!: DisplayContainer;
+    private playerDescriptionText!: DisplayText;
     private playerClassName!: DisplayContainer;
     public lobbySocket!: LobbySocket;
 
@@ -183,6 +184,19 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         );
         this.playerClassName = playerNameContainer;
 
+        const playerTextContainer = new DisplayText(
+            this,
+            playerGrid.getArea({
+                //voir si il y a un meilleur moyen de faire un padding ici
+                x: 1.05,
+                y: 6.55,
+                width: 9,
+                height: 3,
+            }),
+        );
+        playerTextContainer.setDescription(this.classStore.getClass(this.selectClassId).classDescription, {color: Color.btnBorder, fontSize: 18})
+        this.playerDescriptionText = playerTextContainer;
+
         const playerImageArea = playerGrid
             .getArea({
                 x: 1,
@@ -278,7 +292,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                         ),
                         borderWidth: 7,
                         onClick: () => {
-                            this.updatePlayerImage(charClass.id);
+                            this.updatePlayerData(charClass.id);
                         },
                     },
                 ),
@@ -286,8 +300,9 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         });
     }
 
-    updatePlayerImage(classId: CharacterAssetId) {
+    updatePlayerData(classId: CharacterAssetId) {
         this.selectClassId = classId;
+
         this.lobbySocket.changeClass({
             classId,
         });
@@ -299,6 +314,9 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
 
         // Met à jour le nom
         this.playerClassName.setText(this.classStore.getClass(classId).name);
+
+        //Met à jour la desc
+        this.playerDescriptionText.setDescription(this.classStore.getClass(this.selectClassId).classDescription, {color: Color.btnBorder, fontSize: 18});
     }
 }
 
