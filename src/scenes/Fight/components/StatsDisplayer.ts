@@ -37,7 +37,8 @@ export class StatsDisplayer extends FightSceneDisplayer {
     private statsArea!: GridArea;
 
     private statsPanel!: DisplayContainer;
-    private effectList!: List;
+    private effectListGrid!: Grid;
+    protected effectImages: DisplayImage[] = [];
     private statsImage!: DisplayContainer;
     private statsClassName!: DisplayContainer;
     private playerName!: DisplayContainer;
@@ -162,7 +163,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
             },
         );
 
-        const effectListArea = statsGrid.getSubGrid(
+        this.effectListGrid = statsGrid.getSubGrid(
             {
                 x: 1,
                 y: 6,
@@ -174,10 +175,9 @@ export class StatsDisplayer extends FightSceneDisplayer {
                     horizontal: 3,
                     vertical: 4,
                 },
+                padding : { left : 0, top : 10, bottom: 0, right : 0 }
             },
         );
-
-        this.effectList = new List(this.scene, effectListArea);
 
         return this;
     }
@@ -272,50 +272,40 @@ export class StatsDisplayer extends FightSceneDisplayer {
     }
 
     displayEffects() {
-        this.effectList.clear();
+        // Détruit les anciennes images
+        this.effectImages.forEach((img) => img.destroy());
+        this.effectImages = [];
 
         const groupedEffects = this.entity.effects.reduce((acc, effect) => {
-            if (!acc.has(effect.id)) {
-                acc.set(effect.id, []);
-            }
+            if (!acc.has(effect.id)) acc.set(effect.id, []);
             acc.get(effect.id)!.push(effect);
             return acc;
         }, new Map<EffectAssetId, Effect[]>());
 
+
         Array.from(groupedEffects.entries()).forEach(([id, effects], index) => {
-            const iconObj = this.effectList.placeContent(
-                index,
-                0,
-                {
-                    icon: EffectAsset.getAssetKey(id),
-                    alpha: 1,
-                },
-                64,
-            );
+            const col = (index % 3) + 1;
+            const row = Math.floor(index / 3) + 1;
+            
+            const area = this.effectListGrid.getArea({ x: col, y: row });
 
-            const body = effects
-                .map((effect) => {
-                    const modified = Object.fromEntries(
-                        Object.entries(effect.modifier).filter(
-                            ([, value]) => value !== 0,
-                        ),
-                    );
-                    const modifierLines = Object.entries(modified)
-                        .map(
-                            ([key, value]) =>
-                                `${key}: ${value > 0 ? "+" : ""}${value}`,
-                        )
-                        .join("\n");
-                    return `--------\n${modifierLines}\n${effect.author ?? ""}, durée : ${effect.duration}`;
-                })
-                .join("\n");
+            const image = new DisplayImage(this.scene, area)
+                .setImage(EffectAsset.getAssetKey(id), 1.2)
+                .setInteractive(true);
 
-            const title = effects[0].name ?? id;
 
-            if (iconObj) {
-                iconObj.setInteractive();
-                this.scene.tooltip.attachTo(iconObj, body, title);
-            }
+            const body = effects.map((effect) => {
+                const modified = Object.fromEntries(
+                    Object.entries(effect.modifier).filter(([, value]) => value !== 0)
+                );
+                const modifierLines = Object.entries(modified)
+                    .map(([key, value]) => `${key}: ${value > 0 ? "+" : ""}${value}`)
+                    .join("\n");
+                return `--------\n${modifierLines}\n${effect.author ?? ""}, durée : ${effect.duration}`;
+            }).join("\n");
+
+            this.scene.tooltip.attachTo(image.getObject(), body, effects[0].name ?? id);
+            this.effectImages.push(image);
         });
     }
 
