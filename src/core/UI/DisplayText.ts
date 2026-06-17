@@ -37,10 +37,29 @@ export class DisplayText implements Displayable {
     }
 
     setDescription(text: string, options?: { color?: string; fontSize?: number }): this {
-        const fontSize = options?.fontSize ?? 14;
-        this.text.setFontSize(`${fontSize}px`);
-        this.text.setColor(options?.color ?? "#FFFFFF");
         this.text.setWordWrapWidth(this.area.width, true);
+        
+        if (options?.fontSize) {
+            this.text.setFontSize(`${options.fontSize}px`);
+        } else {
+            // FontSize temporaire pour calculer le nombre de lignes
+            this.text.setFontSize("16px");
+            this.text.setText(text);
+            
+            const lines = this.text.getWrappedText(text);
+            const lineCount = lines.length || 1;
+            
+            // Taille automatique basée sur la hauteur disponible
+            const fontSize = Math.min(
+                this.area.height / (lineCount * 1.5) , // 80% de la hauteur par ligne
+                this.area.width / 20,               // contrainte horizontale
+                32,                                 // taille max
+            );
+            console.log("ligneCount",lineCount)
+            this.text.setFontSize(`${fontSize}px`);
+        }
+
+        this.text.setColor(options?.color ?? "#FFFFFF");
         this.text.setOrigin(0, 0);
         this.text.setPosition(this.area.x, this.area.y);
         this.text.setText(text);

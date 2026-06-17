@@ -188,13 +188,14 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             this,
             playerGrid.getArea({
                 //voir si il y a un meilleur moyen de faire un padding ici
-                x: 1.05,
-                y: 6.55,
+                x: 1,
+                y: 6.5,
                 width: 9,
-                height: 3,
+                height: 2.5, 
+                margin : {top: 5, bottom : 10, left : 10 , right : 10}
             }),
         );
-        playerTextContainer.setDescription(this.classStore.getClass(this.selectClassId).classDescription, {color: Color.btnBorder, fontSize: 18})
+        playerTextContainer.setDescription(this.classStore.getClass(this.selectClassId).classDescription, {color: Color.btnBorder})
         this.playerDescriptionText = playerTextContainer;
 
         const playerImageArea = playerGrid
@@ -316,7 +317,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         this.playerClassName.setText(this.classStore.getClass(classId).name);
 
         //Met à jour la desc
-        this.playerDescriptionText.setDescription(this.classStore.getClass(this.selectClassId).classDescription, {color: Color.btnBorder, fontSize: 18});
+        this.playerDescriptionText.setDescription(this.classStore.getClass(this.selectClassId).classDescription, {color: Color.btnBorder});
     }
 }
 
