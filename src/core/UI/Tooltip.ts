@@ -264,7 +264,7 @@ export class Tooltip extends Phaser.GameObjects.Container {
                 position.y,
                 [bg, titleLabel, bodyLabel]
             );
-            container.setDepth(9999);
+            container.setDepth(70);
             this.activeTooltips.push(container);
         });
     }
