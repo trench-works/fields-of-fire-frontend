@@ -263,6 +263,10 @@ export class StatsDisplayer extends FightSceneDisplayer {
         this.statsClassName.setVisible(isShow);
         this.playerName.setVisible(isShow);
 
+        this.effectImages.forEach((img) => {
+            img.setVisible(isShow);
+        })
+
         this.statTexts.forEach(({ text, image }) => {
             text.setVisible(isShow);
             image.setVisible(isShow);
@@ -292,7 +296,6 @@ export class StatsDisplayer extends FightSceneDisplayer {
             const image = new DisplayImage(this.scene, area)
                 .setImage(EffectAsset.getAssetKey(id), 1.2)
                 .setInteractive(true);
-
 
             const body = effects.map((effect) => {
                 const modified = Object.fromEntries(
