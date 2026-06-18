@@ -10,6 +10,7 @@ import {
 import { SceneConfig } from "../../config/SceneConfig";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
 import {
+    GameEventAnimation,
     GamePlayerSocket,
     GameUpdateEvent,
 } from "./repositories/player.socket";
@@ -136,7 +137,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
          * Usecases
          */
         this.gameUpdateQueue = new EventQueue<GameUpdateEvent>((event) =>
-            this.handleUpdate(event),
+            this.handleUpdate(event.data, event.animations),
         );
 
         /**
@@ -200,16 +201,42 @@ export class FightScene extends BaseScene<FightSceneInit> {
         );
     }
 
+    private async reset(game: Game) {
+        /**
+         * Update Store
+         */
+        this.gameStore.setGame(game);
+        this.playerStore.update();
+        /**
+         * Update Displayers
+         */
+        this.board.update();
+        this.actions.destroy().preRender().render().update();
+        this.turns.update();
+        this.character.render().update();
+        this.playerStats
+            .setEntity(this.playerStore.playerEntity)
+            .setCharacterClass(this.playerStore.playerClass)
+            .setName(user?.username ?? "NO_NAME")
+            .update();
+        if (this.inspectStats.isShow) {
+            this.inspectCharacter(this.inspectStats.entityId);
+        }
+
+        await Timeout(1000);
+        this.actions.unlock();
+    }
+
     static start(scene: BaseScene, data: BaseSceneInit<FightSceneInit>) {
         data.config ??= {};
         data.config.keepMusic = false;
         super.startScene(scene, SceneAssetId.FIGHT, data);
     }
 
-    private async handleUpdate({
-        data: game,
-        animations,
-    }: GameUpdateEvent): Promise<void> {
+    private async handleUpdate(
+        game: Game,
+        animations: GameEventAnimation[],
+    ): Promise<void> {
         /**
          * Do animations !!!!!
          */
@@ -288,7 +315,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
             MainMenu.start(this, { keepMusic: false }),
         );
         this.playerSocket.onUpdate((event) => this.gameUpdateQueue.add(event));
-        this.playerSocket.onActionCancel((event) => {
+        this.playerSocket.onActionCancel(() => {
             //TODO: afficher quelque part event.reason (peut être faire un mapping avec des messages plus clairs)
             this.actions.unlock();
         });
@@ -302,19 +329,12 @@ export class FightScene extends BaseScene<FightSceneInit> {
             await this.gameUpdateQueue.waitForCompletion();
             //TODO: DISPLAY POPUP WIasync TH INFO event.playerWin (true|false)
             //this.playBackgroundMusic(MusicAssetId.MENU, true);
-            this.endFight.show(event.playerWin);
-            // const menuSocket = new MenuSocket();
-            // menuSocket.onClose(() =>
-            //     MainMenu.start(this),
-            // );
-            // menuSocket.onJoin(({ lobbyId, playerId }) => {
-            //     LobbyScene.start(this, {
-            //         data: { lobbyId, playerId },
-            //     });
-            // });
-            // menuSocket.onSubscribed(() => {
-            //     menuSocket.joinLobby({ lobbyId: event.lobbyId });
-            // });
+            this.endFight.show(event.playerWin, event.boosts);
+        });
+
+        this.playerSocket.onGameRenew(async (event) => {
+            this.reset(event.data);
+            this.endFight.reset();
         });
     }
 

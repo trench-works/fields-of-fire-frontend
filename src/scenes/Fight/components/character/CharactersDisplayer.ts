@@ -25,6 +25,7 @@ export class CharactersDisplayer extends FightSceneDisplayer {
     }
 
     render(): this {
+        this.characters.forEach((character) => character.destroy());
         this.characters = this.gameStore.game.entities
             .filter((entity) => !entity.dead)
             .map((entity) =>

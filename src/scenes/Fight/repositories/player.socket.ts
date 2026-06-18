@@ -1,5 +1,6 @@
 import { GameAnimation, Position, Socket, SocketListener } from "../../../core";
 import { AnimatedPayload } from "../../../core";
+import { Boost } from "../../../Model/Boost";
 import { Game } from "../../../Model/Game";
 const GAME_TOPIC = "game";
 /**
@@ -9,11 +10,13 @@ const GAME_TOPIC = "game";
 enum GamePlayerActions {
     ACTION = "action",
     FINISH_TURN = "finish-turn",
+    READY = "ready",
 }
 
 enum GamePlayerEvents {
     UPDATE = "update",
     GAME_END = "game-end",
+    GAME_RENEW = "game-renew",
     CANCEL_ACTION = "cancel-action",
 }
 
@@ -62,7 +65,11 @@ export type GameEventAnimation =
 
 export type GameUpdateEvent = AnimatedPayload<Game, GameEventAnimation>;
 
-export type GameEndEvent = { lobbyId: string; playerWin: boolean };
+export type GameEndEvent = { boosts: Boost[]; playerWin: boolean };
+
+export type GameRenew = { data: Game };
+
+export type PlayerReady = { boostId: string };
 
 export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
     constructor(gameId: string, playerId: string) {
@@ -72,6 +79,10 @@ export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
 
     finishTurn() {
         return this.send(GamePlayerActions.FINISH_TURN);
+    }
+
+    readyForNewGame(boostId: string) {
+        return this.send<PlayerReady>(GamePlayerActions.READY, { boostId });
     }
 
     async action(actionPlayer: ActionPlayer) {
@@ -84,6 +95,10 @@ export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
 
     onGameEnd(listener: SocketListener<GameEndEvent>): void {
         this.on(GamePlayerEvents.GAME_END, listener);
+    }
+
+    onGameRenew(listener: SocketListener<GameRenew>): void {
+        this.on(GamePlayerEvents.GAME_RENEW, listener);
     }
 
     onActionCancel(listener: SocketListener<PlayerCancelAction>): void {

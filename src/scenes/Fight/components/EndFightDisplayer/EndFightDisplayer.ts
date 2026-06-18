@@ -10,7 +10,7 @@ import {
     List,
 } from "../../../../core";
 import { DisplayImage } from "../../../../core/UI/DisplayImage";
-import { Effect, EffectType } from "../../../../Model/Effect";
+import { Boost } from "../../../../Model/Boost";
 import { Entity, EntityType } from "../../../../Model/Entity";
 import { MainMenu } from "../../../MainMenu/main-menu.scene";
 import { FightScene } from "../../fight.scene";
@@ -27,69 +27,13 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     protected actionsList!: List;
     protected entityList!: List;
 
-    //VISUAL TESTING PURPOSE ONLY
-    protected boostList: Effect[] = [
-        {
-            id: EffectAssetId.VERSATILE,
-            name: "Versatilité",
-            type: EffectType.APPLY,
-            duration: null,
-            modifier: {
-                life: 0,
-                maxLife: 0,
-                precision: 10,
-                strength: 10,
-                armor: 0,
-                initiative: 0,
-                dodging: 0,
-                energy: 0,
-                mouvement: 0
-            },
-            description: "Augmente les dommages des attaques distances et mélées"
-        },
-        {
-            id: EffectAssetId.HEAL_UP,
-            name: "Soin total",
-            type: EffectType.APPLY,
-            duration: null,
-            modifier: {
-                life: 0,
-                maxLife: 0,
-                precision: 0,
-                strength: 0,
-                armor: 0,
-                initiative: 0,
-                dodging: 0,
-                energy: 0,
-                mouvement: 0
-            },
-            description : "Vous remet vos points de vie au maximum",
-        },
-        {
-            id: EffectAssetId.VAMPIRE,
-            name: "Vampire",
-            type: EffectType.APPLY,
-            duration: null,
-            modifier: {
-                life: 0,
-                maxLife: 0,
-                precision: 0,
-                strength: 0,
-                armor: 0,
-                initiative: 0,
-                dodging: 0,
-                energy: 0,
-                mouvement: 0
-            },
-            description : "Accorde 10% de vol de vie sur les dommages que vous infligez",
-        },
-    ]
+    protected boostId!: string;
+    protected boosts!: Boost[];
 
     protected root: DisplayRoot;
     protected temporaryRoot: DisplayRoot;
 
     protected titleText!: DisplayText;
-    protected selectedBoost: Effect | undefined;
 
     constructor(
         scene: FightScene,
@@ -151,8 +95,6 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.titleText = new DisplayText(this.scene, titleEndgameArea);
         this.root.add(this.titleText);
 
-      
-
         // --- Depths ---
         this.titleText.setDepth(102);
 
@@ -206,10 +148,8 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         });
         this.entityList.setDepth(103);
 
-        this.showButtons(true);
-
-        this.root.setVisible(true);
-        this.temporaryRoot.setVisible(true);
+        this.root.setVisible(false);
+        this.temporaryRoot.setVisible(false);
 
         return this;
     }
@@ -218,16 +158,28 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    setSelectedBoost(boost : Effect) {
-        this.selectedBoost = boost;
+    reset(): this {
+        this.root.setVisible(false);
+        this.temporaryRoot.setVisible(false);
+        this.showButtons(false);
+        return this;
     }
 
-    show(playerWin: boolean) {
+    show(playerWin: boolean, boosts: Boost[]) {
+        this.boosts = boosts;
         //console.log("show called", this.root);
         this.titleText.setText(playerWin ? "Victoire !" : "Défaite ");
         this.showButtons(playerWin ? true : false);
         this.root.setVisible(true);
         this.temporaryRoot.setVisible(true);
+    }
+
+    onBoostClick(boostId: string) {
+        this.boostId = boostId;
+    }
+
+    onReady() {
+        this.scene.playerSocket.readyForNewGame(this.boostId);
     }
 
     async animate(): Promise<this> {
@@ -291,7 +243,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         );
     }
 
-    displayBoostCard(boost: Effect, entityListGrid: Grid): void {
+    displayBoostCard(boost: Boost, entityListGrid: Grid): void {
         // Conteneur de la card
         this.temporaryRoot.add(
             new DisplayContainer(
@@ -303,7 +255,16 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     height: 4,
                     margin: { top: 10, bottom: 10, right: 10, left: 10 },
                 }),
-                { borderWidth: 3, opacity: 1, bgColor : Color.btnBg},
+                {
+                    borderWidth: 3,
+                    opacity: 1,
+                    bgColor: Color.btnBg,
+                    onClick: () => {
+                        this.onBoostClick(boost.id);
+                        this.onReady();
+                        //TODO: FIXME: maybe change logic, first one is for select, second one is sending event to back
+                    },
+                },
             ).setDepth(100),
         );
 
@@ -311,33 +272,54 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.temporaryRoot.add(
             new DisplayImage(
                 this.scene,
-                entityListGrid.getArea({ x: 3, y: 1, width:1, height: 1, margin: {top: 10, bottom : -8, left : 0, right : 0} }),
+                entityListGrid.getArea({
+                    x: 3,
+                    y: 1,
+                    width: 1,
+                    height: 1,
+                    margin: { top: 10, bottom: -8, left: 0, right: 0 },
+                }),
             )
-                .setImage(EffectAsset.getAssetKey(boost.id as EffectAssetId))
+                .setImage(EffectAsset.getAssetKey(boost.id as EffectAssetId)) //TODO: pas bon ca un boost pas forcément = un effet, potentiellement plusieurs effets
                 .setDepth(101),
         );
 
         // Nom (ligne 2)
-         this.temporaryRoot.add(
+        this.temporaryRoot.add(
             new DisplayContainer(
                 this.scene,
-                entityListGrid.getArea({ x: 1, y: 2, width: 5, height: 1, margin: { top: 10, bottom: 0,  left: 0, right : 0} }),
-                {borderWidth: 3, innerRadius: 0,}
-            )
-                .setDepth(100),
+                entityListGrid.getArea({
+                    x: 1,
+                    y: 2,
+                    width: 5,
+                    height: 1,
+                    margin: { top: 10, bottom: 0, left: 0, right: 0 },
+                }),
+                {
+                    borderWidth: 3,
+                    innerRadius: 0,
+                    onClick: () => this.onBoostClick(boost.id),
+                },
+            ).setDepth(100),
         );
         this.temporaryRoot.add(
             new DisplayText(
                 this.scene,
-                entityListGrid.getArea({ x: 2, y: 2, width: 3, height: 1, margin: { top: 10, bottom: 0,  left: 0, right : 0} }),
+                entityListGrid.getArea({
+                    x: 2,
+                    y: 2,
+                    width: 3,
+                    height: 1,
+                    margin: { top: 10, bottom: 0, left: 0, right: 0 },
+                }),
             )
                 .setText(boost.name)
                 .setDepth(101),
         );
 
         // Modifiers non nuls (ligne 3)
-        const nonZeroStats = Object.entries(boost.modifier)
-            .filter(([_, value]) => value !== 0)
+        const nonZeroStats = Object.entries(boost.boosts[0])
+            .filter(([, value]) => value !== 0)
             .map(([key, value]) => `${key}: ${value > 0 ? "+" : ""}${value}`)
             .join("\n");
 
@@ -353,19 +335,25 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         }
 
         // Description (ligne 4)
-        if (boost.description) {
+        if (boost.name) {
             this.temporaryRoot.add(
                 new DisplayText(
                     this.scene,
-                    entityListGrid.getArea({ x: 1, y: 4, width: 5, height: 1, margin: { top: 0, bottom: 0,  left: 10, right : 10}  }),
+                    entityListGrid.getArea({
+                        x: 1,
+                        y: 4,
+                        width: 5,
+                        height: 1,
+                        margin: { top: 0, bottom: 0, left: 10, right: 10 },
+                    }),
                 )
-                    .setDescription(boost.description)
+                    .setDescription(boost.name)
                     .setDepth(101),
             );
         }
     }
 
-    showButtons(isVictory : boolean) {
+    showButtons(isVictory: boolean) {
         const buttonsGrid = this.scene.rootGrid.getSubGrid(
             {
                 x: 3,
@@ -382,53 +370,70 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             },
         );
 
-        if(isVictory) {
+        if (isVictory) {
             this.root.add(
-            new Button(
-                this.scene,
-                buttonsGrid.getArea({
-                    x: 3,
-                    y: 1,
-                    width: 2,
-                    height: 1,
-                }),
-                {
-                    onClick: () => {
-                        console.log("nextRound");
-                        this.temporaryRoot.destroy();
-                        const boostListGrid = this.scene.rootGrid.getSubGrid(
-                            { x: 3, y: 3, width: 5, height: 3 },
-                            {
-                                division: {
-                                    horizontal: this.boostList.length,
-                                    vertical: 4,
-                                },
-                                margin: { top: 20, bottom: 0, left: 10, right: 10 },
-                            },
-                        );
-
-                        this.boostList.forEach((boost, index) => {
-                            this.displayBoostCard(
-                                boost,
-                                boostListGrid.getSubGrid(
+                new Button(
+                    this.scene,
+                    buttonsGrid.getArea({
+                        x: 3,
+                        y: 1,
+                        width: 2,
+                        height: 1,
+                    }),
+                    {
+                        onClick: () => {
+                            console.log("nextRound");
+                            this.temporaryRoot.destroy();
+                            const boostListGrid =
+                                this.scene.rootGrid.getSubGrid(
+                                    { x: 3, y: 3, width: 5, height: 3 },
                                     {
-                                        x: index + 1,
-                                        y: 1,
-                                        width: 1,
-                                        height: 4,
-                                        margin: { top: 40, bottom: 0,  left: 30, right : 30},
+                                        division: {
+                                            horizontal: this.boosts.length,
+                                            vertical: 4,
+                                        },
+                                        margin: {
+                                            top: 20,
+                                            bottom: 0,
+                                            left: 10,
+                                            right: 10,
+                                        },
                                     },
-                                    { division: { horizontal: 5, vertical: 4 } },
-                                ),
-                            );
-                        });
+                                );
 
-                        this.temporaryRoot.setVisible(true);
+                            this.boosts.forEach((boost, index) => {
+                                this.displayBoostCard(
+                                    boost,
+                                    boostListGrid.getSubGrid(
+                                        {
+                                            x: index + 1,
+                                            y: 1,
+                                            width: 1,
+                                            height: 4,
+                                            margin: {
+                                                top: 40,
+                                                bottom: 0,
+                                                left: 30,
+                                                right: 30,
+                                            },
+                                        },
+                                        {
+                                            division: {
+                                                horizontal: 5,
+                                                vertical: 4,
+                                            },
+                                        },
+                                    ),
+                                );
+                            });
+
+                            this.temporaryRoot.setVisible(true);
+                        },
+                        text: "Next Fight",
                     },
-                    text: "Next Fight",
-                },
-            ).setDepth(104),
-        )};
+                ).setDepth(104),
+            );
+        }
 
         this.root.add(
             new Button(
