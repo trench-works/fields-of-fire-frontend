@@ -2,6 +2,7 @@ export class LobbyPlayer {
     userId!: string;
     playerId!: string;
     classId!: string;
+    name!: string;
 }
 
 export class LobbyData {
