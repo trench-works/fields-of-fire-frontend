@@ -152,6 +152,10 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         cell.pixelPosition.x,
                         cell.pixelPosition.y,
                     );
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(SoundEffectAssetId.DOPAGE),
+                    ).play();
                 }
                 break;
             case ActionAssetId.FIGHTING_DRUG:
@@ -163,6 +167,27 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         cell.pixelPosition.x,
                         cell.pixelPosition.y,
                     );
+                }
+                break;
+            case ActionAssetId.CHARGE:
+                {
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(SoundEffectAssetId.CHARGE),
+                    ).play();
+                    await this.particleDisplayer.animate(
+                        ParticleAssetId.BOOST,
+                        cell.pixelPosition.x,
+                        cell.pixelPosition.y,
+                    );
+                }
+                break;
+            case ActionAssetId.SABER :
+                {
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(SoundEffectAssetId.SABER),
+                    ).play();
                 }
                 break;
         }

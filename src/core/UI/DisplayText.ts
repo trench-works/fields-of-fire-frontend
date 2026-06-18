@@ -27,7 +27,7 @@ export class DisplayText implements Displayable {
         options?: { color?: string; fontSize?: number },
     ): this {
         const minSize = Math.min(
-            this.area.height,
+            this.area.height / 1.5,
             (this.area.width / text.length) * 1.5,
         );
 
