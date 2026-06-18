@@ -9,6 +9,7 @@ import {
     GridArea,
 } from "../../../core";
 import { Action } from "../../../Model/Action";
+import { StatsUtils } from "../../../Model/Stats";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/GameStore";
 import { PlayerStore } from "../stores/PlayerStore";
@@ -46,26 +47,24 @@ export class ActionDisplayer extends FightSceneDisplayer {
         const isPlayerTurn =
             this.gameStore.game.playerTurns[0] ===
             this.playerStore.playerEntity.entityId;
-        const hasMovement = this.playerStore.playerEntity.stats.mouvement > 0;
-        const hasEnergy =
-            this.playerStore.playerEntity.stats.energy >= action.cost;
+        const stats = StatsUtils.fromEntity(this.playerStore.playerEntity);
         if (!isPlayerTurn) {
             return;
         }
         this.clearAction();
         switch (action.id) {
             case ActionAssetId.WALK:
-                if (!hasMovement) {
+                if (!stats.mouvement) {
                     return;
                 }
                 this.scene.rangeVisualizer.getCellsInMoveRange(
                     this.playerStore.playerEntity.position,
-                    this.playerStore.playerEntity.stats.mouvement,
+                    stats.mouvement,
                 );
                 break;
             default:
-                if (!hasEnergy) {
-                    return;
+                if (stats.energy < action.cost){
+                    return
                 }
                 this.scene.rangeVisualizer.getCellsInAttackRange(
                     this.playerStore.playerEntity.position,
@@ -182,25 +181,22 @@ export class ActionDisplayer extends FightSceneDisplayer {
             this.gameStore.game.playerTurns[0] ===
             this.playerStore.playerEntity.entityId;
 
+        const stats = StatsUtils.fromEntity(this.playerStore.playerEntity)
+
         this.playerStore.playerClass.actionList.forEach((action) => {
             const actionObject = this.actionElements.get(action.id)!;
             switch (action.id) {
                 case ActionAssetId.WALK:
                     {
-                        const hasMovement =
-                            this.playerStore.playerEntity.stats.mouvement > 0;
                         actionObject.setIsActivated(
-                            isPlayerTurn && hasMovement,
+                            isPlayerTurn && stats.mouvement > 0
                         );
                     }
                     break;
                 default:
                     {
-                        const hasEnoughEnergy =
-                            this.playerStore.playerEntity.stats.energy >=
-                            action.cost;
                         actionObject.setIsActivated(
-                            isPlayerTurn && hasEnoughEnergy,
+                            isPlayerTurn && (stats.energy >= action.cost)
                         );
                     }
                     break;
