@@ -447,6 +447,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 {
                     onClick: () => {
                         console.log("Leave");
+                        this.scene.playerSocket.disconnect();
                         MainMenu.start(this.scene, { keepMusic: false });
                     },
                     text: "Retour Menu",

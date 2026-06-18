@@ -11,6 +11,7 @@ enum GamePlayerActions {
     ACTION = "action",
     FINISH_TURN = "finish-turn",
     READY = "ready",
+    DISCONNECT = "disconnect",
 }
 
 enum GamePlayerEvents {
@@ -83,6 +84,10 @@ export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
 
     readyForNewGame(boostId: string) {
         return this.send<PlayerReady>(GamePlayerActions.READY, { boostId });
+    }
+
+    disconnect() {
+        this.send(GamePlayerActions.DISCONNECT);
     }
 
     async action(actionPlayer: ActionPlayer) {
