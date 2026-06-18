@@ -25,6 +25,7 @@ import { MainMenu } from "../MainMenu/main-menu.scene";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { ClassStore } from "../Fight/stores/ClassStore";
+import { LobbyStore } from "../LobbyList/stores/LobbyStore";
 
 export type LobbySceneInit = {
     lobbyId: string;
@@ -43,10 +44,12 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
     protected playerId!: string;
 
     protected classStore: ClassStore;
+    protected lobbyStore: LobbyStore;
 
     constructor() {
         super(SceneAssetId.LOBBY, BackgroundAssetId.LOBBY);
         this.classStore = new ClassStore();
+        this.lobbyStore = new LobbyStore();
         new ClassesRepository().getClasses().then((data) => {
             this.classStore.setClasses(data);
         });
@@ -77,9 +80,9 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         this.playBackgroundMusic(MusicAssetId.MENU);
         this.lobbySocket = new LobbySocket(this.lobbyId);
         this.lobbySocket.onClose(() => MainMenu.start(this));
-
-        this.lobbySocket.onLobbyUpdate(console.log); //TODO: handle lobby infos update + display
-
+        this.lobbySocket.onLobbyUpdate((lobbyUpdated) => {
+            this.lobbyStore.setCurrentLobby(lobbyUpdated);
+        });
         this.lobbySocket.onStart((game) => {
             const player = game.players.find(
                 (player) => player.userId === global.user?.id,
@@ -142,11 +145,37 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 {
                     label: "Réglages",
                     build: (root, area) => {
-                        root.add(
-                            new DisplayText(this, area).setText(
-                                "not implemented yet",
-                            ),
-                        );
+                        const players = this.lobbyStore.currentLobby!.players
+                        const listGrid = area.getGrid({
+                            division: {
+                                horizontal: 1,
+                                vertical: players.length || 1,
+                            },
+                            padding: 5,
+                        });
+
+                        players.forEach((player, index) => {
+                            const rowGrid = listGrid.getSubGrid(
+                                { x: 1, y: index + 1, width: 1, height: 1 },
+                                { division: { horizontal: 5, vertical: 1 } },
+                            );
+
+                            // Image closeup (1/5)
+                            root.add(
+                                new DisplayContainer(this, rowGrid.getArea({ x: 1, y: 1 }), {
+                                    backgroundImage: CharacterCloseupAsset.getAssetKey(player.classId as CharacterAssetId),
+                                    borderWidth: 2,
+                                }),
+                            );
+
+                            // Nom (4/5)
+                            root.add(
+                                new DisplayText(
+                                    this,
+                                    rowGrid.getArea({ x: 2, y: 1, width: 4, height: 1 }),
+                                ).setText(player.userId),
+                            );
+                        });
                     },
                 },
             ],
