@@ -6,11 +6,17 @@ export class UserRepository {
     async authenticate(username: string): Promise<void> {
         const user = await Http.post<User, never, Authenticate>(
             "/authenticate",
-            {
-                body: {
-                    username,
-                },
-            },
+            { body: { username } },
+        );
+        if (user) {
+            global.user = user;
+        }
+    }
+
+    async register(username: string): Promise<void> {
+        const user = await Http.post<User, never, Authenticate>(
+            "/register",
+            { body: { username } },
         );
         if (user) {
             global.user = user;

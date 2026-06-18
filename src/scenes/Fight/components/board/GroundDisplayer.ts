@@ -195,7 +195,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
                                     this.classStore.getClass(entity.classId)
                                         .name,
                                     `❤️ ${entity.stats.life} PV`,
-                                    { x: zone.x, y: zone.y - 300 },
+                                    { x: zone.x, y: zone.y - 120* this.scene.scaleFactor },
                                 );
                             }
                         }
@@ -302,7 +302,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
                 title: this.classStore.getClass(targetEntity.classId).name,
                 position: {
                     x: cell.pixelPosition.x,
-                    y: cell.pixelPosition.y - 300,
+                    y: cell.pixelPosition.y - 120* this.scene.scaleFactor,
                 },
             });
         });

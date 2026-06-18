@@ -12,6 +12,7 @@ export enum ActionAssetId {
     DOPAGE = "dopage",
     CHARGE = "charge",
     FIGHTING_DRUG = "fighting_drug",
+    SABER = "saber",
 }
 
 const ActionAssetEntries = Object.fromEntries(
@@ -39,7 +40,8 @@ class ActionAssetManager extends ImageAssetManager<ActionAssetId, string> {
             [ActionAssetId.SNEAKY]: { width: 1, height: 1 },
             [ActionAssetId.DOPAGE]: { width: 1, height: 1},
             [ActionAssetId.CHARGE]: {width: 1, height: 1},
-            [ActionAssetId.FIGHTING_DRUG]: {width:1, height:1 } 
+            [ActionAssetId.FIGHTING_DRUG]: {width:1, height:1 },
+            [ActionAssetId.SABER]: {width:1, height:1 },
         });
     }
 }

@@ -135,7 +135,7 @@ export class MainMenu extends BaseScene {
                         title: "S'enregistrer",
                         placeholder: "Entrez votre pseudo...",
                         onValidate: async (value: string) => {
-                            await new UserRepository().authenticate(value);
+                            await new UserRepository().register(value);
                             if (global.user) {
                                 this.playButton.alpha = 1;
                                 this.registerButton.setIsActivated(false);
