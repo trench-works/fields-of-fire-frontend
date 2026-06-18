@@ -13,5 +13,6 @@ export type Effect = {
     duration: number | null;
     modifier: Stats;
     author?: string;
+    description?: string
 };
 

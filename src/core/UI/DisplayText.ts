@@ -26,10 +26,12 @@ export class DisplayText implements Displayable {
         text: string,
         options?: { color?: string; fontSize?: number },
     ): this {
-        const fontSize = Math.min(
-            this.area.height / 2,
+        const minSize = Math.min(
+            this.area.height,
             (this.area.width / text.length) * 1.5,
         );
+
+        const fontSize = Math.max(minSize, 13);
         this.text.setText(text);
         this.text.setFontSize(`${options?.fontSize ?? fontSize}px`);
         this.text.setColor(options?.color ?? "#FFFFFF");
@@ -50,11 +52,13 @@ export class DisplayText implements Displayable {
             const lineCount = lines.length || 1;
             
             // Taille automatique basée sur la hauteur disponible
-            const fontSize = Math.min(
+            const minSize = Math.min(
                 this.area.height / (lineCount * 1.5) , // 80% de la hauteur par ligne
                 this.area.width / 20,               // contrainte horizontale
                 32,                                 // taille max
             );
+
+            const fontSize = Math.max(minSize, 11);
             console.log("ligneCount",lineCount)
             this.text.setFontSize(`${fontSize}px`);
         }
