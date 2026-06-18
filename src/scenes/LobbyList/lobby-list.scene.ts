@@ -14,7 +14,7 @@ import { MainMenu } from "../MainMenu/main-menu.scene";
 import { LobbyRow } from "./objects/LobbyRow";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
-import { LobbyStore } from "./stores/LobbyStore";
+import { LobbyListStore } from "./stores/LobbyListStore";
 import { MusicAsset, MusicAssetId } from "../../assets";
 
 export class LobbyListScene extends BaseScene {
@@ -23,7 +23,7 @@ export class LobbyListScene extends BaseScene {
     private joinButton!: Button;
     private lobbyRows: LobbyRow[] = [];
 
-    protected lobbyStore: LobbyStore;
+    protected lobbyStore: LobbyListStore;
 
     static start(scene: BaseScene, config?: StartSceneConfig | undefined) {
         super.startScene(scene, SceneAssetId.LOBBY_LIST, {
@@ -34,7 +34,7 @@ export class LobbyListScene extends BaseScene {
 
     constructor() {
         super(SceneAssetId.LOBBY_LIST, BackgroundAssetId.LOBBY);
-        this.lobbyStore = new LobbyStore();
+        this.lobbyStore = new LobbyListStore();
     }
 
     preload() {

@@ -25,7 +25,7 @@ import { MainMenu } from "../MainMenu/main-menu.scene";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { ClassStore } from "../Fight/stores/ClassStore";
-import { LobbyStore } from "../LobbyList/stores/LobbyStore";
+import { LobbyStore } from "./stores/LobbyStore";
 
 export type LobbySceneInit = {
     lobbyId: string;
@@ -80,8 +80,9 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         this.playBackgroundMusic(MusicAssetId.MENU);
         this.lobbySocket = new LobbySocket(this.lobbyId);
         this.lobbySocket.onClose(() => MainMenu.start(this));
-        this.lobbySocket.onLobbyUpdate((lobbyUpdated) => {
-            this.lobbyStore.setCurrentLobby(lobbyUpdated);
+        this.lobbySocket.onLobbyUpdate((event) => {
+            this.lobbyStore.setLobby(event.lobby);
+            //TODO: rerender ton tab réglages -> actuellement ca mettra pas à jour
         });
         this.lobbySocket.onStart((game) => {
             const player = game.players.find(
@@ -145,16 +146,16 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 {
                     label: "Réglages",
                     build: (root, area) => {
-                        const players = this.lobbyStore.currentLobby!.players
+                        const players = this.lobbyStore.lobby?.players;
                         const listGrid = area.getGrid({
                             division: {
                                 horizontal: 1,
-                                vertical: players.length || 1,
+                                vertical: players?.length ?? 1,
                             },
                             padding: 5,
                         });
 
-                        players.forEach((player, index) => {
+                        players?.forEach((player, index) => {
                             const rowGrid = listGrid.getSubGrid(
                                 { x: 1, y: index + 1, width: 1, height: 1 },
                                 { division: { horizontal: 5, vertical: 1 } },
@@ -162,17 +163,29 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
 
                             // Image closeup (1/5)
                             root.add(
-                                new DisplayContainer(this, rowGrid.getArea({ x: 1, y: 1 }), {
-                                    backgroundImage: CharacterCloseupAsset.getAssetKey(player.classId as CharacterAssetId),
-                                    borderWidth: 2,
-                                }),
+                                new DisplayContainer(
+                                    this,
+                                    rowGrid.getArea({ x: 1, y: 1 }),
+                                    {
+                                        backgroundImage:
+                                            CharacterCloseupAsset.getAssetKey(
+                                                player.classId as CharacterAssetId,
+                                            ),
+                                        borderWidth: 2,
+                                    },
+                                ),
                             );
 
                             // Nom (4/5)
                             root.add(
                                 new DisplayText(
                                     this,
-                                    rowGrid.getArea({ x: 2, y: 1, width: 4, height: 1 }),
+                                    rowGrid.getArea({
+                                        x: 2,
+                                        y: 1,
+                                        width: 4,
+                                        height: 1,
+                                    }),
                                 ).setText(player.userId),
                             );
                         });
@@ -220,11 +233,14 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 x: 1,
                 y: 6.5,
                 width: 9,
-                height: 2.5, 
-                margin : {top: 5, bottom : 10, left : 10 , right : 10}
+                height: 2.5,
+                margin: { top: 5, bottom: 10, left: 10, right: 10 },
             }),
         );
-        playerTextContainer.setDescription(this.classStore.getClass(this.selectClassId).classDescription, {color: Color.btnBorder})
+        playerTextContainer.setDescription(
+            this.classStore.getClass(this.selectClassId).classDescription,
+            { color: Color.btnBorder },
+        );
         this.playerDescriptionText = playerTextContainer;
 
         const playerImageArea = playerGrid
@@ -346,7 +362,10 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         this.playerClassName.setText(this.classStore.getClass(classId).name);
 
         //Met à jour la desc
-        this.playerDescriptionText.setDescription(this.classStore.getClass(this.selectClassId).classDescription, {color: Color.btnBorder});
+        this.playerDescriptionText.setDescription(
+            this.classStore.getClass(this.selectClassId).classDescription,
+            { color: Color.btnBorder },
+        );
     }
 }
 

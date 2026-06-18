@@ -1,5 +1,6 @@
 import { Socket, SocketListener } from "../../../core";
 import { Game } from "../../../Model/Game";
+import { LobbyData } from "../../LobbyList/interfaces/LobbyData";
 
 const LOBBY_TOPIC = "lobby";
 
@@ -12,8 +13,7 @@ type ChangeClass = {
 };
 
 type LobbyUpdated = {
-    lobbyId: string;
-    players: { playerId: string; classId: string; userId: string }[];
+    lobby: LobbyData;
 };
 
 type GameStarted = Game;

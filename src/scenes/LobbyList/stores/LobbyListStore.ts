@@ -4,9 +4,9 @@ type CurrentLobby = {
     lobbyId: string;
     players: { playerId: string; classId: string; userId: string }[];
 };
-export class LobbyStore {
+export class LobbyListStore {
     lobbies: LobbyData[];
-    currentLobby: CurrentLobby | null = null
+    currentLobby: CurrentLobby | null = null;
     selectedLobbyId: string | null;
 
     constructor() {
@@ -30,5 +30,4 @@ export class LobbyStore {
         return this.lobbies.find((lobby) => lobby.id === lobbyId);
     }
 }
-
 
