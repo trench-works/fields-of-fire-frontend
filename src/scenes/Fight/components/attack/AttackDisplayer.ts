@@ -182,12 +182,17 @@ export class AttackDisplayer extends FightSceneDisplayer {
                     );
                 }
                 break;
-            case ActionAssetId.SABER :
+            case ActionAssetId.SABER:
                 {
                     new SoundEffect(
                         this.scene,
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.SABER),
                     ).play();
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(SoundEffectAssetId.HURT),
+                    ).play();
+                    await this.playBloodSplatter(hits, origin, target);
                 }
                 break;
         }
