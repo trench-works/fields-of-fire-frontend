@@ -52,7 +52,7 @@ export class MainMenu extends BaseScene {
                 width: 5,
                 height: 1,
             }),
-        ).setText("Les Mémoires Oubliées");
+        ).setText("Fields Of Fire");
 
         // Créer une grille interne pour les boutons (3 boutons: 1 colonne, 3 lignes)
         const buttonsGrid = this.rootGrid.getSubGrid(
