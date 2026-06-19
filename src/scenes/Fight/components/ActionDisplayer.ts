@@ -8,6 +8,7 @@ import {
     Blur,
     GridArea,
     DisplayRoot,
+    DisplayText,
 } from "../../../core";
 import { Action } from "../../../Model/Action";
 import { StatsUtils } from "../../../Model/Stats";
@@ -151,17 +152,26 @@ export class ActionDisplayer extends FightSceneDisplayer {
             const iconObj = this.actionsList.placeElement(
                 { x: index, y: 0 },
                 (area) => {
-                    const button = new Button(
-                        this.scene,
-                        area.scaleFromCenter(
-                            ActionAsset.getAssetScale(action.id),
-                            ScaleMode.FIT,
-                        ),
-                        {
-                            image: ActionAsset.getAssetKey(action.id),
-                            onClick: () => this.handleActionClick(action),
-                        },
+                    const buttonArea = area.scaleFromCenter(
+                        ActionAsset.getAssetScale(action.id),
+                        ScaleMode.FIT,
                     );
+                    const button = new Button(this.scene, buttonArea, {
+                        image: ActionAsset.getAssetKey(action.id),
+                        onClick: () => this.handleActionClick(action),
+                    });
+                    if (action.cost > 0) {
+                        const buttonGrid = buttonArea.getGrid({
+                            division: { vertical: 3, horizontal: 3 },
+                        });
+                        const text = new DisplayText(
+                            this.scene,
+                            buttonGrid.getArea({ x: 3, y: 1 }),
+                        )
+                            .setText(`${action.cost}`)
+                            .setDepth(500);
+                        this.root.add(text);
+                    }
                     this.root.add(button);
                     return button;
                 },
