@@ -1,4 +1,5 @@
 import { CharacterCloseupAsset } from "../../../../assets";
+import { BoostAsset, BoostAssetId } from "../../../../assets/BoostAsset";
 import { EffectAsset, EffectAssetId } from "../../../../assets/EffectAsset";
 import { Color } from "../../../../config/ColorConfig";
 import {
@@ -32,6 +33,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
 
     protected root: DisplayRoot;
     protected temporaryRoot: DisplayRoot;
+    protected buttonsRoot: DisplayRoot;
 
     protected titleText!: DisplayText;
 
@@ -43,8 +45,8 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         super(scene, gameStore);
         this.root = new DisplayRoot();
         this.temporaryRoot = new DisplayRoot();
+        this.buttonsRoot = new DisplayRoot()
     }
-
     preRender(): this {
         this.root.add(
             new DisplayContainer(
@@ -129,7 +131,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         );
         this.entityList = new List(this.scene, entityListGrid);
         entities.forEach((entity, index) => {
-            this.displayeEntityCard(
+            this.displayEntityCard(
                 entity,
                 entityListGrid.getSubGrid(
                     {
@@ -160,19 +162,52 @@ export class EndFightDisplayer extends FightSceneDisplayer {
 
     reset(): this {
         this.root.setVisible(false);
-        this.temporaryRoot.setVisible(false);
-        this.showButtons(false);
+        this.temporaryRoot.destroy();
+        this.temporaryRoot = new DisplayRoot();
+        this.buttonsRoot.destroy();
+        this.buttonsRoot = new DisplayRoot();
         return this;
     }
 
     show(playerWin: boolean, boosts: Boost[]) {
         this.boosts = boosts;
-        //console.log("show called", this.root);
+
+        this.buttonsRoot.destroy();
+        this.buttonsRoot = new DisplayRoot();
+
+        this.temporaryRoot.destroy();
+        this.temporaryRoot = new DisplayRoot()
+
         this.titleText.setText(playerWin ? "Victoire !" : "Défaite ");
+        this.showEntityCards();
         this.showButtons(playerWin ? true : false);
         this.root.setVisible(true);
         this.temporaryRoot.setVisible(true);
     }
+
+    showEntityCards(): void {
+    const entities = this.gameStore.game.entities;
+    const rowCount = entities.length;
+
+    const entityListGrid = this.scene.rootGrid.getSubGrid(
+        { x: 3, y: 3, width: 5, height: 3 },
+        {
+            division: { horizontal: rowCount, vertical: 8 },
+            margin: { top: 20, bottom: 0, left: 10, right: 10 },
+        },
+    );
+
+    entities.forEach((entity, index) => {
+        this.displayEntityCard(
+            entity,
+            entityListGrid.getSubGrid(
+                { x: index + 1, y: 1, width: 1, height: 6, margin: { vertical: 0, horizontal: 40 } },
+                { division: { horizontal: 3, vertical: 3 } },
+            ),
+            rowCount,
+        );
+    });
+}
 
     onBoostClick(boostId: string) {
         this.boostId = boostId;
@@ -186,7 +221,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    displayeEntityCard(
+    displayEntityCard(
         entity: Entity,
         ObjectListGrid: Grid,
         width: number,
@@ -280,7 +315,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     margin: { top: 10, bottom: -8, left: 0, right: 0 },
                 }),
             )
-                .setImage(EffectAsset.getAssetKey(boost.id as EffectAssetId)) //TODO: pas bon ca un boost pas forcément = un effet, potentiellement plusieurs effets
+                .setImage(BoostAsset.getAssetKey(boost.id as BoostAssetId)) //TODO: pas bon ca un boost pas forcément = un effet, potentiellement plusieurs effets
                 .setDepth(101),
         );
 
@@ -318,18 +353,31 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         );
 
         // Modifiers non nuls (ligne 3)
-        const nonZeroStats = Object.entries(boost.boosts[0])
-            .filter(([, value]) => value !== 0)
-            .map(([key, value]) => `${key}: ${value > 0 ? "+" : ""}${value}`)
-            .join("\n");
+        let statLine: string;
+        if (boost.id === "vampire") {
+            statLine = "Vol de vie : +10%";
+        } else if (boost.id === "reaction") {
+            statLine = [
+                "life: +5",
+                "strength: +3",
+                "precision: +3",
+                "initiative: +15",
+            ].join("\n");
+        } else {
+            statLine = boost.boosts
+                .flatMap((stat) => Object.entries(stat))
+                .filter(([, value]) => value !== undefined && value !== 0)
+                .map(([key, value]) => `${key}: ${(value as number) > 0 ? "+" : ""}${value}`)
+                .join("\n");
+        }
 
-        if (nonZeroStats) {
+        if (statLine) {
             this.temporaryRoot.add(
                 new DisplayText(
                     this.scene,
                     entityListGrid.getArea({ x: 2, y: 3, width: 3, height: 1 }),
                 )
-                    .setText(nonZeroStats)
+                    .setText(statLine)
                     .setDepth(101),
             );
         }
@@ -371,7 +419,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         );
 
         if (isVictory) {
-            this.root.add(
+            this.buttonsRoot.add(
                 new Button(
                     this.scene,
                     buttonsGrid.getArea({
@@ -435,7 +483,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             );
         }
 
-        this.root.add(
+        this.buttonsRoot.add(
             new Button(
                 this.scene,
                 buttonsGrid.getArea({

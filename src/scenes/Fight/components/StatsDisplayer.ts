@@ -43,6 +43,8 @@ export class StatsDisplayer extends FightSceneDisplayer {
     private statsClassName!: DisplayContainer;
     private playerName!: DisplayContainer;
     private statsValuesGrid!: Grid;
+    private playerNameText !: DisplayText;
+    private statsClassNameText!: DisplayText;
 
     protected statTexts: Map<
         string,
@@ -124,12 +126,21 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 height: 1,
             }),
             {
-                title: "N/A",
                 borderWidth: 2,
                 bgColor: Color.containerBorder,
                 outterRadius: { tl: 0, tr: 10, bl: 0, br: 0 },
             },
         );
+
+        this.statsClassNameText = new DisplayText(
+            this.scene,
+            statsGrid.getArea({
+                x: 4,
+                y: 1,
+                width: 6,
+                height: 1,
+            }),
+        )
 
         this.playerName = new DisplayContainer(
             this.scene,
@@ -140,12 +151,21 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 height: 1,
             }),
             {
-                title: "N/A",
                 borderWidth: 7,
                 bgColor: Color.containerBorder,
                 outterRadius: { tl: 0, tr: 0, bl: 0, br: 10 },
             },
         );
+
+        this.playerNameText = new DisplayText(
+            this.scene,
+            statsGrid.getArea({
+                x: 1,
+                y: 5,
+                width: 3,
+                height: 1,
+            }),
+        )
 
         this.statsValuesGrid = statsGrid.getSubGrid(
             {
@@ -246,8 +266,8 @@ export class StatsDisplayer extends FightSceneDisplayer {
             text.setText(String(stats[key as keyof Stats]), { fontSize: 20 }),
         );
 
-        this.playerName.setText(this.name);
-        this.statsClassName.setText(this.characterClass.name);
+        this.playerNameText.setText(this.name ?? "N/A")
+        this.statsClassNameText.setText(this.characterClass.name ?? "N/A")
         this.statsImage.setBackgroundImage(
             CharacterCloseupAsset.getAssetKey(this.entity.classId),
         );
@@ -261,7 +281,9 @@ export class StatsDisplayer extends FightSceneDisplayer {
         this.statsPanel.setVisible(isShow);
         this.statsImage.setVisible(isShow);
         this.statsClassName.setVisible(isShow);
+        this.statsClassNameText.setVisible(isShow);
         this.playerName.setVisible(isShow);
+        this.playerNameText.setVisible(isShow);
 
         this.effectImages.forEach((img) => {
             img.setVisible(isShow);

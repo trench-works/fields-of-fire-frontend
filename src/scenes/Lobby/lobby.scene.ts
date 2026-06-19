@@ -46,6 +46,9 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
     protected classStore: ClassStore;
     protected lobbyStore: LobbyStore;
 
+    protected settingsRoot!: DisplayRoot;
+    protected settingsArea!: GridArea;
+
     constructor() {
         super(SceneAssetId.LOBBY, BackgroundAssetId.LOBBY);
         this.classStore = new ClassStore();
@@ -82,6 +85,8 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         this.lobbySocket.onClose(() => MainMenu.start(this));
         this.lobbySocket.onLobbyUpdate((event) => {
             this.lobbyStore.setLobby(event.lobby);
+            this.buildPlayerList();
+            console.log("lobby socket emmited a update");
             //TODO: rerender ton tab réglages -> actuellement ca mettra pas à jour
         });
         this.lobbySocket.onStart((game) => {
@@ -146,49 +151,9 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 {
                     label: "Réglages",
                     build: (root, area) => {
-                        const players = this.lobbyStore.lobby?.players;
-                        const listGrid = area.getGrid({
-                            division: {
-                                horizontal: 1,
-                                vertical: players?.length ?? 1,
-                            },
-                            padding: 5,
-                        });
-
-                        players?.forEach((player, index) => {
-                            const rowGrid = listGrid.getSubGrid(
-                                { x: 1, y: index + 1, width: 1, height: 1 },
-                                { division: { horizontal: 5, vertical: 1 } },
-                            );
-
-                            // Image closeup (1/5)
-                            root.add(
-                                new DisplayContainer(
-                                    this,
-                                    rowGrid.getArea({ x: 1, y: 1 }),
-                                    {
-                                        backgroundImage:
-                                            CharacterCloseupAsset.getAssetKey(
-                                                player.classId as CharacterAssetId,
-                                            ),
-                                        borderWidth: 2,
-                                    },
-                                ),
-                            );
-
-                            // Nom (4/5)
-                            root.add(
-                                new DisplayText(
-                                    this,
-                                    rowGrid.getArea({
-                                        x: 2,
-                                        y: 1,
-                                        width: 4,
-                                        height: 1,
-                                    }),
-                                ).setText(player.userId),
-                            );
-                        });
+                        this.settingsRoot = root;  
+                        this.settingsArea = area;
+                        this.buildPlayerList(area, root);
                     },
                 },
             ],
@@ -342,6 +307,53 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                         },
                     },
                 ),
+            );
+        });
+    }
+
+    buildPlayerList(){
+        const players = this.lobbyStore.lobby?.players;
+        console.log("je dois afficher ces joueur : "+ players);
+        const listGrid = this.settingsArea.getGrid({
+            division: {
+                horizontal: 1,
+                vertical: players?.length ?? 1,
+            },
+            padding: 5,
+        });
+
+        players?.forEach((player, index) => {
+            const rowGrid = listGrid.getSubGrid(
+                { x: 1, y: index + 1, width: 1, height: 1 },
+                { division: { horizontal: 5, vertical: 1 } },
+            );
+
+            // Image closeup (1/5)
+            this.settingsRoot.add(
+                new DisplayContainer(
+                    this,
+                    rowGrid.getArea({ x: 1, y: 1 }),
+                    {
+                        backgroundImage:
+                            CharacterCloseupAsset.getAssetKey(
+                                player.classId as CharacterAssetId,
+                            ),
+                        borderWidth: 2,
+                    },
+                ),
+            );
+
+            // Nom (4/5)
+            this.settingsRoot.add(
+                new DisplayText(
+                    this,
+                    rowGrid.getArea({
+                        x: 2,
+                        y: 1,
+                        width: 4,
+                        height: 1,
+                    }),
+                ).setText(player.userId),
             );
         });
     }

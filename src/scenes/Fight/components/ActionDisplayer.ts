@@ -154,7 +154,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
                 (area) => {
                     const buttonArea = area.scaleFromCenter(
                         ActionAsset.getAssetScale(action.id),
-                        ScaleMode.FIT,
+                         ScaleMode.FILL
                     );
                     const button = new Button(this.scene, buttonArea, {
                         image: ActionAsset.getAssetKey(action.id),

@@ -51,6 +51,7 @@ import { PositionUtils } from "../../core/Utils/Sizing";
 import { EndFightDisplayer } from "./components/EndFightDisplayer/EndFightDisplayer";
 import { Toaster } from "./components/Toaster";
 import { ParticleDisplayer } from "./components/Particle/ParticleDisplayer";
+import { BoostAsset } from "../../assets/BoostAsset";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -364,6 +365,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
         MusicAsset.load(this.load, MusicAssetId.FIGHT);
         SoundEffectAsset.loadAll(this.load);
         MiscAnimationAsset.load(this.load, MiscAnimationId.BLOOD_SPLATTER);
+        BoostAsset.loadAll(this.load);
     }
 
     create() {
