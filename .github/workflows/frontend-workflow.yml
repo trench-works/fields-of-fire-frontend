@@ -45,7 +45,7 @@ jobs:
               uses: docker/metadata-action@v5
               with:
                   images: |
-                      ghcr.io/aalafteam/fields-of-fire-frontend
+                      ghcr.io/trench-works/fields-of-fire-frontend
                   tags: |
                       type=ref,event=branch
                       type=sha
