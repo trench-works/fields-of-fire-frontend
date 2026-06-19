@@ -25,6 +25,7 @@ import { MainMenu } from "../MainMenu/main-menu.scene";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { ClassStore } from "../Fight/stores/ClassStore";
+import { LobbyStore } from "./stores/LobbyStore";
 
 export type LobbySceneInit = {
     lobbyId: string;
@@ -43,10 +44,16 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
     protected playerId!: string;
 
     protected classStore: ClassStore;
+    protected lobbyStore: LobbyStore;
+
+    protected settingsRoot!: DisplayRoot;
+    protected settingsArea!: GridArea;
+    protected isSettingsTabActive: boolean = false;
 
     constructor() {
         super(SceneAssetId.LOBBY, BackgroundAssetId.LOBBY);
         this.classStore = new ClassStore();
+        this.lobbyStore = new LobbyStore();
         new ClassesRepository().getClasses().then((data) => {
             this.classStore.setClasses(data);
         });
@@ -77,9 +84,11 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         this.playBackgroundMusic(MusicAssetId.MENU);
         this.lobbySocket = new LobbySocket(this.lobbyId);
         this.lobbySocket.onClose(() => MainMenu.start(this));
-
-        this.lobbySocket.onLobbyUpdate(console.log); //TODO: handle lobby infos update + display
-
+        this.lobbySocket.onLobbyUpdate((event) => {
+            this.lobbyStore.setLobby(event.lobby);
+            this.buildPlayerList();
+            //TODO: rerender ton tab réglages -> actuellement ca mettra pas à jour
+        });
         this.lobbySocket.onStart((game) => {
             const player = game.players.find(
                 (player) => player.userId === global.user?.id,
@@ -105,7 +114,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         ).setText("Lobby");
 
         //tab BOX
-        new TabManager(
+        const tabManager = new TabManager(
             this,
             this.rootGrid.getSubGrid(
                 {
@@ -140,17 +149,23 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                     },
                 },
                 {
-                    label: "Réglages",
+                    label: "Joueurs",
                     build: (root, area) => {
-                        root.add(
-                            new DisplayText(this, area).setText(
-                                "not implemented yet",
-                            ),
-                        );
+                        this.settingsRoot = root;  
+                        this.settingsArea = area;
+                        this.buildPlayerList();
                     },
                 },
             ],
         );
+
+        const originalSwitchTo = tabManager.switchTo.bind(tabManager);
+        tabManager.switchTo = (index: number) => {
+            originalSwitchTo(index);
+            this.isSettingsTabActive = index === 2; // 👈 index du tab "Réglages"
+        };
+
+
         //Selected character info BOX
         const playerGrid = this.rootGrid.getSubGrid(
             {
@@ -191,11 +206,14 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 x: 1,
                 y: 6.5,
                 width: 9,
-                height: 2.5, 
-                margin : {top: 5, bottom : 10, left : 10 , right : 10}
+                height: 2.5,
+                margin: { top: 5, bottom: 10, left: 10, right: 10 },
             }),
         );
-        playerTextContainer.setDescription(this.classStore.getClass(this.selectClassId).classDescription, {color: Color.btnBorder})
+        playerTextContainer.setDescription(
+            this.classStore.getClass(this.selectClassId).classDescription,
+            { color: Color.btnBorder },
+        );
         this.playerDescriptionText = playerTextContainer;
 
         const playerImageArea = playerGrid
@@ -301,6 +319,42 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         });
     }
 
+    buildPlayerList() {
+        if (!this.settingsRoot || !this.settingsArea) return;
+
+        this.settingsRoot.destroy();
+
+        const players = this.lobbyStore.lobby?.players ?? [];
+        const listGrid = this.settingsArea.getGrid({
+            division: { horizontal: 1, vertical: 4 },
+            padding: 5,
+        });
+
+        players.forEach((player, index) => {
+            const rowGrid = listGrid.getSubGrid(
+                { x: 1, y: index + 1, width: 1, height: 1 },
+                { division: { horizontal: 5, vertical: 1 } },
+            );
+
+            this.settingsRoot.add(
+                new DisplayContainer(this, rowGrid.getArea({ x: 1, y: 1 }), {
+                    backgroundImage: CharacterCloseupAsset.getAssetKey(
+                        player.classId as CharacterAssetId,
+                    ),
+                    borderWidth: 2,
+                }),
+            );
+
+            this.settingsRoot.add(
+                new DisplayText(this, rowGrid.getArea({ x: 2, y: 1, width: 4, height: 1 }))
+                    .setText(player.name ?? player.userId),
+            );
+        });
+
+        // 👈 applique la bonne visibilité selon l'onglet actif
+        this.settingsRoot.setVisible(this.isSettingsTabActive);
+}
+
     updatePlayerData(classId: CharacterAssetId) {
         this.selectClassId = classId;
 
@@ -317,7 +371,10 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         this.playerClassName.setText(this.classStore.getClass(classId).name);
 
         //Met à jour la desc
-        this.playerDescriptionText.setDescription(this.classStore.getClass(this.selectClassId).classDescription, {color: Color.btnBorder});
+        this.playerDescriptionText.setDescription(
+            this.classStore.getClass(this.selectClassId).classDescription,
+            { color: Color.btnBorder },
+        );
     }
 }
 

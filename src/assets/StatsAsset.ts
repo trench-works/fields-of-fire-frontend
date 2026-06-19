@@ -1,12 +1,12 @@
 import { ImageAssetManager } from "../core/Assets/Asset";
 
 export enum StatsAssetId {
+    ENERGY = "energy",
+    MOUVEMENT = "mouvement",
     ARMOR = "armor",
     DODGING = "dodging",
-    ENERGY = "energy",
     INITIATIVE = "initiative",
     LIFE = "life",
-    MOUVEMENT = "mouvement",
     PRECISION = "precision",
     STRENGTH = "strength",
 }

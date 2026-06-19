@@ -3,6 +3,7 @@ import { Diamond } from "../../../../core/Objects/Diamond";
 import { scaleAndCenter } from "../../../../core/Utils/Scale";
 import { PositionUtils } from "../../../../core/Utils/Sizing";
 import { EntityType } from "../../../../Model/Entity";
+import { StatsUtils } from "../../../../Model/Stats";
 import { FightScene } from "../../fight.scene";
 import { ClassStore } from "../../stores/ClassStore";
 import { GameStore } from "../../stores/GameStore";
@@ -194,7 +195,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
                                 this.scene.tooltip.showNow(
                                     this.classStore.getClass(entity.classId)
                                         .name,
-                                    `❤️ ${entity.stats.life} PV`,
+                                    `❤️ ${StatsUtils.fromEntity(entity).life} PV`,
                                     { x: zone.x, y: zone.y - 120* this.scene.scaleFactor },
                                 );
                             }

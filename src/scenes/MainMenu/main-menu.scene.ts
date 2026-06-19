@@ -210,6 +210,7 @@ export class MainMenu extends BaseScene {
         this.logginButton.displayText(global.user ? "Disconnect" : "Login");
         this.registerButton.displayText(global.user?.username ?? "Register");
         this.registerButton.setIsActivated(!global.user);
+        this.playButton.setIsActivated(!global.user);
     }
 }
 

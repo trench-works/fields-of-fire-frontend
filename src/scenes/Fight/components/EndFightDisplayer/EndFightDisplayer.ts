@@ -1,5 +1,7 @@
 import { CharacterCloseupAsset } from "../../../../assets";
-import { EffectAsset } from "../../../../assets/EffectAsset";
+import { BoostAsset, BoostAssetId } from "../../../../assets/BoostAsset";
+import { EffectAsset, EffectAssetId } from "../../../../assets/EffectAsset";
+import { Color } from "../../../../config/ColorConfig";
 import {
     Button,
     DisplayContainer,
@@ -9,7 +11,7 @@ import {
     List,
 } from "../../../../core";
 import { DisplayImage } from "../../../../core/UI/DisplayImage";
-import { Effect } from "../../../../Model/Effect";
+import { Boost } from "../../../../Model/Boost";
 import { Entity, EntityType } from "../../../../Model/Entity";
 import { MainMenu } from "../../../MainMenu/main-menu.scene";
 import { FightScene } from "../../fight.scene";
@@ -26,8 +28,12 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     protected actionsList!: List;
     protected entityList!: List;
 
+    protected boostId!: string;
+    protected boosts!: Boost[];
+
     protected root: DisplayRoot;
     protected temporaryRoot: DisplayRoot;
+    protected buttonsRoot: DisplayRoot;
 
     protected titleText!: DisplayText;
 
@@ -39,8 +45,8 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         super(scene, gameStore);
         this.root = new DisplayRoot();
         this.temporaryRoot = new DisplayRoot();
+        this.buttonsRoot = new DisplayRoot()
     }
-
     preRender(): this {
         this.root.add(
             new DisplayContainer(
@@ -91,60 +97,6 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.titleText = new DisplayText(this.scene, titleEndgameArea);
         this.root.add(this.titleText);
 
-        const buttonsGrid = this.scene.rootGrid.getSubGrid(
-            {
-                x: 3,
-                y: 6,
-                width: 5,
-                height: 1,
-            },
-            {
-                division: {
-                    horizontal: 9,
-                    vertical: 1,
-                },
-                padding: 5,
-            },
-        );
-
-        this.root.add(
-            new Button(
-                this.scene,
-                buttonsGrid.getArea({
-                    x: 3,
-                    y: 1,
-                    width: 2,
-                    height: 1,
-                }),
-                {
-                    onClick: () => {
-                        console.log("nextRound");
-                        this.temporaryRoot.destroy;
-                        // implémenter this.displayBoostCard
-                    },
-                    text: "Next Fight",
-                },
-            ).setDepth(104),
-        );
-        this.root.add(
-            new Button(
-                this.scene,
-                buttonsGrid.getArea({
-                    x: 6,
-                    y: 1,
-                    width: 2,
-                    height: 1,
-                }),
-                {
-                    onClick: () => {
-                        console.log("Leave");
-                        MainMenu.start(this.scene, { keepMusic: false });
-                    },
-                    text: "Abandonner",
-                },
-            ).setDepth(104),
-        );
-
         // --- Depths ---
         this.titleText.setDepth(102);
 
@@ -179,7 +131,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         );
         this.entityList = new List(this.scene, entityListGrid);
         entities.forEach((entity, index) => {
-            this.displayeEntityCard(
+            this.displayEntityCard(
                 entity,
                 entityListGrid.getSubGrid(
                     {
@@ -208,18 +160,68 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    show(playerWin: boolean) {
-        //console.log("show called", this.root);
+    reset(): this {
+        this.root.setVisible(false);
+        this.temporaryRoot.destroy();
+        this.temporaryRoot = new DisplayRoot();
+        this.buttonsRoot.destroy();
+        this.buttonsRoot = new DisplayRoot();
+        return this;
+    }
+
+    show(playerWin: boolean, boosts: Boost[]) {
+        this.boosts = boosts;
+
+        this.buttonsRoot.destroy();
+        this.buttonsRoot = new DisplayRoot();
+
+        this.temporaryRoot.destroy();
+        this.temporaryRoot = new DisplayRoot()
+
         this.titleText.setText(playerWin ? "Victoire !" : "Défaite ");
+        this.showEntityCards();
+        this.showButtons(playerWin ? true : false);
         this.root.setVisible(true);
         this.temporaryRoot.setVisible(true);
+    }
+
+    showEntityCards(): void {
+    const entities = this.gameStore.game.entities;
+    const rowCount = entities.length;
+
+    const entityListGrid = this.scene.rootGrid.getSubGrid(
+        { x: 3, y: 3, width: 5, height: 3 },
+        {
+            division: { horizontal: rowCount, vertical: 8 },
+            margin: { top: 20, bottom: 0, left: 10, right: 10 },
+        },
+    );
+
+    entities.forEach((entity, index) => {
+        this.displayEntityCard(
+            entity,
+            entityListGrid.getSubGrid(
+                { x: index + 1, y: 1, width: 1, height: 6, margin: { vertical: 0, horizontal: 40 } },
+                { division: { horizontal: 3, vertical: 3 } },
+            ),
+            rowCount,
+        );
+    });
+}
+
+    onBoostClick(boostId: string) {
+        this.boostId = boostId;
+    }
+
+    onReady() {
+        this.scene.playerSocket.readyForNewGame(this.boostId);
     }
 
     async animate(): Promise<this> {
         return this;
     }
 
-    displayeEntityCard(
+    displayEntityCard(
         entity: Entity,
         ObjectListGrid: Grid,
         width: number,
@@ -276,7 +278,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         );
     }
 
-    displayBoostCard(boost: Effect, entityListGrid: Grid, width: number): void {
+    displayBoostCard(boost: Boost, entityListGrid: Grid): void {
         // Conteneur de la card
         this.temporaryRoot.add(
             new DisplayContainer(
@@ -284,63 +286,221 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 entityListGrid.getArea({
                     x: 1,
                     y: 1,
-                    width: width,
+                    width: 5,
                     height: 4,
-                    margin: { top: 50, bottom: 0, right: 0, left: 0 },
+                    margin: { top: 10, bottom: 10, right: 10, left: 10 },
                 }),
                 {
                     borderWidth: 3,
                     opacity: 1,
+                    bgColor: Color.btnBg,
+                    onClick: () => {
+                        this.onBoostClick(boost.id);
+                        this.onReady();
+                        //TODO: FIXME: maybe change logic, first one is for select, second one is sending event to back
+                    },
                 },
             ).setDepth(100),
         );
 
+        // Image (ligne 1)
         this.temporaryRoot.add(
             new DisplayImage(
                 this.scene,
                 entityListGrid.getArea({
-                    x: 2,
+                    x: 3,
                     y: 1,
                     width: 1,
-                    height: 3,
+                    height: 1,
+                    margin: { top: 10, bottom: -8, left: 0, right: 0 },
                 }),
             )
-                .setImage(EffectAsset.getAssetKey(boost.id), 1)
+                .setImage(BoostAsset.getAssetKey(boost.id as BoostAssetId)) //TODO: pas bon ca un boost pas forcément = un effet, potentiellement plusieurs effets
                 .setDepth(101),
         );
 
-        // Nom (ligne 3)
+        // Nom (ligne 2)
+        this.temporaryRoot.add(
+            new DisplayContainer(
+                this.scene,
+                entityListGrid.getArea({
+                    x: 1,
+                    y: 2,
+                    width: 5,
+                    height: 1,
+                    margin: { top: 10, bottom: 0, left: 0, right: 0 },
+                }),
+                {
+                    borderWidth: 3,
+                    innerRadius: 0,
+                    onClick: () => this.onBoostClick(boost.id),
+                },
+            ).setDepth(100),
+        );
         this.temporaryRoot.add(
             new DisplayText(
                 this.scene,
                 entityListGrid.getArea({
-                    x: 1,
-                    y: 3,
+                    x: 2,
+                    y: 2,
                     width: 3,
                     height: 1,
+                    margin: { top: 10, bottom: 0, left: 0, right: 0 },
                 }),
             )
                 .setText(boost.name)
-                .setDepth(106),
+                .setDepth(101),
         );
 
-        const nonZeroStats = Object.entries(boost.modifier)
-            .filter(([_, value]) => value !== 0)
-            .map(([key, value]) => `${key}: ${value > 0 ? "+" : ""}${value}`)
-            .join("\n");
+        // Modifiers non nuls (ligne 3)
+        let statLine: string;
+        if (boost.id === "vampire") {
+            statLine = "Vol de vie : +10%";
+        } else if (boost.id === "reaction") {
+            statLine = [
+                "life: +5",
+                "strength: +3",
+                "precision: +3",
+                "initiative: +15",
+            ].join("\n");
+        } else {
+            statLine = boost.boosts
+                .flatMap((stat) => Object.entries(stat))
+                .filter(([, value]) => value !== undefined && value !== 0)
+                .map(([key, value]) => `${key}: ${(value as number) > 0 ? "+" : ""}${value}`)
+                .join("\n");
+        }
 
-        this.temporaryRoot.add(
-            new DisplayText(
+        if (statLine) {
+            this.temporaryRoot.add(
+                new DisplayText(
+                    this.scene,
+                    entityListGrid.getArea({ x: 2, y: 3, width: 3, height: 1 }),
+                )
+                    .setText(statLine)
+                    .setDepth(101),
+            );
+        }
+
+        // Description (ligne 4)
+        if (boost.name) {
+            this.temporaryRoot.add(
+                new DisplayText(
+                    this.scene,
+                    entityListGrid.getArea({
+                        x: 1,
+                        y: 4,
+                        width: 5,
+                        height: 1,
+                        margin: { top: 0, bottom: 0, left: 10, right: 10 },
+                    }),
+                )
+                    .setDescription(boost.name)
+                    .setDepth(101),
+            );
+        }
+    }
+
+    showButtons(isVictory: boolean) {
+        const buttonsGrid = this.scene.rootGrid.getSubGrid(
+            {
+                x: 3,
+                y: 6,
+                width: 5,
+                height: 1,
+            },
+            {
+                division: {
+                    horizontal: 9,
+                    vertical: 1,
+                },
+                padding: 5,
+            },
+        );
+
+        if (isVictory) {
+            this.buttonsRoot.add(
+                new Button(
+                    this.scene,
+                    buttonsGrid.getArea({
+                        x: 3,
+                        y: 1,
+                        width: 2,
+                        height: 1,
+                    }),
+                    {
+                        onClick: () => {
+                            console.log("nextRound");
+                            this.temporaryRoot.destroy();
+                            const boostListGrid =
+                                this.scene.rootGrid.getSubGrid(
+                                    { x: 3, y: 3, width: 5, height: 3 },
+                                    {
+                                        division: {
+                                            horizontal: this.boosts.length,
+                                            vertical: 4,
+                                        },
+                                        margin: {
+                                            top: 20,
+                                            bottom: 0,
+                                            left: 10,
+                                            right: 10,
+                                        },
+                                    },
+                                );
+
+                            this.boosts.forEach((boost, index) => {
+                                this.displayBoostCard(
+                                    boost,
+                                    boostListGrid.getSubGrid(
+                                        {
+                                            x: index + 1,
+                                            y: 1,
+                                            width: 1,
+                                            height: 4,
+                                            margin: {
+                                                top: 40,
+                                                bottom: 0,
+                                                left: 30,
+                                                right: 30,
+                                            },
+                                        },
+                                        {
+                                            division: {
+                                                horizontal: 5,
+                                                vertical: 4,
+                                            },
+                                        },
+                                    ),
+                                );
+                            });
+
+                            this.temporaryRoot.setVisible(true);
+                        },
+                        text: "Next Fight",
+                    },
+                ).setDepth(104),
+            );
+        }
+
+        this.buttonsRoot.add(
+            new Button(
                 this.scene,
-                entityListGrid.getArea({
-                    x: 1,
-                    y: 3,
-                    width: 3,
+                buttonsGrid.getArea({
+                    x: isVictory ? 6 : 4.5,
+                    y: 1,
+                    width: 2,
                     height: 1,
                 }),
-            )
-                .setText(nonZeroStats)
-                .setDepth(106),
+                {
+                    onClick: () => {
+                        console.log("Leave");
+                        this.scene.playerSocket.disconnect();
+                        MainMenu.start(this.scene, { keepMusic: false });
+                    },
+                    text: "Retour Menu",
+                },
+            ).setDepth(104),
         );
     }
 }
