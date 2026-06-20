@@ -54,7 +54,6 @@ export class MainMenu extends BaseScene {
             }),
         ).setText("Fields Of Fire");
 
-        // Créer une grille interne pour les boutons (3 boutons: 1 colonne, 3 lignes)
         const buttonsGrid = this.rootGrid.getSubGrid(
             {
                 x: 3,
@@ -194,6 +193,7 @@ export class MainMenu extends BaseScene {
                                         "user",
                                         JSON.stringify(global.user),
                                     );
+                                    this.updateLoginButtons();
                                     return true;
                                 }
                                 return false;
@@ -210,7 +210,7 @@ export class MainMenu extends BaseScene {
         this.logginButton.displayText(global.user ? "Disconnect" : "Login");
         this.registerButton.displayText(global.user?.username ?? "Register");
         this.registerButton.setIsActivated(!global.user);
-        this.playButton.setIsActivated(!global.user);
+        this.playButton.setIsActivated(Boolean(global.user))
     }
 }
 
