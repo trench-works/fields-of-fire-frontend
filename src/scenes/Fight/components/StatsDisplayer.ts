@@ -46,7 +46,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
     private statsClassNameText!: DisplayText;
 
     protected statTexts: Map<
-        string,
+        keyof Stats,
         { text: DisplayText; image: DisplayImage }
     >;
 
@@ -261,9 +261,14 @@ export class StatsDisplayer extends FightSceneDisplayer {
     update(): this {
         const stats = StatsUtils.fromEntity(this.entity);
 
-        this.statTexts.forEach(({ text }, key) =>
-            text.setText(String(stats[key as keyof Stats]), { fontSize: 20 }),
-        );
+        this.statTexts.forEach(({ text }, key) => {
+            let value = stats[key];
+            if (["life", "mouvement", "energy"].includes(key)) {
+                value = Math.max(value, 0);
+            }
+
+            text.setText(String(value), { fontSize: 20 });
+        });
 
         this.playerNameText.setText(this.name ?? "N/A");
         this.statsClassNameText.setText(this.characterClass.name ?? "N/A");
