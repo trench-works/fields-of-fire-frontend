@@ -1,6 +1,5 @@
 import { CharacterCloseupAsset } from "../../../../assets";
 import { BoostAsset, BoostAssetId } from "../../../../assets/BoostAsset";
-import { EffectAsset, EffectAssetId } from "../../../../assets/EffectAsset";
 import { Color } from "../../../../config/ColorConfig";
 import {
     Button,
@@ -37,6 +36,8 @@ export class EndFightDisplayer extends FightSceneDisplayer {
 
     protected titleText!: DisplayText;
 
+    protected isReady: boolean = false;
+
     constructor(
         scene: FightScene,
         gameStore: GameStore,
@@ -45,7 +46,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         super(scene, gameStore);
         this.root = new DisplayRoot();
         this.temporaryRoot = new DisplayRoot();
-        this.buttonsRoot = new DisplayRoot()
+        this.buttonsRoot = new DisplayRoot();
     }
     preRender(): this {
         this.root.add(
@@ -176,7 +177,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.buttonsRoot = new DisplayRoot();
 
         this.temporaryRoot.destroy();
-        this.temporaryRoot = new DisplayRoot()
+        this.temporaryRoot = new DisplayRoot();
 
         this.titleText.setText(playerWin ? "Victoire !" : "Défaite ");
         this.showEntityCards();
@@ -186,35 +187,44 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     }
 
     showEntityCards(): void {
-    const entities = this.gameStore.game.entities;
-    const rowCount = entities.length;
+        const entities = this.gameStore.game.entities;
+        const rowCount = entities.length;
 
-    const entityListGrid = this.scene.rootGrid.getSubGrid(
-        { x: 3, y: 3, width: 5, height: 3 },
-        {
-            division: { horizontal: rowCount, vertical: 8 },
-            margin: { top: 20, bottom: 0, left: 10, right: 10 },
-        },
-    );
-
-    entities.forEach((entity, index) => {
-        this.displayEntityCard(
-            entity,
-            entityListGrid.getSubGrid(
-                { x: index + 1, y: 1, width: 1, height: 6, margin: { vertical: 0, horizontal: 40 } },
-                { division: { horizontal: 3, vertical: 3 } },
-            ),
-            rowCount,
+        const entityListGrid = this.scene.rootGrid.getSubGrid(
+            { x: 3, y: 3, width: 5, height: 3 },
+            {
+                division: { horizontal: rowCount, vertical: 8 },
+                margin: { top: 20, bottom: 0, left: 10, right: 10 },
+            },
         );
-    });
-}
+
+        entities.forEach((entity, index) => {
+            this.displayEntityCard(
+                entity,
+                entityListGrid.getSubGrid(
+                    {
+                        x: index + 1,
+                        y: 1,
+                        width: 1,
+                        height: 6,
+                        margin: { vertical: 0, horizontal: 40 },
+                    },
+                    { division: { horizontal: 3, vertical: 3 } },
+                ),
+                rowCount,
+            );
+        });
+    }
 
     onBoostClick(boostId: string) {
         this.boostId = boostId;
     }
 
     onReady() {
-        this.scene.playerSocket.readyForNewGame(this.boostId);
+        if (!this.isReady) {
+            this.isReady = true;
+            this.scene.playerSocket.readyForNewGame(this.boostId);
+        }
     }
 
     async animate(): Promise<this> {
@@ -367,7 +377,10 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             statLine = boost.boosts
                 .flatMap((stat) => Object.entries(stat))
                 .filter(([, value]) => value !== undefined && value !== 0)
-                .map(([key, value]) => `${key}: ${(value as number) > 0 ? "+" : ""}${value}`)
+                .map(
+                    ([key, value]) =>
+                        `${key}: ${(value as number) > 0 ? "+" : ""}${value}`,
+                )
                 .join("\n");
         }
 
