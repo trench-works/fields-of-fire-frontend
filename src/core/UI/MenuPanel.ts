@@ -4,6 +4,7 @@ import { Color } from "../../config/ColorConfig";
 import { BaseScene } from "../Objects";
 import { FightScene } from "../../scenes/Fight/fight.scene";
 import { LobbyScene } from "../../scenes/Lobby/lobby.scene";
+import { Depth, UI_LEVELS_OFFSET } from "../Utils";
 
 interface MenuPanelConfig {
     onResumeClick?: () => void;
@@ -19,7 +20,7 @@ export class MenuPanel extends Phaser.GameObjects.Container {
     constructor(scene: BaseScene, config: MenuPanelConfig) {
         super(scene, 0, 0);
         scene.add.existing(this);
-        this.setDepth(10000);
+        this.setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP));
 
         // Créer un overlay semi-transparent qui capture TOUS les clics
         this.overlay = scene.add.rectangle(
@@ -32,7 +33,9 @@ export class MenuPanel extends Phaser.GameObjects.Container {
         );
         this.overlay.setInteractive();
         this.overlay.setScrollFactor(0);
-        this.overlay.setDepth(10001);
+        this.overlay.setDepth(
+            Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1,
+        );
         this.add(this.overlay);
 
         // Créer le panneau du menu
@@ -44,7 +47,9 @@ export class MenuPanel extends Phaser.GameObjects.Container {
             Phaser.Display.Color.HexStringToColor(Color.containerBg).color,
         );
         this.panel.setScrollFactor(0);
-        this.panel.setDepth(10002);
+        this.panel.setDepth(
+            Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2,
+        );
         this.panel.setStrokeStyle(3, 0xffffff);
         this.add(this.panel);
 
@@ -61,7 +66,7 @@ export class MenuPanel extends Phaser.GameObjects.Container {
         );
         titleText.setOrigin(0.5);
         titleText.setScrollFactor(0);
-        titleText.setDepth(10003);
+        titleText.setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3);
         this.add(titleText);
 
         // Bouton Reprendre
@@ -84,7 +89,9 @@ export class MenuPanel extends Phaser.GameObjects.Container {
                 },
             },
         );
-        resumeButton.setDepth(10003);
+        resumeButton.setDepth(
+            Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3,
+        );
         resumeButton.setScrollFactor(0);
         this.add(resumeButton);
 
@@ -108,7 +115,9 @@ export class MenuPanel extends Phaser.GameObjects.Container {
                 },
             },
         );
-        settingsButton.setDepth(10003);
+        settingsButton.setDepth(
+            Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3,
+        );
         settingsButton.setScrollFactor(0);
         this.add(settingsButton);
 
@@ -126,7 +135,7 @@ export class MenuPanel extends Phaser.GameObjects.Container {
                 fontSize: 24,
                 onClick: () => {
                     this.hide();
-                    if ('playerSocket' in this.scene) {
+                    if ("playerSocket" in this.scene) {
                         (this.scene as FightScene).playerSocket.disconnect();
                     }
                     if ('lobbySocket' in this.scene) {
@@ -138,7 +147,9 @@ export class MenuPanel extends Phaser.GameObjects.Container {
                 },
             },
         );
-        mainMenuButton.setDepth(10003);
+        mainMenuButton.setDepth(
+            Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3,
+        );
         mainMenuButton.setScrollFactor(0);
         this.add(mainMenuButton);
 

@@ -1,7 +1,10 @@
 import { Position } from "../Types";
 
+export enum BACKGROUND_LEVELS_OFFSET {
+    WIND = 0,
+}
+
 //GRID DEPTH ARE BOUND BETWEEN 100 and 510
-const GRID_BASE_OFFSET = 100;
 export enum GRID_LEVELS_OFFSET {
     HIGHTLIGHT_1 = 1,
     HIGHTLIGHT_2 = 2,
@@ -14,16 +17,19 @@ export enum GRID_LEVELS_OFFSET {
     TOASTER = 9,
 }
 
-const UI_BASE_OFFSET = GRID_BASE_OFFSET + 900;
 export enum UI_LEVELS_OFFSET {
     CONTAINER = 100,
     TITLE = 150,
     BUTTON = 200,
+    TOOLTIP = 300,
     POPUP = 500,
     LOADER = 1000,
 }
 
-export class DepthUtils {
+export class Depth {
+    static BACKGROUND_BASE_OFFSET = 10;
+    static GRID_BASE_OFFSET = 100;
+    static UI_BASE_OFFSET = Depth.GRID_BASE_OFFSET + 900;
     /**
      *
      * @param position position on grid
@@ -34,17 +40,27 @@ export class DepthUtils {
         { x, y }: Position,
         level?: GRID_LEVELS_OFFSET,
     ): number {
-        return GRID_BASE_OFFSET + (x + y) * 10 + (level ?? 0);
+        return Depth.GRID_BASE_OFFSET + (x + y) * 10 + (level ?? 0);
     }
 
     /**
      *
      * @param position position on grid
-     * @param offset a grid object offset level
-     * @returns a value between 100 and 410 depending on the x position
+     * @param offset an object offset level
+     * @returns
      */
     static getUIElementDepth(level?: UI_LEVELS_OFFSET): number {
-        return UI_BASE_OFFSET + (level ?? 0);
+        return Depth.UI_BASE_OFFSET + (level ?? 0);
+    }
+
+    /**
+     *
+     * @param position position on grid
+     * @param offset an object offset level
+     * @returns
+     */
+    static getBackgroundElementDepth(level?: BACKGROUND_LEVELS_OFFSET): number {
+        return Depth.UI_BASE_OFFSET + (level ?? 0);
     }
 }
 
