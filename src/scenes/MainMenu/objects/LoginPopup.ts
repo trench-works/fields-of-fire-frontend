@@ -1,5 +1,11 @@
 import Phaser from "phaser";
-import { Button, DisplayContainer } from "../../../core";
+import {
+    BaseScene,
+    Button,
+    Depth,
+    DisplayContainer,
+    UI_LEVELS_OFFSET,
+} from "../../../core";
 
 interface PopupInputConfig {
     title: string;
@@ -14,7 +20,7 @@ export class PopupInput {
     private validateButton: Button;
     private inputElement: HTMLInputElement;
 
-    constructor(scene: Phaser.Scene, config: PopupInputConfig) {
+    constructor(scene: BaseScene, config: PopupInputConfig) {
         const { title, placeholder = "", onValidate, onCancel } = config;
         const cx = scene.scale.width / 2;
         const cy = scene.scale.height / 2;
@@ -31,7 +37,7 @@ export class PopupInput {
                 0x000000,
                 0.6,
             )
-            .setDepth(10)
+            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP))
             .setInteractive()
             .on("pointerdown", () => {
                 onCancel?.();
@@ -54,9 +60,11 @@ export class PopupInput {
                 fontSize: 30,
             },
         );
-        this.container.setDepth(11);
+        this.container.setDepth(
+            Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1,
+        );
         this.container
-            .setDepth(11)
+            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1)
             .setInteractive()
             .on(
                 "pointerdown",
@@ -112,10 +120,12 @@ export class PopupInput {
                 },
             },
         );
-        this.validateButton.setDepth(12);
+        this.validateButton.setDepth(
+            Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2,
+        );
 
         this.validateButton
-            .setDepth(12)
+            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2)
             .setInteractive()
             .on(
                 "pointerdown",

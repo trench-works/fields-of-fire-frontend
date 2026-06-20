@@ -2,7 +2,7 @@ import {
     ParticleAsset,
     ParticleAssetId,
 } from "../../../../assets/ParticleAsset";
-import { Displayer } from "../../../../core";
+import { BACKGROUND_LEVELS_OFFSET, Depth, Displayer } from "../../../../core";
 import { FightScene } from "../../fight.scene";
 import { ParticleAnimationProps } from "./ParticleAnimation";
 
@@ -34,6 +34,7 @@ export class ParticleDisplayer extends Displayer<FightScene> {
         particleKey: ParticleAssetId,
         x: number,
         y: number,
+        depth: number,
     ): Promise<this> {
         console.log("ANIMATE INTIMIDATION");
         switch (particleKey) {
@@ -43,7 +44,7 @@ export class ParticleDisplayer extends Displayer<FightScene> {
                     ParticleDirectionEnum.UP,
                     x,
                     y,
-                    {}
+                    { depth },
                 );
                 break;
             case ParticleAssetId.DEBUFF:
@@ -52,17 +53,17 @@ export class ParticleDisplayer extends Displayer<FightScene> {
                     ParticleDirectionEnum.DOWN,
                     x,
                     y,
-                    {}
+                    { depth },
                 );
                 break;
-            case ParticleAssetId.HEAL: 
+            case ParticleAssetId.HEAL:
                 this.ParticleAnimation(
                     ParticleAssetId.HEAL,
                     ParticleDirectionEnum.UP,
                     x,
                     y,
-                    {}
-                )
+                    { depth },
+                );
                 break;
             case ParticleAssetId.SMOKE:
                 this.ParticleAnimation(
@@ -71,13 +72,15 @@ export class ParticleDisplayer extends Displayer<FightScene> {
                     x,
                     y,
                     {
-                        speedY : {min : 20, max : 60},
-                        speedX: {min: -30, max : 30},
-                        scale : {start: 2, end : 8},
-                        lifespan : 2000,
-                        frequency : 200
-                    }
-                )
+                        speedY: { min: 20, max: 60 },
+                        speedX: { min: -30, max: 30 },
+                        scale: { start: 2, end: 8 },
+                        lifespan: 2000,
+                        frequency: 200,
+                        depth,
+                    },
+                );
+                break;
             case ParticleAssetId.DUST:
                 this.WindAnimation(x, y);
                 break;
@@ -90,7 +93,7 @@ export class ParticleDisplayer extends Displayer<FightScene> {
         direction: string,
         x: number,
         y: number,
-        props : ParticleAnimationProps
+        props: ParticleAnimationProps,
     ) {
         props.speedY ??= { min: 200, max: 350 };
         props.speedX ??= { min: -30, max: 30 };
@@ -99,19 +102,24 @@ export class ParticleDisplayer extends Displayer<FightScene> {
         props.frequency ??= 120;
         props.quantity ??= { min: 2, max: 0.5 };
 
-        if(this.buffEmitter) {
+        if (this.buffEmitter) {
             this.buffEmitter.stop();
             this.buffEmitter.destroy();
         }
 
         this.buffEmitter = this.scene.add.particles(
             x,
-            direction === ParticleDirectionEnum.UP ? y : y - (128 * this.scene.scaleFactor / 1.5),
+            direction === ParticleDirectionEnum.UP
+                ? y
+                : y - (128 * this.scene.scaleFactor) / 1.5,
             ParticleAsset.getAssetKey(particleSpriteKey),
             {
                 speedY:
                     direction === ParticleDirectionEnum.UP
-                        ? { min: props.speedY.min* -1, max: props.speedY.max * -1 }
+                        ? {
+                              min: props.speedY.min * -1,
+                              max: props.speedY.max * -1,
+                          }
                         : { min: props.speedY.min, max: props.speedY.max },
                 speedX: props.speedX,
 
@@ -128,7 +136,7 @@ export class ParticleDisplayer extends Displayer<FightScene> {
             },
         );
 
-        this.buffEmitter.setDepth((Math.max(x,y) * 10) + 1)
+        this.buffEmitter.setDepth(props.depth);
         await new Promise<void>((resolve) => {
             this.buffEmitter.addEmitZone(
                 new Phaser.GameObjects.Particles.Zones.RandomZone({
@@ -183,16 +191,18 @@ export class ParticleDisplayer extends Displayer<FightScene> {
             }),
         );
 
-    this.buffEmitter.setDepth((Math.max(x, y) * 10) + 1);
+        this.buffEmitter.setDepth(
+            Depth.getBackgroundElementDepth(BACKGROUND_LEVELS_OFFSET.WIND),
+        );
 
-    await new Promise<void>((resolve) => {
-        this.buffEmitter.start();
+        await new Promise<void>((resolve) => {
+            this.buffEmitter.start();
 
-        setTimeout(() => {
-            this.buffEmitter.stop();
-            resolve();
-        }, 3000);
-    });
-}
+            setTimeout(() => {
+                this.buffEmitter.stop();
+                resolve();
+            }, 3000);
+        });
+    }
 }
 

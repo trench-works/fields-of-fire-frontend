@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { Color } from "../../config/ColorConfig";
-import { ColorUtils } from "../Utils";
+import { ColorUtils, Depth, UI_LEVELS_OFFSET } from "../Utils";
 
 interface TooltipConfig {
     bgColor?: string;
@@ -19,7 +19,7 @@ interface TooltipConfig {
 
 export class Tooltip extends Phaser.GameObjects.Container {
     private static instances: Map<Phaser.Scene, Tooltip> = new Map();
-    private fixedPosition: { x: number, y: number } | null = null
+    private fixedPosition: { x: number; y: number } | null = null;
     private bg: Phaser.GameObjects.Graphics;
     private titleLabel: Phaser.GameObjects.Text;
     private bodyLabel: Phaser.GameObjects.Text;
@@ -32,18 +32,18 @@ export class Tooltip extends Phaser.GameObjects.Container {
         super(scene, 0, 0);
 
         this.cfg = {
-            bgColor:       config.bgColor       ?? Color.containerBg,
-            textColor:     config.textColor      ?? "#FFFFFF",
-            titleColor:    config.titleColor     ?? Color.btnBg,
-            fontSize:      config.fontSize       ?? 14,
-            titleFontSize: config.titleFontSize  ?? 16,
-            padding:       config.padding        ?? 10,
-            borderColor:   config.borderColor    ?? Color.containerBorder,
-            borderWidth:   config.borderWidth    ?? 1,
-            offsetX:       config.offsetX        ?? 12,
-            offsetY:       config.offsetY        ?? -20,
-            maxWidth:      config.maxWidth       ?? 200,
-            delay:         config.delay          ?? 2000,
+            bgColor: config.bgColor ?? Color.containerBg,
+            textColor: config.textColor ?? "#FFFFFF",
+            titleColor: config.titleColor ?? Color.btnBg,
+            fontSize: config.fontSize ?? 14,
+            titleFontSize: config.titleFontSize ?? 16,
+            padding: config.padding ?? 10,
+            borderColor: config.borderColor ?? Color.containerBorder,
+            borderWidth: config.borderWidth ?? 1,
+            offsetX: config.offsetX ?? 12,
+            offsetY: config.offsetY ?? -20,
+            maxWidth: config.maxWidth ?? 200,
+            delay: config.delay ?? 2000,
         };
 
         const pad = this.cfg.padding;
@@ -70,7 +70,7 @@ export class Tooltip extends Phaser.GameObjects.Container {
             .setOrigin(0, 0);
 
         this.add([this.bg, this.titleLabel, this.bodyLabel]);
-        this.setDepth(9999);
+        this.setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.TOOLTIP));
         this.setVisible(false);
         this.setScrollFactor(0);
 
@@ -79,9 +79,14 @@ export class Tooltip extends Phaser.GameObjects.Container {
         scene.events.once("shutdown", () => this.destroy(), this);
     }
 
-    public static getInstance(scene: Phaser.Scene, config?: TooltipConfig): Tooltip {
+    public static getInstance(
+        scene: Phaser.Scene,
+        config?: TooltipConfig,
+    ): Tooltip {
         if (!scene.sys || !scene.sys.displayList) {
-            throw new Error("scene must be initialized before calling getInstance()");
+            throw new Error(
+                "scene must be initialized before calling getInstance()",
+            );
         }
         if (!Tooltip.instances.has(scene)) {
             Tooltip.instances.set(scene, new Tooltip(scene, config));
@@ -106,8 +111,10 @@ export class Tooltip extends Phaser.GameObjects.Container {
             resolvedTitle = title;
         }
 
-        target.on("pointerover", () => this.scheduleShow(text, resolvedDelay, resolvedTitle));
-        target.on("pointerout",  () => this.cancelAndHide());
+        target.on("pointerover", () =>
+            this.scheduleShow(text, resolvedDelay, resolvedTitle),
+        );
+        target.on("pointerout", () => this.cancelAndHide());
     }
 
     private scheduleShow(text: string, delay: number, title?: string): void {
@@ -138,7 +145,9 @@ export class Tooltip extends Phaser.GameObjects.Container {
         const gap = 4;
 
         if (title) {
-            this.titleLabel.setText(title.charAt(0).toUpperCase() + title.slice(1)).setVisible(true);
+            this.titleLabel
+                .setText(title.charAt(0).toUpperCase() + title.slice(1))
+                .setVisible(true);
             this.bodyLabel.setText(text).setVisible(true);
             this.bodyLabel.setPosition(pad, pad + this.titleLabel.height + gap);
         } else {
@@ -151,7 +160,8 @@ export class Tooltip extends Phaser.GameObjects.Container {
             ? this.titleLabel.height + gap + this.bodyLabel.height
             : this.bodyLabel.height;
 
-        const w = Math.max(this.titleLabel.width, this.bodyLabel.width) + pad * 2;
+        const w =
+            Math.max(this.titleLabel.width, this.bodyLabel.width) + pad * 2;
         const h = contentH + pad * 2;
 
         this.bg.clear();
@@ -160,7 +170,11 @@ export class Tooltip extends Phaser.GameObjects.Container {
         this.bg.fillStyle(ColorUtils.parseColor(this.cfg.bgColor), 0.92);
         this.bg.fillRoundedRect(0, 0, w, h, 6);
         if (this.cfg.borderWidth > 0) {
-            this.bg.lineStyle(this.cfg.borderWidth, ColorUtils.parseColor(this.cfg.borderColor), 1);
+            this.bg.lineStyle(
+                this.cfg.borderWidth,
+                ColorUtils.parseColor(this.cfg.borderColor),
+                1,
+            );
             this.bg.strokeRoundedRect(0, 0, w, h, 6);
         }
 
@@ -180,7 +194,9 @@ export class Tooltip extends Phaser.GameObjects.Container {
         if (this.fixedPosition) return;
 
         if (this.fixedTarget) {
-            const tooltipW = Math.max(this.titleLabel.width, this.bodyLabel.width) + this.cfg.padding * 2;
+            const tooltipW =
+                Math.max(this.titleLabel.width, this.bodyLabel.width) +
+                this.cfg.padding * 2;
             this.setPosition(
                 this.fixedTarget.x - tooltipW / 2,
                 this.fixedTarget.y - 240,
@@ -192,11 +208,18 @@ export class Tooltip extends Phaser.GameObjects.Container {
         let px = pointer.x + this.cfg.offsetX;
         let py = pointer.y + this.cfg.offsetY;
 
-        const tooltipW = Math.max(this.titleLabel.width, this.bodyLabel.width) + this.cfg.padding * 2;
-        const tooltipH = this.titleLabel.height + this.bodyLabel.height + this.cfg.padding * 2;
+        const tooltipW =
+            Math.max(this.titleLabel.width, this.bodyLabel.width) +
+            this.cfg.padding * 2;
+        const tooltipH =
+            this.titleLabel.height +
+            this.bodyLabel.height +
+            this.cfg.padding * 2;
 
-        if (px + tooltipW > this.scene.scale.width)  px = pointer.x - tooltipW - this.cfg.offsetX;
-        if (py + tooltipH > this.scene.scale.height) py = pointer.y - tooltipH - Math.abs(this.cfg.offsetY);
+        if (px + tooltipW > this.scene.scale.width)
+            px = pointer.x - tooltipW - this.cfg.offsetX;
+        if (py + tooltipH > this.scene.scale.height)
+            py = pointer.y - tooltipH - Math.abs(this.cfg.offsetY);
         if (py < 0) py = 0;
 
         this.setPosition(px, py);
@@ -209,16 +232,28 @@ export class Tooltip extends Phaser.GameObjects.Container {
         super.destroy(fromScene);
     }
 
-    public showNow(text: string, title?: string, position?: { x: number, y: number }): void {
+    public showNow(
+        text: string,
+        title?: string,
+        position?: { x: number; y: number },
+    ): void {
         this.fixedPosition = position ?? null;
         this.show(text, title);
         if (position) {
-            const tooltipW = Math.max(this.titleLabel.width, this.bodyLabel.width) + this.cfg.padding * 2;
+            const tooltipW =
+                Math.max(this.titleLabel.width, this.bodyLabel.width) +
+                this.cfg.padding * 2;
             this.setPosition(position.x - tooltipW / 2, position.y);
         }
     }
 
-    public showFightingTooltip(items: { text: string; title?: string; position: { x: number; y: number } }[]): void {
+    public showFightingTooltip(
+        items: {
+            text: string;
+            title?: string;
+            position: { x: number; y: number };
+        }[],
+    ): void {
         this.clearMultiple(); // nettoie les précédents
 
         items.forEach(({ text, title, position }) => {
@@ -227,21 +262,27 @@ export class Tooltip extends Phaser.GameObjects.Container {
 
             const bg = this.scene.make.graphics({}, false);
 
-            const titleLabel = this.scene.add.text(pad, pad, "", {
-                fontFamily: "MyFont",
-                fontSize: this.cfg.titleFontSize + "px",
-                color: this.cfg.titleColor,
-                fontStyle: "bold",
-            }).setOrigin(0, 0);
+            const titleLabel = this.scene.add
+                .text(pad, pad, "", {
+                    fontFamily: "MyFont",
+                    fontSize: this.cfg.titleFontSize + "px",
+                    color: this.cfg.titleColor,
+                    fontStyle: "bold",
+                })
+                .setOrigin(0, 0);
 
-            const bodyLabel = this.scene.add.text(pad, pad, "", {
-                fontFamily: "MyFont",
-                fontSize: this.cfg.fontSize + "px",
-                color: this.cfg.textColor,
-            }).setOrigin(0, 0);
+            const bodyLabel = this.scene.add
+                .text(pad, pad, "", {
+                    fontFamily: "MyFont",
+                    fontSize: this.cfg.fontSize + "px",
+                    color: this.cfg.textColor,
+                })
+                .setOrigin(0, 0);
 
             if (title) {
-                titleLabel.setText(title.charAt(0).toUpperCase() + title.slice(1)).setVisible(true);
+                titleLabel
+                    .setText(title.charAt(0).toUpperCase() + title.slice(1))
+                    .setVisible(true);
                 bodyLabel.setText(text).setVisible(true);
                 bodyLabel.setPosition(pad, pad + titleLabel.height + gap);
             } else {
@@ -249,7 +290,9 @@ export class Tooltip extends Phaser.GameObjects.Container {
                 bodyLabel.setText(text).setPosition(pad, pad);
             }
 
-            const contentH = title ? titleLabel.height + gap + bodyLabel.height : bodyLabel.height;
+            const contentH = title
+                ? titleLabel.height + gap + bodyLabel.height
+                : bodyLabel.height;
             const w = Math.max(titleLabel.width, bodyLabel.width) + pad * 2;
             const h = contentH + pad * 2;
 
@@ -257,21 +300,22 @@ export class Tooltip extends Phaser.GameObjects.Container {
             bg.fillRoundedRect(2, 2, w, h, 6);
             bg.fillStyle(ColorUtils.parseColor(this.cfg.bgColor), 0.5);
             bg.fillRoundedRect(0, 0, w, h, 6);
-            
 
             const container = this.scene.add.container(
                 position.x - w / 2,
                 position.y,
-                [bg, titleLabel, bodyLabel]
+                [bg, titleLabel, bodyLabel],
             );
-            container.setDepth(70);
+            container.setDepth(
+                Depth.getUIElementDepth(UI_LEVELS_OFFSET.TOOLTIP),
+            );
             this.activeTooltips.push(container);
         });
     }
 
     public clearMultiple(): void {
-        this.activeTooltips.forEach(c => c.destroy());
+        this.activeTooltips.forEach((c) => c.destroy());
         this.activeTooltips = [];
     }
-
 }
+

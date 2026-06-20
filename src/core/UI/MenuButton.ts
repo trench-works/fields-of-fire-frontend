@@ -1,6 +1,7 @@
 import { Button } from "./Button";
 import { MenuPanel } from "./MenuPanel";
 import { BaseScene } from "../Objects";
+import { Depth, UI_LEVELS_OFFSET } from "../Utils";
 
 interface MenuButtonConfig {
     onResumeClick?: () => void;
@@ -46,7 +47,7 @@ export class MenuButton {
         );
 
         this.button.setScrollFactor(0);
-        this.button.setDepth(9999);
+        this.button.setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.BUTTON));
 
         // Ajouter un écouteur pour la touche Échap
         scene.input.keyboard?.on("keydown-ESC", () => {

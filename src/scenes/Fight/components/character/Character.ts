@@ -4,7 +4,7 @@ import { GameStore } from "../../stores/GameStore";
 import { CharacterAssetId, CharacterSpriteAsset } from "../../../../assets";
 import { GameMoveAnimation } from "../../repositories/player.socket";
 import { Game } from "../../../../Model/Game";
-import { Position, Timeout } from "../../../../core";
+import { Depth, GRID_LEVELS_OFFSET, Position, Timeout } from "../../../../core";
 import { PositionUtils } from "../../../../core/Utils/Sizing";
 
 export class Character extends FightSceneDisplayer {
@@ -72,7 +72,9 @@ export class Character extends FightSceneDisplayer {
                 CharacterSpriteAsset.getAssetKey(entity.classId),
             );
 
-            this.sprite.setDepth(Math.max(x * 10, y * 10) + 1);
+            this.sprite.setDepth(
+                Depth.getFromGridPosition({ x, y }, GRID_LEVELS_OFFSET.OBJECT),
+            );
             this.sprite.setOrigin(0.5, 0.95);
             this.sprite.setScale(this.scene.scaleFactor / 1.5);
 
@@ -122,7 +124,9 @@ export class Character extends FightSceneDisplayer {
         const cell = this.scene.gridPositions[x][y];
 
         this.sprite.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
-        this.sprite.setDepth(Math.max(x, y) * 10);
+        this.sprite.setDepth(
+            Depth.getFromGridPosition({ x, y }, GRID_LEVELS_OFFSET.OBJECT),
+        );
 
         return this;
     }
@@ -166,7 +170,9 @@ export class Character extends FightSceneDisplayer {
         const cell = this.scene.gridPositions[x]?.[y];
 
         this.sprite.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
-        this.sprite.setDepth((x + y) * 10 + 2);
+        this.sprite.setDepth(
+            Depth.getFromGridPosition({ x, y }, GRID_LEVELS_OFFSET.OBJECT),
+        );
         return this;
     }
 

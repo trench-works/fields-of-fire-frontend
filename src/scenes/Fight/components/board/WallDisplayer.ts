@@ -1,4 +1,9 @@
-import { DisplayRoot, GridArea } from "../../../../core";
+import {
+    Depth,
+    DisplayRoot,
+    GRID_LEVELS_OFFSET,
+    GridArea,
+} from "../../../../core";
 import { FightScene } from "../../fight.scene";
 import { GameStore } from "../../stores/GameStore";
 import { FightSceneDisplayer } from "../FightSceneDisplayer";
@@ -45,7 +50,12 @@ export class WallDisplayer extends FightSceneDisplayer {
                                 MiscAsset.getAssetKey(MiscAssetId.WALL),
                                 1,
                             )
-                            .setDepth(Math.max(x, y) * 10),
+                            .setDepth(
+                                Depth.getFromGridPosition(
+                                    { x, y },
+                                    GRID_LEVELS_OFFSET.OBJECT,
+                                ),
+                            ),
                     );
                 }
             }

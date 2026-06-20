@@ -3,11 +3,13 @@ import { BoostAsset, BoostAssetId } from "../../../../assets/BoostAsset";
 import { Color } from "../../../../config/ColorConfig";
 import {
     Button,
+    Depth,
     DisplayContainer,
     DisplayRoot,
     DisplayText,
     Grid,
     List,
+    UI_LEVELS_OFFSET,
 } from "../../../../core";
 import { DisplayImage } from "../../../../core/UI/DisplayImage";
 import { Boost } from "../../../../Model/Boost";
@@ -62,7 +64,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     borderWidth: 6,
                     opacity: 0.5,
                 },
-            ).setDepth(99),
+            ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER)),
         );
 
         const endGameArea = this.scene.rootGrid.getArea({
@@ -76,7 +78,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             new DisplayContainer(this.scene, endGameArea, {
                 borderWidth: 6,
                 opacity: 1,
-            }).setDepth(100),
+            }).setDepth(
+                Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 1,
+            ),
         );
 
         const titleEndgameGrid = endGameArea.getGrid();
@@ -92,14 +96,18 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             new DisplayContainer(this.scene, titleEndgameArea, {
                 borderWidth: 6,
                 opacity: 1,
-            }).setDepth(101),
+            }).setDepth(
+                Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 1,
+            ),
         );
 
         this.titleText = new DisplayText(this.scene, titleEndgameArea);
         this.root.add(this.titleText);
 
         // --- Depths ---
-        this.titleText.setDepth(102);
+        this.titleText.setDepth(
+            Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 2,
+        );
 
         this.root.setVisible(false);
 
@@ -149,7 +157,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 rowCount,
             );
         });
-        this.entityList.setDepth(103);
+        this.entityList.setDepth(
+            Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 3,
+        );
 
         this.root.setVisible(false);
         this.temporaryRoot.setVisible(false);
@@ -255,7 +265,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                             ? "#396645"
                             : "#6e3822",
                 },
-            ).setDepth(100),
+            ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 1),
         );
 
         this.temporaryRoot.add(
@@ -269,7 +279,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 }),
             )
                 .setImage(CharacterCloseupAsset.getAssetKey(entity.classId), 1)
-                .setDepth(101),
+                .setDepth(
+                    Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 2,
+                ),
         );
 
         // Nom (ligne 3)
@@ -284,7 +296,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 }),
             )
                 .setText(entity.classId)
-                .setDepth(106),
+                .setDepth(
+                    Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 6,
+                ),
         );
     }
 
@@ -310,7 +324,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                         //TODO: FIXME: maybe change logic, first one is for select, second one is sending event to back
                     },
                 },
-            ).setDepth(100),
+            ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 1),
         );
 
         // Image (ligne 1)
@@ -326,7 +340,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 }),
             )
                 .setImage(BoostAsset.getAssetKey(boost.id as BoostAssetId)) //TODO: pas bon ca un boost pas forcément = un effet, potentiellement plusieurs effets
-                .setDepth(101),
+                .setDepth(
+                    Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 3,
+                ),
         );
 
         // Nom (ligne 2)
@@ -345,7 +361,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     innerRadius: 0,
                     onClick: () => this.onBoostClick(boost.id),
                 },
-            ).setDepth(100),
+            ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 2),
         );
         this.temporaryRoot.add(
             new DisplayText(
@@ -359,7 +375,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 }),
             )
                 .setText(boost.name)
-                .setDepth(101),
+                .setDepth(
+                    Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 3,
+                ),
         );
 
         // Modifiers non nuls (ligne 3)
@@ -391,7 +409,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     entityListGrid.getArea({ x: 2, y: 3, width: 3, height: 1 }),
                 )
                     .setText(statLine)
-                    .setDepth(101),
+                    .setDepth(
+                        Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 5,
+                    ),
             );
         }
 
@@ -409,7 +429,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     }),
                 )
                     .setDescription(boost.name)
-                    .setDepth(101),
+                    .setDepth(
+                        Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 1,
+                    ),
             );
         }
     }
@@ -492,7 +514,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                         },
                         text: "Next Fight",
                     },
-                ).setDepth(104),
+                ).setDepth(
+                    Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 4,
+                ),
             );
         }
 
@@ -513,7 +537,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     },
                     text: "Retour Menu",
                 },
-            ).setDepth(104),
+            ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 4),
         );
     }
 }
