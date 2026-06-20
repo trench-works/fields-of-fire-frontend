@@ -14,6 +14,7 @@ export class LobbyData {
     maxPlayers!: number;
     creatorId!: string;
     players!: LobbyPlayer[];
+    playerReady !: string[];
 }
 
 export enum LobbyStatus {

@@ -259,5 +259,19 @@ export class DisplayContainer
             }
         });
     }
+
+    public setTint(tint: number): this {
+        if (this.background instanceof Phaser.GameObjects.Image) {
+            this.background.setTint(tint);
+        }
+        return this;
+    }
+
+    public clearTint(): this {
+        if (this.background instanceof Phaser.GameObjects.Image) {
+            this.background.clearTint();
+        }
+        return this;
+    }
 }
 
