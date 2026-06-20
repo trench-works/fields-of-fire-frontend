@@ -3,6 +3,7 @@ import { Button } from "./Button";
 import { Color } from "../../config/ColorConfig";
 import { BaseScene } from "../Objects";
 import { FightScene } from "../../scenes/Fight/fight.scene";
+import { LobbyScene } from "../../scenes/Lobby/lobby.scene";
 
 interface MenuPanelConfig {
     onResumeClick?: () => void;
@@ -127,6 +128,9 @@ export class MenuPanel extends Phaser.GameObjects.Container {
                     this.hide();
                     if ('playerSocket' in this.scene) {
                         (this.scene as FightScene).playerSocket.disconnect();
+                    }
+                    if ('lobbySocket' in this.scene) {
+                        (this.scene as LobbyScene).lobbySocket.leaveLobby();
                     }
                     if (config.onMainMenuClick) {
                         config.onMainMenuClick();
