@@ -1,4 +1,4 @@
-import { Position } from "../../../core";
+import { Depth, GRID_LEVELS_OFFSET, Position } from "../../../core";
 import { Action, ActionZoneType } from "../../../Model/Action";
 import { Cell, FightScene } from "../fight.scene";
 import { GameStore } from "../stores/GameStore";
@@ -28,7 +28,12 @@ export class RangeVisualizer {
             true,
         );
         g.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
-        g.setDepth(2);
+        g.setDepth(
+            Depth.getFromGridPosition(
+                cell.gridPosition,
+                GRID_LEVELS_OFFSET.HIGHTLIGHT_3,
+            ),
+        );
         return g; // ✅ ne stocke plus sur cell.highlight ici
     }
 

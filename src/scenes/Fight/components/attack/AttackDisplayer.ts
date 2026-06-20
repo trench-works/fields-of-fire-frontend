@@ -8,8 +8,10 @@ import {
 } from "../../../../assets";
 import { ParticleAssetId } from "../../../../assets/ParticleAsset";
 import {
+    Depth,
     DirectionUtils,
     DisplayAnimation,
+    GRID_LEVELS_OFFSET,
     Position,
     SoundEffect,
     Timeout,
@@ -216,7 +218,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 y: cell.pixelPosition.y,
             },
             {
-                depth: Math.max(x * 10, y * 10) + depth,
+                depth: Depth.getFromGridPosition({ x, y }) + depth,
                 scale: this.scene.scaleFactor / 1.5,
                 origin,
             },
@@ -266,7 +268,10 @@ export class AttackDisplayer extends FightSceneDisplayer {
                                 40 * this.scene.scaleFactor,
                         },
                         {
-                            depth: Math.max(x * 10, y * 10) + 1,
+                            depth: Depth.getFromGridPosition(
+                                { x, y },
+                                GRID_LEVELS_OFFSET.ANIMATION_2,
+                            ),
                             scale: 0.2 * this.scene.scaleFactor,
                             origin: { x: 0.5, y: 0.5 },
                             direction: -direction - 90 - 10,

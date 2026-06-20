@@ -1,5 +1,5 @@
 import { DisplayContainer, DisplayRoot, DisplayText } from "../UI";
-import { Grid } from "../Utils";
+import { Depth, Grid, UI_LEVELS_OFFSET } from "../Utils";
 import { BaseScene } from "./BaseScene";
 
 export class Loader {
@@ -33,7 +33,7 @@ export class Loader {
                 {
                     bgColor: "#000000",
                 },
-            ).setDepth(10000000),
+            ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.LOADER)),
         );
         this.text = new DisplayText(
             this.scene,
@@ -45,7 +45,7 @@ export class Loader {
             }),
         )
             .setText(`Loading ... : ${0}%`)
-            .setDepth(10000000);
+            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.LOADER) + 1);
         this.root.add(this.text);
     }
 
