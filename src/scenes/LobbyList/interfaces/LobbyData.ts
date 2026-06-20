@@ -1,7 +1,9 @@
+import { CharacterAssetId } from "../../../assets";
+
 export class LobbyPlayer {
     userId!: string;
     playerId!: string;
-    classId!: string;
+    classId!: CharacterAssetId;
     name!: string;
 }
 

@@ -26,10 +26,10 @@ import { SceneAssetId } from "../../assets/ScenesAsset";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { ClassStore } from "../Fight/stores/ClassStore";
 import { LobbyStore } from "./stores/LobbyStore";
+import { LobbyData } from "../LobbyList/interfaces/LobbyData";
 
 export type LobbySceneInit = {
-    lobbyId: string;
-    playerId: string;
+    lobby : LobbyData;
 };
 
 export class LobbyScene extends BaseScene<LobbySceneInit> {
@@ -41,6 +41,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
     public lobbySocket!: LobbySocket;
 
     protected lobbyId!: string;
+    protected lobbyName!: string;
     protected playerId!: string;
 
     protected classStore: ClassStore;
@@ -66,9 +67,14 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
     init(init: BaseSceneInit<LobbySceneInit>) {
         super.init(init);
         if (init?.data) {
-            const { lobbyId, playerId } = init.data;
-            this.lobbyId = lobbyId;
-            this.playerId = playerId;
+            const { lobby } = init.data;
+            this.lobbyId = lobby.id;
+            this.lobbyName = lobby.name ?? "Lobby"
+            const player =  lobby.players.find((player) => player.userId === globalThis.user?.id)!;
+            this.playerId =player.playerId!;
+            this.lobbyStore.setLobby(lobby);
+            this.buildPlayerList();
+            this.selectClassId = player.classId;
         }
     }
 
@@ -111,7 +117,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 width: 9,
                 height: 1,
             }),
-        ).setText("Lobby");
+        ).setText(this.lobbyName);
 
         //tab BOX
         const tabManager = new TabManager(
@@ -311,7 +317,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                         ),
                         borderWidth: 7,
                         onClick: () => {
-                            this.updatePlayerData(charClass.id);
+                            this.changeClass(charClass.id);
                         },
                     },
                 ),
@@ -358,10 +364,6 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
     updatePlayerData(classId: CharacterAssetId) {
         this.selectClassId = classId;
 
-        this.lobbySocket.changeClass({
-            classId,
-        });
-
         // Met directement la nouvelle image
         this.playerImageContainer.setBackgroundImage(
             CharacterCloseupAsset.getAssetKey(classId),
@@ -375,6 +377,13 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             this.classStore.getClass(this.selectClassId).classDescription,
             { color: Color.btnBorder },
         );
+    }
+
+    changeClass(classId : CharacterAssetId) {
+         this.lobbySocket.changeClass({
+            classId,
+        });
+        this.updatePlayerData(classId);
     }
 }
 
