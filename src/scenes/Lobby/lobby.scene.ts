@@ -29,7 +29,7 @@ import { LobbyStore } from "./stores/LobbyStore";
 import { LobbyData } from "../LobbyList/interfaces/LobbyData";
 
 export type LobbySceneInit = {
-    lobby : LobbyData;
+    lobby: LobbyData;
 };
 
 export class LobbyScene extends BaseScene<LobbySceneInit> {
@@ -69,9 +69,11 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         super.init(init);
         if (init?.data) {
             const { lobby } = init.data;
-            this.lobby= lobby;
-            const player =  lobby.players.find((player) => player.userId === globalThis.user?.id)!;
-            this.playerId =player.playerId!;
+            this.lobby = lobby;
+            const player = lobby.players.find(
+                (player) => player.userId === globalThis.user?.id,
+            )!;
+            this.playerId = player.playerId!;
             this.lobbyStore.setLobby(lobby);
             this.buildPlayerList();
             this.selectClassId = player.classId;
@@ -91,9 +93,10 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         this.lobbySocket = new LobbySocket(this.lobby.id);
         this.lobbySocket.onClose(() => MainMenu.start(this));
         this.lobbySocket.onLobbyUpdate((event) => {
+            console.log("RECEIVED LOBBY UPDATE", event.lobby);
             this.lobbyStore.setLobby(event.lobby);
             this.buildPlayerList();
-            this.buildReadyList(); 
+            this.buildReadyList();
             this.updateStartButton();
             //TODO: rerender ton tab réglages -> actuellement ca mettra pas à jour
         });
@@ -159,7 +162,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 {
                     label: "Joueurs",
                     build: (root, area) => {
-                        this.settingsRoot = root;  
+                        this.settingsRoot = root;
                         this.settingsArea = area;
                         this.buildPlayerList();
                     },
@@ -253,10 +256,16 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         this.playerImageContainer = playerImageContainer;
 
         const isCreator = this.lobby.creatorId === global.user?.id;
-        const allReady = this.lobby.playerReady.length === this.lobby.players.length;
+        const allReady =
+            this.lobby.playerReady.length === this.lobby.players.length;
         const iAmReady = this.lobby.playerReady.includes(this.playerId);
 
-        console.log("creator : ", this.lobby.creatorId, ", me :", global.user?.id);
+        console.log(
+            "creator : ",
+            this.lobby.creatorId,
+            ", me :",
+            global.user?.id,
+        );
         this.startButton = new Button(
             this,
             playerGrid.getArea({
@@ -362,8 +371,10 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             );
 
             this.settingsRoot.add(
-                new DisplayText(this, rowGrid.getArea({ x: 2, y: 1, width: 4, height: 1 }))
-                    .setText(player.name ?? player.userId),
+                new DisplayText(
+                    this,
+                    rowGrid.getArea({ x: 2, y: 1, width: 4, height: 1 }),
+                ).setText(player.name ?? player.userId),
             );
         });
 
@@ -408,14 +419,16 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
 
         for (let i = 0; i < 4; i++) {
             const player = players[i];
-            const isReady = player ? playerReady.includes(player.playerId) : false;
+            const isReady = player
+                ? playerReady.includes(player.playerId)
+                : false;
 
             const container = new DisplayContainer(
                 this,
                 readyGrid.getArea({ x: i + 1, y: 1, width: 1, height: 1 }),
                 {
                     backgroundImage: player
-                        ? CharacterCloseupAsset.getAssetKey(player.classId as CharacterAssetId)
+                        ? CharacterCloseupAsset.getAssetKey(player.classId)
                         : undefined,
                     borderWidth: 2,
                     opacity: player ? 1 : 0.2,
@@ -434,11 +447,27 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
 
     updateStartButton() {
         const isCreator = this.lobby.creatorId === global.user?.id;
-        const allReady = (this.lobbyStore.lobby?.playerReady.length ?? 0) === (this.lobbyStore.lobby?.players.length ?? 0);
-        const iAmReady = this.lobbyStore.lobby?.playerReady.includes(this.playerId) ?? false;
+        const allReady =
+            (this.lobbyStore.lobby?.playerReady.length ?? 0) ===
+            (this.lobbyStore.lobby?.players.length ?? 0);
+        const iAmReady =
+            this.lobbyStore.lobby?.playerReady.includes(this.playerId) ?? false;
 
-        this.startButton.displayText(isCreator && iAmReady ? "Combattre" : "Prêt");
-        this.startButton.setIsActivated(isCreator ? (iAmReady ? allReady : true) : !iAmReady);
+        console.log(
+            "Start Button Update",
+            isCreator,
+            allReady,
+            iAmReady,
+            this.lobbyStore.lobby,
+            this.playerId,
+        );
+
+        this.startButton.displayText(
+            isCreator && iAmReady ? "Combattre" : "Prêt",
+        );
+        this.startButton.setIsActivated(
+            isCreator ? (iAmReady ? allReady : true) : !iAmReady,
+        );
         this.startButton.setOnClick(() => {
             if (isCreator && allReady) {
                 this.lobbySocket.startGame();
@@ -448,16 +477,16 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         });
     }
 
-    changeClass(classId : CharacterAssetId) {
-         this.lobbySocket.changeClass({
+    changeClass(classId: CharacterAssetId) {
+        this.lobbySocket.changeClass({
             classId,
         });
         this.updatePlayerData(classId);
     }
 
-    setPlayerReady(playerId : string) {
+    setPlayerReady(playerId: string) {
         this.lobbySocket.setPlayerReady({
-            playerId
+            playerId,
         });
     }
 }

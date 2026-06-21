@@ -66,7 +66,7 @@ export class TurnDisplayer extends FightSceneDisplayer {
 
         this.gameStore.game.playerTurns.forEach((entityId, index) => {
             const entity = this.gameStore.game.entities.find(
-                (entity) => entity.entityId === entityId,
+                (entity) => entity.id === entityId,
             )!;
             const player = this.gameStore.game.players.find(
                 (player) => player.entityId === entityId,

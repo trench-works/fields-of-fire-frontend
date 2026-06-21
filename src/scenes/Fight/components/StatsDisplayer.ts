@@ -59,7 +59,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
     private show!: boolean;
 
     get entityId() {
-        return this.entity?.entityId;
+        return this.entity?.id;
     }
 
     get isShow() {

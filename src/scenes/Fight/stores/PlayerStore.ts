@@ -21,11 +21,12 @@ export class PlayerStore {
     }
 
     update() {
+        console.log(this.gameStore.game);
         this.player = this.gameStore.game.players.find(
-            (player) => player.playerId === this.playerId,
+            (player) => player.id === this.playerId,
         )!;
         this.playerEntity = this.gameStore.game.entities.find(
-            (entity) => entity.entityId === this.player.entityId,
+            (entity) => entity.id === this.player.entityId,
         )!;
         this.playerClass = this.classStore.classes.find(
             (charClass) => charClass.id === this.playerEntity.classId,
