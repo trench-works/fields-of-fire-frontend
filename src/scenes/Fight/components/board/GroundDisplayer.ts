@@ -3,7 +3,6 @@ import { Depth, GRID_LEVELS_OFFSET, Position } from "../../../../core";
 import { Diamond } from "../../../../core/Objects/Diamond";
 import { scaleAndCenter } from "../../../../core/Utils/Scale";
 import { PositionUtils } from "../../../../core/Utils/Sizing";
-import { EntityType } from "../../../../Model/Entity";
 import { StatsUtils } from "../../../../Model/Stats";
 import { FightScene } from "../../fight.scene";
 import { ClassStore } from "../../stores/ClassStore";
@@ -107,8 +106,8 @@ export class GroundDisplayer extends FightSceneDisplayer {
                                 this.tileHighlights.push(
                                     this.getTileHighlights({ x, y }, tile, {
                                         color:
-                                            entity.entityType ===
-                                            EntityType.ALLY
+                                            entity.teamId ===
+                                            this.playerStore.playerEntity.teamId
                                                 ? 0x00ff00
                                                 : 0xff0000,
                                         depth: Math.max(x * 10, y * 10),
