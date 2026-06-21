@@ -4,16 +4,16 @@ import { Effect } from "./Effect";
 import { Stats } from "./Stats";
 
 export enum EntityType {
-    ALLY = "ALLY",
-    ENEMY = "ENEMY",
-    NEUTRAL = "NEUTRAL",
+    PLAYER = "PLAYER",
+    NPC = "NPC",
 }
 
 export type Entity = {
     id: string;
     classId: CharacterAssetId;
+    teamId: string;
     position: Position;
-    entityType: EntityType;
+    type: EntityType;
     stats: Stats;
     effects: Effect[];
     dead: boolean;
