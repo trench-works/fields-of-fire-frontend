@@ -9,7 +9,7 @@ export enum EffectAssetId {
     REACTION = "reaction",
     VAMPIRE = "vampire",
     PROVOKED = "provoked",
-    ANGERED = "ANGERED"
+    ANGERED = "angered",
 }
 
 class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
@@ -31,7 +31,7 @@ class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
             [EffectAssetId.REACTION] : "reaction",
             [EffectAssetId.VAMPIRE] : "vampire",
             [EffectAssetId.PROVOKED] : "provok",
-            [EffectAssetId.ANGERED] : "anger",
+            [EffectAssetId.ANGERED] : "angered",
         },
         {
             [EffectAssetId.AMPUTATED]: { width: 512, height: 512 },
