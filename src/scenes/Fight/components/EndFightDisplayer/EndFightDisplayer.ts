@@ -13,7 +13,7 @@ import {
 } from "../../../../core";
 import { DisplayImage } from "../../../../core/UI/DisplayImage";
 import { Boost } from "../../../../Model/Boost";
-import { Entity, EntityType } from "../../../../Model/Entity";
+import { Entity } from "../../../../Model/Entity";
 import { MainMenu } from "../../../MainMenu/main-menu.scene";
 import { FightScene } from "../../fight.scene";
 import { GameStore } from "../../stores/GameStore";
@@ -263,7 +263,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     borderWidth: 3,
                     opacity: 1,
                     bgColor:
-                        entity.entityType === EntityType.ALLY
+                        entity.teamId === this.playerStore.playerEntity.teamId
                             ? "#396645"
                             : "#6e3822",
                 },
@@ -398,8 +398,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 .flatMap((stat) => Object.entries(stat))
                 .filter(([, value]) => value !== undefined && value !== 0)
                 .map(
-                    ([key, value]) =>
-                        `${key}: ${(value as number) > 0 ? "+" : ""}${value}`,
+                    ([key, value]) => `${key}: ${value > 0 ? "+" : ""}${value}`,
                 )
                 .join("\n");
         }
