@@ -29,7 +29,7 @@ export class CharactersDisplayer extends FightSceneDisplayer {
         this.characters = this.gameStore.game.entities
             .filter((entity) => !entity.dead)
             .map((entity) =>
-                new Character(this.scene, this.gameStore, entity.entityId)
+                new Character(this.scene, this.gameStore, entity.id)
                     .preRender()
                     .render(),
             );
@@ -68,7 +68,7 @@ export class CharactersDisplayer extends FightSceneDisplayer {
     }
 
     changeDirection(target: Position, entityId?: string) {
-        entityId ??= this.playerStore.playerEntity.entityId;
+        entityId ??= this.playerStore.playerEntity.id;
         const character = this.characters.find(
             (character) => character.entityId === entityId,
         );

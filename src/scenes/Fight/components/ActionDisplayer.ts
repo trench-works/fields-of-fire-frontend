@@ -53,7 +53,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
     protected handleActionClick(action: Action) {
         const isPlayerTurn =
             this.gameStore.game.playerTurns[0] ===
-            this.playerStore.playerEntity.entityId;
+            this.playerStore.playerEntity.id;
         const stats = StatsUtils.fromEntity(this.playerStore.playerEntity);
         if (!isPlayerTurn) {
             return;
@@ -213,7 +213,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
     update(): this {
         const isPlayerTurn =
             this.gameStore.game.playerTurns[0] ===
-            this.playerStore.playerEntity.entityId;
+            this.playerStore.playerEntity.id;
 
         const stats = StatsUtils.fromEntity(this.playerStore.playerEntity);
 

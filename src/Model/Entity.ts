@@ -10,7 +10,7 @@ export enum EntityType {
 }
 
 export type Entity = {
-    entityId: string;
+    id: string;
     classId: CharacterAssetId;
     position: Position;
     entityType: EntityType;

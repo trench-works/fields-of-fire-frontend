@@ -101,8 +101,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
                                 this.gameStore.game.playerTurns[0]
                         ) {
                             const entity = this.gameStore.game.entities.find(
-                                (entity) =>
-                                    entity.entityId === caseTile.entityId,
+                                (entity) => entity.id === caseTile.entityId,
                             );
                             if (entity) {
                                 this.tileHighlights.push(

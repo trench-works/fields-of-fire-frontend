@@ -78,7 +78,7 @@ export interface Displayable {
 
 export type FightSceneInit = {
     game: Game;
-    player: { playerId: string };
+    player: { id: string };
 };
 
 export class FightScene extends BaseScene<FightSceneInit> {
@@ -257,7 +257,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
                     }
                     if (
                         animation.data.entityId ===
-                        this.playerStore.playerEntity.entityId
+                        this.playerStore.playerEntity.id
                     ) {
                         this.playerStats.blurOut();
                         this.actions.blurOut();
@@ -297,10 +297,11 @@ export class FightScene extends BaseScene<FightSceneInit> {
         const {
             data: {
                 game,
-                player: { playerId },
+                player: { id: playerId },
             },
         } = init;
         this.gameStore.setGame(game);
+        console.log(playerId);
         this.playerStore.setPlayerId(playerId);
 
         this.actions.preRender();

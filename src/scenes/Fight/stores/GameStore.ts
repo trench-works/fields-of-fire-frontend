@@ -10,15 +10,11 @@ export class GameStore {
     }
 
     getEntity(entityId: string): Entity {
-        return this.game.entities.find(
-            (entity) => entity.entityId === entityId,
-        )!;
+        return this.game.entities.find((entity) => entity.id === entityId)!;
     }
 
     getPlayer(playerId: string): Player {
-        return this.game.players.find(
-            (player) => player.playerId === playerId,
-        )!;
+        return this.game.players.find((player) => player.id === playerId)!;
     }
 }
 
