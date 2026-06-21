@@ -231,9 +231,11 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     }
 
     onReady() {
+        console.log("onReady method called with boost : ", this.boostId);
         if (!this.isReady) {
             this.isReady = true;
             this.scene.playerSocket.readyForNewGame(this.boostId);
+            this.isReady = false;
         }
     }
 
