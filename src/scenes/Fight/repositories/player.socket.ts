@@ -83,6 +83,7 @@ export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
     }
 
     readyForNewGame(boostId: string) {
+        console.log("rdyFrNewGame called")
         return this.send<PlayerReady>(GamePlayerActions.READY, { boostId });
     }
 
