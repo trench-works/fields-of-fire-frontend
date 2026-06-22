@@ -46,6 +46,8 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
     protected classStore: ClassStore;
     protected lobbyStore: LobbyStore;
 
+    protected teamNumber: Number = 1;
+
     protected settingsRoot!: DisplayRoot;
     protected settingsArea!: GridArea;
     protected isPlayerTabActive: boolean = false;
@@ -351,14 +353,34 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
 
         const players = this.lobbyStore.lobby?.players ?? [];
         const listGrid = this.settingsArea.getGrid({
-            division: { horizontal: 1, vertical: 4 },
-            padding: 5,
+            division: { horizontal: 9, vertical: 9 },
         });
+
+        this.settingsRoot.add(
+            new DisplayContainer(
+                this,
+                listGrid.getArea({ x: 1, y: 1, height: 9, width:9}),
+                { innerRadius: 0, outterRadius: 0 },
+            ),
+        );
+        this.settingsRoot.add(
+            new Button(
+                this,
+                 listGrid.getArea({ x: 8, y: 1, width: 2, margin : 10}),
+                 {
+                    text : this.teamNumber === 1 ? `${this.teamNumber} équipe ` : `${this.teamNumber} équipes `,
+                    onClick() {
+                        console.log("rien");
+                    },
+                 }
+            )
+        )
 
         players.forEach((player, index) => {
             const rowGrid = listGrid.getSubGrid(
-                { x: 1, y: index + 1, width: 1, height: 1 },
+                { x: 1, y: index + 2, width: 9, height: 2, margin : 10},
                 { division: { horizontal: 5, vertical: 1 } },
+            
             );
 
             this.settingsRoot.add(
@@ -367,6 +389,8 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                         player.classId as CharacterAssetId,
                     ),
                     borderWidth: 2,
+                    innerRadius:0,
+                    outterRadius: 0,
                 }),
             );
 
