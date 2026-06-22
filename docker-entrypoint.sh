@@ -7,7 +7,10 @@ cat <<EOF > /usr/local/apache2/htdocs/config/config.json
   "server": {
     "url": "${GAME_SERVER_URL}",
     "port": "${GAME_SERVER_PORT}",
-    "protocol": "${GAME_SERVER_PROTOCOL}"
+    "protocols": {
+      "http": "${GAME_SERVER_HTTP_PROTOCOL}",
+      "ws": "${GAME_SERVER_WS_PROTOCOL}"
+    }
   }
 }
 EOF
