@@ -75,7 +75,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
                 }
                 this.scene.rangeVisualizer.getCellsInAttackRange(
                     this.playerStore.playerEntity.position,
-                    action.range ?? 0,
+                    action,
                 );
                 break;
         }

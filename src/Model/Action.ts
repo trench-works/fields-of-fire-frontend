@@ -9,7 +9,8 @@ export class Action {
     damage?: { min: number; max: number };
     actionType!: ActionType;
     effectList?: Effect[];
-    range?: number;
+    range!: { min: number; max: number };
+    rangeType!: ActionZoneType;
     zoneType?: ActionZoneType;
     zoneSize?: number;
     mooveToTarget?: Position;
