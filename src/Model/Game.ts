@@ -20,6 +20,7 @@ export type Game = {
     teams: Team[];
 
     playerTurns: string[];
+    readyPlayers: string[];
 
     //things relative to rounds
     isStopped: boolean;
