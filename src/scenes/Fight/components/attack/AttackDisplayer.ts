@@ -104,17 +104,29 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         ParticleAssetId.DEBUFF,
                         cell.pixelPosition.x,
                         cell.pixelPosition.y,
+                        Depth.getFromGridPosition(
+                            cell.gridPosition,
+                            GRID_LEVELS_OFFSET.ANIMATION_4,
+                        ),
                     );
                 }
                 break;
             case ActionAssetId.HEAL:
                 {
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(SoundEffectAssetId.DOPAGE),
+                    ).play();
                     this.scene.character.changeDirection(target, entityId);
                     this.scene.toaster.attackToast(animation);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.HEAL,
                         cell.pixelPosition.x,
                         cell.pixelPosition.y,
+                        Depth.getFromGridPosition(
+                            cell.gridPosition,
+                            GRID_LEVELS_OFFSET.ANIMATION_4,
+                        ),
                     );
                 }
                 break;
@@ -142,6 +154,10 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         ParticleAssetId.SMOKE,
                         cell.pixelPosition.x,
                         cell.pixelPosition.y,
+                        Depth.getFromGridPosition(
+                            cell.gridPosition,
+                            GRID_LEVELS_OFFSET.ANIMATION_4,
+                        ),
                     );
                 }
                 break;
@@ -153,6 +169,10 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         ParticleAssetId.BOOST,
                         cell.pixelPosition.x,
                         cell.pixelPosition.y,
+                        Depth.getFromGridPosition(
+                            cell.gridPosition,
+                            GRID_LEVELS_OFFSET.ANIMATION_4,
+                        ),
                     );
                     new SoundEffect(
                         this.scene,
@@ -162,12 +182,20 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.FIGHTING_DRUG:
                 {
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(SoundEffectAssetId.DOPAGE),
+                    ).play();
                     this.scene.character.changeDirection(target, entityId);
                     this.scene.toaster.attackToast(animation);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.BOOST,
                         cell.pixelPosition.x,
                         cell.pixelPosition.y,
+                        Depth.getFromGridPosition(
+                            cell.gridPosition,
+                            GRID_LEVELS_OFFSET.ANIMATION_4,
+                        ),
                     );
                 }
                 break;
@@ -181,6 +209,10 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         ParticleAssetId.BOOST,
                         cell.pixelPosition.x,
                         cell.pixelPosition.y,
+                        Depth.getFromGridPosition(
+                            cell.gridPosition,
+                            GRID_LEVELS_OFFSET.ANIMATION_4,
+                        ),
                     );
                 }
                 break;
