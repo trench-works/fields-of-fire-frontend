@@ -9,6 +9,9 @@ export class Loader {
     constructor(
         protected readonly scene: BaseScene,
         protected readonly getProgressText: (progress: number) => string,
+        protected readonly offset:
+            | UI_LEVELS_OFFSET.LOADER_1
+            | UI_LEVELS_OFFSET.LOADER_2,
     ) {
         this.root = new DisplayRoot();
     }
@@ -30,7 +33,7 @@ export class Loader {
                 {
                     bgColor: "#000000",
                 },
-            ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.LOADER)),
+            ).setDepth(Depth.getUIElementDepth(this.offset)),
         );
         this.text = new DisplayText(
             this.scene,
@@ -42,7 +45,7 @@ export class Loader {
             }),
         )
             .setText(this.getProgressText(0))
-            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.LOADER) + 1);
+            .setDepth(Depth.getUIElementDepth(this.offset) + 1);
         this.root.add(this.text);
     }
 
@@ -59,7 +62,11 @@ export class Loader {
 
 export class AssetLoader extends Loader {
     constructor(scene: BaseScene) {
-        super(scene, (progress) => `Loading Assets ... : ${progress}%`);
+        super(
+            scene,
+            (progress) => `Loading Assets ... : ${progress}%`,
+            UI_LEVELS_OFFSET.LOADER_2,
+        );
         this.watch();
     }
 
@@ -91,6 +98,7 @@ export class ConnectionLoader extends Loader {
         super(
             scene,
             (progress) => `Waiting for players to connect ... : ${progress}%`,
+            UI_LEVELS_OFFSET.LOADER_1,
         );
         this.watch();
     }
