@@ -94,6 +94,7 @@ export class GamePlayerSocket
         this.on<{ progress: number }>(
             GamePlayerEvents.CONNECTION_UPDATE,
             ({ progress }) => {
+                console.log("progress", progress);
                 if (progress === 1) {
                     listener();
                 }
@@ -102,7 +103,8 @@ export class GamePlayerSocket
     }
 
     removeConnectionListener() {
-        console.log("TODO: REMOVE CONNECTION UPDATE LISTENERS");
+        console.log("WILL REMOVE LISTENERS NOW");
+        this.removeListeners(GamePlayerEvents.CONNECTION_UPDATE);
     }
 
     finishTurn() {

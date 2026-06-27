@@ -1,5 +1,5 @@
 import { CharacterCloseupAsset } from "../../../../assets";
-import { BoostAsset, BoostAssetId } from "../../../../assets/BoostAsset";
+import { BoostAsset } from "../../../../assets/BoostAsset";
 import { Color } from "../../../../config/ColorConfig";
 import {
     Button,
@@ -9,6 +9,7 @@ import {
     DisplayText,
     Grid,
     List,
+    ScaleMode,
     UI_LEVELS_OFFSET,
 } from "../../../../core";
 import { DisplayImage } from "../../../../core/UI/DisplayImage";
@@ -82,9 +83,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             new DisplayContainer(this.scene, endGameArea, {
                 borderWidth: 6,
                 opacity: 1,
-            }).setDepth(
-                Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1,
-            ),
+            }).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1),
         );
 
         const titleEndgameGrid = endGameArea.getGrid();
@@ -100,9 +99,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             new DisplayContainer(this.scene, titleEndgameArea, {
                 borderWidth: 6,
                 opacity: 1,
-            }).setDepth(
-                Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1,
-            ),
+            }).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1),
         );
 
         this.titleText = new DisplayText(this.scene, titleEndgameArea);
@@ -186,7 +183,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
 
     show(playerWin: boolean, boosts: Boost[]) {
         this.boosts = boosts;
-        this.isReady = this.gameStore.game.readyPlayers.includes(this.playerStore.player.id);
+        this.isReady = this.gameStore.game.readyPlayers.includes(
+            this.playerStore.player.id,
+        );
 
         this.buttonsRoot.destroy();
         this.buttonsRoot = new DisplayRoot();
@@ -245,9 +244,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         });
     }
 
-    onBoostClick(boostId: string, card : DisplayContainer) {
+    onBoostClick(boostId: string, card: DisplayContainer) {
         this.boostId = boostId;
-        
+
         if (this.selectedBoostCard) {
             this.selectedBoostCard.setBackgroundColor(Color.btnBorder);
         }
@@ -269,10 +268,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    displayEntityCard(
-        entity: Entity,
-        ObjectListGrid: Grid,
-    ): void {
+    displayEntityCard(entity: Entity, ObjectListGrid: Grid): void {
         // Conteneur de la card
         this.temporaryRoot.add(
             new DisplayContainer(
@@ -306,9 +302,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 }),
             )
                 .setImage(CharacterCloseupAsset.getAssetKey(entity.classId), 1)
-                .setDepth(
-                    Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2,
-                ),
+                .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2),
         );
 
         // Nom (ligne 3)
@@ -323,51 +317,54 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 }),
             )
                 .setText(entity.classId)
-                .setDepth(
-                    Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 6,
-                ),
+                .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 6),
         );
     }
 
-    displayBoostCard(boost: Boost, entityListGrid: Grid, index : number) {
+    displayBoostCard(boost: Boost, entityListGrid: Grid, index: number) {
         // Conteneur de la card
         const boostCard = new DisplayContainer(
-                this.scene,
-                entityListGrid.getArea({
-                    x: 1,
-                    y: 1,
-                    width: 5,
-                    height: 4,
-                    margin: { top: 40 * this.scene.scaleFactor, bottom: 10, right: 10, left: 10 },
-                }),
-                {
-                    borderWidth: 3,
-                    opacity: 1,
-                    bgColor: Color.btnBg,
-                    onClick: () => {
-                        this.onBoostClick(boost.id, boostCard);
-                        //TODO: FIXME: maybe change logic, first one is for select, second one is sending event to back
-                    },
+            this.scene,
+            entityListGrid.getArea({
+                x: 1,
+                y: 1,
+                width: 5,
+                height: 4,
+                margin: {
+                    top: 40 * this.scene.scaleFactor,
+                    bottom: 10,
+                    right: 10,
+                    left: 10,
                 },
-            ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1);
-            this.boostCards.set(`${boost.id}-${index}`, boostCard);
-            this.temporaryRoot.add(boostCard);
+            }),
+            {
+                borderWidth: 3,
+                opacity: 1,
+                bgColor: Color.btnBg,
+                onClick: () => {
+                    this.onBoostClick(boost.id, boostCard);
+                    //TODO: FIXME: maybe change logic, first one is for select, second one is sending event to back
+                },
+            },
+        ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1);
+        this.boostCards.set(`${boost.id}-${index}`, boostCard);
+        this.temporaryRoot.add(boostCard);
         // Image (ligne 1)
         this.temporaryRoot.add(
             new DisplayImage(
                 this.scene,
-                entityListGrid.getArea({
-                    x: 3,
-                    y: 1,
-                    width: 1,
-                    height: 1,
-                    margin: { top: 10, bottom: -8, left: 0, right: 0 },
-                }),
+                entityListGrid
+                    .getArea({
+                        x: 3,
+                        y: 1,
+                        width: 1,
+                        height: 1,
+                        margin: { top: 10, bottom: -8, left: 0, right: 0 },
+                    })
+                    .scaleFromCenter(1, ScaleMode.FILL),
             )
-                .setImage(BoostAsset.getAssetKey(boost.id as BoostAssetId))
-                .setDepth(
-                    Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3,
-                ),
+                .setImage(BoostAsset.getAssetKey(boost.id))
+                .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3),
         );
 
         // Nom (ligne 2)
@@ -384,7 +381,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 {
                     borderWidth: 3,
                     innerRadius: 0,
-                    onClick: () => this.onBoostClick(boost.id,  boostCard),
+                    onClick: () => this.onBoostClick(boost.id, boostCard),
                 },
             ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2),
         );
@@ -400,9 +397,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 }),
             )
                 .setText(boost.name)
-                .setDepth(
-                    Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3,
-                ),
+                .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3),
         );
 
         // Modifiers non nuls (ligne 3)
@@ -467,7 +462,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 y: 7,
                 width: 5,
                 height: 1,
-                margin : { bottom: 10, top : 0, left : 0, right:0 }
+                margin: { bottom: 10, top: 0, left: 0, right: 0 },
             },
             {
                 division: {
@@ -532,7 +527,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                                             },
                                         },
                                     ),
-                                    index
+                                    index,
                                 );
                             });
 
@@ -541,16 +536,14 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                         },
                         text: "Next Fight",
                     },
-                ).setDepth(
-                    Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 4,
-                ),
+                ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 4),
             );
         }
 
         this.buttonsRoot.add(
             new Button(
                 this.scene,
-                 this.buttonsGrid.getArea({
+                this.buttonsGrid.getArea({
                     x: isVictory ? 6 : 4,
                     y: 1,
                     width: 3,
@@ -568,13 +561,13 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         );
     }
 
-    showReadyButton(){
+    showReadyButton() {
         this.buttonsRoot.destroy();
         this.buttonsRoot.add(
             new Button(
                 this.scene,
-                 this.buttonsGrid.getArea({
-                    x:4,
+                this.buttonsGrid.getArea({
+                    x: 4,
                     y: 1,
                     width: 3,
                     height: 1,
@@ -586,7 +579,8 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     },
                     text: "Prêt",
                 },
-            ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 4)
+            )
+                .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 4)
                 .setIsActivated(!this.isReady),
         );
     }

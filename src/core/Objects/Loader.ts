@@ -104,7 +104,6 @@ export class ConnectionLoader extends Loader {
     }
 
     watch() {
-        console.log(this.connecter);
         this.connecter.onConnectionProgress((value: number) => {
             this.progress(value);
         });
