@@ -52,6 +52,7 @@ import { EndFightDisplayer } from "./components/EndFightDisplayer/EndFightDispla
 import { Toaster } from "./components/Toaster";
 import { ParticleDisplayer } from "./components/Particle/ParticleDisplayer";
 import { BoostAsset } from "../../assets/BoostAsset";
+import { ConnectionLoader } from "../../core/Objects/Loader";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -301,7 +302,6 @@ export class FightScene extends BaseScene<FightSceneInit> {
             },
         } = init;
         this.gameStore.setGame(game);
-        console.log(playerId);
         this.playerStore.setPlayerId(playerId);
 
         this.actions.preRender();
@@ -313,6 +313,8 @@ export class FightScene extends BaseScene<FightSceneInit> {
         this.endFight.preRender();
 
         this.playerSocket = new GamePlayerSocket(game.id, playerId);
+        console.log(this.playerSocket);
+        new ConnectionLoader(this, this.playerSocket);
         this.playerSocket.onClose(() =>
             MainMenu.start(this, { keepMusic: false }),
         );
