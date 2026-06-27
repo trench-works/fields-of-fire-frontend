@@ -112,6 +112,10 @@ export class Socket<
         }
     }
 
+    removeListeners(action: OutputActions) {
+        this.listeners.delete(action);
+    }
+
     onSubscribed(listener: () => void): Error | void {
         this.onSubscribedListeners.push(listener);
     }

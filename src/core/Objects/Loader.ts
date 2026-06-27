@@ -6,17 +6,17 @@ export class Loader {
     root: DisplayRoot;
     text!: DisplayText;
 
-    constructor(private readonly scene: BaseScene) {
+    constructor(
+        protected readonly scene: BaseScene,
+        protected readonly getProgressText: (progress: number) => string,
+        protected readonly offset:
+            | UI_LEVELS_OFFSET.LOADER_1
+            | UI_LEVELS_OFFSET.LOADER_2,
+    ) {
         this.root = new DisplayRoot();
-        this.watch();
     }
 
     watch() {
-        this.scene.load.on("progress", (value: number) => {
-            this.progress(value);
-        });
-        this.scene.load.on("complete", () => this.destroy());
-
         const screenGrid = new Grid({
             division: { vertical: 3, horizontal: 3 },
         });
@@ -33,7 +33,7 @@ export class Loader {
                 {
                     bgColor: "#000000",
                 },
-            ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.LOADER)),
+            ).setDepth(Depth.getUIElementDepth(this.offset)),
         );
         this.text = new DisplayText(
             this.scene,
@@ -44,20 +44,78 @@ export class Loader {
                 height: 1,
             }),
         )
-            .setText(`Loading ... : ${0}%`)
-            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.LOADER) + 1);
+            .setText(this.getProgressText(0))
+            .setDepth(Depth.getUIElementDepth(this.offset) + 1);
         this.root.add(this.text);
     }
 
     progress(value: number) {
         this.text.setText(
-            `Loading ... : ${Number.parseInt(String(value * 100))}%`,
+            this.getProgressText(Number.parseInt(String(value * 100))),
         );
     }
 
     destroy() {
-        this.scene.load.removeAllListeners();
         this.root.destroy();
+    }
+}
+
+export class AssetLoader extends Loader {
+    constructor(scene: BaseScene) {
+        super(
+            scene,
+            (progress) => `Loading Assets ... : ${progress}%`,
+            UI_LEVELS_OFFSET.LOADER_2,
+        );
+        this.watch();
+    }
+
+    watch() {
+        this.scene.load.on("progress", (value: number) => {
+            this.progress(value);
+        });
+        this.scene.load.on("complete", () => this.destroy());
+        super.watch();
+    }
+
+    destroy() {
+        this.scene.load.removeAllListeners();
+        super.destroy();
+    }
+}
+
+export interface ConnectionListener {
+    onConnectionProgress: (listener: (value: number) => void) => void;
+    onConnectionComplete: (listener: () => void) => void;
+    removeConnectionListener: () => void;
+}
+
+export class ConnectionLoader extends Loader {
+    constructor(
+        scene: BaseScene,
+        protected readonly connecter: ConnectionListener,
+    ) {
+        super(
+            scene,
+            (progress) => `Waiting for players to connect ... : ${progress}%`,
+            UI_LEVELS_OFFSET.LOADER_1,
+        );
+        this.watch();
+    }
+
+    watch() {
+        this.connecter.onConnectionProgress((value: number) => {
+            this.progress(value);
+        });
+        this.connecter.onConnectionComplete(() => {
+            this.destroy();
+        });
+        super.watch();
+    }
+
+    destroy() {
+        this.connecter.removeConnectionListener();
+        super.destroy();
     }
 }
 

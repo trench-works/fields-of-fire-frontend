@@ -23,7 +23,8 @@ export enum UI_LEVELS_OFFSET {
     BUTTON = 200,
     TOOLTIP = 300,
     POPUP = 500,
-    LOADER = 1000,
+    LOADER_1 = 1000,
+    LOADER_2 = 1050,
 }
 
 export class Depth {

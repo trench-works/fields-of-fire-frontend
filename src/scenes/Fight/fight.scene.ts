@@ -52,6 +52,7 @@ import { EndFightDisplayer } from "./components/EndFightDisplayer/EndFightDispla
 import { Toaster } from "./components/Toaster";
 import { ParticleDisplayer } from "./components/Particle/ParticleDisplayer";
 import { BoostAsset } from "../../assets/BoostAsset";
+import { ConnectionLoader } from "../../core/Objects/Loader";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -301,7 +302,6 @@ export class FightScene extends BaseScene<FightSceneInit> {
             },
         } = init;
         this.gameStore.setGame(game);
-        console.log(playerId);
         this.playerStore.setPlayerId(playerId);
 
         this.actions.preRender();
@@ -313,6 +313,8 @@ export class FightScene extends BaseScene<FightSceneInit> {
         this.endFight.preRender();
 
         this.playerSocket = new GamePlayerSocket(game.id, playerId);
+        console.log(this.playerSocket);
+        new ConnectionLoader(this, this.playerSocket);
         this.playerSocket.onClose(() =>
             MainMenu.start(this, { keepMusic: false }),
         );
@@ -322,13 +324,13 @@ export class FightScene extends BaseScene<FightSceneInit> {
             this.actions.unlock();
         });
         this.playerSocket.onGameEnd(async (event) => {
+            await this.gameUpdateQueue.waitForCompletion();
             if (event.playerWin) {
                 new SoundEffect(
                     this,
                     SoundEffectAsset.getAssetKey(SoundEffectAssetId.VICTORY),
                 ).play();
             }
-            await this.gameUpdateQueue.waitForCompletion();
             //TODO: DISPLAY POPUP WIasync TH INFO event.playerWin (true|false)
             //this.playBackgroundMusic(MusicAssetId.MENU, true);
             this.endFight.show(event.playerWin, event.boosts);
