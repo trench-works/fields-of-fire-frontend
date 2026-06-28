@@ -10,6 +10,7 @@ export enum EffectAssetId {
     VAMPIRE = "vampire",
     PROVOKED = "provoked",
     ANGERED = "angered",
+    MASOCHISTIC = "masochistic"
 }
 
 class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
@@ -32,6 +33,7 @@ class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
             [EffectAssetId.VAMPIRE] : "vampire",
             [EffectAssetId.PROVOKED] : "provok",
             [EffectAssetId.ANGERED] : "angered",
+            [EffectAssetId.MASOCHISTIC] : "masochistic",
         },
         {
             [EffectAssetId.AMPUTATED]: { width: 512, height: 512 },
@@ -43,6 +45,7 @@ class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
             [EffectAssetId.VAMPIRE] : { width: 512, height: 512 },
             [EffectAssetId.PROVOKED] : { width: 512, height: 512 },
             [EffectAssetId.ANGERED] : { width: 512, height: 512 },
+            [EffectAssetId.MASOCHISTIC] : { width: 512, height: 512 },
         }
         );
     }
