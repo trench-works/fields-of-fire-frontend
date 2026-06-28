@@ -11,6 +11,7 @@ import {
     DisplayText,
     Blur,
     GridArea,
+    ScaleMode,
 } from "../../../core";
 import { DisplayImage } from "../../../core/UI/DisplayImage";
 import { CharacterClass } from "../../../Model/CharacterClass";
@@ -318,7 +319,10 @@ export class StatsDisplayer extends FightSceneDisplayer {
 
             const area = this.effectListGrid.getArea({ x: col, y: row });
 
-            const image = new DisplayImage(this.scene, area)
+            const image = new DisplayImage(
+                this.scene,
+                area.scaleFromCenter(1, ScaleMode.FIT),
+            )
                 .setImage(EffectAsset.getAssetKey(id), 1.2)
                 .setInteractive(true);
 

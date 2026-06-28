@@ -11,7 +11,12 @@ export enum BoostAssetId {
     REACTION = "reaction",
     ENERGY = "energy",
     ACCELERATION = "acceleration",
-    DODGE = "dodging"
+    DODGE = "dodging",
+    HEAVY_GUN = "heavy_gun",
+    STABILISATION = "stabilisation",
+    SPRINT = "sprint",
+    ALLEVIATE = "alleviate",
+    MASOCHISTIC = "masochistic",
 }
 
 class BoostAssetManager extends ImageAssetManager<BoostAssetId, string> {
@@ -35,7 +40,12 @@ class BoostAssetManager extends ImageAssetManager<BoostAssetId, string> {
             [BoostAssetId.REACTION]: "reaction",
             [BoostAssetId.ENERGY]: "energy",
             [BoostAssetId.ACCELERATION]: "acceleration",
-            [BoostAssetId.DODGE]: "dodge"
+            [BoostAssetId.DODGE]: "dodge",
+            [BoostAssetId.HEAVY_GUN]: "heavy_gun",
+            [BoostAssetId.STABILISATION]: "stabilisation",
+            [BoostAssetId.SPRINT]: "sprint",
+            [BoostAssetId.ALLEVIATE]: "alleviate",
+            [BoostAssetId.MASOCHISTIC]: "masochistic"
         },
         {
             [BoostAssetId.HEAL]: { width: 512, height: 512 },
@@ -49,6 +59,11 @@ class BoostAssetManager extends ImageAssetManager<BoostAssetId, string> {
             [BoostAssetId.ENERGY]: { width: 512, height: 512 },
             [BoostAssetId.ACCELERATION]:{ width: 512, height: 512 },
             [BoostAssetId.DODGE]: { width: 512, height: 512 },
+            [BoostAssetId.HEAVY_GUN]: { width: 512, height: 512 },
+            [BoostAssetId.STABILISATION]: { width: 512, height: 512 },
+            [BoostAssetId.SPRINT]: { width: 512, height: 512 },
+            [BoostAssetId.ALLEVIATE]: { width: 512, height: 512 },
+            [BoostAssetId.MASOCHISTIC]: { width: 512, height: 512 },
         }
         );
     }

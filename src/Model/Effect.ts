@@ -2,8 +2,8 @@ import { EffectAssetId } from "../assets/EffectAsset";
 import { Stats } from "./Stats";
 
 export enum EffectType {
-    POISON = "poison",
-    APPLY = "apply",
+    POISON = "POISON",
+    APPLY = "APPLY",
 }
 
 export type Effect = {
