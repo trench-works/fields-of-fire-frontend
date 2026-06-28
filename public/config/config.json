@@ -2,7 +2,8 @@
     "server": {
         "url": "localhost",
         "port": "3000",
-        "basePath": "",
+        "apiBasePath": "",
+        "socketBasePath": "",
         "protocols": {
             "http": "http",
             "ws": "ws"
