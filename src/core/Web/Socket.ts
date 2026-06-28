@@ -37,7 +37,7 @@ export class Socket<
         const port = Number(global.config.server.port);
         const portStr = port === 443 || port === 80 ? "" : `:${port}`;
         this.socket = new WebSocket(
-            `${global.config.server.protocols.ws}://${global.config.server.url}${portStr}/${this.topic}`,
+            `${global.config.server.protocols.ws}://${global.config.server.url}${portStr}${global.config.server.socketBasePath}/${this.topic}`,
         );
         this.socket.addEventListener("open", this.handleOpen.bind(this));
         this.socket.addEventListener("message", this.handleMessage.bind(this));
