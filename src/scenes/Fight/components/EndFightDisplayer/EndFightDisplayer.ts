@@ -408,7 +408,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         if (boost.id === "vampire") {
             statLine = "Vol de vie : +10%";
         } else if(boost.id === "masochistic"){
-            statLine = "+20% de dommage, vous subisser lamoitier de ces dommages"
+            statLine = "+20% de dommage, vous subisser lamoitier de ces dommages";
         }else if (boost.id === "reaction") {
             statLine = [
                 "life: +8",
