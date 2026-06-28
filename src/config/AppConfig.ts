@@ -4,6 +4,7 @@ export type App = {
     server: {
         url: string;
         port: string;
+        basePath: string;
         protocols: {
             http: "http" | "https";
             ws: "ws" | "wss";
