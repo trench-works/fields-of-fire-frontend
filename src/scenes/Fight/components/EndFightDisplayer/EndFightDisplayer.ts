@@ -165,6 +165,10 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.root.setVisible(false);
         this.temporaryRoot.setVisible(false);
 
+        if(this.gameStore.game.isStopped){
+            this.show(this.gameStore.game.playerWin, this.playerStore.player.randomBoost)
+        }
+
         return this;
     }
 
@@ -353,15 +357,14 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.temporaryRoot.add(
             new DisplayImage(
                 this.scene,
-                entityListGrid
-                    .getArea({
-                        x: 3,
-                        y: 1,
-                        width: 1,
-                        height: 1,
-                        margin: { top: 10, bottom: -8, left: 0, right: 0 },
-                    })
-                    .scaleFromCenter(1, ScaleMode.FILL),
+                entityListGrid.getArea({
+                    x: 3,
+                    y: 1,
+                    width: 1,
+                    height: 1,
+                    margin: { top: 10, bottom: -8, left: 0, right: 0 },
+                })
+                .scaleFromCenter(1,ScaleMode.FIT),
             )
                 .setImage(BoostAsset.getAssetKey(boost.id))
                 .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3),
