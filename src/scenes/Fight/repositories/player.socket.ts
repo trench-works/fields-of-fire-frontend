@@ -51,7 +51,7 @@ export type GameAttackAnimation = GameAnimation<
         actionId: string;
         origin: Position;
         target: Position;
-        hits: Position[];
+        hits: (Position & { damage: number })[];
     }
 >;
 export type GameDeathAnimation = GameAnimation<

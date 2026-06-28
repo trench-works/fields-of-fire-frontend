@@ -81,9 +81,9 @@ export class ParticleDisplayer extends Displayer<FightScene> {
                     },
                 );
                 break;
-            case ParticleAssetId.DUST:
-                this.WindAnimation(x, y);
-                break;
+            // case ParticleAssetId.DUST:
+            //     this.windAnimation(x, y);
+            //     break;
         }
         return this;
     }
@@ -157,52 +157,91 @@ export class ParticleDisplayer extends Displayer<FightScene> {
         });
     }
 
-    async WindAnimation(x: number, y: number): Promise<void> {
-        if (this.buffEmitter) {
-            this.buffEmitter.stop();
-            this.buffEmitter.destroy();
-        }
+    async baseWindAnimation() {}
 
-        this.buffEmitter = this.scene.add.particles(
-            x,
-            y,
+    private dustAnimation() {
+        const buffEmitter = this.scene.add.particles(
+            0,
+            0,
             ParticleAsset.getAssetKey(ParticleAssetId.DUST),
             {
                 speedX: { min: 40, max: 100 },
                 speedY: { min: -15, max: 15 },
                 accelerationY: { min: -20, max: 20 },
-                scale: { start: 0.3, end: 1.2 },
+                scale: {
+                    start: Phaser.Math.Between(0.8, 1.2),
+                    end: Phaser.Math.Between(0.8, 1.2),
+                },
                 alpha: { start: 0.6, end: 0 },
-                lifespan: { min: 1500, max: 3000 },
+                lifespan: { min: 3000, max: 6000 },
                 frequency: 80,
-                quantity: { min: 1, max: 3 },
+                quantity: { min: 1, max: 5 },
                 rotate: { min: -15, max: 15 },
                 emitting: false,
             },
         );
 
-        this.buffEmitter.addEmitZone(
+        buffEmitter.addEmitZone(
             new Phaser.GameObjects.Particles.Zones.RandomZone({
                 getRandomPoint: (point: any) => {
-                    point.x = Phaser.Math.Between(-100, 0);
-                    point.y = Phaser.Math.Between(-20, 20);
+                    point.x = Phaser.Math.Between(0, window.innerWidth);
+                    point.y = Phaser.Math.Between(0, window.innerHeight);
                     return point;
                 },
             }),
         );
 
-        this.buffEmitter.setDepth(
+        buffEmitter.setDepth(
             Depth.getBackgroundElementDepth(BACKGROUND_LEVELS_OFFSET.WIND),
         );
+        buffEmitter.start();
+    }
 
-        await new Promise<void>((resolve) => {
-            this.buffEmitter.start();
+    embersAnimation() {
+        const buffEmitter = this.scene.add.particles(
+            0,
+            0,
+            ParticleAsset.getAssetKey(ParticleAssetId.EMBER),
+            {
+                speedX: { min: -100, max: 100 },
+                speedY: { min: -100, max: 100 },
+                accelerationY: { min: -20, max: 20 },
+                accelerationX: { min: -20, max: 20 },
+                gravityX: Phaser.Math.Between(-2, 2),
+                gravityY: Phaser.Math.Between(-2, 2),
+                scale: {
+                    start: Phaser.Math.Between(0.5, 1),
+                    end: Phaser.Math.Between(0.5, 1),
+                },
+                alpha: { start: 0.6, end: 0 },
+                lifespan: { min: 3000, max: 6000 },
+                frequency: 150,
+                quantity: { min: 1, max: 2 },
+                rotate: { min: -45, max: 45 },
+                emitting: false,
+                angle: Phaser.Math.Between(50, 150),
+            },
+        );
 
-            setTimeout(() => {
-                this.buffEmitter.stop();
-                resolve();
-            }, 3000);
-        });
+        buffEmitter.addEmitZone(
+            new Phaser.GameObjects.Particles.Zones.RandomZone({
+                getRandomPoint: (point: any) => {
+                    point.x = Phaser.Math.Between(0, window.innerWidth);
+                    point.y = Phaser.Math.Between(0, window.innerHeight);
+                    return point;
+                },
+            }),
+        );
+
+        buffEmitter.setDepth(
+            Depth.getBackgroundElementDepth(BACKGROUND_LEVELS_OFFSET.WIND),
+        );
+        buffEmitter.start();
+    }
+
+    windAnimation(): void {
+        this.dustAnimation();
+        this.embersAnimation();
     }
 }
 

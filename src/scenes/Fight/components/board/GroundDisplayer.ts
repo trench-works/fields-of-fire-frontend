@@ -203,7 +203,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
                                         x: zone.x,
                                         y:
                                             zone.y -
-                                            120 * this.scene.scaleFactor,
+                                            140 * this.scene.scaleFactor,
                                     },
                                 );
                             }
@@ -321,7 +321,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
                 title: this.classStore.getClass(targetEntity.classId).name,
                 position: {
                     x: cell.pixelPosition.x,
-                    y: cell.pixelPosition.y - 120 * this.scene.scaleFactor,
+                    y: cell.pixelPosition.y - 130 * this.scene.scaleFactor,
                 },
             });
         });

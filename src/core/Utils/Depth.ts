@@ -61,7 +61,7 @@ export class Depth {
      * @returns
      */
     static getBackgroundElementDepth(level?: BACKGROUND_LEVELS_OFFSET): number {
-        return Depth.UI_BASE_OFFSET + (level ?? 0);
+        return Depth.BACKGROUND_BASE_OFFSET + (level ?? 0);
     }
 }
 
