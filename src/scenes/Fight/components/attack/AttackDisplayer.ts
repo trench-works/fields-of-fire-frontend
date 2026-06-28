@@ -8,8 +8,10 @@ import {
 } from "../../../../assets";
 import { ParticleAssetId } from "../../../../assets/ParticleAsset";
 import {
+    Depth,
     DirectionUtils,
     DisplayAnimation,
+    GRID_LEVELS_OFFSET,
     Position,
     SoundEffect,
     Timeout,
@@ -20,13 +22,17 @@ import { GameAttackAnimation } from "../../repositories/player.socket";
 import { GameStore } from "../../stores/GameStore";
 import { FightSceneDisplayer } from "../FightSceneDisplayer";
 import { ParticleDisplayer } from "../Particle/ParticleDisplayer";
+import { Toaster } from "../Toaster";
 
 export class AttackDisplayer extends FightSceneDisplayer {
     protected readonly particleDisplayer: ParticleDisplayer;
 
+    protected readonly toaster: Toaster;
+
     constructor(scene: FightScene, gameStore: GameStore) {
         super(scene, gameStore);
         this.particleDisplayer = new ParticleDisplayer(scene);
+        this.toaster = new Toaster(scene);
     }
 
     async animate(
@@ -55,6 +61,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                     this.scene.cameras.main.shake(200, 0.001);
                     this.scene.toaster.attackToast(animation);
                     await this.playBloodSplatter(hits, origin, target);
+                    await this.toaster.attackToast(animation);
                 }
                 break;
             case ActionAssetId.BAYONET:
@@ -69,6 +76,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                     this.scene.cameras.main.shake(200, 0.001);
                     this.scene.toaster.attackToast(animation);
                     await this.playBloodSplatter(hits, origin, target);
+                    await this.toaster.attackToast(animation);
                 }
                 break;
             case ActionAssetId.AMPUTATE:
@@ -82,6 +90,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                     ).play();
                     this.scene.toaster.attackToast(animation);
                     await this.playBloodSplatter(hits, origin, target);
+                    await this.toaster.attackToast(animation);
                 }
                 break;
             case ActionAssetId.INTIMIDATION:
@@ -97,22 +106,32 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         ActionAssetId.INTIMIDATION,
                         target,
                     );
-                    this.scene.toaster.attackToast(animation);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.DEBUFF,
                         cell.pixelPosition.x,
                         cell.pixelPosition.y,
+                        Depth.getFromGridPosition(
+                            cell.gridPosition,
+                            GRID_LEVELS_OFFSET.ANIMATION_4,
+                        ),
                     );
                 }
                 break;
             case ActionAssetId.HEAL:
                 {
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(SoundEffectAssetId.DOPAGE),
+                    ).play();
                     this.scene.character.changeDirection(target, entityId);
-                    this.scene.toaster.attackToast(animation);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.HEAL,
                         cell.pixelPosition.x,
                         cell.pixelPosition.y,
+                        Depth.getFromGridPosition(
+                            cell.gridPosition,
+                            GRID_LEVELS_OFFSET.ANIMATION_4,
+                        ),
                     );
                 }
                 break;
@@ -134,23 +153,31 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.CANNON),
                     ).play();
                     this.scene.cameras.main.shake(200, 0.005);
-                    this.scene.toaster.attackToast(animation);
+                    await this.toaster.attackToast(animation);
                     await this.playBloodSplatter(hits, origin, target); //TODO: make particle blood splatter
                     await this.particleDisplayer.animate(
                         ParticleAssetId.SMOKE,
                         cell.pixelPosition.x,
                         cell.pixelPosition.y,
+                        Depth.getFromGridPosition(
+                            cell.gridPosition,
+                            GRID_LEVELS_OFFSET.ANIMATION_4,
+                        ),
                     );
+                    this.toaster.attackToast(animation);
                 }
                 break;
             case ActionAssetId.DOPAGE:
                 {
                     this.scene.character.changeDirection(target, entityId);
-                    this.scene.toaster.attackToast(animation);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.BOOST,
                         cell.pixelPosition.x,
                         cell.pixelPosition.y,
+                        Depth.getFromGridPosition(
+                            cell.gridPosition,
+                            GRID_LEVELS_OFFSET.ANIMATION_4,
+                        ),
                     );
                     new SoundEffect(
                         this.scene,
@@ -160,12 +187,19 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.FIGHTING_DRUG:
                 {
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(SoundEffectAssetId.DOPAGE),
+                    ).play();
                     this.scene.character.changeDirection(target, entityId);
-                    this.scene.toaster.attackToast(animation);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.BOOST,
                         cell.pixelPosition.x,
                         cell.pixelPosition.y,
+                        Depth.getFromGridPosition(
+                            cell.gridPosition,
+                            GRID_LEVELS_OFFSET.ANIMATION_4,
+                        ),
                     );
                 }
                 break;
@@ -179,6 +213,10 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         ParticleAssetId.BOOST,
                         cell.pixelPosition.x,
                         cell.pixelPosition.y,
+                        Depth.getFromGridPosition(
+                            cell.gridPosition,
+                            GRID_LEVELS_OFFSET.ANIMATION_4,
+                        ),
                     );
                 }
                 break;
@@ -193,6 +231,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.HURT),
                     ).play();
                     await this.playBloodSplatter(hits, origin, target);
+                    await this.toaster.attackToast(animation);
                 }
                 break;
         }
@@ -216,7 +255,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 y: cell.pixelPosition.y,
             },
             {
-                depth: Math.max(x * 10, y * 10) + depth,
+                depth: Depth.getFromGridPosition({ x, y }) + depth,
                 scale: this.scene.scaleFactor / 1.5,
                 origin,
             },
@@ -266,7 +305,10 @@ export class AttackDisplayer extends FightSceneDisplayer {
                                 40 * this.scene.scaleFactor,
                         },
                         {
-                            depth: Math.max(x * 10, y * 10) + 1,
+                            depth: Depth.getFromGridPosition(
+                                { x, y },
+                                GRID_LEVELS_OFFSET.ANIMATION_2,
+                            ),
                             scale: 0.2 * this.scene.scaleFactor,
                             origin: { x: 0.5, y: 0.5 },
                             direction: -direction - 90 - 10,

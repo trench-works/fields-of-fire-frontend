@@ -29,7 +29,7 @@ export class CharactersDisplayer extends FightSceneDisplayer {
         this.characters = this.gameStore.game.entities
             .filter((entity) => !entity.dead)
             .map((entity) =>
-                new Character(this.scene, this.gameStore, entity.entityId)
+                new Character(this.scene, this.gameStore, entity.id)
                     .preRender()
                     .render(),
             );
@@ -37,8 +37,19 @@ export class CharactersDisplayer extends FightSceneDisplayer {
     }
 
     update(): this {
+        const currentEntityIds: string[] = [];
         for (const character of this.characters) {
+            currentEntityIds.push(character.entityId);
             character.update();
+        }
+        for (const entity of this.gameStore.game.entities) {
+            if (!entity.dead && !currentEntityIds.includes(entity.id)) {
+                this.characters.push(
+                    new Character(this.scene, this.gameStore, entity.id)
+                        .preRender()
+                        .render(),
+                );
+            }
         }
         return this;
     }
@@ -68,7 +79,7 @@ export class CharactersDisplayer extends FightSceneDisplayer {
     }
 
     changeDirection(target: Position, entityId?: string) {
-        entityId ??= this.playerStore.playerEntity.entityId;
+        entityId ??= this.playerStore.playerEntity.id;
         const character = this.characters.find(
             (character) => character.entityId === entityId,
         );

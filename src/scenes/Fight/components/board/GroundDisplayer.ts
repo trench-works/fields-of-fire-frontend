@@ -1,8 +1,8 @@
 import { MiscAsset, MiscAssetId } from "../../../../assets";
+import { Depth, GRID_LEVELS_OFFSET, Position } from "../../../../core";
 import { Diamond } from "../../../../core/Objects/Diamond";
 import { scaleAndCenter } from "../../../../core/Utils/Scale";
 import { PositionUtils } from "../../../../core/Utils/Sizing";
-import { EntityType } from "../../../../Model/Entity";
 import { StatsUtils } from "../../../../Model/Stats";
 import { FightScene } from "../../fight.scene";
 import { ClassStore } from "../../stores/ClassStore";
@@ -74,7 +74,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
         }
 
         this.groundStore.groundLayer.setScale(this.scene.scaleFactor);
-        this.groundStore.groundLayer.setDepth(0);
+        this.groundStore.groundLayer.setDepth(Depth.GRID_BASE_OFFSET);
     }
 
     private displayEntitiesHighlights() {
@@ -100,15 +100,14 @@ export class GroundDisplayer extends FightSceneDisplayer {
                                 this.gameStore.game.playerTurns[0]
                         ) {
                             const entity = this.gameStore.game.entities.find(
-                                (entity) =>
-                                    entity.entityId === caseTile.entityId,
+                                (entity) => entity.id === caseTile.entityId,
                             );
                             if (entity) {
                                 this.tileHighlights.push(
-                                    this.getTileHighlights(tile, {
+                                    this.getTileHighlights({ x, y }, tile, {
                                         color:
-                                            entity.entityType ===
-                                            EntityType.ALLY
+                                            entity.teamId ===
+                                            this.playerStore.playerEntity.teamId
                                                 ? 0x00ff00
                                                 : 0xff0000,
                                         depth: Math.max(x * 10, y * 10),
@@ -151,16 +150,20 @@ export class GroundDisplayer extends FightSceneDisplayer {
                     if (!tile) continue;
                     const diamond = new Diamond(tile, this.scene.scaleFactor);
 
-                    const hoverGraphics = this.getTileHighlights(tile, {
-                        color: 0xffffff,
-                        diamond,
-                        depth: 2,
-                    });
+                    const hoverGraphics = this.getTileHighlights(
+                        { x, y },
+                        tile,
+                        {
+                            color: 0xffffff,
+                            diamond,
+                            depth: 2,
+                        },
+                    );
                     hoverGraphics.setVisible(false);
                     this.scene.gridPositions[x][y].hoverGraphics =
                         hoverGraphics;
 
-                    const zone = this.getTileInteractiveZone(tile, {
+                    const zone = this.getTileInteractiveZone({ x, y }, tile, {
                         diamond,
                     });
                     this.scene.gridPositions[x][y].zone = zone;
@@ -196,7 +199,12 @@ export class GroundDisplayer extends FightSceneDisplayer {
                                     this.classStore.getClass(entity.classId)
                                         .name,
                                     `❤️ ${StatsUtils.fromEntity(entity).life} PV`,
-                                    { x: zone.x, y: zone.y - 120* this.scene.scaleFactor },
+                                    {
+                                        x: zone.x,
+                                        y:
+                                            zone.y -
+                                            140 * this.scene.scaleFactor,
+                                    },
                                 );
                             }
                         }
@@ -218,6 +226,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
     }
 
     getTileHighlights(
+        position: Position,
         tile: Phaser.Tilemaps.Tile,
         props?: { color: number; diamond?: Diamond; depth?: number },
     ): Phaser.GameObjects.Graphics {
@@ -234,13 +243,17 @@ export class GroundDisplayer extends FightSceneDisplayer {
         graphics.strokePoints(diamond.points, true);
         graphics.setPosition(worldX, worldY);
         graphics.setDepth(
-            this.groundStore.groundLayer?.depth ?? 0 + (props?.depth ?? 1),
+            Depth.getFromGridPosition(
+                position,
+                GRID_LEVELS_OFFSET.HIGHTLIGHT_1,
+            ),
         );
 
         return graphics;
     }
 
     getTileInteractiveZone(
+        position: Position,
         tile: Phaser.Tilemaps.Tile,
         props?: { diamond?: Diamond },
     ): Phaser.GameObjects.Zone {
@@ -254,7 +267,12 @@ export class GroundDisplayer extends FightSceneDisplayer {
         // Create Zone
         const zone = this.scene.add.zone(worldX, worldY, 10, 10);
         zone.setInteractive(diamond, Phaser.Geom.Polygon.Contains);
-        zone.setDepth(this.groundStore.groundLayer?.depth ?? 0 + 2);
+        zone.setDepth(
+            Depth.getFromGridPosition(
+                position,
+                GRID_LEVELS_OFFSET.HIGHTLIGHT_2,
+            ),
+        );
         return zone;
     }
 
@@ -303,7 +321,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
                 title: this.classStore.getClass(targetEntity.classId).name,
                 position: {
                     x: cell.pixelPosition.x,
-                    y: cell.pixelPosition.y - 120* this.scene.scaleFactor,
+                    y: cell.pixelPosition.y - 130 * this.scene.scaleFactor,
                 },
             });
         });

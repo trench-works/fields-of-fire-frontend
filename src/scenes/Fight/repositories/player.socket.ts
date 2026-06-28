@@ -1,5 +1,6 @@
 import { GameAnimation, Position, Socket, SocketListener } from "../../../core";
 import { AnimatedPayload } from "../../../core";
+import { ConnectionListener } from "../../../core/Objects/Loader";
 import { Boost } from "../../../Model/Boost";
 import { Game } from "../../../Model/Game";
 const GAME_TOPIC = "game";
@@ -19,6 +20,7 @@ enum GamePlayerEvents {
     GAME_END = "game-end",
     GAME_RENEW = "game-renew",
     CANCEL_ACTION = "cancel-action",
+    CONNECTION_UPDATE = "connection-update",
 }
 
 type GamePlayerKey = {
@@ -49,7 +51,7 @@ export type GameAttackAnimation = GameAnimation<
         actionId: string;
         origin: Position;
         target: Position;
-        hits: Position[];
+        hits: (Position & { damage: number })[];
     }
 >;
 export type GameDeathAnimation = GameAnimation<
@@ -72,10 +74,37 @@ export type GameRenew = { data: Game };
 
 export type PlayerReady = { boostId: string };
 
-export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
+export class GamePlayerSocket
+    extends Socket<GamePlayerKey, GamePlayerActions>
+    implements ConnectionListener
+{
     constructor(gameId: string, playerId: string) {
         super(GAME_TOPIC);
         super.open({ gameId, playerId });
+    }
+
+    onConnectionProgress(listener: (value: number) => void) {
+        this.on<{ progress: number }>(
+            GamePlayerEvents.CONNECTION_UPDATE,
+            ({ progress }) => listener(progress),
+        );
+    }
+
+    onConnectionComplete(listener: () => void) {
+        this.on<{ progress: number }>(
+            GamePlayerEvents.CONNECTION_UPDATE,
+            ({ progress }) => {
+                console.log("progress", progress);
+                if (progress === 1) {
+                    listener();
+                }
+            },
+        );
+    }
+
+    removeConnectionListener() {
+        console.log("WILL REMOVE LISTENERS NOW");
+        this.removeListeners(GamePlayerEvents.CONNECTION_UPDATE);
     }
 
     finishTurn() {
@@ -83,6 +112,7 @@ export class GamePlayerSocket extends Socket<GamePlayerKey, GamePlayerActions> {
     }
 
     readyForNewGame(boostId: string) {
+        console.log("rdyFrNewGame called");
         return this.send<PlayerReady>(GamePlayerActions.READY, { boostId });
     }
 

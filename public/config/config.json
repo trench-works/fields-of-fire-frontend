@@ -2,7 +2,10 @@
     "server": {
         "url": "localhost",
         "port": "3000",
-        "protocol": "http"
+        "protocols": {
+            "http": "http",
+            "ws": "ws"
+        }
     }
 }
 

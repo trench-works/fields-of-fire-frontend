@@ -35,7 +35,7 @@ export class Socket<
 
     private createSocket() {
         this.socket = new WebSocket(
-            `ws://${global.config.server.url}:${global.config.server.port}/${this.topic}`,
+            `${global.config.server.protocols.ws}://${global.config.server.url}:${global.config.server.port}/${this.topic}`,
         );
         this.socket.addEventListener("open", this.handleOpen.bind(this));
         this.socket.addEventListener("message", this.handleMessage.bind(this));
@@ -110,6 +110,10 @@ export class Socket<
         } else {
             this.listeners.set(action, [listener]);
         }
+    }
+
+    removeListeners(action: OutputActions) {
+        this.listeners.delete(action);
     }
 
     onSubscribed(listener: () => void): Error | void {

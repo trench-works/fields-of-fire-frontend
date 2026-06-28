@@ -9,6 +9,8 @@ import {
     GridArea,
     DisplayRoot,
     DisplayText,
+    Depth,
+    UI_LEVELS_OFFSET,
 } from "../../../core";
 import { Action } from "../../../Model/Action";
 import { StatsUtils } from "../../../Model/Stats";
@@ -51,7 +53,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
     protected handleActionClick(action: Action) {
         const isPlayerTurn =
             this.gameStore.game.playerTurns[0] ===
-            this.playerStore.playerEntity.entityId;
+            this.playerStore.playerEntity.id;
         const stats = StatsUtils.fromEntity(this.playerStore.playerEntity);
         if (!isPlayerTurn) {
             return;
@@ -73,7 +75,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
                 }
                 this.scene.rangeVisualizer.getCellsInAttackRange(
                     this.playerStore.playerEntity.position,
-                    action.range ?? 0,
+                    action,
                 );
                 break;
         }
@@ -154,7 +156,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
                 (area) => {
                     const buttonArea = area.scaleFromCenter(
                         ActionAsset.getAssetScale(action.id),
-                         ScaleMode.FILL
+                        ScaleMode.FILL,
                     );
                     const button = new Button(this.scene, buttonArea, {
                         image: ActionAsset.getAssetKey(action.id),
@@ -169,7 +171,11 @@ export class ActionDisplayer extends FightSceneDisplayer {
                             buttonGrid.getArea({ x: 3, y: 1 }),
                         )
                             .setText(`${action.cost}`)
-                            .setDepth(500);
+                            .setDepth(
+                                Depth.getUIElementDepth(
+                                    UI_LEVELS_OFFSET.BUTTON,
+                                ),
+                            );
                         this.root.add(text);
                     }
                     this.root.add(button);
@@ -207,7 +213,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
     update(): this {
         const isPlayerTurn =
             this.gameStore.game.playerTurns[0] ===
-            this.playerStore.playerEntity.entityId;
+            this.playerStore.playerEntity.id;
 
         const stats = StatsUtils.fromEntity(this.playerStore.playerEntity);
 

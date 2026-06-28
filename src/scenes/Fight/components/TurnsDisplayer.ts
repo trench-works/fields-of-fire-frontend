@@ -1,6 +1,11 @@
 import { CharacterCloseupAsset } from "../../../assets";
 import { Color } from "../../../config/ColorConfig";
-import { DisplayContainer, ScaleMode } from "../../../core";
+import {
+    Depth,
+    DisplayContainer,
+    ScaleMode,
+    UI_LEVELS_OFFSET,
+} from "../../../core";
 import { FightScene } from "../fight.scene";
 import { ClassStore } from "../stores/ClassStore";
 import { GameStore } from "../stores/GameStore";
@@ -34,7 +39,9 @@ export class TurnDisplayer extends FightSceneDisplayer {
             },
         );
 
-        this.turnPanel.setDepth(0);
+        this.turnPanel.setDepth(
+            Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER),
+        );
 
         return this;
     }
@@ -59,7 +66,7 @@ export class TurnDisplayer extends FightSceneDisplayer {
 
         this.gameStore.game.playerTurns.forEach((entityId, index) => {
             const entity = this.gameStore.game.entities.find(
-                (entity) => entity.entityId === entityId,
+                (entity) => entity.id === entityId,
             )!;
             const player = this.gameStore.game.players.find(
                 (player) => player.entityId === entityId,
@@ -100,6 +107,8 @@ export class TurnDisplayer extends FightSceneDisplayer {
                         ),
                         opacity: isFirstCell ? 1 : 0.7,
                     },
+                ).setDepth(
+                    Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 1,
                 ),
             );
         });

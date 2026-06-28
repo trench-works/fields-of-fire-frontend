@@ -9,7 +9,6 @@ import {
     DisplayContainer,
     Grid,
     DisplayText,
-    List,
     Blur,
     GridArea,
 } from "../../../core";
@@ -43,11 +42,11 @@ export class StatsDisplayer extends FightSceneDisplayer {
     private statsClassName!: DisplayContainer;
     private playerName!: DisplayContainer;
     private statsValuesGrid!: Grid;
-    private playerNameText !: DisplayText;
+    private playerNameText!: DisplayText;
     private statsClassNameText!: DisplayText;
 
     protected statTexts: Map<
-        string,
+        keyof Stats,
         { text: DisplayText; image: DisplayImage }
     >;
 
@@ -60,7 +59,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
     private show!: boolean;
 
     get entityId() {
-        return this.entity?.entityId;
+        return this.entity?.id;
     }
 
     get isShow() {
@@ -140,7 +139,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 width: 6,
                 height: 1,
             }),
-        )
+        );
 
         this.playerName = new DisplayContainer(
             this.scene,
@@ -165,7 +164,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 width: 3,
                 height: 1,
             }),
-        )
+        );
 
         this.statsValuesGrid = statsGrid.getSubGrid(
             {
@@ -195,7 +194,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                     horizontal: 3,
                     vertical: 4,
                 },
-                padding : { left : 0, top : 10, bottom: 0, right : 0 }
+                padding: { left: 0, top: 10, bottom: 0, right: 0 },
             },
         );
 
@@ -262,12 +261,17 @@ export class StatsDisplayer extends FightSceneDisplayer {
     update(): this {
         const stats = StatsUtils.fromEntity(this.entity);
 
-        this.statTexts.forEach(({ text }, key) =>
-            text.setText(String(stats[key as keyof Stats]), { fontSize: 20 }),
-        );
+        this.statTexts.forEach(({ text }, key) => {
+            let value = stats[key];
+            if (["life", "mouvement", "energy"].includes(key)) {
+                value = Math.max(value, 0);
+            }
 
-        this.playerNameText.setText(this.name ?? "N/A")
-        this.statsClassNameText.setText(this.characterClass.name ?? "N/A")
+            text.setText(String(value), { fontSize: 20 });
+        });
+
+        this.playerNameText.setText(this.name ?? "N/A");
+        this.statsClassNameText.setText(this.characterClass.name ?? "N/A");
         this.statsImage.setBackgroundImage(
             CharacterCloseupAsset.getAssetKey(this.entity.classId),
         );
@@ -287,7 +291,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
 
         this.effectImages.forEach((img) => {
             img.setVisible(isShow);
-        })
+        });
 
         this.statTexts.forEach(({ text, image }) => {
             text.setVisible(isShow);
@@ -308,28 +312,41 @@ export class StatsDisplayer extends FightSceneDisplayer {
             return acc;
         }, new Map<EffectAssetId, Effect[]>());
 
-
         Array.from(groupedEffects.entries()).forEach(([id, effects], index) => {
             const col = (index % 3) + 1;
             const row = Math.floor(index / 3) + 1;
-            
+
             const area = this.effectListGrid.getArea({ x: col, y: row });
 
             const image = new DisplayImage(this.scene, area)
                 .setImage(EffectAsset.getAssetKey(id), 1.2)
                 .setInteractive(true);
 
-            const body = effects.map((effect) => {
-                const modified = Object.fromEntries(
-                    Object.entries(effect.modifier).filter(([, value]) => value !== 0)
-                );
-                const modifierLines = Object.entries(modified)
-                    .map(([key, value]) => `${key}: ${value > 0 ? "+" : ""}${value}`)
-                    .join("\n");
-                return `--------\n${modifierLines}\n${effect.author ?? ""}, durée : ${effect.duration}`;
-            }).join("\n");
+            const body = effects
+                .map((effect) => {
+                    const modified = Object.fromEntries(
+                        Object.entries(effect.modifier).filter(
+                            ([, value]) => value !== 0,
+                        ),
+                    );
+                    if (Object.keys(modified).length === 0) {
+                        return `${effect.author ? effect.author + ", " : ""}durée : ${effect.duration ?? "∞"}`;
+                    }
+                    const modifierLines = Object.entries(modified)
+                        .map(
+                            ([key, value]) =>
+                                `${key}: ${value > 0 ? "+" : ""}${value}`,
+                        )
+                        .join("\n");
+                    return `--------\n${modifierLines}\n${effect.author ? effect.author + ", " : ""}durée : ${effect.duration ?? "∞"}`;
+                })
+                .join("\n");
 
-            this.scene.tooltip.attachTo(image.getObject(), body, effects[0].name ?? id);
+            this.scene.tooltip.attachTo(
+                image.getObject(),
+                body,
+                effects[0].name ?? id,
+            );
             this.effectImages.push(image);
         });
     }

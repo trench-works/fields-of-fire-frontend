@@ -20,6 +20,7 @@ export class SoundEffect {
 
     play(): this {
         this.sound.play();
+        this.sound.on("complete", () => this.destroy());
         return this;
     }
 

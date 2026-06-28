@@ -52,6 +52,7 @@ import { EndFightDisplayer } from "./components/EndFightDisplayer/EndFightDispla
 import { Toaster } from "./components/Toaster";
 import { ParticleDisplayer } from "./components/Particle/ParticleDisplayer";
 import { BoostAsset } from "../../assets/BoostAsset";
+import { ConnectionLoader } from "../../core/Objects/Loader";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -78,7 +79,7 @@ export interface Displayable {
 
 export type FightSceneInit = {
     game: Game;
-    player: { playerId: string };
+    player: { id: string };
 };
 
 export class FightScene extends BaseScene<FightSceneInit> {
@@ -257,7 +258,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
                     }
                     if (
                         animation.data.entityId ===
-                        this.playerStore.playerEntity.entityId
+                        this.playerStore.playerEntity.id
                     ) {
                         this.playerStats.blurOut();
                         this.actions.blurOut();
@@ -297,7 +298,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
         const {
             data: {
                 game,
-                player: { playerId },
+                player: { id: playerId },
             },
         } = init;
         this.gameStore.setGame(game);
@@ -312,6 +313,8 @@ export class FightScene extends BaseScene<FightSceneInit> {
         this.endFight.preRender();
 
         this.playerSocket = new GamePlayerSocket(game.id, playerId);
+        console.log(this.playerSocket);
+        new ConnectionLoader(this, this.playerSocket);
         this.playerSocket.onClose(() =>
             MainMenu.start(this, { keepMusic: false }),
         );
@@ -321,13 +324,13 @@ export class FightScene extends BaseScene<FightSceneInit> {
             this.actions.unlock();
         });
         this.playerSocket.onGameEnd(async (event) => {
+            await this.gameUpdateQueue.waitForCompletion();
             if (event.playerWin) {
                 new SoundEffect(
                     this,
                     SoundEffectAsset.getAssetKey(SoundEffectAssetId.VICTORY),
                 ).play();
             }
-            await this.gameUpdateQueue.waitForCompletion();
             //TODO: DISPLAY POPUP WIasync TH INFO event.playerWin (true|false)
             //this.playBackgroundMusic(MusicAssetId.MENU, true);
             this.endFight.show(event.playerWin, event.boosts);
@@ -404,16 +407,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
             },
         });
 
-        this.time.addEvent({
-            delay: 2000,
-            loop: true,
-            callback: () => {
-                this.particleDisplayer.WindAnimation(
-                    0, // part du bord gauche
-                    Phaser.Math.Between(100, this.scale.height - 100),
-                );
-            },
-        });
+        this.particleDisplayer.windAnimation();
 
         // --- Placement des icônes ---
 

@@ -8,6 +8,8 @@ export enum EffectAssetId {
     FIGHTING_DRUG = "enhanced_drug",
     REACTION = "reaction",
     VAMPIRE = "vampire",
+    PROVOKED = "provoked",
+    ANGERED = "angered",
 }
 
 class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
@@ -28,6 +30,8 @@ class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
             [EffectAssetId.FIGHTING_DRUG] : "enhanced_drug",
             [EffectAssetId.REACTION] : "reaction",
             [EffectAssetId.VAMPIRE] : "vampire",
+            [EffectAssetId.PROVOKED] : "provok",
+            [EffectAssetId.ANGERED] : "angered",
         },
         {
             [EffectAssetId.AMPUTATED]: { width: 512, height: 512 },
@@ -37,6 +41,8 @@ class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
             [EffectAssetId.FIGHTING_DRUG]: { width: 512, height: 512 },
             [EffectAssetId.REACTION] : { width: 512, height: 512 },
             [EffectAssetId.VAMPIRE] : { width: 512, height: 512 },
+            [EffectAssetId.PROVOKED] : { width: 512, height: 512 },
+            [EffectAssetId.ANGERED] : { width: 512, height: 512 },
         }
         );
     }

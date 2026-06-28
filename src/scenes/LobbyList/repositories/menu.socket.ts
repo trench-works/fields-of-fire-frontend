@@ -9,8 +9,7 @@ type JoinLobby = {
 };
 
 type JoinedLobby = {
-    lobbyId: string;
-    playerId: string;
+    lobby: LobbyData;
 };
 
 type Reconnect = {

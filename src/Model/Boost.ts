@@ -1,3 +1,4 @@
+import { BoostAssetId } from "../assets/BoostAsset";
 import { Stats } from "./Stats";
 
 export enum BoostType {
@@ -6,7 +7,7 @@ export enum BoostType {
 }
 
 export type Boost = {
-    id: string;
+    id: BoostAssetId;
     name: string;
     effects: string[];
     boosts: Partial<Stats>[];

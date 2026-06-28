@@ -48,9 +48,9 @@ export class LobbyListScene extends BaseScene {
         this.menuSocket = new MenuSocket();
         this.menuSocket.onClose(() => MainMenu.start(this));
 
-        this.menuSocket.onJoin(({ lobbyId, playerId }) => {
+        this.menuSocket.onJoin(({ lobby }) => {
             LobbyScene.start(this, {
-                data: { lobbyId, playerId },
+                data: { lobby },
             });
         });
 

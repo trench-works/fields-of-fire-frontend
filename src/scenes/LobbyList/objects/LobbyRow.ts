@@ -16,7 +16,7 @@ type LobbyInfos = {
 };
 export class LobbyRow {
     private container: DisplayContainer;
-    private texts: Phaser.GameObjects.Text[] = [];
+    private texts: DisplayText[] = []; 
 
     public id: string;
 
@@ -35,6 +35,7 @@ export class LobbyRow {
 
         this.container.setInteractive();
         this.container.on("pointerdown", () => onClick(this));
+        
 
         // Sous-grille locale à la ligne
 
@@ -52,47 +53,55 @@ export class LobbyRow {
     }
 
     private buildCells(scene: BaseScene, lobby: LobbyInfos, rowGrid: Grid) {
-        new DisplayText(
-            scene,
-            rowGrid.getArea({
-                x: 1,
-                y: 1,
-                width: 2,
-                height: 1,
-            }),
-        ).setText(`Lobby : ${lobby.name}`);
+        this.texts.push(
+            new DisplayText(
+                scene,
+                rowGrid.getArea({
+                    x: 1,
+                    y: 1,
+                    width: 2,
+                    height: 1,
+                }),
+            ).setText(`Lobby : ${lobby.name}`)
+        );
+        
+        this.texts.push(
+            new DisplayText(
+                scene,
+                rowGrid.getArea({
+                    x: 4,
+                    y: 1,
+                    width: 1,
+                    height: 1,
+                }),
+            ).setText(`${lobby.playersNum}/${lobby.maxPlayers}`)
+        )
 
-        new DisplayText(
-            scene,
-            rowGrid.getArea({
-                x: 4,
-                y: 1,
-                width: 1,
-                height: 1,
-            }),
-        ).setText(`${lobby.playersNum}/${lobby.maxPlayers}`);
+        this.texts.push(
+            new DisplayText(
+                scene,
+                rowGrid.getArea({
+                    x: 5,
+                    y: 1,
+                    width: 1,
+                    height: 1,
+                }),
+            ).setText(lobby.playersNum < lobby.maxPlayers ? "Open" : "Full", {
+                color: lobby.playersNum < lobby.maxPlayers ? "#4ec64e" : "#c9443d",
+            })
+        )
 
-        new DisplayText(
-            scene,
-            rowGrid.getArea({
-                x: 5,
-                y: 1,
-                width: 1,
-                height: 1,
-            }),
-        ).setText(lobby.playersNum < lobby.maxPlayers ? "Open" : "Full", {
-            color: lobby.playersNum < lobby.maxPlayers ? "#4ec64e" : "#c9443d",
-        });
-
-        new DisplayText(
-            scene,
-            rowGrid.getArea({
-                x: 9,
-                y: 1,
-                width: 2,
-                height: 1,
-            }),
-        ).setText(`Creator : ${lobby.creator}`);
+        this.texts.push(
+            new DisplayText(
+                scene,
+                rowGrid.getArea({
+                    x: 9,
+                    y: 1,
+                    width: 2,
+                    height: 1,
+                }),
+            ).setText(`Creator : ${lobby.creator}`)
+        );
     }
 
     public setSelected(selected: boolean) {
