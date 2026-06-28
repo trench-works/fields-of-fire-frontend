@@ -59,7 +59,11 @@ export class Http {
             }
         }
 
-        let url = `${global.config.server.protocols.http}://${global.config.server.url}:${global.config.server.port}${paramEndpoint}`;
+        const port = Number(global.config.server.port);
+        const portStr = port === 443 || port === 80 ? "" : `:${port}`;
+        const base = `${global.config.server.protocols.http}://${global.config.server.url}${portStr}${global.config.server.basePath}`;
+        let url = `${base}${paramEndpoint}`;
+
         if (payload?.query) {
             url += "?";
             for (const [key, value] of Object.entries(payload?.query)) {
