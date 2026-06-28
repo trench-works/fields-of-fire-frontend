@@ -6,6 +6,7 @@ export enum ParticleAssetId {
     HEAL = "heal",
     SMOKE = "smoke",
     DUST = "dust",
+    EMBER = "ember",
 }
 
 class ParticleAssetManager extends ImageAssetManager<ParticleAssetId, string> {
@@ -21,11 +22,12 @@ class ParticleAssetManager extends ImageAssetManager<ParticleAssetId, string> {
         super(
             "particle",
             {
-                [ParticleAssetId.BOOST]: "boost_particle",
-                [ParticleAssetId.DEBUFF]: "debuff_particle",
-                [ParticleAssetId.HEAL]: "heal_particle",
-                [ParticleAssetId.SMOKE]: "smoke_particle",
-                [ParticleAssetId.DUST] : "dust_particle",
+                [ParticleAssetId.BOOST]: "boost",
+                [ParticleAssetId.DEBUFF]: "debuff",
+                [ParticleAssetId.HEAL]: "heal",
+                [ParticleAssetId.SMOKE]: "smoke",
+                [ParticleAssetId.DUST]: "dust",
+                [ParticleAssetId.EMBER]: "ember",
             },
             {
                 [ParticleAssetId.BOOST]: { width: 1, height: 1 },
@@ -33,6 +35,7 @@ class ParticleAssetManager extends ImageAssetManager<ParticleAssetId, string> {
                 [ParticleAssetId.HEAL]: { width: 1, height: 1 },
                 [ParticleAssetId.SMOKE]: { width: 1, height: 1 },
                 [ParticleAssetId.DUST]: { width: 1, height: 1 },
+                [ParticleAssetId.EMBER]: { width: 1, height: 1 },
             },
         );
     }

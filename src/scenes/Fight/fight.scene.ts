@@ -407,16 +407,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
             },
         });
 
-        this.time.addEvent({
-            delay: 2000,
-            loop: true,
-            callback: () => {
-                this.particleDisplayer.WindAnimation(
-                    0, // part du bord gauche
-                    Phaser.Math.Between(100, this.scale.height - 100),
-                );
-            },
-        });
+        this.particleDisplayer.windAnimation();
 
         // --- Placement des icônes ---
 

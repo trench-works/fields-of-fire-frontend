@@ -22,13 +22,17 @@ import { GameAttackAnimation } from "../../repositories/player.socket";
 import { GameStore } from "../../stores/GameStore";
 import { FightSceneDisplayer } from "../FightSceneDisplayer";
 import { ParticleDisplayer } from "../Particle/ParticleDisplayer";
+import { Toaster } from "../Toaster";
 
 export class AttackDisplayer extends FightSceneDisplayer {
     protected readonly particleDisplayer: ParticleDisplayer;
 
+    protected readonly toaster: Toaster;
+
     constructor(scene: FightScene, gameStore: GameStore) {
         super(scene, gameStore);
         this.particleDisplayer = new ParticleDisplayer(scene);
+        this.toaster = new Toaster(scene);
     }
 
     async animate(
@@ -57,6 +61,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                     this.scene.cameras.main.shake(200, 0.001);
                     this.scene.toaster.attackToast(animation);
                     await this.playBloodSplatter(hits, origin, target);
+                    this.toaster.attackToast(animation);
                 }
                 break;
             case ActionAssetId.BAYONET:
@@ -71,6 +76,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                     this.scene.cameras.main.shake(200, 0.001);
                     this.scene.toaster.attackToast(animation);
                     await this.playBloodSplatter(hits, origin, target);
+                    this.toaster.attackToast(animation);
                 }
                 break;
             case ActionAssetId.AMPUTATE:
@@ -84,6 +90,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                     ).play();
                     this.scene.toaster.attackToast(animation);
                     await this.playBloodSplatter(hits, origin, target);
+                    this.toaster.attackToast(animation);
                 }
                 break;
             case ActionAssetId.INTIMIDATION:
@@ -159,6 +166,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                             GRID_LEVELS_OFFSET.ANIMATION_4,
                         ),
                     );
+                    this.toaster.attackToast(animation);
                 }
                 break;
             case ActionAssetId.DOPAGE:
@@ -227,6 +235,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.HURT),
                     ).play();
                     await this.playBloodSplatter(hits, origin, target);
+                    this.toaster.attackToast(animation);
                 }
                 break;
         }
