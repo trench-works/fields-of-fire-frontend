@@ -27,6 +27,11 @@ export class WallDisplayer extends FightSceneDisplayer {
         return this;
     }
 
+    clean(): this {
+        this.root.destroy();
+        return this;
+    }
+
     private displayTiles() {
         for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {

@@ -212,7 +212,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
         /**
          * Update Displayers
          */
-        this.board.update();
+        this.board.reset();
         this.actions.destroy().preRender().render().update();
         this.turns.update();
         this.character.render().update();
@@ -313,7 +313,6 @@ export class FightScene extends BaseScene<FightSceneInit> {
         this.endFight.preRender();
 
         this.playerSocket = new GamePlayerSocket(game.id, playerId);
-        console.log(this.playerSocket);
         new ConnectionLoader(this, this.playerSocket);
         this.playerSocket.onClose(() =>
             MainMenu.start(this, { keepMusic: false }),

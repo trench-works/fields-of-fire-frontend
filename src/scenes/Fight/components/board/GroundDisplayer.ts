@@ -28,6 +28,19 @@ export class GroundDisplayer extends FightSceneDisplayer {
         return this;
     }
 
+    clean(): this {
+        this.groundStore.groundLayer?.destroy();
+        this.tileHighlights.forEach((highlight) => highlight.destroy());
+        for (let x = 0; x < this.scene.gridPositions.length; x++) {
+            for (let y = 0; y < this.scene.gridPositions[x].length; y++) {
+                this.scene.gridPositions[x][y].highlight?.destroy();
+                this.scene.gridPositions[x][y].hoverGraphics?.destroy();
+                this.scene.gridPositions[x][y].zone?.destroy();
+            }
+        }
+        return this;
+    }
+
     render(): this {
         this.renderGroundLayer();
         this.generatePlayGrid();
@@ -60,14 +73,15 @@ export class GroundDisplayer extends FightSceneDisplayer {
         );
         this.scene.scaleFactor = centerMap.scaleFactor;
 
-        this.groundStore.setGroundLayer(
-            map.createLayer(
-                "Ground",
-                tileset!,
-                centerMap.offset.x,
-                centerMap.offset.y,
-            ),
+        const layer = map.createLayer(
+            "Ground",
+            tileset!,
+            centerMap.offset.x,
+            centerMap.offset.y,
         );
+        console.log(layer);
+
+        this.groundStore.setGroundLayer(layer);
 
         if (!this.groundStore.groundLayer) {
             throw new Error("Ground layer seemingly inexistent");
@@ -91,6 +105,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
                 // Ground part
                 const tile = this.groundStore.groundLayer?.getTileAt?.(x, y);
                 if (tile) {
+                    tile.setVisible(true);
                     if (caseTile.isHole) {
                         tile.setVisible(false);
                     } else if (!caseTile.isWall) {
@@ -126,15 +141,15 @@ export class GroundDisplayer extends FightSceneDisplayer {
             return;
         }
         for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
+            if (!this.scene.gridPositions[x]) {
+                this.scene.gridPositions[x] = [];
+            }
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
                 const tile = this.groundStore.groundLayer.getTileAt(x, y);
                 const caseTile = this.gameStore.game.plateau[x][y];
 
                 const worldX = tile.getCenterX();
                 const worldY = tile.getCenterY();
-                if (!this.scene.gridPositions[y]) {
-                    this.scene.gridPositions[y] = [];
-                }
 
                 this.scene.gridPositions[x][y] = {
                     gridPosition: { x, y },
@@ -144,6 +159,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
                     },
                 };
 
+                tile.setVisible(true);
                 if (caseTile.isHole) {
                     tile.setVisible(false);
                 } else if (!caseTile.isWall) {
