@@ -226,10 +226,12 @@ export class StatsDisplayer extends FightSceneDisplayer {
             // Image
             const image = new DisplayImage(
                 this.scene,
-                statGrid.getArea({
-                    x: 1,
-                    y: 1,
-                }),
+                statGrid
+                    .getArea({
+                        x: 1,
+                        y: 1,
+                    })
+                    .scaleFromCenter(1, ScaleMode.FIT),
             ).setImage(
                 StatsIconAsset.getAssetKey(icon),
                 StatsIconAsset.getAssetScale(icon),

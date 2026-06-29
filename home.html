@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <!-- SEO essentiels -->
+        <title>
+            Fields of Fire – Jeu de stratégie Tour par Tour sur la Grande Guerre
+        </title>
+        <meta
+            name="description"
+            content="Fields of Fire est un jeu multijoueur tour par tour gratuit sur la Première Guerre mondiale. Commandez vos troupes dans les tranchées, planifiez vos offensives et affrontez d'autres joueurs en ligne."
+        />
+        <meta
+            name="keywords"
+            content="jeu première guerre mondiale, wargame 14-18, jeu tour par tour multijoueur, jeu stratégie WWI, jeu tranchées en ligne, browser game guerre mondiale"
+        />
+        <link rel="canonical" href="https://www.fields-of-fire.fr/" />
+
+        <!-- Open Graph (réseaux sociaux) -->
+        <meta property="og:type" content="website" />
+        <meta
+            property="og:title"
+            content="Fields of Fire – Stratégie & Tranchées, Grande Guerre"
+        />
+        <meta
+            property="og:description"
+            content="Jeu de stratégie tour par tour multijoueur gratuit sur la Première Guerre mondiale. Rejoignez la bataille."
+        />
+        <meta property="og:url" content="https://www.fields-of-fire.fr/" />
+        <meta
+            property="og:image"
+            content="https://www.fields-of-fire.fr/assets/preview.png"
+        />
+        <meta property="og:locale" content="fr_FR" />
+
+        <!-- Schema.org VideoGame -->
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "VideoGame",
+                "name": "Fields of Fire",
+                "url": "https://www.fields-of-fire.fr",
+                "description": "Jeu de stratégie tour par tour multijoueur sur la Première Guerre mondiale. Commandez vos troupes, gérez vos ressources et affrontez d'autres joueurs dans les tranchées du front occidental.",
+                "genre": ["Strategy", "Wargame", "Turn-based"],
+                "playMode": "MultiPlayer",
+                "applicationCategory": "Game",
+                "operatingSystem": "Web Browser",
+                "inLanguage": "fr",
+                "isAccessibleForFree": true,
+                "gamePlatform": "Web Browser"
+            }
+        </script>
+
+        <style>
+            /* ─── Tokens ─────────────────────────────────── */
+            :root {
+                --mud: #2b2417;
+                --trench: #1a1510;
+                --khaki: #7a6a45;
+                --brass: #c8972a;
+                --wire: #4a3f2f;
+                --fog: #c8bfa8;
+                --cream: #e8dfc8;
+                --blood: #8b1a1a;
+                --gas: rgba(120, 140, 80, 0.08);
+            }
+
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            html {
+                scroll-behavior: smooth;
+            }
+
+            body {
+                background: var(--trench);
+                color: var(--cream);
+                font-family: "Georgia", "Times New Roman", serif;
+                line-height: 1.65;
+                overflow-x: hidden;
+            }
+
+            /* ─── Typographie ────────────────────────────── */
+            .label {
+                font-family: "Courier New", monospace;
+                font-size: 0.7rem;
+                letter-spacing: 0.25em;
+                text-transform: uppercase;
+                color: var(--brass);
+            }
+
+            h1 {
+                font-size: clamp(2.8rem, 8vw, 6rem);
+                font-weight: 700;
+                line-height: 0.95;
+                letter-spacing: -0.02em;
+                color: var(--cream);
+            }
+
+            h2 {
+                font-size: clamp(1.4rem, 3vw, 2rem);
+                font-weight: 400;
+                color: var(--fog);
+                letter-spacing: 0.04em;
+            }
+
+            h3 {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: var(--brass);
+                margin-bottom: 0.5rem;
+                font-family: "Courier New", monospace;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+            }
+
+            p {
+                color: var(--fog);
+                max-width: 62ch;
+            }
+
+            /* ─── Utilitaires ────────────────────────────── */
+            .container {
+                max-width: 1100px;
+                margin: 0 auto;
+                padding: 0 1.5rem;
+            }
+            .sr-only {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+            }
+
+            /* ─── Barre de navigation ────────────────────── */
+            nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 100;
+                padding: 1rem 1.5rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: linear-gradient(
+                    to bottom,
+                    rgba(26, 21, 16, 0.95),
+                    transparent
+                );
+                border-bottom: 1px solid rgba(200, 151, 42, 0.15);
+            }
+
+            .nav-logo {
+                font-family: "Courier New", monospace;
+                font-size: 0.85rem;
+                letter-spacing: 0.3em;
+                color: var(--brass);
+                text-decoration: none;
+                text-transform: uppercase;
+            }
+
+            .nav-cta {
+                display: inline-block;
+                padding: 0.5rem 1.4rem;
+                background: transparent;
+                border: 1px solid var(--brass);
+                color: var(--brass);
+                font-family: "Courier New", monospace;
+                font-size: 0.75rem;
+                letter-spacing: 0.2em;
+                text-transform: uppercase;
+                text-decoration: none;
+                transition:
+                    background 0.2s,
+                    color 0.2s;
+            }
+            .nav-cta:hover {
+                background: var(--brass);
+                color: var(--trench);
+            }
+
+            /* ─── Hero ───────────────────────────────────── */
+            #hero {
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+                padding: 0 1.5rem 5rem;
+                position: relative;
+                overflow: hidden;
+            }
+
+            /* Texture de fond simulée par SVG inline */
+            #hero::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background:
+                    radial-gradient(
+                        ellipse 80% 60% at 50% 30%,
+                        rgba(120, 100, 60, 0.12) 0%,
+                        transparent 70%
+                    ),
+                    repeating-linear-gradient(
+                        0deg,
+                        transparent,
+                        transparent 3px,
+                        rgba(0, 0, 0, 0.06) 3px,
+                        rgba(0, 0, 0, 0.06) 4px
+                    );
+                pointer-events: none;
+            }
+
+            /* Fil barbelé décoratif */
+            #hero::after {
+                content: "— — — ✕ — — — ✕ — — — ✕ — — — ✕ — — — ✕ — — —";
+                position: absolute;
+                top: 40%;
+                left: 0;
+                right: 0;
+                text-align: center;
+                color: rgba(200, 151, 42, 0.12);
+                font-family: "Courier New", monospace;
+                font-size: 1.2rem;
+                letter-spacing: 0.15em;
+                pointer-events: none;
+            }
+
+            .hero-eyebrow {
+                margin-bottom: 1.5rem;
+            }
+
+            .hero-title {
+                margin-bottom: 0.3rem;
+            }
+
+            .hero-sub {
+                font-size: clamp(1rem, 2.5vw, 1.35rem);
+                color: var(--khaki);
+                margin-bottom: 2.5rem;
+                font-style: italic;
+            }
+
+            .hero-desc {
+                font-size: 1.05rem;
+                margin-bottom: 3rem;
+                max-width: 55ch;
+            }
+
+            .hero-actions {
+                display: flex;
+                gap: 1rem;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .btn-primary {
+                display: inline-block;
+                padding: 1rem 2.5rem;
+                background: var(--brass);
+                color: var(--trench);
+                font-family: "Courier New", monospace;
+                font-size: 0.85rem;
+                letter-spacing: 0.2em;
+                text-transform: uppercase;
+                text-decoration: none;
+                font-weight: 700;
+                transition:
+                    background 0.2s,
+                    transform 0.15s;
+            }
+            .btn-primary:hover {
+                background: var(--cream);
+                transform: translateY(-2px);
+            }
+
+            .btn-ghost {
+                display: inline-block;
+                padding: 1rem 2rem;
+                border: 1px solid var(--wire);
+                color: var(--fog);
+                font-family: "Courier New", monospace;
+                font-size: 0.8rem;
+                letter-spacing: 0.2em;
+                text-transform: uppercase;
+                text-decoration: none;
+                transition:
+                    border-color 0.2s,
+                    color 0.2s;
+            }
+            .btn-ghost:hover {
+                border-color: var(--fog);
+                color: var(--cream);
+            }
+
+            /* ─── Divider ────────────────────────────────── */
+            .divider {
+                border: none;
+                border-top: 1px solid rgba(200, 151, 42, 0.2);
+                margin: 0;
+            }
+
+            /* ─── Section : Ce qu'est le jeu ────────────── */
+            #about {
+                padding: 6rem 1.5rem;
+                background: var(--mud);
+            }
+
+            .about-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 4rem;
+                align-items: center;
+            }
+
+            @media (max-width: 680px) {
+                .about-grid {
+                    grid-template-columns: 1fr;
+                    gap: 2rem;
+                }
+            }
+
+            .about-text .label {
+                margin-bottom: 1rem;
+                display: block;
+            }
+            .about-text h2 {
+                margin-bottom: 1.5rem;
+            }
+            .about-text p {
+                margin-bottom: 1rem;
+            }
+
+            /* Fausse carte tactique */
+            .map-mock {
+                aspect-ratio: 4/3;
+                background: #1e1a12;
+                border: 1px solid var(--wire);
+                position: relative;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .map-mock svg {
+                width: 90%;
+                opacity: 0.6;
+            }
+
+            /* ─── Section : Mécaniques ───────────────────── */
+            #features {
+                padding: 6rem 1.5rem;
+                background: var(--trench);
+            }
+
+            .features-header {
+                margin-bottom: 3.5rem;
+            }
+            .features-header .label {
+                display: block;
+                margin-bottom: 0.75rem;
+            }
+
+            .features-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 2rem;
+            }
+
+            .feature-card {
+                padding: 1.75rem;
+                border: 1px solid var(--wire);
+                background: rgba(42, 32, 20, 0.4);
+                position: relative;
+            }
+
+            .feature-card::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 3px;
+                height: 100%;
+                background: var(--brass);
+                opacity: 0;
+                transition: opacity 0.2s;
+            }
+            .feature-card:hover::before {
+                opacity: 1;
+            }
+
+            .feature-icon {
+                font-size: 1.8rem;
+                margin-bottom: 1rem;
+                display: block;
+            }
+
+            .feature-card p {
+                font-size: 0.9rem;
+                line-height: 1.6;
+            }
+
+            /* ─── Section : Contexte historique ─────────── */
+            #history {
+                padding: 6rem 1.5rem;
+                background: var(--mud);
+            }
+
+            .history-intro {
+                margin-bottom: 3rem;
+            }
+            .history-intro .label {
+                display: block;
+                margin-bottom: 0.75rem;
+            }
+
+            .history-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .history-card {
+                padding: 1.5rem;
+                border-left: 2px solid var(--blood);
+            }
+
+            .history-date {
+                font-family: "Courier New", monospace;
+                font-size: 0.75rem;
+                color: var(--blood);
+                letter-spacing: 0.15em;
+                display: block;
+                margin-bottom: 0.4rem;
+            }
+
+            .history-card h3 {
+                color: var(--cream);
+                font-family: Georgia, serif;
+                text-transform: none;
+                letter-spacing: 0;
+                font-size: 1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .history-card p {
+                font-size: 0.88rem;
+            }
+
+            /* ─── CTA final ──────────────────────────────── */
+            #cta {
+                padding: 8rem 1.5rem;
+                text-align: center;
+                background: var(--trench);
+                position: relative;
+                overflow: hidden;
+            }
+
+            #cta::before {
+                content: "FIELDS OF FIRE";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: clamp(4rem, 12vw, 10rem);
+                font-weight: 900;
+                color: rgba(200, 151, 42, 0.04);
+                white-space: nowrap;
+                pointer-events: none;
+                font-family: Georgia, serif;
+                letter-spacing: 0.05em;
+            }
+
+            #cta .label {
+                display: block;
+                margin-bottom: 1.5rem;
+            }
+            #cta h2 {
+                font-size: clamp(1.8rem, 4vw, 2.8rem);
+                color: var(--cream);
+                margin-bottom: 1rem;
+            }
+            #cta p {
+                margin: 0 auto 2.5rem;
+                font-size: 1.05rem;
+            }
+
+            /* ─── Footer ─────────────────────────────────── */
+            footer {
+                padding: 2rem 1.5rem;
+                border-top: 1px solid var(--wire);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 1rem;
+                background: var(--trench);
+            }
+
+            footer p {
+                font-family: "Courier New", monospace;
+                font-size: 0.72rem;
+                letter-spacing: 0.1em;
+                color: var(--wire);
+                max-width: none;
+            }
+
+            footer a {
+                color: var(--khaki);
+                text-decoration: none;
+            }
+            footer a:hover {
+                color: var(--brass);
+            }
+
+            /* ─── Accessibilité & responsive ─────────────── */
+            @media (prefers-reduced-motion: reduce) {
+                *,
+                *::before,
+                *::after {
+                    transition: none !important;
+                    animation: none !important;
+                }
+            }
+
+            @media (max-width: 480px) {
+                nav {
+                    padding: 0.75rem 1rem;
+                }
+                #hero {
+                    padding: 0 1rem 4rem;
+                }
+            }
+
+            :focus-visible {
+                outline: 2px solid var(--brass);
+                outline-offset: 3px;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Navigation -->
+        <nav aria-label="Navigation principale">
+            <a href="/" class="nav-logo" aria-label="Fields of Fire – Accueil"
+                >Fields of Fire</a
+            >
+            <a href="/game.html" class="nav-cta">Jouer →</a>
+        </nav>
+
+        <!-- ── HERO ─────────────────────────────────────── -->
+        <section id="hero" aria-labelledby="hero-title">
+            <div class="container">
+                <div class="hero-eyebrow">
+                    <span class="label">Front occidental · 1914–1918</span>
+                </div>
+                <h1 id="hero-title">Fields<br />of Fire</h1>
+                <p class="hero-sub">
+                    Jeu de stratégie tour par tour multijoueur
+                </p>
+                <p class="hero-desc">
+                    Commandez vos troupes dans les tranchées de la Grande
+                    Guerre. Planifiez chaque offensive, gérez vos ressources et
+                    affrontez d'autres joueurs dans un wargame historique
+                    gratuit, jouable directement dans votre navigateur.
+                </p>
+                <div class="hero-actions">
+                    <a href="/game.html" class="btn-primary"
+                        >Rejoindre la bataille</a
+                    >
+                    <a href="#about" class="btn-ghost">En savoir plus</a>
+                </div>
+            </div>
+        </section>
+
+        <hr class="divider" />
+
+        <!-- ── À PROPOS ──────────────────────────────────── -->
+        <section id="about" aria-labelledby="about-title">
+            <div class="container">
+                <div class="about-grid">
+                    <div class="about-text">
+                        <span class="label">Le jeu</span>
+                        <h2 id="about-title">
+                            La guerre de position réinventée
+                        </h2>
+                        <p>
+                            Fields of Fire est un wargame tour par tour
+                            multijoueur librement inspiré des batailles du front
+                            occidental entre 1914 et 1918. Chaque décision
+                            compte : où positionner vos unités, quand lancer une
+                            offensive, comment tenir la ligne sous les
+                            bombardements adverses.
+                        </p>
+                        <p>
+                            Pas de twitch gaming — ici, la réflexion prime.
+                            Construisez votre stratégie entre deux tours,
+                            analysez la carte et anticipez les mouvements
+                            ennemis.
+                        </p>
+                    </div>
+                    <!-- Illustration carte tactique SVG -->
+                    <div
+                        class="map-mock"
+                        role="img"
+                        aria-label="Aperçu de la carte tactique du jeu"
+                    >
+                        <svg
+                            viewBox="0 0 320 240"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
+                        >
+                            <!-- Grille hexagonale stylisée -->
+                            <defs>
+                                <pattern
+                                    id="hex"
+                                    x="0"
+                                    y="0"
+                                    width="40"
+                                    height="46"
+                                    patternUnits="userSpaceOnUse"
+                                >
+                                    <polygon
+                                        points="20,2 38,12 38,34 20,44 2,34 2,12"
+                                        fill="none"
+                                        stroke="#4a3f2f"
+                                        stroke-width="0.8"
+                                    />
+                                </pattern>
+                            </defs>
+                            <rect width="320" height="240" fill="url(#hex)" />
+                            <!-- Ligne de front -->
+                            <path
+                                d="M 0,120 Q 80,100 160,125 Q 240,150 320,115"
+                                stroke="#8b1a1a"
+                                stroke-width="1.5"
+                                fill="none"
+                                stroke-dasharray="6,3"
+                            />
+                            <!-- Unités côté allié -->
+                            <rect
+                                x="40"
+                                y="85"
+                                width="18"
+                                height="18"
+                                fill="#2a4a2a"
+                                stroke="#4a7a4a"
+                                stroke-width="1"
+                            />
+                            <rect
+                                x="80"
+                                y="70"
+                                width="18"
+                                height="18"
+                                fill="#2a4a2a"
+                                stroke="#4a7a4a"
+                                stroke-width="1"
+                            />
+                            <rect
+                                x="60"
+                                y="105"
+                                width="18"
+                                height="18"
+                                fill="#2a4a2a"
+                                stroke="#4a7a4a"
+                                stroke-width="1"
+                            />
+                            <!-- Unités côté ennemi -->
+                            <rect
+                                x="200"
+                                y="130"
+                                width="18"
+                                height="18"
+                                fill="#4a1a1a"
+                                stroke="#8b3a3a"
+                                stroke-width="1"
+                            />
+                            <rect
+                                x="240"
+                                y="115"
+                                width="18"
+                                height="18"
+                                fill="#4a1a1a"
+                                stroke="#8b3a3a"
+                                stroke-width="1"
+                            />
+                            <rect
+                                x="220"
+                                y="148"
+                                width="18"
+                                height="18"
+                                fill="#4a1a1a"
+                                stroke="#8b3a3a"
+                                stroke-width="1"
+                            />
+                            <!-- Labels -->
+                            <text
+                                x="60"
+                                y="68"
+                                fill="#7a6a45"
+                                font-family="Courier New"
+                                font-size="7"
+                                text-anchor="middle"
+                            >
+                                ALLIÉ
+                            </text>
+                            <text
+                                x="230"
+                                y="165"
+                                fill="#7a6a45"
+                                font-family="Courier New"
+                                font-size="7"
+                                text-anchor="middle"
+                            >
+                                ENNEMI
+                            </text>
+                            <text
+                                x="160"
+                                y="175"
+                                fill="#8b1a1a"
+                                font-family="Courier New"
+                                font-size="6"
+                                text-anchor="middle"
+                            >
+                                LIGNE DE FRONT
+                            </text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="divider" />
+
+        <!-- ── MÉCANIQUES ────────────────────────────────── -->
+        <section id="features" aria-labelledby="features-title">
+            <div class="container">
+                <div class="features-header">
+                    <span class="label">Mécaniques de jeu</span>
+                    <h2 id="features-title">
+                        Ce qui vous attend dans les tranchées
+                    </h2>
+                </div>
+                <div class="features-grid">
+                    <article class="feature-card">
+                        <span class="feature-icon" aria-hidden="true">🗺️</span>
+                        <h3>Carte tactique</h3>
+                        <p>
+                            Un terrain divisé en zones stratégiques. Chaque
+                            position a son importance : collines, villages,
+                            nœuds de ravitaillement.
+                        </p>
+                    </article>
+                    <article class="feature-card">
+                        <span class="feature-icon" aria-hidden="true">⚔️</span>
+                        <h3>Tour par tour</h3>
+                        <p>
+                            Prenez le temps de réfléchir. Déplacez vos unités,
+                            choisissez vos cibles, validez votre tour et
+                            attendez la réponse adverse.
+                        </p>
+                    </article>
+                    <article class="feature-card">
+                        <span class="feature-icon" aria-hidden="true">🎖️</span>
+                        <h3>Multijoueur</h3>
+                        <p>
+                            Affrontez des joueurs réels. Chaque partie est une
+                            nouvelle campagne avec un adversaire humain
+                            imprévisible.
+                        </p>
+                    </article>
+                    <article class="feature-card">
+                        <span class="feature-icon" aria-hidden="true">🌐</span>
+                        <h3>Navigateur</h3>
+                        <p>
+                            Aucune installation. Fields of Fire se joue
+                            directement dans votre navigateur, sur PC ou mobile.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <hr class="divider" />
+
+        <!-- ── CONTEXTE HISTORIQUE ───────────────────────── -->
+        <section id="history" aria-labelledby="history-title">
+            <div class="container">
+                <div class="history-intro">
+                    <span class="label">Contexte historique</span>
+                    <h2 id="history-title">
+                        1914 – 1918 : la guerre des tranchées
+                    </h2>
+                    <p>
+                        Fields of Fire s'inspire des grandes batailles du front
+                        occidental. Un théâtre de guerre où chaque kilomètre de
+                        terrain coûtait des milliers de vies.
+                    </p>
+                </div>
+                <div class="history-grid">
+                    <article class="history-card">
+                        <span class="history-date">1914</span>
+                        <h3>La guerre de mouvement</h3>
+                        <p>
+                            Les premières semaines voient des armées manœuvrer à
+                            travers la Belgique et le nord de la France avant
+                            que le front ne se stabilise en une ligne continue
+                            de fortifications.
+                        </p>
+                    </article>
+                    <article class="history-card">
+                        <span class="history-date">1916</span>
+                        <h3>Verdun & la Somme</h3>
+                        <p>
+                            Les batailles les plus sanglantes de l'histoire :
+                            des mois d'affrontements pour des gains territoriaux
+                            mesurés en centaines de mètres. La guerre d'usure à
+                            son paroxysme.
+                        </p>
+                    </article>
+                    <article class="history-card">
+                        <span class="history-date">1917 – 1918</span>
+                        <h3>La guerre de rupture</h3>
+                        <p>
+                            Chars, gaz, artillerie de précision — les nouvelles
+                            armes transforment les tactiques. En 1918, la guerre
+                            de mouvement reprend jusqu'à l'armistice du 11
+                            novembre.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <hr class="divider" />
+
+        <!-- ── CTA FINAL ──────────────────────────────────── -->
+        <section id="cta" aria-labelledby="cta-title">
+            <div class="container">
+                <span class="label">Rejoindre la bataille</span>
+                <h2 id="cta-title">Votre campagne commence maintenant</h2>
+                <p>
+                    Gratuit. Aucune installation. Jouable depuis votre
+                    navigateur.
+                </p>
+                <a href="/game.html" class="btn-primary">Lancer le jeu</a>
+            </div>
+        </section>
+
+        <!-- ── FOOTER ─────────────────────────────────────── -->
+        <footer>
+            <p>
+                © 2024 Fields of Fire ·
+                <a href="mailto:contact@fields-of-fire.fr">Contact</a>
+            </p>
+            <p>
+                <a href="#hero">Accueil</a> &nbsp;·&nbsp;
+                <a href="#about">Le jeu</a> &nbsp;·&nbsp;
+                <a href="#features">Mécaniques</a> &nbsp;·&nbsp;
+                <a href="#history">Histoire</a>
+            </p>
+        </footer>
+    </body>
+</html>
