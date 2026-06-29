@@ -33,6 +33,7 @@ export class WallDisplayer extends FightSceneDisplayer {
     }
 
     private displayTiles() {
+        this.clean();
         for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
                 const tile = this.gameStore.game.plateau[x][y];
