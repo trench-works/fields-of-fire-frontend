@@ -2,6 +2,7 @@ import {
     BaseScene,
     Button,
     DisplayText,
+    i18n,
     ScaleMode,
     StartSceneConfig,
 } from "../../core";
@@ -21,6 +22,7 @@ export class MainMenu extends BaseScene {
         super(SceneAssetId.MENU, BackgroundAssetId.MAIN_MENU, {
             division: { vertical: 7, horizontal: 5 },
         });
+        i18n.load(navigator.language);
         const user = localStorage.getItem("user");
         if (user) {
             global.user = JSON.parse(user);
@@ -81,7 +83,7 @@ export class MainMenu extends BaseScene {
                     ScaleMode.CONSERVE,
                 ),
             {
-                text: "Jouer",
+                text: i18n.translate("mainMenu.play"),
                 image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
                 onClick: () => {
                     LobbyListScene.start(this);
@@ -104,7 +106,7 @@ export class MainMenu extends BaseScene {
                     ScaleMode.CONSERVE,
                 ),
             {
-                text: "Paramètres",
+                text: i18n.translate("mainMenu.settings"),
                 image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
                 onClick: () => {
                     console.log("Paramètres - À implémenter");
@@ -210,7 +212,7 @@ export class MainMenu extends BaseScene {
         this.logginButton.displayText(global.user ? "Disconnect" : "Login");
         this.registerButton.displayText(global.user?.username ?? "Register");
         this.registerButton.setIsActivated(!global.user);
-        this.playButton.setIsActivated(Boolean(global.user))
+        this.playButton.setIsActivated(Boolean(global.user));
     }
 }
 
