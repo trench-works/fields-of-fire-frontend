@@ -88,7 +88,7 @@ export class BaseScene<InitData = any> extends Scene {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 !(this.backgroundSound as any)?.["currentConfig"] //FIXME: ptn de magie noire pour détecter si l'objet musique est corrompu à la réception
             ) {
-                this.backgroundSound?.stop();
+                this.sound.stopAll();
                 this.backgroundSound?.destroy();
                 this.backgroundSound = this.sound.add(
                     MusicAsset.getAssetKey(id),
@@ -99,6 +99,7 @@ export class BaseScene<InitData = any> extends Scene {
                 );
             }
             if (!this.backgroundSound.isPlaying) {
+                this.sound.stopAll();
                 this.backgroundSound.play();
                 this.sound.unlock();
             }

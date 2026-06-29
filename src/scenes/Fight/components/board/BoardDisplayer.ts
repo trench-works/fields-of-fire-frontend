@@ -49,6 +49,17 @@ export class BoardDisplayer extends FightSceneDisplayer {
         return this;
     }
 
+    reset(): this {
+        this.destroy().render().update();
+        return this;
+    }
+
+    destroy(): this {
+        this.groundDisplayer.clean();
+        this.wallDisplayer.clean();
+        return this;
+    }
+
     async animate(): Promise<this> {
         return this;
     }
