@@ -22,7 +22,7 @@ export class MainMenu extends BaseScene {
         super(SceneAssetId.MENU, BackgroundAssetId.MAIN_MENU, {
             division: { vertical: 7, horizontal: 5 },
         });
-        i18n.load(navigator.language);
+        i18n.loadBase();
         const user = localStorage.getItem("user");
         if (user) {
             global.user = JSON.parse(user);
@@ -129,11 +129,13 @@ export class MainMenu extends BaseScene {
                     ScaleMode.FIT,
                 ),
             {
-                text: global.user?.username ?? "Register",
+                text:
+                    global.user?.username ??
+                    i18n.translate("mainMenu.register"),
                 image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
                 onClick: () => {
                     new PopupInput(this, {
-                        title: "S'enregistrer",
+                        title: i18n.translate("mainMenu.register"),
                         placeholder: "Entrez votre pseudo...",
                         onValidate: async (value: string) => {
                             await new UserRepository().register(value);
@@ -173,7 +175,9 @@ export class MainMenu extends BaseScene {
                     ScaleMode.FIT,
                 ),
             {
-                text: global.user ? "Disconnect" : "Login",
+                text: global.user
+                    ? i18n.translate("mainMenu.disconnect")
+                    : i18n.translate("mainMenu.login"),
                 image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
                 onClick: () => {
                     if (global.user) {
@@ -181,7 +185,7 @@ export class MainMenu extends BaseScene {
                         global.user = undefined;
                     } else {
                         new PopupInput(this, {
-                            title: "Connexion",
+                            title: i18n.translate("mainMenu.login"),
                             placeholder: "Entrez votre pseudo...",
                             onValidate: async (value: string) => {
                                 await new UserRepository().authenticate(value);
@@ -209,8 +213,14 @@ export class MainMenu extends BaseScene {
     }
 
     updateLoginButtons() {
-        this.logginButton.displayText(global.user ? "Disconnect" : "Login");
-        this.registerButton.displayText(global.user?.username ?? "Register");
+        this.logginButton.displayText(
+            global.user
+                ? i18n.translate("mainMenu.disconnect")
+                : i18n.translate("mainMenu.login"),
+        );
+        this.registerButton.displayText(
+            global.user?.username ?? i18n.translate("mainMenu.register"),
+        );
         this.registerButton.setIsActivated(!global.user);
         this.playButton.setIsActivated(Boolean(global.user));
     }

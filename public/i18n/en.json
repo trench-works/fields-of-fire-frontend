@@ -1,7 +1,10 @@
 {
     "mainMenu": {
         "play": "Play",
-        "settings": "Settings"
+        "settings": "Settings",
+        "login": "Login",
+        "register": "Register",
+        "disconnect": "Disconnect"
     }
 }
 
