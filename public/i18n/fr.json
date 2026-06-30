@@ -1,7 +1,10 @@
 {
     "mainMenu": {
         "play": "Jouer",
-        "settings": "Paramètres"
+        "settings": "Paramètres",
+        "login": "Se Connecter",
+        "register": "Créer un Compte",
+        "disconnect": "Se Déconnecter"
     }
 }
 

@@ -72,7 +72,7 @@ export type GameEndEvent = { boosts: Boost[]; playerWin: boolean };
 
 export type GameRenew = { data: Game };
 
-export type PlayerReady = { boostId: string };
+export type PlayerReady = { boostId: string | null };
 
 export class GamePlayerSocket
     extends Socket<GamePlayerKey, GamePlayerActions>
@@ -111,7 +111,7 @@ export class GamePlayerSocket
         return this.send(GamePlayerActions.FINISH_TURN);
     }
 
-    readyForNewGame(boostId: string) {
+    readyForNewGame(boostId: string | null) {
         console.log("rdyFrNewGame called");
         return this.send<PlayerReady>(GamePlayerActions.READY, { boostId });
     }

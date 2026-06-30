@@ -34,7 +34,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     protected selectedBoostCard?: DisplayContainer;
     protected boostCards: Map<string, DisplayContainer> = new Map();
 
-    protected boostId!: string;
+    protected boostId: string | null = null;
     protected boosts!: Boost[];
 
     protected root: DisplayRoot;
@@ -165,8 +165,11 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.root.setVisible(false);
         this.temporaryRoot.setVisible(false);
 
-        if(this.gameStore.game.isStopped){
-            this.show(this.gameStore.game.playerWin, this.playerStore.player.randomBoost)
+        if (this.gameStore.game.isStopped) {
+            this.show(
+                this.gameStore.game.playerWin,
+                this.playerStore.player.randomBoost,
+            );
         }
 
         return this;
@@ -357,14 +360,15 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.temporaryRoot.add(
             new DisplayImage(
                 this.scene,
-                entityListGrid.getArea({
-                    x: 3,
-                    y: 1,
-                    width: 1,
-                    height: 1,
-                    margin: { top: 10, bottom: -8, left: 0, right: 0 },
-                })
-                .scaleFromCenter(1,ScaleMode.FIT),
+                entityListGrid
+                    .getArea({
+                        x: 3,
+                        y: 1,
+                        width: 1,
+                        height: 1,
+                        margin: { top: 10, bottom: -8, left: 0, right: 0 },
+                    })
+                    .scaleFromCenter(1, ScaleMode.FIT),
             )
                 .setImage(BoostAsset.getAssetKey(boost.id))
                 .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3),
@@ -407,16 +411,17 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         let statLine: string;
         if (boost.id === "vampire") {
             statLine = "Vol de vie : +10%";
-        } else if(boost.id === "masochistic"){
-            statLine = "+20% de dommage, vous subisser lamoitier de ces dommages";
-        }else if (boost.id === "reaction") {
+        } else if (boost.id === "masochistic") {
+            statLine =
+                "+20% de dommage, vous subisser lamoitier de ces dommages";
+        } else if (boost.id === "reaction") {
             statLine = [
                 "life: +8",
                 "strength: +10",
                 "precision: +10",
                 "initiative: +15",
                 "esquive: +2",
-                "armor: +5"
+                "armor: +5",
             ].join("\n");
         } else {
             statLine = boost.boosts
