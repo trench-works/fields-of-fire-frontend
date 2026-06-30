@@ -137,9 +137,11 @@ export class MainMenu extends BaseScene {
                         placeholder: "Entrez votre pseudo...",
                         onValidate: async (value: string) => {
                             await new UserRepository().register(value);
+                            console.log("globo : ", global.user)
                             if (global.user) {
                                 this.playButton.alpha = 1;
                                 this.registerButton.setIsActivated(false);
+                                console.log("register globo : ", global.user.username)
                                 this.registerButton.displayText(
                                     global.user.username,
                                 );
@@ -185,12 +187,14 @@ export class MainMenu extends BaseScene {
                             placeholder: "Entrez votre pseudo...",
                             onValidate: async (value: string) => {
                                 await new UserRepository().authenticate(value);
+                                console.log(" authent globo : ", global.user)
                                 if (global.user) {
                                     this.playButton.alpha = 1;
                                     this.registerButton.setIsActivated(false);
                                     this.registerButton.displayText(
                                         global.user.username,
                                     );
+                                    console.log(" authent globo : ", global.user.username)
                                     localStorage.setItem(
                                         "user",
                                         JSON.stringify(global.user),
