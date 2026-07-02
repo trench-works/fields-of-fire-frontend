@@ -1,5 +1,7 @@
 import { Position } from "../Types";
 
+const ACCEPTANCE = 0.5;
+
 export function computeFov(
     origin: Position,
     isBlocking: (position: Position) => boolean,
@@ -121,10 +123,10 @@ function isSymmetric(row: Row, tile: Position): boolean {
 }
 
 function roundTiesUp(n: number): number {
-    return Math.floor(n + 0.5);
+    return Math.floor(n + ACCEPTANCE);
 }
 
 function roundTiesDown(n: number): number {
-    return Math.ceil(n - 0.5);
+    return Math.ceil(n - ACCEPTANCE);
 }
 
