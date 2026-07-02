@@ -22,6 +22,7 @@ export class Action {
 export enum ActionType {
     MELEE = "MELEE",
     RANGED = "RANGED",
+    OTHER = "OTHER",
 }
 
 export enum ActionZoneType {

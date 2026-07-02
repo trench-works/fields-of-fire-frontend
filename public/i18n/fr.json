@@ -18,6 +18,17 @@
                 "placeholder": "Entrez votre mot de passe..."
             }
         }
+    },
+    "fight": {
+        "actions": {
+            "cost": "Coût",
+            "range": "Portée",
+            "type": {
+                "ranged": "A Distance",
+                "melee": "Mêlée",
+                "other": "Autre"
+            }
+        }
     }
 }
 

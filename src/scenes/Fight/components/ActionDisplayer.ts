@@ -11,6 +11,7 @@ import {
     DisplayText,
     Depth,
     UI_LEVELS_OFFSET,
+    i18n,
 } from "../../../core";
 import { Action } from "../../../Model/Action";
 import { StatsUtils } from "../../../Model/Stats";
@@ -182,11 +183,34 @@ export class ActionDisplayer extends FightSceneDisplayer {
                     return button;
                 },
             );
-            const actionDesc = `coût: ${action.cost}\naction: ${action.actionType}\nportée: ${action.range}`;
+            const actionDesc: string[] = [];
+            if (action.cost) {
+                actionDesc.push(
+                    `${i18n.translate("fight.actions.cost")}: ${action.cost}`,
+                );
+                if (action.actionType) {
+                    actionDesc.push(
+                        i18n.translate(
+                            `fight.actions.type.${action.actionType.toLocaleLowerCase()}` as any,
+                        ),
+                    );
+                }
+                if (action.range) {
+                    if (action.range.min === action.range.max) {
+                        actionDesc.push(
+                            `${i18n.translate("fight.actions.range")}: ${action.range.min}`,
+                        );
+                    } else {
+                        actionDesc.push(
+                            `${i18n.translate("fight.actions.range")}: ${action.range.min}-${action.range.max}`,
+                        );
+                    }
+                }
+            }
             if (iconObj) {
                 this.scene.tooltip.attachTo(
                     iconObj,
-                    actionDesc ?? "",
+                    actionDesc.join("\n"),
                     action.name ?? action.id,
                 );
                 this.actionElements.set(action.id, iconObj);
