@@ -3,25 +3,23 @@ import { Authenticate } from "../interfaces/Authenticate";
 import { User } from "../interfaces/User";
 
 export class UserRepository {
-    async authenticate(username: string): Promise<void> {
+    async authenticate(username: string, password: string): Promise<void> {
         const user = await Http.post<User, never, Authenticate>(
             "/authenticate",
-            { body: { username } },
+            { body: { username, password } },
         );
         if (user) {
             global.user = user;
         }
     }
 
-    async register(username: string): Promise<void> {
-        const user = await Http.post<User, never, Authenticate>(
-            "/register",
-            { body: { username } },
-        );
-        console.log ("User created : ", user)
+    async register(username: string, password: string): Promise<void> {
+        const user = await Http.post<User, never, Authenticate>("/register", {
+            body: { username, password },
+        });
         if (user) {
             global.user = user;
-            console.log ("global user is then -> ", global.user )
+            console.log("global user is then -> ", global.user);
         }
     }
 }

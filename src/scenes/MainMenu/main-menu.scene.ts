@@ -136,14 +136,21 @@ export class MainMenu extends BaseScene {
                 onClick: () => {
                     new PopupInput(this, {
                         title: i18n.translate("mainMenu.register"),
-                        placeholder: "Entrez votre pseudo...",
-                        onValidate: async (value: string) => {
-                            await new UserRepository().register(value);
-                            console.log("globo : ", global.user)
+                        onValidate: async (
+                            username: string,
+                            password: string,
+                        ) => {
+                            await new UserRepository().register(
+                                username,
+                                password,
+                            );
                             if (global.user) {
                                 this.playButton.alpha = 1;
                                 this.registerButton.setIsActivated(false);
-                                console.log("register globo : ", global.user.username)
+                                console.log(
+                                    "register globo : ",
+                                    global.user.username,
+                                );
                                 this.registerButton.displayText(
                                     global.user.username,
                                 );
@@ -188,17 +195,24 @@ export class MainMenu extends BaseScene {
                     } else {
                         new PopupInput(this, {
                             title: i18n.translate("mainMenu.login"),
-                            placeholder: "Entrez votre pseudo...",
-                            onValidate: async (value: string) => {
-                                await new UserRepository().authenticate(value);
-                                console.log(" authent globo : ", global.user)
+                            onValidate: async (
+                                username: string,
+                                password: string,
+                            ) => {
+                                await new UserRepository().authenticate(
+                                    username,
+                                    password,
+                                );
                                 if (global.user) {
                                     this.playButton.alpha = 1;
                                     this.registerButton.setIsActivated(false);
                                     this.registerButton.displayText(
                                         global.user.username,
                                     );
-                                    console.log(" authent globo : ", global.user.username)
+                                    console.log(
+                                        " authent globo : ",
+                                        global.user.username,
+                                    );
                                     localStorage.setItem(
                                         "user",
                                         JSON.stringify(global.user),

@@ -1,18 +1,8 @@
 import { Scene } from "phaser";
-import { Position } from "../Types/Sizing";
 
 export type GameObjectProps = {
     //input: Input;
     scene: Scene;
-};
-
-export type Input = {
-    keyboard: {
-        on: (handler: (key: string) => void) => void;
-    };
-    mouse: {
-        onClick: (handler: (position: Position) => void) => void;
-    };
 };
 
 export abstract class GameObject {

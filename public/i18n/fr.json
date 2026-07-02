@@ -1,10 +1,23 @@
 {
+    "common": {
+        "validate": "Valider"
+    },
     "mainMenu": {
         "play": "Jouer",
         "settings": "Paramètres",
         "login": "Se Connecter",
         "register": "Créer un Compte",
-        "disconnect": "Se Déconnecter"
+        "disconnect": "Se Déconnecter",
+        "registerPopup": {
+            "username": {
+                "title": "Nom d'utilisateur",
+                "placeholder": "Entrez votre pseudo..."
+            },
+            "password": {
+                "title": "Mot de passe",
+                "placeholder": "Entrez votre mot de passe..."
+            }
+        }
     }
 }
 

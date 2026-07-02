@@ -4,34 +4,53 @@ import {
     Button,
     Depth,
     DisplayContainer,
+    i18n,
+    DisplayInput,
     UI_LEVELS_OFFSET,
+    DisplayText,
 } from "../../../core";
 
 interface PopupInputConfig {
     title: string;
-    placeholder?: string;
-    onValidate: (value: string) => Promise<boolean>;
+    onValidate: (username: string, password: string) => Promise<boolean>;
     onCancel?: () => void;
 }
 
 export class PopupInput {
     private overlay: Phaser.GameObjects.Rectangle;
+    private title: DisplayText;
     private container: DisplayContainer;
     private validateButton: Button;
-    private inputElement: HTMLInputElement;
+    private usernameInput: DisplayInput;
+    private passwordInput: DisplayInput;
+
+    private username: string = "";
+    private password: string = "";
 
     constructor(scene: BaseScene, config: PopupInputConfig) {
-        const { title, placeholder = "", onValidate, onCancel } = config;
-        const cx = scene.scale.width / 2;
-        const cy = scene.scale.height / 2;
-        const popupW = 400;
-        const popupH = 220;
+        const { title, onValidate, onCancel } = config;
+
+        const popupArea = scene.rootGrid.getArea({
+            x: 2.5,
+            y: 3,
+            width: 2,
+            height: 3,
+        });
+
+        const popupGrid = popupArea.getGrid({
+            division: {
+                vertical: 5,
+                horizontal: 5,
+            },
+            margin: 20,
+            padding: 5,
+        });
 
         // --- OVERLAY ---
         this.overlay = scene.add
             .rectangle(
-                cx,
-                cy,
+                scene.scale.width / 2,
+                scene.scale.height / 2,
                 scene.scale.width,
                 scene.scale.height,
                 0x000000,
@@ -45,25 +64,11 @@ export class PopupInput {
             });
 
         // --- CONTAINER ---
-        this.container = new DisplayContainer(
-            scene,
-            {
-                x: cx - 200,
-                y: cy - 110,
-                width: popupW,
-                height: popupH,
-            },
-            {
-                title,
-                borderWidth: 2,
-                opacity: 0.95,
-                fontSize: 30,
-            },
-        );
-        this.container.setDepth(
-            Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1,
-        );
-        this.container
+        this.container = new DisplayContainer(scene, popupArea, {
+            borderWidth: 2,
+            opacity: 0.95,
+            fontSize: 30,
+        })
             .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1)
             .setInteractive()
             .on(
@@ -77,54 +82,56 @@ export class PopupInput {
                     event.stopPropagation();
                 },
             );
+        this.title = new DisplayText(
+            scene,
+            popupGrid.getArea({ x: 2, y: 1, width: 3 }),
+        )
+            .setText(title)
+            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2);
 
         // --- INPUT HTML ---
-        this.inputElement = document.createElement("input");
-        this.inputElement.type = "text";
-        this.inputElement.placeholder = placeholder;
-        Object.assign(this.inputElement.style, {
-            position: "absolute",
-            left: `${cx - 150}px`,
-            top: `${cy - 20}px`,
-            width: "300px",
-            height: "36px",
-            fontSize: "16px",
-            padding: "0 10px",
-            borderRadius: "6px",
-            border: "1px solid #555",
-            background: "#1a1a2e",
-            color: "#ffffff",
-            outline: "none",
-            zIndex: "100",
+        this.usernameInput = new DisplayInput({
+            onChange: (value) => {
+                this.username = value;
+            },
+            area: popupGrid.getArea({ x: 2, y: 3, width: 3 }),
+            depth: Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2,
+            placeholder: i18n.translate(
+                "mainMenu.registerPopup.username.placeholder",
+            ),
+        }).focus();
+        this.passwordInput = new DisplayInput({
+            onChange: (value) => {
+                this.password = value;
+            },
+            onEnter: () => {
+                onValidate(this.username, this.password).then((retour) => {
+                    if (retour) {
+                        this.destroy();
+                    }
+                });
+            },
+            area: popupGrid.getArea({ x: 2, y: 4, width: 3 }),
+            depth: Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2,
+            placeholder: i18n.translate(
+                "mainMenu.registerPopup.password.placeholder",
+            ),
         });
-        document.body.appendChild(this.inputElement);
-        this.inputElement.focus();
-
         // --- BOUTON VALIDER (positionné dans le container) ---
         this.validateButton = new Button(
             scene,
+            popupGrid.getArea({ x: 2, y: 5, width: 3 }),
             {
-                x: cx - 80,
-                y: cy + 70 - 20,
-                width: 160,
-                height: 40,
-            },
-            {
-                text: "Valider",
+                text: i18n.translate("common.validate"),
                 onClick: () => {
-                    onValidate(this.inputElement.value).then((retour) => {
+                    onValidate(this.username, this.password).then((retour) => {
                         if (retour) {
                             this.destroy();
                         }
                     });
                 },
             },
-        );
-        this.validateButton.setDepth(
-            Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2,
-        );
-
-        this.validateButton
+        )
             .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2)
             .setInteractive()
             .on(
@@ -138,19 +145,13 @@ export class PopupInput {
                     event.stopPropagation();
                 },
             );
-
-        // --- ENTER pour valider ---
-        this.inputElement.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                onValidate(this.inputElement.value);
-                this.destroy();
-            }
-        });
     }
 
     public destroy() {
-        this.inputElement.remove();
+        this.usernameInput.destroy();
+        this.passwordInput.destroy();
         this.overlay.destroy();
+        this.title.destroy();
         this.container.destroy();
         this.validateButton.destroy(); // ← nettoyage du bouton
     }

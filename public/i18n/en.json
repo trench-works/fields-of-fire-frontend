@@ -1,10 +1,23 @@
 {
+    "common": {
+        "validate": "Validate"
+    },
     "mainMenu": {
         "play": "Play",
         "settings": "Settings",
         "login": "Login",
         "register": "Register",
-        "disconnect": "Disconnect"
+        "disconnect": "Disconnect",
+        "registerPopup": {
+            "username": {
+                "title": "Username",
+                "placeholder": "username..."
+            },
+            "password": {
+                "title": "Password",
+                "placeholder": "password..."
+            }
+        }
     }
 }
 
