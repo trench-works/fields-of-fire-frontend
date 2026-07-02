@@ -19,6 +19,7 @@ export class UserRepository {
         });
         if (user) {
             global.user = user;
+            console.log("global user is then -> ", global.user);
         }
     }
 }

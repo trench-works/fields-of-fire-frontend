@@ -147,6 +147,10 @@ export class MainMenu extends BaseScene {
                             if (global.user) {
                                 this.playButton.alpha = 1;
                                 this.registerButton.setIsActivated(false);
+                                console.log(
+                                    "register globo : ",
+                                    global.user.username,
+                                );
                                 this.registerButton.displayText(
                                     global.user.username,
                                 );
@@ -203,6 +207,10 @@ export class MainMenu extends BaseScene {
                                     this.playButton.alpha = 1;
                                     this.registerButton.setIsActivated(false);
                                     this.registerButton.displayText(
+                                        global.user.username,
+                                    );
+                                    console.log(
+                                        " authent globo : ",
                                         global.user.username,
                                     );
                                     localStorage.setItem(
