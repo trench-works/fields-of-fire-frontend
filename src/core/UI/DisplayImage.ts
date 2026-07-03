@@ -61,5 +61,15 @@ export class DisplayImage implements Displayable {
     getObject(): Phaser.GameObjects.GameObject {
         return this.image;
     }
+
+    setTint(color: number): this {
+        this.image.setTint(color);
+        return this;
+    }
+
+    clearTint(): this {
+        this.image.clearTint();
+        return this;
+    }
 }
 

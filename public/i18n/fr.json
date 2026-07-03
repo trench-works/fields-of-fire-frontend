@@ -29,6 +29,16 @@
                 "other": "Autre"
             }
         }
+    },
+    "parameter": {
+        "parameter": "Paramètres",
+        "return": "Retour",
+        "languageTitle": "Selection de la Langue",
+        "soundTitle": "Paramètres Sonores",
+        "sound": {
+            "music": "Musique",
+            "effects": "Effets Sonores"
+        }
     }
 }
 

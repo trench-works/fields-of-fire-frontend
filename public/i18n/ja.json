@@ -1,7 +1,17 @@
 {
     "mainMenu": {
-        "play": "遊ぶ",
+        "play": "プレイ",
         "settings": "設定"
+    },
+    "parameter": {
+        "parameter": "設定",
+        "return": "戻る",
+        "languageTitle": "言語設定",
+        "soundTitle": "サウンド設定",
+        "sound": {
+            "music": "音楽",
+            "effects": "効果音"
+        }
     }
 }
 

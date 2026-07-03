@@ -36,6 +36,11 @@ export async function load(language: string): Promise<void> {
     );
 }
 
+export function getCurrentLanguage(): string {
+    const language = localStorage.getItem("language");
+    return language ?? "fr";
+}
+
 export function translate(key: TranslationKey, language?: string): string {
     language ??= localStorage.getItem("language") ?? undefined;
     let tradFile = localStorage.getItem(`i18n-${language ?? DEFAULT_LANGUAGE}`);

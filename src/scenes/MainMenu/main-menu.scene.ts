@@ -12,6 +12,7 @@ import { PopupInput } from "./objects/LoginPopup";
 import { UserRepository } from "./repositories/user.repository";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { MiscAsset, MiscAssetId, MusicAsset, MusicAssetId } from "../../assets";
+import { ParameterScene } from "../Parameter/parameter.scene";
 
 export class MainMenu extends BaseScene {
     private playButton!: Button;
@@ -110,6 +111,7 @@ export class MainMenu extends BaseScene {
                 image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
                 onClick: () => {
                     console.log("Paramètres - À implémenter");
+                    ParameterScene.start(this);
                 },
             },
         );
