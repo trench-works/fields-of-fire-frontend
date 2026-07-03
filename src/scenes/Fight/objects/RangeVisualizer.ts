@@ -1,6 +1,6 @@
 import { Depth, GRID_LEVELS_OFFSET, Position } from "../../../core";
 import { applyFovToRange } from "../../../Model";
-import { Action, ActionZoneType } from "../../../Model/Action";
+import { Action, ActionLevel, ActionZoneType } from "../../../Model/Action";
 import { Cell, FightScene } from "../fight.scene";
 import { GameStore } from "../stores/GameStore";
 
@@ -172,8 +172,12 @@ export class RangeVisualizer {
                 }
             }
         }
-        this.cellsInRange = applyFovToRange(start, result, board);
 
+        if (action.level === ActionLevel.GROUND) {
+            this.cellsInRange = applyFovToRange(start, result, board);
+            return this;
+        }
+        this.cellsInRange = result;
         return this;
     }
 
