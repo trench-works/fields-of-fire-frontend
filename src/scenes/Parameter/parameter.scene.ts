@@ -200,7 +200,7 @@ export class ParameterScene extends BaseScene {
             {
                 text: title,
                 onClick: () => {
-                    i18n.load(lang);
+                    i18n.changeLanguage(lang);
                     this.currentLanguage = lang;
                     this.updateLanguageButtons();
                 },

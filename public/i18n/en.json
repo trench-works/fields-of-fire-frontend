@@ -29,6 +29,16 @@
                 "other": "Other"
             }
         }
+    },
+    "parameter": {
+        "parameter": "Parameters",
+        "return": "Return",
+        "languageTitle": "Language Selection",
+        "soundTitle": "Sound Settings",
+        "sound": {
+            "music": "Music",
+            "effects": "Sound Effects"
+        }
     }
 }
 
