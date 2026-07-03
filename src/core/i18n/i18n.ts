@@ -19,11 +19,15 @@ export function loadBase() {
         load(preferredLanguage);
     } else {
         const simplifiedNavigatorLanguage = navigator.language.split("-")[0];
-        localStorage.setItem("language", simplifiedNavigatorLanguage);
+        changeLanguage(simplifiedNavigatorLanguage);
         if (simplifiedNavigatorLanguage !== DEFAULT_LANGUAGE) {
             load(simplifiedNavigatorLanguage);
         }
     }
+}
+
+export function changeLanguage(language: string): void {
+    localStorage.setItem("language", language);
 }
 
 export async function load(language: string): Promise<void> {
