@@ -70,14 +70,14 @@ interface Translation {
 }
 
 function getSubElement(keys: string[], obj: Translation): string | null {
-    if (typeof obj === "string") {
+    if (!obj || typeof obj === "string") {
         return null;
     }
     if (keys.length === 1) {
         return obj[keys[0]] ? String(obj[keys[0]]) : null;
     } else {
         const subObj = obj[keys[0]];
-        if (typeof subObj === "string") {
+        if (!subObj || typeof subObj === "string") {
             return null;
         }
         keys.shift();
