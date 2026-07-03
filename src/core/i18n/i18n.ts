@@ -42,7 +42,7 @@ export async function load(language: string): Promise<void> {
 
 export function getCurrentLanguage(): string {
     const language = localStorage.getItem("language");
-    return language ?? "fr";
+    return language ?? DEFAULT_LANGUAGE;
 }
 
 export function translate(key: TranslationKey, language?: string): string {
