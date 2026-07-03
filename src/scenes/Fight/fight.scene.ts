@@ -402,6 +402,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
                 console.log("Options - À implémenter");
             },
             onMainMenuClick: () => {
+                this.playerSocket.disconnect();
                 MainMenu.start(this, { keepMusic: false });
             },
         });
