@@ -300,6 +300,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 console.log("Options - À implémenter");
             },
             onMainMenuClick: () => {
+                this.lobbySocket.leaveLobby();
                 MainMenu.start(this);
             },
         });
@@ -364,7 +365,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             this.settingsRoot.add(
                 new DisplayContainer(this, rowGrid.getArea({ x: 1, y: 1 }), {
                     backgroundImage: CharacterCloseupAsset.getAssetKey(
-                        player.classId as CharacterAssetId,
+                        player.classId,
                     ),
                     borderWidth: 2,
                 }),

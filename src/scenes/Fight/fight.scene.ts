@@ -6,6 +6,7 @@ import {
     BaseSceneInit,
     SoundEffect,
     Timeout,
+    KeyBindUtils,
 } from "../../core";
 import { SceneConfig } from "../../config/SceneConfig";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
@@ -53,6 +54,7 @@ import { Toaster } from "./components/Toaster";
 import { ParticleDisplayer } from "./components/Particle/ParticleDisplayer";
 import { BoostAsset } from "../../assets/BoostAsset";
 import { ConnectionLoader } from "../../core/Objects/Loader";
+import { KeyBinds } from "../../core/keybinds/keybinds";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -124,9 +126,12 @@ export class FightScene extends BaseScene<FightSceneInit> {
     public gridPositions: Cell[][] = [];
     public scaleFactor: number = 1;
     public particleDisplayer: ParticleDisplayer = new ParticleDisplayer(this);
+    public keyBinds: KeyBinds;
 
     constructor() {
         super(SceneAssetId.FIGHT, BackgroundAssetId.FIGHT);
+
+        this.keyBinds = KeyBindUtils.getKeyBinds();
 
         /**
          * Stores
@@ -402,6 +407,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
                 console.log("Options - À implémenter");
             },
             onMainMenuClick: () => {
+                this.playerSocket.disconnect();
                 MainMenu.start(this, { keepMusic: false });
             },
         });
