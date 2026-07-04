@@ -246,17 +246,16 @@ export class ActionDisplayer extends FightSceneDisplayer {
                 },
             );
             const actionDesc: string[] = [];
+
+            if (action.actionType) {
+                actionDesc.push(
+                    i18n.translate(`fight.actions.type.${action.actionType}`),
+                );
+            }
             if (action.cost) {
                 actionDesc.push(
                     `${i18n.translate("fight.actions.cost")}: ${action.cost}`,
                 );
-                if (action.actionType) {
-                    actionDesc.push(
-                        i18n.translate(
-                            `fight.actions.type.${action.actionType.toLocaleLowerCase()}` as any,
-                        ),
-                    );
-                }
                 if (action.range) {
                     if (action.range.min === action.range.max) {
                         actionDesc.push(
