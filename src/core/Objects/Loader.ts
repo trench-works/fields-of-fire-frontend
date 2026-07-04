@@ -1,3 +1,4 @@
+import { i18n } from "../i18n";
 import { DisplayContainer, DisplayRoot, DisplayText } from "../UI";
 import { Depth, Grid, UI_LEVELS_OFFSET } from "../Utils";
 import { BaseScene } from "./BaseScene";
@@ -64,7 +65,8 @@ export class AssetLoader extends Loader {
     constructor(scene: BaseScene) {
         super(
             scene,
-            (progress) => `Loading Assets ... : ${progress}%`,
+            (progress) =>
+                `${i18n.translate("loader.assets")} ... : ${progress}%`,
             UI_LEVELS_OFFSET.LOADER_2,
         );
         this.watch();
@@ -97,7 +99,8 @@ export class ConnectionLoader extends Loader {
     ) {
         super(
             scene,
-            (progress) => `Waiting for players to connect ... : ${progress}%`,
+            (progress) =>
+                `${i18n.translate("loader.connect")} ... : ${progress}%`,
             UI_LEVELS_OFFSET.LOADER_1,
         );
         this.watch();

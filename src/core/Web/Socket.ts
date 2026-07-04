@@ -28,16 +28,16 @@ export class Socket<
     }
 
     protected open(key: RessourceKey) {
-        this.userId = global.user?.id;
+        this.userId = globalThis.user?.id;
         this.key = key;
         this.createSocket();
     }
 
     private createSocket() {
-        const port = Number(global.config.server.port);
+        const port = Number(globalThis.config.server.port);
         const portStr = port === 443 || port === 80 ? "" : `:${port}`;
         this.socket = new WebSocket(
-            `${global.config.server.protocols.ws}://${global.config.server.url}${portStr}${global.config.server.socketBasePath}/${this.topic}`,
+            `${globalThis.config.server.protocols.ws}://${globalThis.config.server.url}${portStr}${globalThis.config.server.socketBasePath}/${this.topic}`,
         );
         this.socket.addEventListener("open", this.handleOpen.bind(this));
         this.socket.addEventListener("message", this.handleMessage.bind(this));

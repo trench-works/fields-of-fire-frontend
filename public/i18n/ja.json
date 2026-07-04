@@ -1,7 +1,44 @@
 {
+    "common": {
+        "validate": "検証"
+    },
     "mainMenu": {
-        "play": "遊ぶ",
-        "settings": "設定"
+        "play": "プレイ",
+        "settings": "設定",
+        "login": "ログイン",
+        "register": "登録",
+        "disconnect": "切断",
+        "registerPopup": {
+            "username": {
+                "title": "ユーザー名",
+                "placeholder": "ユーザー名..."
+            },
+            "password": {
+                "title": "パスワード",
+                "placeholder": "パスワード..."
+            }
+        }
+    },
+    "fight": {
+        "actions": {
+            "cost": "コスト",
+            "range": "射程",
+            "type": {
+                "RANGED": "遠距離",
+                "MELEE": "近接",
+                "OTHER": "その他"
+            }
+        }
+    },
+    "parameter": {
+        "parameter": "設定",
+        "return": "戻る",
+        "languageTitle": "言語設定",
+        "soundTitle": "サウンド設定",
+        "sound": {
+            "music": "音楽",
+            "effects": "効果音"
+        }
     }
 }
 

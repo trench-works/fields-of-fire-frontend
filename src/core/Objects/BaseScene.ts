@@ -4,11 +4,13 @@ import {
     BackgroundAsset,
     BackgroundAssetId,
 } from "../../assets/BackgroundAsset";
-import { Grid } from "../Utils";
+import { Grid, SoundLevel } from "../Utils";
 import { TwoAxis } from "../Types";
 import { MusicAsset, MusicAssetId } from "../../assets";
 import { Sound } from "../Types/Sound";
 import { AssetLoader } from "./Loader";
+import { i18n } from "../i18n";
+import { SoundParam } from "../Utils/SoundLevel";
 
 export type BaseSceneInit<InitData = never> = {
     data: InitData;
@@ -36,6 +38,7 @@ export class BaseScene<InitData = any> extends Scene {
         rootGridOptions?: { division: TwoAxis },
     ) {
         super({ key });
+        i18n.loadBase();
         this.isOpen = false;
         this.rootGrid = new Grid(rootGridOptions);
         this.startConfig = {};
@@ -94,10 +97,16 @@ export class BaseScene<InitData = any> extends Scene {
                     MusicAsset.getAssetKey(id),
                 );
                 this.backgroundSound.setLoop(true);
+                console.log("VOLUME ", this.backgroundSound.volume);
                 this.backgroundSound.setVolume(
-                    0.4 * MusicAsset.getBaseSoundLevel(id),
+                    SoundLevel.get(SoundParam.BACKGROUND),
                 );
             }
+            console.log(
+                "Play background music: ",
+                id,
+                this.backgroundSound.volume,
+            );
             if (!this.backgroundSound.isPlaying) {
                 this.sound.stopAll();
                 this.backgroundSound.play();

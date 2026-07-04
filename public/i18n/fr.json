@@ -2,6 +2,16 @@
     "common": {
         "validate": "Valider"
     },
+    "loader": {
+        "assets": "Chargements des assets",
+        "connect": "En attente des joueurs"
+    },
+    "menuPanel": {
+        "title": "Menu",
+        "back": "Reprendre",
+        "options": "Options",
+        "mainMenu": "Retour au Menu"
+    },
     "mainMenu": {
         "play": "Jouer",
         "settings": "Paramètres",
@@ -24,10 +34,22 @@
             "cost": "Coût",
             "range": "Portée",
             "type": {
-                "ranged": "A Distance",
-                "melee": "Mêlée",
-                "other": "Autre"
-            }
+                "RANGED": "A Distance",
+                "MOUVEMENT": "Déplacement",
+                "MELEE": "Mêlée",
+                "OTHER": "Autre"
+            },
+            "endTurn": "Fin du tour"
+        }
+    },
+    "parameter": {
+        "parameter": "Paramètres",
+        "return": "Retour",
+        "languageTitle": "Selection de la Langue",
+        "soundTitle": "Paramètres Sonores",
+        "sound": {
+            "music": "Musique",
+            "effects": "Effets Sonores"
         }
     }
 }

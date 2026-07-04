@@ -1,6 +1,12 @@
-const DEFAULT_LANGUAGE = "en";
+const DEFAULT_LANGUAGE = "fr";
 
-import translations from "../../../public/i18n/en.json";
+import translations from "../../../public/i18n/fr.json";
+
+import languages from "./index.json";
+
+type StringRecord = { [key: string]: string };
+
+export const AvailableLanguages: StringRecord = languages.languages;
 
 type NestedKeyOf<T> = T extends object
     ? {
@@ -10,7 +16,7 @@ type NestedKeyOf<T> = T extends object
       }[keyof T & (string | number)]
     : never;
 
-type TranslationKey = NestedKeyOf<typeof translations>;
+export type TranslationKey = NestedKeyOf<typeof translations>;
 
 export function loadBase() {
     load(DEFAULT_LANGUAGE);
@@ -27,10 +33,17 @@ export function loadBase() {
 }
 
 export function changeLanguage(language: string): void {
+    if (!AvailableLanguages[language]) {
+        load(DEFAULT_LANGUAGE);
+        language = DEFAULT_LANGUAGE;
+    }
     localStorage.setItem("language", language);
 }
 
 export async function load(language: string): Promise<void> {
+    if (!AvailableLanguages[language]) {
+        language = DEFAULT_LANGUAGE;
+    }
     const tradResponse = await fetch(
         `${window.location.href}i18n/${language}.json`,
     );
@@ -38,6 +51,11 @@ export async function load(language: string): Promise<void> {
         `i18n-${language}`,
         JSON.stringify(await tradResponse.json()),
     );
+}
+
+export function getCurrentLanguage(): string {
+    const language = localStorage.getItem("language");
+    return language ?? DEFAULT_LANGUAGE;
 }
 
 export function translate(key: TranslationKey, language?: string): string {

@@ -24,10 +24,20 @@
             "cost": "Cost",
             "range": "Range",
             "type": {
-                "ranged": "Ranged",
-                "melee": "Melee",
-                "other": "Other"
+                "RANGED": "Ranged",
+                "MELEE": "Melee",
+                "OTHER": "Other"
             }
+        }
+    },
+    "parameter": {
+        "parameter": "Parameters",
+        "return": "Return",
+        "languageTitle": "Language Selection",
+        "soundTitle": "Sound Settings",
+        "sound": {
+            "music": "Music",
+            "effects": "Sound Effects"
         }
     }
 }

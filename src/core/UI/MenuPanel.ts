@@ -3,6 +3,7 @@ import { Button } from "./Button";
 import { Color } from "../../config/ColorConfig";
 import { BaseScene } from "../Objects";
 import { Depth, UI_LEVELS_OFFSET } from "../Utils";
+import { i18n } from "../i18n";
 
 interface MenuPanelConfig {
     onResumeClick?: () => void;
@@ -21,50 +22,49 @@ export class MenuPanel extends Phaser.GameObjects.Container {
         this.setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP));
 
         // Créer un overlay semi-transparent qui capture TOUS les clics
-        this.overlay = scene.add.rectangle(
-            scene.scale.width / 2,
-            scene.scale.height / 2,
-            scene.scale.width * 2,
-            scene.scale.height * 2,
-            0x000000,
-            0.7,
-        );
-        this.overlay.setInteractive();
-        this.overlay.setScrollFactor(0);
-        this.overlay.setDepth(
-            Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1,
-        );
+        this.overlay = scene.add
+            .rectangle(
+                scene.scale.width / 2,
+                scene.scale.height / 2,
+                scene.scale.width * 2,
+                scene.scale.height * 2,
+                0x000000,
+                0.7,
+            )
+            .setInteractive()
+            .setScrollFactor(0)
+            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1);
         this.add(this.overlay);
 
         // Créer le panneau du menu
-        this.panel = scene.add.rectangle(
-            scene.scale.width / 2,
-            scene.scale.height / 2,
-            600,
-            500,
-            Phaser.Display.Color.HexStringToColor(Color.containerBg).color,
-        );
-        this.panel.setScrollFactor(0);
-        this.panel.setDepth(
-            Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2,
-        );
-        this.panel.setStrokeStyle(3, 0xffffff);
+        this.panel = scene.add
+            .rectangle(
+                scene.scale.width / 2,
+                scene.scale.height / 2,
+                600,
+                500,
+                Phaser.Display.Color.HexStringToColor(Color.containerBg).color,
+            )
+            .setScrollFactor(0)
+            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2)
+            .setStrokeStyle(3, 0xffffff);
         this.add(this.panel);
 
         // Titre du menu
-        const titleText = scene.add.text(
-            scene.scale.width / 2,
-            scene.scale.height / 2 - 180,
-            "MENU",
-            {
-                fontFamily: "MyFont",
-                fontSize: "60px",
-                color: "#FFFFFF",
-            },
-        );
-        titleText.setOrigin(0.5);
-        titleText.setScrollFactor(0);
-        titleText.setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3);
+        const titleText = scene.add
+            .text(
+                scene.scale.width / 2,
+                scene.scale.height / 2 - 180,
+                i18n.translate("menuPanel.title"),
+                {
+                    fontFamily: "MyFont",
+                    fontSize: "60px",
+                    color: "#FFFFFF",
+                },
+            )
+            .setOrigin(0.5)
+            .setScrollFactor(0)
+            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3);
         this.add(titleText);
 
         // Bouton Reprendre
@@ -77,20 +77,16 @@ export class MenuPanel extends Phaser.GameObjects.Container {
                 height: 50,
             },
             {
-                text: "Reprendre",
+                text: i18n.translate("menuPanel.back"),
                 fontSize: 24,
                 onClick: () => {
                     this.hide();
-                    if (config.onResumeClick) {
-                        config.onResumeClick();
-                    }
+                    config.onResumeClick?.();
                 },
             },
-        );
-        resumeButton.setDepth(
-            Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3,
-        );
-        resumeButton.setScrollFactor(0);
+        )
+            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3)
+            .setScrollFactor(0);
         this.add(resumeButton);
 
         // Bouton Paramètres
@@ -103,20 +99,16 @@ export class MenuPanel extends Phaser.GameObjects.Container {
                 height: 50,
             },
             {
-                text: "Options",
+                text: i18n.translate("menuPanel.options"),
                 fontSize: 24,
                 onClick: () => {
                     this.hide();
-                    if (config.onSettingsClick) {
-                        config.onSettingsClick();
-                    }
+                    config.onSettingsClick?.();
                 },
             },
-        );
-        settingsButton.setDepth(
-            Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3,
-        );
-        settingsButton.setScrollFactor(0);
+        )
+            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3)
+            .setScrollFactor(0);
         this.add(settingsButton);
 
         // Bouton Retour au Menu Principal
@@ -129,20 +121,16 @@ export class MenuPanel extends Phaser.GameObjects.Container {
                 height: 50,
             },
             {
-                text: "Retour au Menu",
+                text: i18n.translate("menuPanel.mainMenu"),
                 fontSize: 24,
                 onClick: () => {
                     this.hide();
-                    if (config.onMainMenuClick) {
-                        config.onMainMenuClick();
-                    }
+                    config.onMainMenuClick?.();
                 },
             },
-        );
-        mainMenuButton.setDepth(
-            Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3,
-        );
-        mainMenuButton.setScrollFactor(0);
+        )
+            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3)
+            .setScrollFactor(0);
         this.add(mainMenuButton);
 
         // Masquer le panneau par défaut

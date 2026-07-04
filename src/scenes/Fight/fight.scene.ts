@@ -7,6 +7,7 @@ import {
     SoundEffect,
     Timeout,
     KeyBindUtils,
+    SoundLevel,
 } from "../../core";
 import { SceneConfig } from "../../config/SceneConfig";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
@@ -55,6 +56,7 @@ import { ParticleDisplayer } from "./components/Particle/ParticleDisplayer";
 import { BoostAsset } from "../../assets/BoostAsset";
 import { ConnectionLoader } from "../../core/Objects/Loader";
 import { KeyBinds } from "../../core/keybinds/keybinds";
+import { SoundParam } from "../../core/Utils/SoundLevel";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -377,6 +379,10 @@ export class FightScene extends BaseScene<FightSceneInit> {
 
     create() {
         super.create();
+        console.log(
+            "musicSound - FIGHT : ",
+            SoundLevel.get(SoundParam.BACKGROUND),
+        );
         this.playBackgroundMusic(MusicAssetId.FIGHT);
         this.tooltip = Tooltip.getInstance(this, {
             textColor: "#000000",

@@ -9,7 +9,7 @@ export class UserRepository {
             { body: { username, password } },
         );
         if (user) {
-            global.user = user;
+            globalThis.user = user;
         }
     }
 
@@ -18,8 +18,8 @@ export class UserRepository {
             body: { username, password },
         });
         if (user) {
-            global.user = user;
-            console.log("global user is then -> ", global.user);
+            globalThis.user = user;
+            console.log("global user is then -> ", globalThis.user);
         }
     }
 }

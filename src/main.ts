@@ -4,6 +4,7 @@ import { FightScene } from "./scenes/Fight/fight.scene";
 import { LobbyScene } from "./scenes/Lobby/lobby.scene";
 import { App } from "./config/AppConfig";
 import { LobbyListScene } from "./scenes/LobbyList/lobby-list.scene";
+import { ParameterScene } from "./scenes/Parameter/parameter.scene";
 
 //  Find out more information about the Game Config at: https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
 
@@ -15,6 +16,8 @@ declare global {
               username: string;
           }
         | undefined;
+    var effectsVolume: number;
+    var musicVolume: number;   
 }
 
 export default new Game({
@@ -29,6 +32,6 @@ export default new Game({
         default: "arcade",
         arcade: { debug: false },
     },
-    scene: [MainMenu, LobbyListScene, LobbyScene, FightScene],
+    scene: [MainMenu, LobbyListScene, LobbyScene, FightScene, ParameterScene],
 });
 
