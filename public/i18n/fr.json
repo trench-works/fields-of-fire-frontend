@@ -34,10 +34,10 @@
             "cost": "Coût",
             "range": "Portée",
             "type": {
-                "ranged": "A Distance",
-                "mouvement": "Déplacement",
-                "melee": "Mêlée",
-                "other": "Autre"
+                "RANGED": "A Distance",
+                "MOUVEMENT": "Déplacement",
+                "MELEE": "Mêlée",
+                "OTHER": "Autre"
             },
             "endTurn": "Fin du tour"
         }

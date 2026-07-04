@@ -24,9 +24,9 @@
             "cost": "コスト",
             "range": "射程",
             "type": {
-                "ranged": "遠距離",
-                "melee": "近接",
-                "other": "その他"
+                "RANGED": "遠距離",
+                "MELEE": "近接",
+                "OTHER": "その他"
             }
         }
     },
