@@ -41,6 +41,9 @@
                 "OTHER": "Autre"
             },
             "endTurn": "Fin du tour"
+        },
+        "effects": {
+            "duration": "durée"
         }
     },
     "parameter": {

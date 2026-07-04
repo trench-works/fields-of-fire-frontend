@@ -11,6 +11,7 @@ import {
     DisplayText,
     GridArea,
     ScaleMode,
+    i18n,
 } from "../../../core";
 import { DisplayImage } from "../../../core/UI/DisplayImage";
 import { CharacterClass } from "../../../Model/CharacterClass";
@@ -366,7 +367,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                         ),
                     );
                     if (Object.keys(modified).length === 0) {
-                        return `${effect.author ? effect.author + ", " : ""}durée : ${effect.duration ?? "∞"}`;
+                        return `${effect.author ? effect.author + ", " : ""}${i18n.translate("fight.effects.duration")} : ${effect.duration ?? "∞"}`;
                     }
                     const modifierLines = Object.entries(modified)
                         .map(
@@ -374,7 +375,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                                 `${key}: ${value > 0 ? "+" : ""}${value}`,
                         )
                         .join("\n");
-                    return `--------\n${modifierLines}\n${effect.author ? effect.author + ", " : ""}durée : ${effect.duration ?? "∞"}`;
+                    return `--------\n${modifierLines}\n${effect.author ? effect.author + ", " : ""}${i18n.translate("fight.effects.duration")} : ${effect.duration ?? "∞"}`;
                 })
                 .join("\n");
 
