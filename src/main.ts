@@ -17,11 +17,11 @@ declare global {
           }
         | undefined;
     var effectsVolume: number;
-    var musicVolume: number;   
+    var musicVolume: number;
 }
 
 export default new Game({
-    type: Phaser.AUTO,
+    type: Phaser.WEBGL,
     width: window.innerWidth,
     height: window.innerHeight,
     scale: {

@@ -9,7 +9,6 @@ import {
     DisplayContainer,
     Grid,
     DisplayText,
-    Blur,
     GridArea,
     ScaleMode,
 } from "../../../core";
@@ -203,9 +202,31 @@ export class StatsDisplayer extends FightSceneDisplayer {
     }
 
     blurOut(): this {
-        new Blur(this.scene, this.statsArea, {
-            radius: this.statsPanel.outterRadius,
-            depth: 50,
+        this.statsImage.blur();
+        this.statsPanel.blur();
+        this.playerName.blur();
+        this.playerNameText.blur();
+        this.statsClassName.blur();
+        this.statsClassNameText.blur();
+        this.effectImages.forEach((image) => image.blur());
+        this.statTexts.forEach(({ text, image }) => {
+            text.blur();
+            image.blur();
+        });
+        return this;
+    }
+
+    unblur(): this {
+        this.statsImage.unblur();
+        this.statsPanel.unblur();
+        this.playerName.unblur();
+        this.playerNameText.unblur();
+        this.statsClassName.unblur();
+        this.statsClassNameText.unblur();
+        this.effectImages.forEach((image) => image.unblur());
+        this.statTexts.forEach(({ text, image }) => {
+            text.unblur();
+            image.unblur();
         });
         return this;
     }
@@ -263,6 +284,12 @@ export class StatsDisplayer extends FightSceneDisplayer {
 
     update(): this {
         const stats = StatsUtils.fromEntity(this.entity);
+
+        if (this.entity.dead) {
+            this.blurOut();
+        } else {
+            this.unblur();
+        }
 
         this.statTexts.forEach(({ text }, key) => {
             let value = stats[key];
@@ -353,6 +380,9 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 body,
                 effects[0].name ?? id,
             );
+            if (this.entity.dead) {
+                image.blur();
+            }
             this.effectImages.push(image);
         });
     }

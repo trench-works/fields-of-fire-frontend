@@ -99,7 +99,8 @@ export class BaseScene<InitData = any> extends Scene {
                 this.backgroundSound.setLoop(true);
                 console.log("VOLUME ", this.backgroundSound.volume);
                 this.backgroundSound.setVolume(
-                    SoundLevel.get(SoundParam.BACKGROUND),
+                    SoundLevel.get(SoundParam.BACKGROUND) *
+                        MusicAsset.getBaseSoundLevel(id),
                 );
             }
             console.log(

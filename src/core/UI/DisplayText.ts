@@ -4,6 +4,7 @@ import { Displayable } from "./DisplayRoot";
 
 export class DisplayText implements Displayable {
     protected text: Phaser.GameObjects.Text;
+    public blurred: Phaser.FX.Blur | undefined = undefined;
 
     constructor(
         protected readonly scene: BaseScene,
@@ -16,6 +17,19 @@ export class DisplayText implements Displayable {
                 color: "#FFFFFF",
             })
             .setOrigin(0.5);
+    }
+
+    blur() {
+        if (!this.blurred) {
+            this.blurred = this.text.postFX?.addBlur();
+        }
+        this.blurred?.setActive(true);
+        return this;
+    }
+
+    unblur() {
+        this.blurred?.setActive(false);
+        return this;
     }
 
     place(position: Position, size: Size, origin: PlacementOrigin): void {
@@ -38,28 +52,31 @@ export class DisplayText implements Displayable {
         return this;
     }
 
-    setDescription(text: string, options?: { color?: string; fontSize?: number }): this {
+    setDescription(
+        text: string,
+        options?: { color?: string; fontSize?: number },
+    ): this {
         this.text.setWordWrapWidth(this.area.width, true);
-        
+
         if (options?.fontSize) {
             this.text.setFontSize(`${options.fontSize}px`);
         } else {
             // FontSize temporaire pour calculer le nombre de lignes
             this.text.setFontSize("16px");
             this.text.setText(text);
-            
+
             const lines = this.text.getWrappedText(text);
             const lineCount = lines.length || 1;
-            
+
             // Taille automatique basée sur la hauteur disponible
             const minSize = Math.min(
-                this.area.height / (lineCount * 1.5) , // 80% de la hauteur par ligne
-                this.area.width / 20,               // contrainte horizontale
-                32,                                 // taille max
+                this.area.height / (lineCount * 1.5), // 80% de la hauteur par ligne
+                this.area.width / 20, // contrainte horizontale
+                32, // taille max
             );
 
             const fontSize = Math.max(minSize, 11);
-            console.log("ligneCount",lineCount)
+            console.log("ligneCount", lineCount);
             this.text.setFontSize(`${fontSize}px`);
         }
 

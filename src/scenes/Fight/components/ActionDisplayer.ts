@@ -5,7 +5,6 @@ import {
     List,
     Button,
     ScaleMode,
-    Blur,
     GridArea,
     DisplayRoot,
     DisplayText,
@@ -34,7 +33,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
 
     protected lockLevel: number;
 
-    protected root!: DisplayRoot;
+    public root!: DisplayRoot;
 
     constructor(
         scene: FightScene,
@@ -287,15 +286,12 @@ export class ActionDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    blurOut(): this {
-        new Blur(this.scene, this.actionArea, {
-            radius: this.actionPanel.outterRadius,
-            depth: 50,
-        });
-        return this;
-    }
-
     update(): this {
+        if (this.playerStore.playerEntity.dead) {
+            this.root.blur();
+        } else {
+            this.root.unblur();
+        }
         const isPlayerTurn =
             this.gameStore.game.playerTurns[0] ===
             this.playerStore.playerEntity.id;

@@ -41,6 +41,8 @@ export class Button
 
     protected color = Color.btnBg;
 
+    public blurred: Phaser.FX.Blur | undefined = undefined;
+
     constructor(
         scene: BaseScene,
         protected readonly area: Position & Size,
@@ -103,6 +105,21 @@ export class Button
 
         // Ajoute le bouton à la scène
         scene.add.existing(this);
+    }
+
+    blur() {
+        if (!this.blurred) {
+            this.blurred = this.postFX?.addBlur();
+        }
+        this.blurred?.setActive(true);
+        this.imageDisplay?.blur();
+        return this;
+    }
+
+    unblur() {
+        this.blurred?.setActive(false);
+        this.imageDisplay?.unblur();
+        return this;
     }
 
     hightlight(highlight: boolean): this {
