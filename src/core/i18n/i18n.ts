@@ -33,17 +33,26 @@ export function loadBase() {
 }
 
 export function changeLanguage(language: string): void {
+    if (!AvailableLanguages[language]) {
+        load(DEFAULT_LANGUAGE);
+        language = DEFAULT_LANGUAGE;
+    }
     localStorage.setItem("language", language);
 }
 
 export async function load(language: string): Promise<void> {
-    const tradResponse = await fetch(
-        `${window.location.href}i18n/${language}.json`,
-    );
-    localStorage.setItem(
-        `i18n-${language}`,
-        JSON.stringify(await tradResponse.json()),
-    );
+    if (!AvailableLanguages[language]) {
+        language = DEFAULT_LANGUAGE;
+    }
+    if (!localStorage.getItem(`i18n-${language}`)) {
+        const tradResponse = await fetch(
+            `${window.location.href}i18n/${language}.json`,
+        );
+        localStorage.setItem(
+            `i18n-${language}`,
+            JSON.stringify(await tradResponse.json()),
+        );
+    }
 }
 
 export function getCurrentLanguage(): string {
