@@ -1,6 +1,12 @@
-const DEFAULT_LANGUAGE = "en";
+const DEFAULT_LANGUAGE = "fr";
 
-import translations from "../../../public/i18n/en.json";
+import translations from "../../../public/i18n/fr.json";
+
+import languages from "./index.json";
+
+type StringRecord = { [key: string]: string };
+
+export const AvailableLanguages: StringRecord = languages.languages;
 
 type NestedKeyOf<T> = T extends object
     ? {

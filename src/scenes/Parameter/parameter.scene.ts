@@ -2,16 +2,24 @@ import { MiscAsset, MiscAssetId } from "../../assets";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { Color } from "../../config/ColorConfig";
-import { BaseScene, Button, DisplayContainer, DisplayText, GridArea, i18n, ScaleMode, StartSceneConfig } from "../../core";
+import {
+    BaseScene,
+    Button,
+    DisplayContainer,
+    DisplayText,
+    GridArea,
+    i18n,
+    ScaleMode,
+    StartSceneConfig,
+} from "../../core";
 import { DisplayImage } from "../../core/UI/DisplayImage";
 import { MainMenu } from "../MainMenu/main-menu.scene";
 
 export class ParameterScene extends BaseScene {
-
     private languageButtons: Map<string, Button> = new Map();
-    private currentLanguage: string = i18n.getCurrentLanguage(); 
+    private currentLanguage: string = i18n.getCurrentLanguage();
     private sceneTitle!: DisplayText;
-    private LanguageTitle !: DisplayText;
+    private LanguageTitle!: DisplayText;
     private returnButton!: Button;
     private test!: DisplayImage;
 
@@ -34,7 +42,7 @@ export class ParameterScene extends BaseScene {
 
     create() {
         super.create();
-        console.log ("Start Current language: ", this.currentLanguage);
+        console.log("Start Current language: ", this.currentLanguage);
         //Title
         this.sceneTitle = new DisplayText(
             this,
@@ -43,19 +51,25 @@ export class ParameterScene extends BaseScene {
                 y: 1,
                 width: 5,
                 height: 1,
-                margin: {top : 10, bottom:0, left: 0, right: 0}
+                margin: { top: 10, bottom: 0, left: 0, right: 0 },
             }),
         ).setText(i18n.translate("parameter.parameter"));
 
         //Button to return to the main menu
         this.returnButton = new Button(
             this,
-            this.rootGrid.getArea({
+            this.rootGrid
+                .getArea({
                     x: 1,
                     y: 1,
                     width: 1,
                     height: 1,
-                    margin: {left: 5 *this.scale.width / 100, right : 0, top: 0, bottom: 0},
+                    margin: {
+                        left: (5 * this.scale.width) / 100,
+                        right: 0,
+                        top: 0,
+                        bottom: 0,
+                    },
                 })
                 .scaleFromCenter(
                     MiscAsset.getAssetScale(MiscAssetId.BUTTON),
@@ -68,7 +82,7 @@ export class ParameterScene extends BaseScene {
                     MainMenu.start(this);
                 },
             },
-        )
+        );
 
         //language selection
         this.languageSelection();
@@ -80,20 +94,16 @@ export class ParameterScene extends BaseScene {
             y: 3,
             width: 7,
             height: 1,
-        })
-
-        const languageGrid = languageArea.getGrid({
-            division: { vertical: 4, horizontal: 12},
         });
 
-        new DisplayContainer(
-            this,
-            languageArea,
-            {
-                borderWidth: 6,
-                opacity: 0.25,
-            }
-        );
+        const languageGrid = languageArea.getGrid({
+            division: { vertical: 4, horizontal: 12 },
+        });
+
+        new DisplayContainer(this, languageArea, {
+            borderWidth: 6,
+            opacity: 0.25,
+        });
 
         new DisplayContainer(
             this,
@@ -105,10 +115,10 @@ export class ParameterScene extends BaseScene {
             }),
             {
                 borderWidth: 2,
-                opacity:1,
+                opacity: 1,
                 bgColor: Color.btnBorder,
-                outterRadius: {tr: 10, tl: 10, bl: 0, br: 0},
-            }
+                outterRadius: { tr: 10, tl: 10, bl: 0, br: 0 },
+            },
         );
 
         this.LanguageTitle = new DisplayText(
@@ -121,82 +131,33 @@ export class ParameterScene extends BaseScene {
             }),
         ).setText(i18n.translate("parameter.languageTitle"));
 
-        const frenchButton = this.languageButton(
-            "Français",
-            languageGrid.getArea({
-                x: 2,
-                y: 3,
-                width: 2,
-                height: 1,
-                margin: {top: 0, bottom: 0, left: 0, right: 0}
-            }),
-            "fr"
-        );
-        this.languageButtons.set("fr", frenchButton);
-
-        const EnglishButton = this.languageButton(
-            "English",
-            languageGrid.getArea({
-                x: 4,
-                y: 3,
-                width: 2,
-                height: 1,
-                margin: {top: 0, bottom: 0, left: 0, right: 0}
-            }),
-            "en"
-        );
-        this.languageButtons.set("en", EnglishButton);
-
-        const JapaneseButton = this.languageButton(
-            "日本語",
-            languageGrid.getArea({
-                x: 6,
-                y: 3,
-                width: 2,
-                height: 1,
-                margin: {top: 0, bottom: 0, left: 0, right: 0}
-            }),
-            "ja"
-        );
-        this.languageButtons.set("ja", JapaneseButton);
-
-        const RussianButton = this.languageButton(
-            "Русский",
-            languageGrid.getArea({
-                x: 8,
-                y: 3,
-                width: 2,
-                height: 1,
-                margin: {top: 0, bottom: 0, left: 0, right: 0}
-            }),
-            "ru"
-        );
-        this.languageButtons.set("ru", RussianButton);
-
-        const ChineseButton = this.languageButton(
-            "中文",
-            languageGrid.getArea({
-                x: 10,
-                y: 3,
-                width: 2,
-                height: 1,
-                margin: {top: 0, bottom: 0, left: 0, right: 0}
-            }),
-            "zh"
-        );
-        this.languageButtons.set("zh", ChineseButton);
+        let i = 1;
+        for (const [code, title] of Object.entries(i18n.AvailableLanguages)) {
+            const languageButton = this.languageButton(
+                title,
+                languageGrid.getArea({
+                    x: i * 2,
+                    y: 3,
+                    width: 2,
+                    height: 1,
+                    margin: { top: 0, bottom: 0, left: 0, right: 0 },
+                }),
+                code,
+            );
+            this.languageButtons.set(code, languageButton);
+            i++;
+        }
 
         this.updateLanguageButtons();
     }
 
-
-    languageButton(title : string, gridArea : GridArea, lang : string) {
+    languageButton(title: string, gridArea: GridArea, lang: string) {
         return new Button(
             this,
             gridArea.scaleFromCenter(
-                    MiscAsset.getAssetScale(MiscAssetId.BUTTON),
-                    ScaleMode.CONSERVE,
-                ),
+                MiscAsset.getAssetScale(MiscAssetId.BUTTON),
+                ScaleMode.CONSERVE,
+            ),
             {
                 text: title,
                 onClick: () => {
@@ -215,7 +176,7 @@ export class ParameterScene extends BaseScene {
             button.setImage(
                 lang === this.currentLanguage
                     ? MiscAsset.getAssetKey(MiscAssetId.BUTTON_BLEU)
-                    : MiscAsset.getAssetKey(MiscAssetId.BUTTON)
+                    : MiscAsset.getAssetKey(MiscAssetId.BUTTON),
             );
         });
         this.sceneTitle.setText(i18n.translate("parameter.parameter"));
