@@ -1,4 +1,6 @@
 import { Sound } from "../Types/Sound";
+import { SoundLevel } from "../Utils";
+import { SoundParam } from "../Utils/SoundLevel";
 import { BaseScene } from "./BaseScene";
 
 export class SoundEffect {
@@ -15,12 +17,16 @@ export class SoundEffect {
             //     y,
             // },
         });
-        console.log("SoundEffect constructor: ", globalThis.effectsVolume, this.sound);
-        this.sound.setVolume(global.effectsVolume ??0.4);
+        console.log(
+            "SoundEffect constructor: ",
+            SoundLevel.get(SoundParam.EFFECT),
+            this.sound,
+        );
+        this.sound.setVolume(SoundLevel.get(SoundParam.EFFECT));
     }
 
     play(): this {
-        this.sound.setVolume(global.effectsVolume ?? 0.5);
+        this.sound.setVolume(SoundLevel.get(SoundParam.EFFECT));
         this.sound.play();
         this.sound.on("complete", () => this.destroy());
         return this;

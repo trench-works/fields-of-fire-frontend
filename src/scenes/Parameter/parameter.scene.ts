@@ -10,9 +10,11 @@ import {
     GridArea,
     i18n,
     ScaleMode,
+    SoundLevel,
     StartSceneConfig,
 } from "../../core";
 import { DisplayImage } from "../../core/UI/DisplayImage";
+import { SoundParam } from "../../core/Utils/SoundLevel";
 import { MainMenu } from "../MainMenu/main-menu.scene";
 import { SoundBar } from "./objects/SoundBar";
 
@@ -93,7 +95,7 @@ export class ParameterScene extends BaseScene {
         this.languageSelection();
         //
         this.soundParameter();
-        
+
         this.updateLanguageButtons();
     }
 
@@ -136,7 +138,7 @@ export class ParameterScene extends BaseScene {
     languageSelection() {
         const languageGrid = this.subParameterContainer(2, 1.5);
 
-         this.LanguageTitle = new DisplayText(
+        this.LanguageTitle = new DisplayText(
             this,
             languageGrid.getArea({
                 x: 5,
@@ -186,7 +188,7 @@ export class ParameterScene extends BaseScene {
     soundParameter() {
         console.log("soundParameter called");
         const soundGrid = this.subParameterContainer(4, 2);
-        
+
         this.soundTitle = new DisplayText(
             this,
             soundGrid.getArea({
@@ -202,23 +204,23 @@ export class ParameterScene extends BaseScene {
             soundGrid,
             2.25,
             "parameter.sound.music",
-            global.musicVolume ? global.musicVolume*10 : 10,
+            SoundLevel.get(SoundParam.BACKGROUND) * 10,
             (volume: number) => {
-                global.musicVolume = volume;
+                SoundLevel.set(SoundParam.BACKGROUND, volume);
                 console.log("MusicSoundBar volume changed to: ", volume);
                 this.sound.setVolume(volume);
-            }
+            },
         );
         console.log("MusicSoundBar created with volume: ", this.sound.volume);
         this.SFXSoundBar = new SoundBar(
             this,
             soundGrid,
-           3.5,
+            3.5,
             "parameter.sound.effects",
-            global.effectsVolume ? global.effectsVolume*10 : 10,
+            SoundLevel.get(SoundParam.EFFECT) * 10,
             (volume: number) => {
-                 global.effectsVolume = volume;
-            }
+                SoundLevel.set(SoundParam.EFFECT, volume);
+            },
         );
     }
 
@@ -228,7 +230,7 @@ export class ParameterScene extends BaseScene {
             button.setImage(
                 lang === this.currentLanguage
                     ? MiscAsset.getAssetKey(MiscAssetId.BUTTON_BLUE)
-                    : MiscAsset.getAssetKey(MiscAssetId.BUTTON)
+                    : MiscAsset.getAssetKey(MiscAssetId.BUTTON),
             );
         });
         this.sceneTitle.setText(i18n.translate("parameter.parameter"));
@@ -237,3 +239,4 @@ export class ParameterScene extends BaseScene {
         this.returnButton.setText(i18n.translate("parameter.return"));
     }
 }
+

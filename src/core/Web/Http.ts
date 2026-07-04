@@ -44,9 +44,9 @@ export class Http {
         endpoint: string,
         payload: HttpPayload<Param, Query, Body> | undefined,
     ): Promise<Response> {
-        if (!global.config) {
+        if (!globalThis.config) {
             await new AppConfigLoader().loadConfig().then((appConfig) => {
-                global.config = appConfig.getConfig();
+                globalThis.config = appConfig.getConfig();
             });
         }
         let paramEndpoint = endpoint;
@@ -59,9 +59,9 @@ export class Http {
             }
         }
 
-        const port = Number(global.config.server.port);
+        const port = Number(globalThis.config.server.port);
         const portStr = port === 443 || port === 80 ? "" : `:${port}`;
-        const base = `${global.config.server.protocols.http}://${global.config.server.url}${portStr}${global.config.server.apiBasePath}`;
+        const base = `${globalThis.config.server.protocols.http}://${globalThis.config.server.url}${portStr}${globalThis.config.server.apiBasePath}`;
         let url = `${base}${paramEndpoint}`;
 
         if (payload?.query) {
