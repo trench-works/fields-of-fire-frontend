@@ -148,8 +148,8 @@ export class Button
                 this.area.width,
                 this.area.height,
             ),
-        ).setImage(imageKey); 
-        
+        ).setImage(imageKey);
+
         return this;
     }
 
@@ -178,6 +178,9 @@ export class Button
     public setIsActivated(isActivated: boolean): this {
         this.isActivated = isActivated;
         this.setAlpha(isActivated ? CLICKABLE_ALPHA : UNCLICKABLE_ALPHA);
+        this.imageDisplay?.setAlpha(
+            isActivated ? CLICKABLE_ALPHA : UNCLICKABLE_ALPHA,
+        );
         this.background?.setFillStyle(
             Phaser.Display.Color.HexStringToColor(Color.btnBg).color,
         );
@@ -224,12 +227,15 @@ export class Button
         });
     }
 
-    setText(text: string, options?: { color?: string; fontSize?: number }): this {
+    setText(
+        text: string,
+        options?: { color?: string; fontSize?: number },
+    ): this {
         this.displayText(text, options);
         return this;
     }
 
-    setImage(imageKey: string) : this {
+    setImage(imageKey: string): this {
         console.log("test", this.imageDisplay);
         this.imageDisplay?.setImage(imageKey);
         return this;
