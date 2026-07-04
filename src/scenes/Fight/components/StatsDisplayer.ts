@@ -354,6 +354,9 @@ export class StatsDisplayer extends FightSceneDisplayer {
             )
                 .setImage(EffectAsset.getAssetKey(id), 1.2)
                 .setInteractive(true);
+            if (this.entity.dead) {
+                image.blur();
+            }
 
             const body = effects
                 .map((effect) => {
@@ -380,9 +383,6 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 body,
                 effects[0].name ?? id,
             );
-            if (this.entity.dead) {
-                image.blur();
-            }
             this.effectImages.push(image);
         });
     }
