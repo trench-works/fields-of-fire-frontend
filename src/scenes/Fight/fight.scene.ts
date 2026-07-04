@@ -377,6 +377,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
 
     create() {
         super.create();
+        console.log("musicSound - FIGHT : ", global.musicVolume);
         this.playBackgroundMusic(MusicAssetId.FIGHT);
         this.tooltip = Tooltip.getInstance(this, {
             textColor: "#000000",

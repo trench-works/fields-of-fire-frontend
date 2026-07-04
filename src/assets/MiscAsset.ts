@@ -5,7 +5,8 @@ export enum MiscAssetId {
     WALL = "wall",
     BULLET = "bullet",
     BUTTON = "bouton",
-    BUTTON_BLEU = "bouton_bleu",
+    BUTTON_BLUE = "bouton_bleu",
+    BUTTON_ROUND = "bouton_round",
 }
 
 class MiscAssetManager extends ImageAssetManager<MiscAssetId, string> {
@@ -25,14 +26,16 @@ class MiscAssetManager extends ImageAssetManager<MiscAssetId, string> {
                 [MiscAssetId.WALL]: "wall",
                 [MiscAssetId.BULLET]: "menuBalle",
                 [MiscAssetId.BUTTON]: "BoutonSauvage",
-                [MiscAssetId.BUTTON_BLEU]: "BoutonSauvageBleu",
+                [MiscAssetId.BUTTON_BLUE]: "BoutonSauvageBleu",
+                [MiscAssetId.BUTTON_ROUND]: "BoutonSauvageRond",
             },
             {
                 [MiscAssetId.GROUND]: { width: 1, height: 1 },
                 [MiscAssetId.WALL]: { width: 1, height: 1 },
                 [MiscAssetId.BULLET]: { width: 1, height: 1 },
                 [MiscAssetId.BUTTON]: { width: 180, height: 50 },
-                [MiscAssetId.BUTTON_BLEU]: { width: 180, height: 50 },
+                [MiscAssetId.BUTTON_BLUE]: { width: 180, height: 50 },
+                [MiscAssetId.BUTTON_ROUND]: { width: 50, height: 50 },
             },
         );
     }

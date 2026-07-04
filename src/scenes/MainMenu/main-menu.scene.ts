@@ -229,6 +229,8 @@ export class MainMenu extends BaseScene {
                 },
             },
         ).setIsActivated(true);
+
+        console.log("musicSound - MENU : ", global.musicVolume);
     }
 
     updateLoginButtons() {

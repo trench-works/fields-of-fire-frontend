@@ -112,7 +112,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 config: { keepMusic: false },
             });
         });
-
+        console.log("musicSound - LOBBY : ", global.musicVolume);
         //title BOX
         new DisplayText(
             this,

@@ -15,10 +15,12 @@ export class SoundEffect {
             //     y,
             // },
         });
-        this.sound.setVolume(0.4);
+        console.log("SoundEffect constructor: ", globalThis.effectsVolume, this.sound);
+        this.sound.setVolume(global.effectsVolume ??0.4);
     }
 
     play(): this {
+        this.sound.setVolume(global.effectsVolume ?? 0.5);
         this.sound.play();
         this.sound.on("complete", () => this.destroy());
         return this;

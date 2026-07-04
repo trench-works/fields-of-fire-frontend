@@ -6,4 +6,5 @@ export const Color = {
     classBorder: "#d4d2b8",
     actualTurnBorder: "#ccd828",
     otherTurnBorder: "#ac8142",
+    soundBar: "#7b734a",
 }

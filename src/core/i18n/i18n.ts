@@ -16,7 +16,7 @@ type NestedKeyOf<T> = T extends object
       }[keyof T & (string | number)]
     : never;
 
-type TranslationKey = NestedKeyOf<typeof translations>;
+export type TranslationKey = NestedKeyOf<typeof translations>;
 
 export function loadBase() {
     load(DEFAULT_LANGUAGE);

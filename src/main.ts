@@ -16,6 +16,8 @@ declare global {
               username: string;
           }
         | undefined;
+    var effectsVolume: number;
+    var musicVolume: number;   
 }
 
 export default new Game({

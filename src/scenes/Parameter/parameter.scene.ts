@@ -14,6 +14,7 @@ import {
 } from "../../core";
 import { DisplayImage } from "../../core/UI/DisplayImage";
 import { MainMenu } from "../MainMenu/main-menu.scene";
+import { SoundBar } from "./objects/SoundBar";
 
 export class ParameterScene extends BaseScene {
     private languageButtons: Map<string, Button> = new Map();
@@ -21,7 +22,10 @@ export class ParameterScene extends BaseScene {
     private sceneTitle!: DisplayText;
     private LanguageTitle!: DisplayText;
     private returnButton!: Button;
+    private soundTitle!: DisplayText;
     private test!: DisplayImage;
+    private MusicSoundBar!: SoundBar;
+    private SFXSoundBar!: SoundBar;
 
     static start(scene: BaseScene, config?: StartSceneConfig | undefined) {
         super.startScene(scene, SceneAssetId.PARAMETER, {
@@ -37,7 +41,8 @@ export class ParameterScene extends BaseScene {
     preload() {
         super.preload();
         MiscAsset.load(this.load, MiscAssetId.BUTTON);
-        MiscAsset.load(this.load, MiscAssetId.BUTTON_BLEU);
+        MiscAsset.load(this.load, MiscAssetId.BUTTON_BLUE);
+        MiscAsset.load(this.load, MiscAssetId.BUTTON_ROUND);
     }
 
     create() {
@@ -86,28 +91,32 @@ export class ParameterScene extends BaseScene {
 
         //language selection
         this.languageSelection();
+        //
+        this.soundParameter();
+        
+        this.updateLanguageButtons();
     }
 
-    languageSelection() {
-        const languageArea = this.rootGrid.getArea({
+    subParameterContainer(y: number, ContainerHeight: number) {
+        const paramArea = this.rootGrid.getArea({
             x: 2,
-            y: 3,
+            y: y,
             width: 7,
-            height: 1,
+            height: ContainerHeight,
         });
 
-        const languageGrid = languageArea.getGrid({
+        const paramGrid = paramArea.getGrid({
             division: { vertical: 4, horizontal: 12 },
         });
 
-        new DisplayContainer(this, languageArea, {
+        new DisplayContainer(this, paramArea, {
             borderWidth: 6,
             opacity: 0.25,
         });
 
         new DisplayContainer(
             this,
-            languageGrid.getArea({
+            paramGrid.getArea({
                 x: 1,
                 y: 1,
                 width: 12,
@@ -121,7 +130,13 @@ export class ParameterScene extends BaseScene {
             },
         );
 
-        this.LanguageTitle = new DisplayText(
+        return paramGrid;
+    }
+
+    languageSelection() {
+        const languageGrid = this.subParameterContainer(2, 1.5);
+
+         this.LanguageTitle = new DisplayText(
             this,
             languageGrid.getArea({
                 x: 5,
@@ -147,8 +162,6 @@ export class ParameterScene extends BaseScene {
             this.languageButtons.set(code, languageButton);
             i++;
         }
-
-        this.updateLanguageButtons();
     }
 
     languageButton(title: string, gridArea: GridArea, lang: string) {
@@ -170,17 +183,57 @@ export class ParameterScene extends BaseScene {
         );
     }
 
+    soundParameter() {
+        console.log("soundParameter called");
+        const soundGrid = this.subParameterContainer(4, 2);
+        
+        this.soundTitle = new DisplayText(
+            this,
+            soundGrid.getArea({
+                x: 5,
+                y: 1,
+                width: 4,
+                height: 1,
+            }),
+        ).setText(i18n.translate("parameter.soundTitle"));
+
+        this.MusicSoundBar = new SoundBar(
+            this,
+            soundGrid,
+            2.25,
+            "parameter.sound.music",
+            global.musicVolume ? global.musicVolume*10 : 10,
+            (volume: number) => {
+                global.musicVolume = volume;
+                console.log("MusicSoundBar volume changed to: ", volume);
+                this.sound.setVolume(volume);
+            }
+        );
+        console.log("MusicSoundBar created with volume: ", this.sound.volume);
+        this.SFXSoundBar = new SoundBar(
+            this,
+            soundGrid,
+           3.5,
+            "parameter.sound.effects",
+            global.effectsVolume ? global.effectsVolume*10 : 10,
+            (volume: number) => {
+                 global.effectsVolume = volume;
+            }
+        );
+    }
+
     updateLanguageButtons() {
-        console.log("Buttn List: ", this.languageButtons);
+        console.log("Button List: ", this.languageButtons);
         this.languageButtons.forEach((button, lang) => {
             button.setImage(
                 lang === this.currentLanguage
-                    ? MiscAsset.getAssetKey(MiscAssetId.BUTTON_BLEU)
-                    : MiscAsset.getAssetKey(MiscAssetId.BUTTON),
+                    ? MiscAsset.getAssetKey(MiscAssetId.BUTTON_BLUE)
+                    : MiscAsset.getAssetKey(MiscAssetId.BUTTON)
             );
         });
         this.sceneTitle.setText(i18n.translate("parameter.parameter"));
         this.LanguageTitle.setText(i18n.translate("parameter.languageTitle"));
+        this.soundTitle.setText(i18n.translate("parameter.soundTitle"));
         this.returnButton.setText(i18n.translate("parameter.return"));
     }
 }
