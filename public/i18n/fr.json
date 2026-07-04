@@ -37,6 +37,7 @@
                 "RANGED": "A Distance",
                 "MOUVEMENT": "Déplacement",
                 "MELEE": "Mêlée",
+                "SUPPORT": "Support",
                 "OTHER": "Autre"
             },
             "endTurn": "Fin du tour"

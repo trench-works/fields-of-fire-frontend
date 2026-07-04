@@ -30,6 +30,7 @@ export enum ActionType {
     RANGED = "RANGED",
     MELEE = "MELEE",
     MOUVEMENT = "MOUVEMENT",
+    SUPPORT = "SUPPORT",
     OTHER = "OTHER",
 }
 
