@@ -23,7 +23,6 @@ export class MainMenu extends BaseScene {
         super(SceneAssetId.MENU, BackgroundAssetId.MAIN_MENU, {
             division: { vertical: 7, horizontal: 5 },
         });
-        i18n.loadBase();
         const user = localStorage.getItem("user");
         if (user) {
             global.user = JSON.parse(user);

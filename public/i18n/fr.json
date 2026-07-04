@@ -2,6 +2,16 @@
     "common": {
         "validate": "Valider"
     },
+    "loader": {
+        "assets": "Chargements des assets",
+        "connect": "En attente des joueurs"
+    },
+    "menuPanel": {
+        "title": "Menu",
+        "back": "Reprendre",
+        "options": "Options",
+        "mainMenu": "Retour au Menu"
+    },
     "mainMenu": {
         "play": "Jouer",
         "settings": "Paramètres",
@@ -25,9 +35,11 @@
             "range": "Portée",
             "type": {
                 "ranged": "A Distance",
+                "mouvement": "Déplacement",
                 "melee": "Mêlée",
                 "other": "Autre"
-            }
+            },
+            "endTurn": "Fin du tour"
         }
     },
     "parameter": {

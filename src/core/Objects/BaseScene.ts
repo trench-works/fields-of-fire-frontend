@@ -9,6 +9,7 @@ import { TwoAxis } from "../Types";
 import { MusicAsset, MusicAssetId } from "../../assets";
 import { Sound } from "../Types/Sound";
 import { AssetLoader } from "./Loader";
+import { i18n } from "../i18n";
 
 export type BaseSceneInit<InitData = never> = {
     data: InitData;
@@ -36,6 +37,7 @@ export class BaseScene<InitData = any> extends Scene {
         rootGridOptions?: { division: TwoAxis },
     ) {
         super({ key });
+        i18n.loadBase();
         this.isOpen = false;
         this.rootGrid = new Grid(rootGridOptions);
         this.startConfig = {};

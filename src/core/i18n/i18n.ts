@@ -44,15 +44,13 @@ export async function load(language: string): Promise<void> {
     if (!AvailableLanguages[language]) {
         language = DEFAULT_LANGUAGE;
     }
-    if (!localStorage.getItem(`i18n-${language}`)) {
-        const tradResponse = await fetch(
-            `${window.location.href}i18n/${language}.json`,
-        );
-        localStorage.setItem(
-            `i18n-${language}`,
-            JSON.stringify(await tradResponse.json()),
-        );
-    }
+    const tradResponse = await fetch(
+        `${window.location.href}i18n/${language}.json`,
+    );
+    localStorage.setItem(
+        `i18n-${language}`,
+        JSON.stringify(await tradResponse.json()),
+    );
 }
 
 export function getCurrentLanguage(): string {

@@ -5,6 +5,7 @@ import { BaseScene } from "../Objects";
 import { FightScene } from "../../scenes/Fight/fight.scene";
 import { LobbyScene } from "../../scenes/Lobby/lobby.scene";
 import { Depth, UI_LEVELS_OFFSET } from "../Utils";
+import { i18n } from "../i18n";
 
 interface MenuPanelConfig {
     onResumeClick?: () => void;
@@ -57,7 +58,7 @@ export class MenuPanel extends Phaser.GameObjects.Container {
         const titleText = scene.add.text(
             scene.scale.width / 2,
             scene.scale.height / 2 - 180,
-            "MENU",
+            i18n.translate("menuPanel.title"),
             {
                 fontFamily: "MyFont",
                 fontSize: "60px",
@@ -79,7 +80,7 @@ export class MenuPanel extends Phaser.GameObjects.Container {
                 height: 50,
             },
             {
-                text: "Reprendre",
+                text: i18n.translate("menuPanel.back"),
                 fontSize: 24,
                 onClick: () => {
                     this.hide();
@@ -105,7 +106,7 @@ export class MenuPanel extends Phaser.GameObjects.Container {
                 height: 50,
             },
             {
-                text: "Options",
+                text: i18n.translate("menuPanel.options"),
                 fontSize: 24,
                 onClick: () => {
                     this.hide();
@@ -131,14 +132,14 @@ export class MenuPanel extends Phaser.GameObjects.Container {
                 height: 50,
             },
             {
-                text: "Retour au Menu",
+                text: i18n.translate("menuPanel.mainMenu"),
                 fontSize: 24,
                 onClick: () => {
                     this.hide();
                     if ("playerSocket" in this.scene) {
                         (this.scene as FightScene).playerSocket.disconnect();
                     }
-                    if ('lobbySocket' in this.scene) {
+                    if ("lobbySocket" in this.scene) {
                         (this.scene as LobbyScene).lobbySocket.leaveLobby();
                     }
                     if (config.onMainMenuClick) {

@@ -139,7 +139,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
                 height: 1,
             }),
             {
-                text: "Fin du tour",
+                text: i18n.translate("fight.actions.endTurn"),
                 borderColor: Color.containerBorder,
                 borderWidth: 2,
                 onClick: () => {},
