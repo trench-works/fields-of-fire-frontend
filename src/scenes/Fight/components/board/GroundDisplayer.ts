@@ -324,16 +324,23 @@ export class GroundDisplayer extends FightSceneDisplayer {
             const targetEntity = this.gameStore.getEntity(entityId);
             if (!targetEntity) return;
 
-            const damagePreview = this.scene.actionManager
-                .calculateDamagePreview(
-                    action,
-                    this.playerStore.playerEntity,
-                    targetEntity,
-                )
-                .join(" - ");
+            const minDamage = this.scene.actionManager.calculateFinalDamage(
+                action.damage?.min ?? 0,
+                action,
+                this.playerStore.playerEntity,
+                targetEntity,
+            );
+            const maxDamage = this.scene.actionManager.calculateFinalDamage(
+                action.damage?.max ?? 0,
+                action,
+                this.playerStore.playerEntity,
+                targetEntity,
+            );
+
+            const isHeal = (action.damage?.max ?? 0) <= 0;
 
             tooltipItems.push({
-                text: `${(action.damage?.max ?? 0) <= 0 ? "🩹" : "⚔️"} ${damagePreview}`,
+                text: `${isHeal ? "🩹" : "⚔️"} ${isHeal ? -minDamage.defenserDamage : minDamage.defenserDamage}-${isHeal ? -maxDamage.defenserDamage : maxDamage.defenserDamage}`,
                 title: this.classStore.getClass(targetEntity.classId).name,
                 position: {
                     x: cell.pixelPosition.x,
