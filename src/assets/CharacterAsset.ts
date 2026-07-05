@@ -102,7 +102,7 @@ class CharacterSpriteAssetManager extends SpriteAssetManager<
             },
             [CharacterAssetId.ENTENTE_BRISE_BARRICADE]: {
                 frameWidth: 96,
-                frameHeight: 128,
+                frameHeight: 140,
                 frameTime: [],
             },
             [CharacterAssetId.ALLIANCE_FANTASSIN]: {
