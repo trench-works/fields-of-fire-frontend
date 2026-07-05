@@ -75,7 +75,11 @@ export class Character extends FightSceneDisplayer {
             this.sprite.setDepth(
                 Depth.getFromGridPosition({ x, y }, GRID_LEVELS_OFFSET.OBJECT),
             );
-            this.sprite.setOrigin(0.5, 0.95);
+            if (entity.classId === CharacterAssetId.BARRICADE) {
+                this.sprite.setOrigin(0.5, 0.75);
+            } else {
+                this.sprite.setOrigin(0.5, 0.95);
+            }
             this.sprite.setScale(this.scene.scaleFactor / 1.5);
 
             this.createAnimations(entity.classId);

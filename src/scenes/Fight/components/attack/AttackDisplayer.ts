@@ -256,8 +256,9 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.BREAK:
                 {
-                    this.scene.character.changeDirection(target, entityId);
+                    //this.scene.character.changeDirection(target, entityId);
                     this.scene.character.scope(entityId, 700);
+                    await Timeout(350);
                     new SoundEffect(
                         this.scene,
                         SoundEffectAsset.getAssetKey(
