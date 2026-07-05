@@ -203,32 +203,32 @@ export class StatsDisplayer extends FightSceneDisplayer {
     }
 
     blurOut(): this {
-        this.statsImage.blur();
-        this.statsPanel.blur();
-        this.playerName.blur();
-        this.playerNameText.blur();
-        this.statsClassName.blur();
-        this.statsClassNameText.blur();
-        this.effectImages.forEach((image) => image.blur());
-        this.statTexts.forEach(({ text, image }) => {
-            text.blur();
-            image.blur();
-        });
+        // this.statsImage.blur();
+        // this.statsPanel.blur();
+        // this.playerName.blur();
+        // this.playerNameText.blur();
+        // this.statsClassName.blur();
+        // this.statsClassNameText.blur();
+        // this.effectImages.forEach((image) => image.blur());
+        // this.statTexts.forEach(({ text, image }) => {
+        //     text.blur();
+        //     image.blur();
+        // });
         return this;
     }
 
     unblur(): this {
-        this.statsImage.unblur();
-        this.statsPanel.unblur();
-        this.playerName.unblur();
-        this.playerNameText.unblur();
-        this.statsClassName.unblur();
-        this.statsClassNameText.unblur();
-        this.effectImages.forEach((image) => image.unblur());
-        this.statTexts.forEach(({ text, image }) => {
-            text.unblur();
-            image.unblur();
-        });
+        // this.statsImage.unblur();
+        // this.statsPanel.unblur();
+        // this.playerName.unblur();
+        // this.playerNameText.unblur();
+        // this.statsClassName.unblur();
+        // this.statsClassNameText.unblur();
+        // this.effectImages.forEach((image) => image.unblur());
+        // this.statTexts.forEach(({ text, image }) => {
+        //     text.unblur();
+        //     image.unblur();
+        // });
         return this;
     }
 
@@ -356,7 +356,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 .setImage(EffectAsset.getAssetKey(id), 1.2)
                 .setInteractive(true);
             if (this.entity.dead) {
-                image.blur();
+                //image.blur();
             }
 
             const body = effects

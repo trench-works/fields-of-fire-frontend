@@ -31,12 +31,12 @@ export class DisplayRoot implements Omit<
     }
 
     blur(): this {
-        this.displayables.forEach((displayable) => displayable.blur());
+        //this.displayables.forEach((displayable) => displayable.blur());
         return this;
     }
 
     unblur(): this {
-        this.displayables.forEach((displayable) => displayable.unblur());
+        //this.displayables.forEach((displayable) => displayable.unblur());
         return this;
     }
 
