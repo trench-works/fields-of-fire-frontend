@@ -243,6 +243,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         ),
                     ).play();
                     await this.playBloodSplatter(hits, origin, target);
+                    await this.toaster.attackToast(animation);
                 }
                 break;
             case ActionAssetId.BARRICADE:
@@ -251,6 +252,18 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         this.scene,
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.HAMMER),
                     ).play();
+                }
+                break;
+            case ActionAssetId.BREAK:
+                {
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(
+                            SoundEffectAssetId.BATTLE_AXE,
+                        ),
+                    ).play();
+                    await this.playBloodSplatter(hits, origin, target);
+                    await this.toaster.attackToast(animation);
                 }
                 break;
         }
