@@ -97,7 +97,8 @@ export class ActionDisplayer extends FightSceneDisplayer {
 
     selectAction(index: number) {
         const action = this.orderedActions[index];
-        if (action) {
+        if (action && !this.lockLevel) {
+            this.lock();
             this.handleActionSelection(action);
         } else {
             this.clearAction();
