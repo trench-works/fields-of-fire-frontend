@@ -62,6 +62,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                     this.scene.toaster.attackToast(animation);
                     await this.playBloodSplatter(hits, origin, target);
                     await this.toaster.attackToast(animation);
+                    await Timeout(200);
                 }
                 break;
             case ActionAssetId.BAYONET:
@@ -77,6 +78,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                     this.scene.toaster.attackToast(animation);
                     await this.playBloodSplatter(hits, origin, target);
                     await this.toaster.attackToast(animation);
+                    await Timeout(200);
                 }
                 break;
             case ActionAssetId.AMPUTATE:
@@ -133,6 +135,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                             GRID_LEVELS_OFFSET.ANIMATION_4,
                         ),
                     );
+                    await Timeout(500);
                 }
                 break;
             case ActionAssetId.ARTILLERY_SUPPORT:
@@ -183,6 +186,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         this.scene,
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.DOPAGE),
                     ).play();
+                    await Timeout(1000);
                 }
                 break;
             case ActionAssetId.FIGHTING_DRUG:
@@ -201,6 +205,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                             GRID_LEVELS_OFFSET.ANIMATION_4,
                         ),
                     );
+                    await Timeout(1000);
                 }
                 break;
             case ActionAssetId.CHARGE:
@@ -218,6 +223,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                             GRID_LEVELS_OFFSET.ANIMATION_4,
                         ),
                     );
+                    await Timeout(1000);
                 }
                 break;
             case ActionAssetId.SABER:
@@ -252,6 +258,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         this.scene,
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.HAMMER),
                     ).play();
+                    await Timeout(1000);
                 }
                 break;
             case ActionAssetId.BREAK:

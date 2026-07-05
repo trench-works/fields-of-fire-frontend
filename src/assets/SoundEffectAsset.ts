@@ -14,6 +14,7 @@ export enum SoundEffectAssetId {
     HAMMER = "hammer",
     SHIELD_IMPACT = "shield-impact",
     BATTLE_AXE = "battle-axe",
+    WOOD_CRACK = "wood-crack",
 }
 
 class SoundEffectAssetManager extends SoundAssetManager<
@@ -45,6 +46,7 @@ class SoundEffectAssetManager extends SoundAssetManager<
                 [SoundEffectAssetId.HAMMER]: "hammer",
                 [SoundEffectAssetId.SHIELD_IMPACT]: "shield-impact",
                 [SoundEffectAssetId.BATTLE_AXE]: "battle-axe",
+                [SoundEffectAssetId.WOOD_CRACK]: "wood_crack",
             },
             {
                 [SoundEffectAssetId.DEATH]: 1,
@@ -60,6 +62,7 @@ class SoundEffectAssetManager extends SoundAssetManager<
                 [SoundEffectAssetId.HAMMER]: 1,
                 [SoundEffectAssetId.SHIELD_IMPACT]: 1,
                 [SoundEffectAssetId.BATTLE_AXE]: 0.5,
+                [SoundEffectAssetId.WOOD_CRACK]: 0.5,
             },
         );
     }

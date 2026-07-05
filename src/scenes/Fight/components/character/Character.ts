@@ -89,12 +89,12 @@ export class Character extends FightSceneDisplayer {
         this.loadAnimation(assetKey, `${assetKey}-idle-DL`, 2, 3);
         this.loadAnimation(assetKey, `${assetKey}-idle-UL`, 4, 5);
         this.loadAnimation(assetKey, `${assetKey}-idle-UR`, 6, 7);
-        if (classId === CharacterAssetId.ENTENTE_BRISE_BARRICADE){
+        if (classId === CharacterAssetId.ENTENTE_BRISE_BARRICADE) {
             this.loadAnimation(assetKey, `${assetKey}-scope-DR`, 8, 9);
             this.loadAnimation(assetKey, `${assetKey}-scope-DL`, 10, 11);
             this.loadAnimation(assetKey, `${assetKey}-scope-UL`, 12, 13);
             this.loadAnimation(assetKey, `${assetKey}-scope-UR`, 14, 15);
-        }else {
+        } else {
             this.loadAnimation(assetKey, `${assetKey}-scope-DR`, 8, 8);
             this.loadAnimation(assetKey, `${assetKey}-scope-DL`, 9, 9);
             this.loadAnimation(assetKey, `${assetKey}-scope-UL`, 10, 10);

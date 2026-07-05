@@ -2,9 +2,10 @@ import { Position } from "../../../core";
 import { Action, ActionType } from "../../../Model/Action";
 import { Entity } from "../../../Model/Entity";
 import { FightScene } from "../fight.scene";
-import { StatsUtils } from "../../../Model/Stats";
 import { Ran } from "../../../core/Types/Ran";
 import { EffectAction } from "../../../Model/Effect";
+import { PositionUtils } from "../../../core/Utils/Sizing";
+import { StatsUtils } from "../../../Model/Stats";
 
 export class ActionManager {
     public currentAction: Action | undefined;
@@ -45,12 +46,12 @@ export class ActionManager {
         switch (action.actionType) {
             case ActionType.MELEE:
                 {
-                    statBonus += Math.ceil(attackerStats.strength / 10);
+                    statBonus += attackerStats.strength / 10;
                 }
                 break;
             case ActionType.RANGED:
                 {
-                    statBonus += Math.ceil(attackerStats.precision / 10);
+                    statBonus += attackerStats.precision / 10;
                 }
                 break;
         }
@@ -64,9 +65,7 @@ export class ActionManager {
             }
         } else {
             brutTotal = damage + statBonus;
-            defenserDamage = Math.ceil(
-                brutTotal * (100 / (100 + defenserStats.armor)),
-            );
+            defenserDamage = brutTotal * (100 / (100 + defenserStats.armor));
 
             //Crit Logik
             const critRoll = Ran.int(100);
@@ -78,10 +77,16 @@ export class ActionManager {
             ).length;
             const critChance = 1 + critChanceBuff * 3;
             if (critRoll < critChance) {
-                defenserDamage = Math.ceil(
-                    defenserDamage * (2 + 0.25 * critDammageBuff),
-                );
+                defenserDamage = defenserDamage * (2 + 0.25 * critDammageBuff);
             }
+        }
+
+        if (action.id === "shield_rush") {
+            defenserDamage *=
+                1 +
+                (PositionUtils.distance(attacker.position, defenser.position) -
+                    1) *
+                    0.1;
         }
 
         // Vampire : vol de vie par stack
@@ -92,8 +97,7 @@ export class ActionManager {
                 (e) => e.action === EffectAction.VAMPIRISM,
             ).length;
             if (vampireStacks > 0) {
-                const lifeSteal =
-                    Math.ceil(defenserDamage / 10) * vampireStacks;
+                const lifeSteal = (defenserDamage / 10) * vampireStacks;
                 attackerDamage = -lifeSteal;
             }
 
@@ -101,13 +105,9 @@ export class ActionManager {
                 (e) => e.action === EffectAction.MASOCHISTIC,
             ).length;
             if (masoStacks > 0) {
-                const masoDamage = Math.floor(
-                    defenserDamage * (0.2 * masoStacks),
-                );
-                attackerDamage = Math.ceil(
-                    Math.floor(masoDamage / 2) *
-                        (100 / (100 + attackerStats.armor)),
-                );
+                const masoDamage = defenserDamage * (0.2 * masoStacks);
+                attackerDamage =
+                    (masoDamage / 2) * (100 / (100 + attackerStats.armor));
                 defenserDamage += masoDamage;
             }
 
@@ -115,14 +115,15 @@ export class ActionManager {
                 (e) => e.action === EffectAction.WEAKNESS,
             ).length;
             if (weaknessStacks > 0) {
-                const weaknessDamage = Math.floor(
-                    defenserDamage * (0.2 * weaknessStacks),
-                );
+                const weaknessDamage = defenserDamage * (0.2 * weaknessStacks);
                 defenserDamage += weaknessDamage;
             }
         }
 
-        return { attackerDamage, defenserDamage };
+        return {
+            attackerDamage: Math.ceil(attackerDamage),
+            defenserDamage: Math.ceil(defenserDamage),
+        };
     }
 }
 

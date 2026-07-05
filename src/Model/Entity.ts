@@ -17,5 +17,7 @@ export type Entity = {
     stats: Stats;
     effects: Effect[];
     dead: boolean;
+    isInvocation: boolean;
+    isPlaying: boolean;
 };
 
