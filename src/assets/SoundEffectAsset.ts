@@ -10,7 +10,9 @@ export enum SoundEffectAssetId {
     INTIMIDATION = "intimidation",
     CHARGE = "charge",
     DOPAGE = "dopage",
-    SABER = "saber"
+    SABER = "saber",
+    HAMMER = "hammer",
+    SHIELD_IMPACT = "shield-impact",
 }
 
 class SoundEffectAssetManager extends SoundAssetManager<
@@ -39,6 +41,8 @@ class SoundEffectAssetManager extends SoundAssetManager<
                 [SoundEffectAssetId.CHARGE]: "charge",
                 [SoundEffectAssetId.DOPAGE]: "dopage",
                 [SoundEffectAssetId.SABER]: "saber",
+                [SoundEffectAssetId.HAMMER]: "hammer",
+                [SoundEffectAssetId.SHIELD_IMPACT]: "shield-impact",
             },
             {
                 [SoundEffectAssetId.DEATH]: 1,
@@ -51,6 +55,8 @@ class SoundEffectAssetManager extends SoundAssetManager<
                 [SoundEffectAssetId.CHARGE]: 1,
                 [SoundEffectAssetId.DOPAGE]: 1,
                 [SoundEffectAssetId.SABER]: 1,
+                [SoundEffectAssetId.HAMMER]: 1,
+                [SoundEffectAssetId.SHIELD_IMPACT]: 1,
             },
         );
     }

@@ -234,6 +234,25 @@ export class AttackDisplayer extends FightSceneDisplayer {
                     await this.toaster.attackToast(animation);
                 }
                 break;
+            case ActionAssetId.SHIELD_RUSH:
+                {
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(
+                            SoundEffectAssetId.SHIELD_IMPACT,
+                        ),
+                    ).play();
+                    await this.playBloodSplatter(hits, origin, target);
+                }
+                break;
+            case ActionAssetId.BARRICADE:
+                {
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(SoundEffectAssetId.HAMMER),
+                    ).play();
+                }
+                break;
         }
         return this;
     }
