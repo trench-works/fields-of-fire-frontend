@@ -9,6 +9,7 @@ import {
     DisplayText,
     ScaleMode,
     BaseSceneInit,
+    SoundLevel,
 } from "../../core";
 import { Color } from "../../config/ColorConfig";
 import { LobbySocket } from "./repositories/lobby.socket";
@@ -27,6 +28,7 @@ import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { ClassStore } from "../Fight/stores/ClassStore";
 import { LobbyStore } from "./stores/LobbyStore";
 import { LobbyData } from "../LobbyList/interfaces/LobbyData";
+import { SoundParam } from "../../core/Utils/SoundLevel";
 
 export type LobbySceneInit = {
     lobby: LobbyData;
@@ -102,7 +104,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         });
         this.lobbySocket.onStart((game) => {
             const player = game.players.find(
-                (player) => player.userId === global.user?.id,
+                (player) => player.userId === globalThis.user?.id,
             )!;
             FightScene.start(this, {
                 data: {
@@ -112,7 +114,10 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 config: { keepMusic: false },
             });
         });
-
+        console.log(
+            "musicSound - LOBBY : ",
+            SoundLevel.get(SoundParam.BACKGROUND),
+        );
         //title BOX
         new DisplayText(
             this,
@@ -255,7 +260,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
 
         this.playerImageContainer = playerImageContainer;
 
-        const isCreator = this.lobby.creatorId === global.user?.id;
+        const isCreator = this.lobby.creatorId === globalThis.user?.id;
         const allReady =
             this.lobby.playerReady.length === this.lobby.players.length;
         const iAmReady = this.lobby.playerReady.includes(this.playerId);
@@ -264,7 +269,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             "creator : ",
             this.lobby.creatorId,
             ", me :",
-            global.user?.id,
+            globalThis.user?.id,
         );
         this.startButton = new Button(
             this,
@@ -300,6 +305,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 console.log("Options - À implémenter");
             },
             onMainMenuClick: () => {
+                this.lobbySocket.leaveLobby();
                 MainMenu.start(this);
             },
         });
@@ -364,7 +370,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             this.settingsRoot.add(
                 new DisplayContainer(this, rowGrid.getArea({ x: 1, y: 1 }), {
                     backgroundImage: CharacterCloseupAsset.getAssetKey(
-                        player.classId as CharacterAssetId,
+                        player.classId,
                     ),
                     borderWidth: 2,
                 }),
@@ -446,7 +452,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
     }
 
     updateStartButton() {
-        const isCreator = this.lobby.creatorId === global.user?.id;
+        const isCreator = this.lobby.creatorId === globalThis.user?.id;
         const allReady =
             (this.lobbyStore.lobby?.playerReady.length ?? 0) ===
             (this.lobbyStore.lobby?.players.length ?? 0);

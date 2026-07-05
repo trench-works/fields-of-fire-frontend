@@ -2,6 +2,7 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "esnext",
+        "resolveJsonModule": true,
         "esModuleInterop": true,
         "noImplicitAny": true,
         "removeComments": true,

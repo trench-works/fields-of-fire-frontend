@@ -4,7 +4,7 @@ import { GameStore } from "../../stores/GameStore";
 import { FightSceneDisplayer } from "../FightSceneDisplayer";
 import { GameMoveAnimation } from "../../repositories/player.socket";
 import { Game } from "../../../../Model/Game";
-import { Position, SoundEffect } from "../../../../core";
+import { Position, SoundEffect, Timeout } from "../../../../core";
 import { SoundEffectAsset, SoundEffectAssetId } from "../../../../assets";
 import { PlayerStore } from "../../stores/PlayerStore";
 import { PositionUtils } from "../../../../core/Utils/Sizing";
@@ -55,6 +55,7 @@ export class CharactersDisplayer extends FightSceneDisplayer {
     }
 
     async kill(entityId: string): Promise<this> {
+        const entity = this.gameStore.getEntity(entityId);
         return new Promise((resolve) => {
             const i = this.characters.findIndex(
                 (character) => character.entityId === entityId,
@@ -62,11 +63,20 @@ export class CharactersDisplayer extends FightSceneDisplayer {
             if (i >= 0) {
                 const character = this.characters[i];
                 this.characters.splice(i, 1);
-                new SoundEffect(
-                    this.scene,
-                    SoundEffectAsset.getAssetKey(SoundEffectAssetId.DEATH),
-                ).play();
                 character.destroy();
+                if (entity.classId === "barricade") {
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(
+                            SoundEffectAssetId.WOOD_CRACK,
+                        ),
+                    ).play();
+                } else {
+                    new SoundEffect(
+                        this.scene,
+                        SoundEffectAsset.getAssetKey(SoundEffectAssetId.DEATH),
+                    ).play();
+                }
             }
             setTimeout(() => resolve(this), 1000);
         });
@@ -98,6 +108,7 @@ export class CharactersDisplayer extends FightSceneDisplayer {
         await this.characters
             .find((character) => character.entityId === animation.data.entityId)
             ?.animate(animation, newGame);
+        await Timeout(100);
         return this;
     }
 }

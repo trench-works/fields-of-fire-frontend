@@ -9,9 +9,9 @@ import {
     DisplayContainer,
     Grid,
     DisplayText,
-    Blur,
     GridArea,
     ScaleMode,
+    i18n,
 } from "../../../core";
 import { DisplayImage } from "../../../core/UI/DisplayImage";
 import { CharacterClass } from "../../../Model/CharacterClass";
@@ -203,9 +203,31 @@ export class StatsDisplayer extends FightSceneDisplayer {
     }
 
     blurOut(): this {
-        new Blur(this.scene, this.statsArea, {
-            radius: this.statsPanel.outterRadius,
-            depth: 50,
+        this.statsImage.blur();
+        this.statsPanel.blur();
+        this.playerName.blur();
+        this.playerNameText.blur();
+        this.statsClassName.blur();
+        this.statsClassNameText.blur();
+        this.effectImages.forEach((image) => image.blur());
+        this.statTexts.forEach(({ text, image }) => {
+            text.blur();
+            image.blur();
+        });
+        return this;
+    }
+
+    unblur(): this {
+        this.statsImage.unblur();
+        this.statsPanel.unblur();
+        this.playerName.unblur();
+        this.playerNameText.unblur();
+        this.statsClassName.unblur();
+        this.statsClassNameText.unblur();
+        this.effectImages.forEach((image) => image.unblur());
+        this.statTexts.forEach(({ text, image }) => {
+            text.unblur();
+            image.unblur();
         });
         return this;
     }
@@ -226,10 +248,12 @@ export class StatsDisplayer extends FightSceneDisplayer {
             // Image
             const image = new DisplayImage(
                 this.scene,
-                statGrid.getArea({
-                    x: 1,
-                    y: 1,
-                }),
+                statGrid
+                    .getArea({
+                        x: 1,
+                        y: 1,
+                    })
+                    .scaleFromCenter(1, ScaleMode.FIT),
             ).setImage(
                 StatsIconAsset.getAssetKey(icon),
                 StatsIconAsset.getAssetScale(icon),
@@ -261,6 +285,12 @@ export class StatsDisplayer extends FightSceneDisplayer {
 
     update(): this {
         const stats = StatsUtils.fromEntity(this.entity);
+
+        if (this.entity.dead) {
+            this.blurOut();
+        } else {
+            this.unblur();
+        }
 
         this.statTexts.forEach(({ text }, key) => {
             let value = stats[key];
@@ -325,6 +355,9 @@ export class StatsDisplayer extends FightSceneDisplayer {
             )
                 .setImage(EffectAsset.getAssetKey(id), 1.2)
                 .setInteractive(true);
+            if (this.entity.dead) {
+                image.blur();
+            }
 
             const body = effects
                 .map((effect) => {
@@ -334,7 +367,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                         ),
                     );
                     if (Object.keys(modified).length === 0) {
-                        return `${effect.author ? effect.author + ", " : ""}durée : ${effect.duration ?? "∞"}`;
+                        return `${effect.author ? effect.author + ", " : ""}${i18n.translate("fight.effects.duration")} : ${effect.duration ?? "∞"}`;
                     }
                     const modifierLines = Object.entries(modified)
                         .map(
@@ -342,7 +375,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                                 `${key}: ${value > 0 ? "+" : ""}${value}`,
                         )
                         .join("\n");
-                    return `--------\n${modifierLines}\n${effect.author ? effect.author + ", " : ""}durée : ${effect.duration ?? "∞"}`;
+                    return `--------\n${modifierLines}\n${effect.author ? effect.author + ", " : ""}${i18n.translate("fight.effects.duration")} : ${effect.duration ?? "∞"}`;
                 })
                 .join("\n");
 

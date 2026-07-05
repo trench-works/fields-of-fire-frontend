@@ -1,5 +1,6 @@
 import { Depth, GRID_LEVELS_OFFSET, Position } from "../../../core";
-import { Action, ActionZoneType } from "../../../Model/Action";
+import { applyFovToRange } from "../../../Model";
+import { Action, ActionLevel, ActionZoneType } from "../../../Model/Action";
 import { Cell, FightScene } from "../fight.scene";
 import { GameStore } from "../stores/GameStore";
 
@@ -38,6 +39,7 @@ export class RangeVisualizer {
     }
 
     showRange(): this {
+        this.clearRange();
         this.cellsInRange.forEach((cell) => {
             if (cell) {
                 cell.highlight = this.highlightCell(cell);
@@ -119,6 +121,7 @@ export class RangeVisualizer {
 
         for (let x = 0; x < this.scene.gridPositions.length; x++) {
             for (let y = 0; y < this.scene.gridPositions[x].length; y++) {
+                let isInRange = false;
                 const cell = board[x]?.[y];
                 const dist = Math.abs(start.x - x) + Math.abs(start.y - y);
 
@@ -132,7 +135,7 @@ export class RangeVisualizer {
                             !cell.isHole &&
                             !cell.isWall
                         ) {
-                            result.push(this.scene.gridPositions[x]?.[y]);
+                            isInRange = true;
                         }
                         break;
                     case ActionZoneType.PLUS:
@@ -141,14 +144,14 @@ export class RangeVisualizer {
                             dist >= action.range.min &&
                             cell &&
                             !cell.isHole &&
-                            !cell.isWall 
+                            !cell.isWall
                         ) {
-                            if(x === start.x ||y === start.y){
-                                result.push(this.scene.gridPositions[x]?.[y]);
+                            if (x === start.x || y === start.y) {
+                                isInRange = true;
                             }
                         }
                         break;
-                    case ActionZoneType.XCROSS:
+                    case ActionZoneType.XCROSS: {
                         const dx = Math.abs(start.x - x);
                         const dy = Math.abs(start.y - y);
                         if (
@@ -159,14 +162,22 @@ export class RangeVisualizer {
                             dx >= action.range.min &&
                             dx <= action.range.max
                         ) {
-                            result.push(this.scene.gridPositions[x]?.[y]);
+                            isInRange = true;
                         }
                         break;
+                    }
+                }
+                if (isInRange) {
+                    result.push(this.scene.gridPositions[x]?.[y]);
                 }
             }
         }
-        this.cellsInRange = result;
 
+        if (action.level === ActionLevel.GROUND) {
+            this.cellsInRange = applyFovToRange(start, result, board);
+            return this;
+        }
+        this.cellsInRange = result;
         return this;
     }
 

@@ -3,6 +3,7 @@ import {
     DisplayRoot,
     DisplayText,
     GridArea,
+    i18n,
     Position,
     UI_LEVELS_OFFSET,
 } from "../../../core";
@@ -30,8 +31,8 @@ class Toast extends DisplayRoot {
         this.add(this.text);
     }
 
-    setText(text: string): this {
-        this.text.setText(text, { color: "#FF0000" });
+    setText(text: string, color: string = "#FF0000"): this {
+        this.text.setText(text, { color: color });
         return this;
     }
 
@@ -56,7 +57,10 @@ export class Toaster {
                     this.scene.gridPositions[hit.x][hit.y].pixelPosition,
                     1,
                 )
-                    .setText(`${-hit.damage} ❤️`)
+                    .setText(
+                        hit.damage === 0 ? i18n.translate("fight.actions.dodged"): `${-hit.damage} ❤️`,
+                        hit.damage === 0 ? "#00FF00" : "#FF0000",
+                    )
                     .animate(1000),
             ),
         );

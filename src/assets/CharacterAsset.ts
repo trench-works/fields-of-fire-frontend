@@ -8,6 +8,7 @@ export enum CharacterAssetId {
     ALLIANCE_MEDIC = "alliance_medic",
     ALLIANCE_CAPORAL = "alliance_caporal",
     ENTENTE_BRISE_BARRICADE = "entente_brise_barricade",
+    BARRICADE = "barricade",
 }
 
 const CharacterAssetEntries = Object.fromEntries(
@@ -34,7 +35,8 @@ class CharacterIconAssetManager extends ImageAssetManager<
             [CharacterAssetId.ALLIANCE_FANTASSIN]: { width: 1, height: 1 },
             [CharacterAssetId.ALLIANCE_MEDIC]: { width: 1, height: 1 },
             [CharacterAssetId.ALLIANCE_CAPORAL]: { width: 1, height: 1 },
-            [CharacterAssetId.ENTENTE_BRISE_BARRICADE]:{ width: 1, height: 1 },
+            [CharacterAssetId.ENTENTE_BRISE_BARRICADE]: { width: 1, height: 1 },
+            [CharacterAssetId.BARRICADE]: { width: 1, height: 1 },
         });
     }
 }
@@ -62,6 +64,7 @@ class CharacterCloseupAssetManager extends ImageAssetManager<
             [CharacterAssetId.ALLIANCE_MEDIC]: { width: 1, height: 1 },
             [CharacterAssetId.ALLIANCE_CAPORAL]: { width: 1, height: 1 },
             [CharacterAssetId.ENTENTE_BRISE_BARRICADE]: { width: 1, height: 1 },
+            [CharacterAssetId.BARRICADE]: { width: 1, height: 1 },
         });
     }
 }
@@ -99,7 +102,7 @@ class CharacterSpriteAssetManager extends SpriteAssetManager<
             },
             [CharacterAssetId.ENTENTE_BRISE_BARRICADE]: {
                 frameWidth: 96,
-                frameHeight: 128,
+                frameHeight: 140,
                 frameTime: [],
             },
             [CharacterAssetId.ALLIANCE_FANTASSIN]: {
@@ -115,6 +118,11 @@ class CharacterSpriteAssetManager extends SpriteAssetManager<
             [CharacterAssetId.ALLIANCE_CAPORAL]: {
                 frameWidth: 96,
                 frameHeight: 128,
+                frameTime: [],
+            },
+            [CharacterAssetId.BARRICADE]: {
+                frameWidth: 64,
+                frameHeight: 64,
                 frameTime: [],
             },
         });

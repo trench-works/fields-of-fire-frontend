@@ -33,6 +33,10 @@ export class PositionUtils {
         };
     }
 
+    static distance(a: Position, b: Position): number {
+        return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+    }
+
     static subtract(a: Position, b: Position): Position {
         return {
             x: a.x - b.x,

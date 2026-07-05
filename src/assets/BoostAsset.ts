@@ -1,22 +1,24 @@
 import { ImageAssetManager } from "../core/Assets/Asset";
 
 export enum BoostAssetId {
-    HEAL= "heal",
+    HEAL = "heal",
     ARMOR = "armor",
     VERSATILE = "versatile",
     STRENGTH = "strength",
-    PRECISION= "precision",
+    PRECISION = "precision",
     LIFE = "life",
     VAMPIRE = "vampire",
     REACTION = "reaction",
     ENERGY = "energy",
     ACCELERATION = "acceleration",
-    DODGE = "dodging",
+    DODGE = "dodge",
     HEAVY_GUN = "heavy_gun",
     STABILISATION = "stabilisation",
     SPRINT = "sprint",
     ALLEVIATE = "alleviate",
     MASOCHISTIC = "masochistic",
+    CRIT_DAMMAGE = "crit_dammage",
+    CRIT_CHANCE = "crit_chance",
 }
 
 class BoostAssetManager extends ImageAssetManager<BoostAssetId, string> {
@@ -45,7 +47,9 @@ class BoostAssetManager extends ImageAssetManager<BoostAssetId, string> {
             [BoostAssetId.STABILISATION]: "stabilisation",
             [BoostAssetId.SPRINT]: "sprint",
             [BoostAssetId.ALLEVIATE]: "alleviate",
-            [BoostAssetId.MASOCHISTIC]: "masochistic"
+            [BoostAssetId.MASOCHISTIC]: "masochistic",
+            [BoostAssetId.CRIT_DAMMAGE]: "crit_dammage",
+            [BoostAssetId.CRIT_CHANCE]: "crit_chance",
         },
         {
             [BoostAssetId.HEAL]: { width: 512, height: 512 },
@@ -64,6 +68,8 @@ class BoostAssetManager extends ImageAssetManager<BoostAssetId, string> {
             [BoostAssetId.SPRINT]: { width: 512, height: 512 },
             [BoostAssetId.ALLEVIATE]: { width: 512, height: 512 },
             [BoostAssetId.MASOCHISTIC]: { width: 512, height: 512 },
+            [BoostAssetId.CRIT_DAMMAGE]: { width: 512, height: 512 },
+            [BoostAssetId.CRIT_CHANCE]: { width: 512, height: 512 },
         }
         );
     }

@@ -2,6 +2,12 @@ import { ActionAssetId } from "../assets";
 import { Position } from "../core";
 import { Effect } from "./Effect";
 
+export enum ActionLevel {
+    UNDERGROUND = "UNDERGROUND",
+    GROUND = "GROUND",
+    OVERGROUND = "OVERGROUND",
+}
+
 export class Action {
     id!: ActionAssetId;
     name!: string;
@@ -17,17 +23,21 @@ export class Action {
     pushValue?: number;
     cost!: number;
     isWalkAction?: boolean;
+    level!: ActionLevel;
 }
 
 export enum ActionType {
-    MELEE = "MELEE",
     RANGED = "RANGED",
+    MELEE = "MELEE",
+    MOUVEMENT = "MOUVEMENT",
+    SUPPORT = "SUPPORT",
+    OTHER = "OTHER",
 }
 
 export enum ActionZoneType {
-    DIAMOND = "diamond",
-    CIRCLE = "circle",
-    PLUS = "plus",
-    XCROSS = "xcross",
+    DIAMOND = "DIAMOND",
+    CIRCLE = "CIRCLE",
+    PLUS = "PLUS",
+    XCROSS = "XCROSS",
 }
 

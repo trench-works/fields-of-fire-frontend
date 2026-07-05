@@ -4,7 +4,8 @@ import { FourAxis, PlacementOrigin, Position, Size } from "../Types";
 import { Displayable } from "./DisplayRoot";
 import { DisplayText } from "./DisplayText";
 import { BaseScene } from "../Objects";
-import { ColorUtils } from "../Utils";
+import { ColorUtils, GridArea } from "../Utils";
+import { DisplayImage } from "./DisplayImage";
 
 const CLICKABLE_ALPHA = 1;
 const UNCLICKABLE_ALPHA = 0.5;
@@ -27,7 +28,7 @@ export class Button
 {
     declare scene: BaseScene;
     protected textDisplay?: DisplayText;
-    protected imageDisplay?: Phaser.GameObjects.Image;
+    protected imageDisplay?: DisplayImage;
     protected background?: Phaser.GameObjects.Rectangle;
 
     private highlighter?: Phaser.GameObjects.Graphics;
@@ -39,6 +40,8 @@ export class Button
     protected textColor;
 
     protected color = Color.btnBg;
+
+    public blurred: Phaser.FX.Blur | undefined = undefined;
 
     constructor(
         scene: BaseScene,
@@ -104,6 +107,21 @@ export class Button
         scene.add.existing(this);
     }
 
+    blur() {
+        if (!this.blurred) {
+            this.blurred = this.postFX?.addBlur();
+        }
+        this.blurred?.setActive(true);
+        this.imageDisplay?.blur();
+        return this;
+    }
+
+    unblur() {
+        this.blurred?.setActive(false);
+        this.imageDisplay?.unblur();
+        return this;
+    }
+
     hightlight(highlight: boolean): this {
         if (highlight) {
             if (!this.highlighter) {
@@ -139,14 +157,16 @@ export class Button
 
         this.background?.destroy();
 
-        this.imageDisplay = this.scene.make.image(
-            { x: 0, y: 0, key: imageKey },
-            false,
-        );
-        this.imageDisplay.setDisplaySize(this.width, this.height);
-        this.imageDisplay.setOrigin(0.5);
+        this.imageDisplay = new DisplayImage(
+            this.scene,
+            new GridArea(
+                this.area.x,
+                this.area.y,
+                this.area.width,
+                this.area.height,
+            ),
+        ).setImage(imageKey);
 
-        this.addAt(this.imageDisplay);
         return this;
     }
 
@@ -175,6 +195,9 @@ export class Button
     public setIsActivated(isActivated: boolean): this {
         this.isActivated = isActivated;
         this.setAlpha(isActivated ? CLICKABLE_ALPHA : UNCLICKABLE_ALPHA);
+        this.imageDisplay?.setAlpha(
+            isActivated ? CLICKABLE_ALPHA : UNCLICKABLE_ALPHA,
+        );
         this.background?.setFillStyle(
             Phaser.Display.Color.HexStringToColor(Color.btnBg).color,
         );
@@ -219,6 +242,20 @@ export class Button
                 this.imageDisplay.clearTint();
             }
         });
+    }
+
+    setText(
+        text: string,
+        options?: { color?: string; fontSize?: number },
+    ): this {
+        this.displayText(text, options);
+        return this;
+    }
+
+    setImage(imageKey: string): this {
+        console.log("test", this.imageDisplay);
+        this.imageDisplay?.setImage(imageKey);
+        return this;
     }
 }
 

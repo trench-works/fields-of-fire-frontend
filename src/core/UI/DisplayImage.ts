@@ -6,6 +6,8 @@ import { Displayable } from "./DisplayRoot";
 export class DisplayImage implements Displayable {
     protected image: Phaser.GameObjects.Image;
 
+    public blurred: Phaser.FX.Blur | undefined = undefined;
+
     constructor(
         protected readonly scene: BaseScene,
         protected readonly area: GridArea,
@@ -15,6 +17,19 @@ export class DisplayImage implements Displayable {
 
     setDepth(depth: number): this {
         this.image.setDepth(depth);
+        return this;
+    }
+
+    blur(): this {
+        if (!this.blurred) {
+            this.blurred = this.image.postFX?.addBlur();
+        }
+        this.blurred?.setActive(true);
+        return this;
+    }
+
+    unblur(): this {
+        this.blurred?.setActive(false);
         return this;
     }
 
@@ -60,6 +75,16 @@ export class DisplayImage implements Displayable {
 
     getObject(): Phaser.GameObjects.GameObject {
         return this.image;
+    }
+
+    setTint(color: number): this {
+        this.image.setTint(color);
+        return this;
+    }
+
+    clearTint(): this {
+        this.image.clearTint();
+        return this;
     }
 }
 

@@ -37,6 +37,8 @@ export class DisplayContainer
     private bgOpacity: number;
     private hoverTint: number | undefined;
 
+    public blurred: Phaser.FX.Blur | undefined = undefined;
+
     protected radius:
         | Phaser.Types.GameObjects.Graphics.RoundedRectRadius
         | number;
@@ -46,6 +48,19 @@ export class DisplayContainer
     protected innerRadius?:
         | Phaser.Types.GameObjects.Graphics.RoundedRectRadius
         | number;
+
+    blur() {
+        if (!this.blurred) {
+            this.blurred = this.postFX?.addBlur();
+        }
+        this.blurred?.setActive(true);
+        return this;
+    }
+
+    unblur() {
+        this.blurred?.setActive(false);
+        return this;
+    }
 
     getObject(): Phaser.GameObjects.GameObject {
         throw new Error("Method not implemented.");
@@ -154,15 +169,16 @@ export class DisplayContainer
         }
         const width = this.width;
         const height = this.height;
-        this.border.clear();
-        this.border.lineStyle(borderWidth, borderColor, 1);
-        this.border.strokeRoundedRect(
-            -width / 2,
-            -height / 2,
-            width,
-            height,
-            this.innerRadius ?? this.radius,
-        );
+        this.border
+            .clear()
+            .lineStyle(borderWidth, borderColor, 1)
+            .strokeRoundedRect(
+                -width / 2,
+                -height / 2,
+                width,
+                height,
+                this.innerRadius ?? this.radius,
+            );
         if (this.outterRadius !== undefined) {
             if (!this.outterBorder) {
                 this.outterBorder = this.scene.make.graphics({}, false);
@@ -170,23 +186,25 @@ export class DisplayContainer
             }
             const width = this.width;
             const height = this.height;
-            this.outterBorder.clear();
-            this.outterBorder.lineStyle(borderWidth, borderColor, 1);
-            this.outterBorder.strokeRoundedRect(
-                -width / 2,
-                -height / 2,
-                width,
-                height,
-                this.outterRadius,
-            );
+            this.outterBorder
+                .clear()
+                .lineStyle(borderWidth, borderColor, 1)
+                .strokeRoundedRect(
+                    -width / 2,
+                    -height / 2,
+                    width,
+                    height,
+                    this.outterRadius,
+                );
         }
     }
 
     public setBackgroundColor(color: string, alpha = 1) {
         // Sinon on met à jour le Graphics existant
         if (this.background instanceof Phaser.GameObjects.Graphics) {
-            this.background.clear();
-            this.background.fillStyle(ColorUtils.parseColor(color), alpha);
+            this.background
+                .clear()
+                .fillStyle(ColorUtils.parseColor(color), alpha);
             this.drawBackground();
         }
     }
@@ -223,17 +241,14 @@ export class DisplayContainer
                 { x: 0, y: 0, key: imageKey },
                 false,
             );
-            img.setDisplaySize(width, height);
-            img.setOrigin(0.5);
+            img.setDisplaySize(width, height).setOrigin(0.5);
 
             this.background = img;
             this.addAt(img, 0);
         } else {
-            this.background = this.scene.make.graphics({}, false);
-            this.background.fillStyle(
-                ColorUtils.parseColor(this.bgColor),
-                this.bgOpacity,
-            );
+            this.background = this.scene.make
+                .graphics({}, false)
+                .fillStyle(ColorUtils.parseColor(this.bgColor), this.bgOpacity);
             this.drawBackground();
             this.addAt(this.background, 0);
         }

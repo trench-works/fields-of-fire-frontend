@@ -28,6 +28,19 @@ export class GroundDisplayer extends FightSceneDisplayer {
         return this;
     }
 
+    clean(): this {
+        this.groundStore.groundLayer?.destroy();
+        this.tileHighlights.forEach((highlight) => highlight.destroy());
+        for (let x = 0; x < this.scene.gridPositions.length; x++) {
+            for (let y = 0; y < this.scene.gridPositions[x].length; y++) {
+                this.scene.gridPositions[x][y].highlight?.destroy();
+                this.scene.gridPositions[x][y].hoverGraphics?.destroy();
+                this.scene.gridPositions[x][y].zone?.destroy();
+            }
+        }
+        return this;
+    }
+
     render(): this {
         this.renderGroundLayer();
         this.generatePlayGrid();
@@ -60,14 +73,15 @@ export class GroundDisplayer extends FightSceneDisplayer {
         );
         this.scene.scaleFactor = centerMap.scaleFactor;
 
-        this.groundStore.setGroundLayer(
-            map.createLayer(
-                "Ground",
-                tileset!,
-                centerMap.offset.x,
-                centerMap.offset.y,
-            ),
+        const layer = map.createLayer(
+            "Ground",
+            tileset!,
+            centerMap.offset.x,
+            centerMap.offset.y,
         );
+        console.log(layer);
+
+        this.groundStore.setGroundLayer(layer);
 
         if (!this.groundStore.groundLayer) {
             throw new Error("Ground layer seemingly inexistent");
@@ -91,6 +105,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
                 // Ground part
                 const tile = this.groundStore.groundLayer?.getTileAt?.(x, y);
                 if (tile) {
+                    tile.setVisible(true);
                     if (caseTile.isHole) {
                         tile.setVisible(false);
                     } else if (!caseTile.isWall) {
@@ -126,15 +141,15 @@ export class GroundDisplayer extends FightSceneDisplayer {
             return;
         }
         for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
+            if (!this.scene.gridPositions[x]) {
+                this.scene.gridPositions[x] = [];
+            }
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
                 const tile = this.groundStore.groundLayer.getTileAt(x, y);
                 const caseTile = this.gameStore.game.plateau[x][y];
 
                 const worldX = tile.getCenterX();
                 const worldY = tile.getCenterY();
-                if (!this.scene.gridPositions[y]) {
-                    this.scene.gridPositions[y] = [];
-                }
 
                 this.scene.gridPositions[x][y] = {
                     gridPosition: { x, y },
@@ -144,18 +159,19 @@ export class GroundDisplayer extends FightSceneDisplayer {
                     },
                 };
 
+                tile.setVisible(true);
                 if (caseTile.isHole) {
                     tile.setVisible(false);
                 } else if (!caseTile.isWall) {
                     if (!tile) continue;
-                    const diamond = new Diamond(tile, this.scene.scaleFactor);
+                    const DIAMOND = new Diamond(tile, this.scene.scaleFactor);
 
                     const hoverGraphics = this.getTileHighlights(
                         { x, y },
                         tile,
                         {
                             color: 0xffffff,
-                            diamond,
+                            DIAMOND,
                             depth: 2,
                         },
                     );
@@ -164,12 +180,12 @@ export class GroundDisplayer extends FightSceneDisplayer {
                         hoverGraphics;
 
                     const zone = this.getTileInteractiveZone({ x, y }, tile, {
-                        diamond,
+                        DIAMOND,
                     });
                     this.scene.gridPositions[x][y].zone = zone;
 
                     // --- DEBUG VISUEL ---
-                    //this.gridShower(diamond, worldX, worldY, layer);
+                    //this.gridShower(DIAMOND, worldX, worldY, layer);
                     zone.on("pointerdown", () => {
                         this.scene.character.changeDirection({ x, y });
                         if (this.scene.actionManager.currentAction) {
@@ -228,11 +244,11 @@ export class GroundDisplayer extends FightSceneDisplayer {
     getTileHighlights(
         position: Position,
         tile: Phaser.Tilemaps.Tile,
-        props?: { color: number; diamond?: Diamond; depth?: number },
+        props?: { color: number; DIAMOND?: Diamond; depth?: number },
     ): Phaser.GameObjects.Graphics {
-        let diamond: Diamond | undefined = props?.diamond;
-        if (!diamond) {
-            diamond = new Diamond(tile, this.scene.scaleFactor);
+        let DIAMOND: Diamond | undefined = props?.DIAMOND;
+        if (!DIAMOND) {
+            DIAMOND = new Diamond(tile, this.scene.scaleFactor);
         }
         const worldX = tile.getCenterX();
         const worldY = tile.getCenterY();
@@ -240,7 +256,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
         // Create Graphic
         const graphics = this.scene.add.graphics();
         graphics.lineStyle(2, props?.color ?? 0xffffff, 1);
-        graphics.strokePoints(diamond.points, true);
+        graphics.strokePoints(DIAMOND.points, true);
         graphics.setPosition(worldX, worldY);
         graphics.setDepth(
             Depth.getFromGridPosition(
@@ -255,18 +271,18 @@ export class GroundDisplayer extends FightSceneDisplayer {
     getTileInteractiveZone(
         position: Position,
         tile: Phaser.Tilemaps.Tile,
-        props?: { diamond?: Diamond },
+        props?: { DIAMOND?: Diamond },
     ): Phaser.GameObjects.Zone {
-        let diamond: Diamond | undefined = props?.diamond;
-        if (!diamond) {
-            diamond = new Diamond(tile, this.scene.scaleFactor);
+        let DIAMOND: Diamond | undefined = props?.DIAMOND;
+        if (!DIAMOND) {
+            DIAMOND = new Diamond(tile, this.scene.scaleFactor);
         }
         const worldX = tile.getCenterX();
         const worldY = tile.getCenterY();
 
         // Create Zone
         const zone = this.scene.add.zone(worldX, worldY, 10, 10);
-        zone.setInteractive(diamond, Phaser.Geom.Polygon.Contains);
+        zone.setInteractive(DIAMOND, Phaser.Geom.Polygon.Contains);
         zone.setDepth(
             Depth.getFromGridPosition(
                 position,
@@ -308,16 +324,23 @@ export class GroundDisplayer extends FightSceneDisplayer {
             const targetEntity = this.gameStore.getEntity(entityId);
             if (!targetEntity) return;
 
-            const damagePreview = this.scene.actionManager
-                .calculateDamagePreview(
-                    action,
-                    this.playerStore.playerEntity,
-                    targetEntity,
-                )
-                .join(" - ");
+            const minDamage = this.scene.actionManager.calculateFinalDamage(
+                action.damage?.min ?? 0,
+                action,
+                this.playerStore.playerEntity,
+                targetEntity,
+            );
+            const maxDamage = this.scene.actionManager.calculateFinalDamage(
+                action.damage?.max ?? 0,
+                action,
+                this.playerStore.playerEntity,
+                targetEntity,
+            );
+
+            const isHeal = (action.damage?.max ?? 0) <= 0;
 
             tooltipItems.push({
-                text: `${(action.damage?.max ?? 0) <= 0 ? "🩹" : "⚔️"} ${damagePreview}`,
+                text: `${isHeal ? "🩹" : "⚔️"} ${isHeal ? -minDamage.defenserDamage : minDamage.defenserDamage}-${isHeal ? -maxDamage.defenserDamage : maxDamage.defenserDamage}`,
                 title: this.classStore.getClass(targetEntity.classId).name,
                 position: {
                     x: cell.pixelPosition.x,

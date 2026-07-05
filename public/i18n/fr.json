@@ -1,0 +1,61 @@
+{
+    "common": {
+        "validate": "Valider"
+    },
+    "loader": {
+        "assets": "Chargements des assets",
+        "connect": "En attente des joueurs"
+    },
+    "menuPanel": {
+        "title": "Menu",
+        "back": "Reprendre",
+        "options": "Options",
+        "mainMenu": "Retour au Menu"
+    },
+    "mainMenu": {
+        "play": "Jouer",
+        "settings": "Paramètres",
+        "login": "Se Connecter",
+        "register": "Créer un Compte",
+        "disconnect": "Se Déconnecter",
+        "registerPopup": {
+            "username": {
+                "title": "Nom d'utilisateur",
+                "placeholder": "Entrez votre pseudo..."
+            },
+            "password": {
+                "title": "Mot de passe",
+                "placeholder": "Entrez votre mot de passe..."
+            }
+        }
+    },
+    "fight": {
+        "actions": {
+            "cost": "Coût",
+            "range": "Portée",
+            "type": {
+                "RANGED": "A Distance",
+                "MOUVEMENT": "Déplacement",
+                "MELEE": "Mêlée",
+                "SUPPORT": "Support",
+                "OTHER": "Autre"
+            },
+            "dodged": "Esquivé",
+            "endTurn": "Fin du tour"
+        },
+        "effects": {
+            "duration": "durée"
+        }
+    },
+    "parameter": {
+        "parameter": "Paramètres",
+        "return": "Retour",
+        "languageTitle": "Selection de la Langue",
+        "soundTitle": "Paramètres Sonores",
+        "sound": {
+            "music": "Musique",
+            "effects": "Effets Sonores"
+        }
+    }
+}
+

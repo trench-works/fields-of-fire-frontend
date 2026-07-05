@@ -6,6 +6,8 @@ import {
     BaseSceneInit,
     SoundEffect,
     Timeout,
+    KeyBindUtils,
+    SoundLevel,
 } from "../../core";
 import { SceneConfig } from "../../config/SceneConfig";
 import { RangeVisualizer } from "./objects/RangeVisualizer";
@@ -53,6 +55,8 @@ import { Toaster } from "./components/Toaster";
 import { ParticleDisplayer } from "./components/Particle/ParticleDisplayer";
 import { BoostAsset } from "../../assets/BoostAsset";
 import { ConnectionLoader } from "../../core/Objects/Loader";
+import { KeyBinds } from "../../core/keybinds/keybinds";
+import { SoundParam } from "../../core/Utils/SoundLevel";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -124,9 +128,12 @@ export class FightScene extends BaseScene<FightSceneInit> {
     public gridPositions: Cell[][] = [];
     public scaleFactor: number = 1;
     public particleDisplayer: ParticleDisplayer = new ParticleDisplayer(this);
+    public keyBinds: KeyBinds;
 
     constructor() {
         super(SceneAssetId.FIGHT, BackgroundAssetId.FIGHT);
+
+        this.keyBinds = KeyBindUtils.getKeyBinds();
 
         /**
          * Stores
@@ -212,7 +219,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
         /**
          * Update Displayers
          */
-        this.board.update();
+        this.board.reset();
         this.actions.destroy().preRender().render().update();
         this.turns.update();
         this.character.render().update();
@@ -261,7 +268,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
                         this.playerStore.playerEntity.id
                     ) {
                         this.playerStats.blurOut();
-                        this.actions.blurOut();
+                        this.actions.root.blur();
                     }
                     this.character.kill(animation.data.entityId);
                     break;
@@ -289,7 +296,6 @@ export class FightScene extends BaseScene<FightSceneInit> {
             this.inspectCharacter(this.inspectStats.entityId);
         }
 
-        await Timeout(1000);
         this.actions.unlock();
     }
 
@@ -313,7 +319,6 @@ export class FightScene extends BaseScene<FightSceneInit> {
         this.endFight.preRender();
 
         this.playerSocket = new GamePlayerSocket(game.id, playerId);
-        console.log(this.playerSocket);
         new ConnectionLoader(this, this.playerSocket);
         this.playerSocket.onClose(() =>
             MainMenu.start(this, { keepMusic: false }),
@@ -373,6 +378,10 @@ export class FightScene extends BaseScene<FightSceneInit> {
 
     create() {
         super.create();
+        console.log(
+            "musicSound - FIGHT : ",
+            SoundLevel.get(SoundParam.BACKGROUND),
+        );
         this.playBackgroundMusic(MusicAssetId.FIGHT);
         this.tooltip = Tooltip.getInstance(this, {
             textColor: "#000000",
@@ -403,6 +412,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
                 console.log("Options - À implémenter");
             },
             onMainMenuClick: () => {
+                this.playerSocket.disconnect();
                 MainMenu.start(this, { keepMusic: false });
             },
         });

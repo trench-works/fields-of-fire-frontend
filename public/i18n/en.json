@@ -1,0 +1,45 @@
+{
+    "common": {
+        "validate": "Validate"
+    },
+    "mainMenu": {
+        "play": "Play",
+        "settings": "Settings",
+        "login": "Login",
+        "register": "Register",
+        "disconnect": "Disconnect",
+        "registerPopup": {
+            "username": {
+                "title": "Username",
+                "placeholder": "username..."
+            },
+            "password": {
+                "title": "Password",
+                "placeholder": "password..."
+            }
+        }
+    },
+    "fight": {
+        "actions": {
+            "cost": "Cost",
+            "range": "Range",
+            "type": {
+                "RANGED": "Ranged",
+                "MELEE": "Melee",
+                "OTHER": "Other"
+            },
+            "dodged": "Dodged"
+        }
+    },
+    "parameter": {
+        "parameter": "Parameters",
+        "return": "Return",
+        "languageTitle": "Language Selection",
+        "soundTitle": "Sound Settings",
+        "sound": {
+            "music": "Music",
+            "effects": "Sound Effects"
+        }
+    }
+}
+

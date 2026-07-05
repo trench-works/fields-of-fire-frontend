@@ -2,7 +2,9 @@ import {
     BaseScene,
     Button,
     DisplayText,
+    i18n,
     ScaleMode,
+    SoundLevel,
     StartSceneConfig,
 } from "../../core";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
@@ -11,6 +13,8 @@ import { PopupInput } from "./objects/LoginPopup";
 import { UserRepository } from "./repositories/user.repository";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { MiscAsset, MiscAssetId, MusicAsset, MusicAssetId } from "../../assets";
+import { ParameterScene } from "../Parameter/parameter.scene";
+import { SoundParam } from "../../core/Utils/SoundLevel";
 
 export class MainMenu extends BaseScene {
     private playButton!: Button;
@@ -23,7 +27,7 @@ export class MainMenu extends BaseScene {
         });
         const user = localStorage.getItem("user");
         if (user) {
-            global.user = JSON.parse(user);
+            globalThis.user = JSON.parse(user);
         }
     }
 
@@ -81,13 +85,13 @@ export class MainMenu extends BaseScene {
                     ScaleMode.CONSERVE,
                 ),
             {
-                text: "Jouer",
+                text: i18n.translate("mainMenu.play"),
                 image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
                 onClick: () => {
                     LobbyListScene.start(this);
                 },
             },
-        ).setIsActivated(Boolean(global.user));
+        ).setIsActivated(Boolean(globalThis.user));
 
         // Bouton Paramètres (ligne 1)
         new Button(
@@ -104,10 +108,11 @@ export class MainMenu extends BaseScene {
                     ScaleMode.CONSERVE,
                 ),
             {
-                text: "Paramètres",
+                text: i18n.translate("mainMenu.settings"),
                 image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
                 onClick: () => {
                     console.log("Paramètres - À implémenter");
+                    ParameterScene.start(this);
                 },
             },
         );
@@ -127,23 +132,34 @@ export class MainMenu extends BaseScene {
                     ScaleMode.FIT,
                 ),
             {
-                text: global.user?.username ?? "Register",
+                text:
+                    globalThis.user?.username ??
+                    i18n.translate("mainMenu.register"),
                 image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
                 onClick: () => {
                     new PopupInput(this, {
-                        title: "S'enregistrer",
-                        placeholder: "Entrez votre pseudo...",
-                        onValidate: async (value: string) => {
-                            await new UserRepository().register(value);
-                            if (global.user) {
+                        title: i18n.translate("mainMenu.register"),
+                        onValidate: async (
+                            username: string,
+                            password: string,
+                        ) => {
+                            await new UserRepository().register(
+                                username,
+                                password,
+                            );
+                            if (globalThis.user) {
                                 this.playButton.alpha = 1;
                                 this.registerButton.setIsActivated(false);
+                                console.log(
+                                    "register globo : ",
+                                    globalThis.user.username,
+                                );
                                 this.registerButton.displayText(
-                                    global.user.username,
+                                    globalThis.user.username,
                                 );
                                 localStorage.setItem(
                                     "user",
-                                    JSON.stringify(global.user),
+                                    JSON.stringify(globalThis.user),
                                 );
                                 this.updateLoginButtons();
                                 return true;
@@ -153,7 +169,7 @@ export class MainMenu extends BaseScene {
                     });
                 },
             },
-        ).setIsActivated(!global.user);
+        ).setIsActivated(!globalThis.user);
 
         //bouton login
         this.logginButton = new Button(
@@ -171,27 +187,38 @@ export class MainMenu extends BaseScene {
                     ScaleMode.FIT,
                 ),
             {
-                text: global.user ? "Disconnect" : "Login",
+                text: globalThis.user
+                    ? i18n.translate("mainMenu.disconnect")
+                    : i18n.translate("mainMenu.login"),
                 image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
                 onClick: () => {
-                    if (global.user) {
+                    if (globalThis.user) {
                         localStorage.removeItem("user");
-                        global.user = undefined;
+                        globalThis.user = undefined;
                     } else {
                         new PopupInput(this, {
-                            title: "Connexion",
-                            placeholder: "Entrez votre pseudo...",
-                            onValidate: async (value: string) => {
-                                await new UserRepository().authenticate(value);
-                                if (global.user) {
+                            title: i18n.translate("mainMenu.login"),
+                            onValidate: async (
+                                username: string,
+                                password: string,
+                            ) => {
+                                await new UserRepository().authenticate(
+                                    username,
+                                    password,
+                                );
+                                if (globalThis.user) {
                                     this.playButton.alpha = 1;
                                     this.registerButton.setIsActivated(false);
                                     this.registerButton.displayText(
-                                        global.user.username,
+                                        globalThis.user.username,
+                                    );
+                                    console.log(
+                                        " authent globo : ",
+                                        globalThis.user.username,
                                     );
                                     localStorage.setItem(
                                         "user",
-                                        JSON.stringify(global.user),
+                                        JSON.stringify(globalThis.user),
                                     );
                                     this.updateLoginButtons();
                                     return true;
@@ -204,13 +231,24 @@ export class MainMenu extends BaseScene {
                 },
             },
         ).setIsActivated(true);
+
+        console.log(
+            "musicSound - MENU : ",
+            SoundLevel.get(SoundParam.BACKGROUND),
+        );
     }
 
     updateLoginButtons() {
-        this.logginButton.displayText(global.user ? "Disconnect" : "Login");
-        this.registerButton.displayText(global.user?.username ?? "Register");
-        this.registerButton.setIsActivated(!global.user);
-        this.playButton.setIsActivated(Boolean(global.user))
+        this.logginButton.displayText(
+            globalThis.user
+                ? i18n.translate("mainMenu.disconnect")
+                : i18n.translate("mainMenu.login"),
+        );
+        this.registerButton.displayText(
+            globalThis.user?.username ?? i18n.translate("mainMenu.register"),
+        );
+        this.registerButton.setIsActivated(!globalThis.user);
+        this.playButton.setIsActivated(Boolean(globalThis.user));
     }
 }
 

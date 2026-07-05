@@ -1,5 +1,5 @@
 import { CharacterCloseupAsset } from "../../../../assets";
-import { BoostAsset } from "../../../../assets/BoostAsset";
+import { BoostAsset, BoostAssetId } from "../../../../assets/BoostAsset";
 import { Color } from "../../../../config/ColorConfig";
 import {
     Button,
@@ -34,7 +34,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     protected selectedBoostCard?: DisplayContainer;
     protected boostCards: Map<string, DisplayContainer> = new Map();
 
-    protected boostId!: string;
+    protected boostId: string | null = null;
     protected boosts!: Boost[];
 
     protected root: DisplayRoot;
@@ -116,7 +116,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     }
 
     render(): this {
-        const entities = this.gameStore.game.entities;
+        const entities = this.gameStore.game.entities.filter(
+            (entity) => !entity.isInvocation,
+        );
         const rowCount = entities.length;
 
         const entityListGrid = this.scene.rootGrid.getSubGrid(
@@ -165,8 +167,11 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.root.setVisible(false);
         this.temporaryRoot.setVisible(false);
 
-        if(this.gameStore.game.isStopped){
-            this.show(this.gameStore.game.playerWin, this.playerStore.player.randomBoost)
+        if (this.gameStore.game.isStopped) {
+            this.show(
+                this.gameStore.game.playerWin,
+                this.playerStore.player.randomBoost,
+            );
         }
 
         return this;
@@ -205,7 +210,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     }
 
     showEntityCards(): void {
-        const entities = this.gameStore.game.entities;
+        const entities = this.gameStore.game.entities.filter(
+            (entity) => !entity.isInvocation,
+        );
         const rowCount = entities.length;
 
         const entityListGrid = this.scene.rootGrid.getSubGrid(
@@ -357,14 +364,15 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.temporaryRoot.add(
             new DisplayImage(
                 this.scene,
-                entityListGrid.getArea({
-                    x: 3,
-                    y: 1,
-                    width: 1,
-                    height: 1,
-                    margin: { top: 10, bottom: -8, left: 0, right: 0 },
-                })
-                .scaleFromCenter(1,ScaleMode.FIT),
+                entityListGrid
+                    .getArea({
+                        x: 3,
+                        y: 1,
+                        width: 1,
+                        height: 1,
+                        margin: { top: 10, bottom: -8, left: 0, right: 0 },
+                    })
+                    .scaleFromCenter(1, ScaleMode.FIT),
             )
                 .setImage(BoostAsset.getAssetKey(boost.id))
                 .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3),
@@ -405,20 +413,34 @@ export class EndFightDisplayer extends FightSceneDisplayer {
 
         // Modifiers non nuls (ligne 3)
         let statLine: string;
-        if (boost.id === "vampire") {
-            statLine = "Vol de vie : +10%";
-        } else if(boost.id === "masochistic"){
-            statLine = "+20% de dommage, vous subisser lamoitier de ces dommages";
-        }else if (boost.id === "reaction") {
+        switch (boost.id) {
+            case BoostAssetId.VAMPIRE:
+                statLine = "Vol de vie : +10%";
+                break;
+            case BoostAssetId.MASOCHISTIC:
+                statLine =[
+                    "+20% de dommages", 
+                    "vous subisser la moitiée",
+                    "de ces dommages"
+                ].join("\n");
+                break;
+            case BoostAssetId.REACTION:
             statLine = [
                 "life: +8",
                 "strength: +10",
                 "precision: +10",
                 "initiative: +15",
                 "esquive: +2",
-                "armor: +5"
+                "armor: +5",
             ].join("\n");
-        } else {
+                break;
+            case BoostAssetId.CRIT_CHANCE:
+                statLine = "chance de critique : +3%";
+                break;
+            case BoostAssetId.CRIT_DAMMAGE:
+                statLine = "dégats de critique : +25%";
+                break;
+            default:
             statLine = boost.boosts
                 .flatMap((stat) => Object.entries(stat))
                 .filter(([, value]) => value !== undefined && value !== 0)
