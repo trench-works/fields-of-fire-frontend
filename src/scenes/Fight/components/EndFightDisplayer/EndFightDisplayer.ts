@@ -1,5 +1,5 @@
 import { CharacterCloseupAsset } from "../../../../assets";
-import { BoostAsset } from "../../../../assets/BoostAsset";
+import { BoostAsset, BoostAssetId } from "../../../../assets/BoostAsset";
 import { Color } from "../../../../config/ColorConfig";
 import {
     Button,
@@ -413,12 +413,17 @@ export class EndFightDisplayer extends FightSceneDisplayer {
 
         // Modifiers non nuls (ligne 3)
         let statLine: string;
-        if (boost.id === "vampire") {
-            statLine = "Vol de vie : +10%";
-        } else if (boost.id === "masochistic") {
-            statLine =
-                "+20% de dommage, vous subisser lamoitier de ces dommages";
-        } else if (boost.id === "reaction") {
+        switch (boost.id) {
+            case BoostAssetId.VAMPIRE:
+                statLine = "Vol de vie : +10%";
+                break;
+            case BoostAssetId.MASOCHISTIC:
+                statLine =[
+                    "+20% de dommages", 
+                    "vous subisser la moitiée de ces dommages"
+                ].join("\n");
+                break;
+            case BoostAssetId.REACTION:
             statLine = [
                 "life: +8",
                 "strength: +10",
@@ -427,7 +432,13 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 "esquive: +2",
                 "armor: +5",
             ].join("\n");
-        } else {
+            case BoostAssetId.CRIT_CHANCE:
+                statLine = "chance de critique : +3%";
+                break;
+            case BoostAssetId.CRIT_DAMMAGE:
+                statLine = "dégats de critique : +25%";
+                break;
+            default:
             statLine = boost.boosts
                 .flatMap((stat) => Object.entries(stat))
                 .filter(([, value]) => value !== undefined && value !== 0)
