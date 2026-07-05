@@ -420,7 +420,8 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             case BoostAssetId.MASOCHISTIC:
                 statLine =[
                     "+20% de dommages", 
-                    "vous subisser la moitiée de ces dommages"
+                    "vous subisser la moitiée",
+                    "de ces dommages"
                 ].join("\n");
                 break;
             case BoostAssetId.REACTION:
