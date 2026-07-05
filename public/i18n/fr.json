@@ -40,6 +40,7 @@
                 "SUPPORT": "Support",
                 "OTHER": "Autre"
             },
+            "dodged": "Esquivé",
             "endTurn": "Fin du tour"
         },
         "effects": {

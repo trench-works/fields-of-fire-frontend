@@ -13,6 +13,7 @@ export enum EffectAssetId {
     MASOCHISTIC = "masochistic",
     CRIT_DAMMAGE = "crit_dammage",
     CRIT_CHANCE = "crit_chance",
+    WEAKNESS = "weakness",
 }
 
 class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
@@ -38,6 +39,7 @@ class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
             [EffectAssetId.MASOCHISTIC] : "masochistic",
             [EffectAssetId.CRIT_DAMMAGE] : "crit_dammage",
             [EffectAssetId.CRIT_CHANCE] : "crit_chance",
+            [EffectAssetId.WEAKNESS] : "weakness",
         },
         {
             [EffectAssetId.AMPUTATED]: { width: 512, height: 512 },
@@ -52,6 +54,7 @@ class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
             [EffectAssetId.MASOCHISTIC] : { width: 512, height: 512 },
             [EffectAssetId.CRIT_DAMMAGE] : { width: 512, height: 512 },
             [EffectAssetId.CRIT_CHANCE] : { width: 512, height: 512 },
+            [EffectAssetId.WEAKNESS] : { width: 512, height: 512 },
         }
         );
     }

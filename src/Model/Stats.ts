@@ -16,10 +16,8 @@ export type Stats = {
 };
 
 export class StatsUtils {
-    
     static add(baseStats: Stats, ...stats: Stats[]): Stats {
         const addedStats = { ...baseStats };
-        console.log(` addin in data : ${JSON.stringify(baseStats)} + ${JSON.stringify(stats)} `)
         for (const stat of stats) {
             for (const [key, value] of Object.entries(stat)) {
                 addedStats[key as keyof Stats] =
@@ -29,25 +27,24 @@ export class StatsUtils {
         return addedStats;
     }
 
-        static fromEntity(entity: Entity): Stats {
-            console.log(` from entity called`)
-            const total = StatsUtils.add(
-                entity.stats,
-                ...entity.effects
-                    .filter((effect) => effect.type === EffectType.APPLY)
-                    .map((effect) => {
+    static fromEntity(entity: Entity): Stats {
+        const total = StatsUtils.add(
+            entity.stats,
+            ...entity.effects
+                .filter((effect) => effect.type === EffectType.APPLY)
+                .map((effect) => {
                     return effect.modifier;
-            }));
-            
-            //console.log(` from entity data (after add): ${JSON.stringify(entity)}`)
-            // Caper energy and mouvement à 0
-            total.energy = Math.max(total.energy, 0);
-            total.mouvement = Math.max(total.mouvement, 0);
-            total.totalEnergy = Math.max(total.totalEnergy, 0);
-            total.totalMouvement = Math.max(total.totalMouvement, 0);
-            total.life = Math.max(total.life, 0);
-            console.log(` total :  ${JSON.stringify(total)}`)
-            return total;
-            
-        }
+                }),
+        );
+
+        //console.log(` from entity data (after add): ${JSON.stringify(entity)}`)
+        // Caper energy and mouvement à 0
+        total.energy = Math.max(total.energy, 0);
+        total.mouvement = Math.max(total.mouvement, 0);
+        total.totalEnergy = Math.max(total.totalEnergy, 0);
+        total.totalMouvement = Math.max(total.totalMouvement, 0);
+        total.life = Math.max(total.life, 0);
+        return total;
+    }
 }
+

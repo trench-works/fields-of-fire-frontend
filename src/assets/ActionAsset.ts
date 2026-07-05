@@ -16,7 +16,7 @@ export enum ActionAssetId {
     BREAK = "break",
     PROVOK = "provok",
     SHIELD_RUSH = "shield_rush",
-    BARRICADE = "barricade"
+    BARRICADE = "barricade",
 }
 
 const ActionAssetEntries = Object.fromEntries(

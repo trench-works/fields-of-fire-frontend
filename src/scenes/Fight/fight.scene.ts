@@ -296,7 +296,6 @@ export class FightScene extends BaseScene<FightSceneInit> {
             this.inspectCharacter(this.inspectStats.entityId);
         }
 
-        await Timeout(1000);
         this.actions.unlock();
     }
 
