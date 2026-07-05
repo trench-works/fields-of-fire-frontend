@@ -27,7 +27,8 @@
                 "RANGED": "Ranged",
                 "MELEE": "Melee",
                 "OTHER": "Other"
-            }
+            },
+            "dodged": "Dodged"
         }
     },
     "parameter": {

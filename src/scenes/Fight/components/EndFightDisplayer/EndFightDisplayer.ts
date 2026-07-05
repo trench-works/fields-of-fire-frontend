@@ -433,6 +433,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 "esquive: +2",
                 "armor: +5",
             ].join("\n");
+                break;
             case BoostAssetId.CRIT_CHANCE:
                 statLine = "chance de critique : +3%";
                 break;

@@ -27,7 +27,8 @@
                 "RANGED": "遠距離",
                 "MELEE": "近接",
                 "OTHER": "その他"
-            }
+            },
+            "dodged": "回避"
         }
     },
     "parameter": {
