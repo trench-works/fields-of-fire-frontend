@@ -1,15 +1,18 @@
-import { MiscAsset, MiscAssetId } from "../../../../assets";
-import { Depth, GRID_LEVELS_OFFSET, Position } from "../../../../core";
-import { Diamond } from "../../../../core/Objects/Diamond";
-import { scaleAndCenter } from "../../../../core/Utils/Scale";
-import { PositionUtils } from "../../../../core/Utils/Sizing";
-import { StatsUtils } from "../../../../Model/Stats";
-import { FightScene } from "../../fight.scene";
-import { ClassStore } from "../../stores/ClassStore";
-import { GameStore } from "../../stores/GameStore";
-import { GroundStore } from "../../stores/GroundStore";
-import { PlayerStore } from "../../stores/PlayerStore";
-import { FightSceneDisplayer } from "../FightSceneDisplayer";
+import { MiscAsset, MiscAssetId } from "../../../assets";
+import { Depth, GRID_LEVELS_OFFSET, Position } from "../../../core";
+import { Diamond } from "../../../core/Objects/Diamond";
+import { scaleAndCenter } from "../../../core/Utils/Scale";
+import { PositionUtils } from "../../../core/Utils/Sizing";
+import { StatsUtils } from "../../../Model/Stats";
+import { FightScene } from "../fight.scene";
+import { ClassStore } from "../stores/class.store";
+import { GameStore } from "../stores/game.store";
+import { GridStore } from "../stores/grid.store";
+import { PlayerStore } from "../stores/player.store";
+import { ActionsService } from "../services/actions.service";
+import { RangeService } from "../services/range.service";
+import { CharactersDisplayer } from "./characters.displayer";
+import { FightSceneDisplayer } from "./base/fight-scene.displayer";
 
 export class GroundDisplayer extends FightSceneDisplayer {
     private tileHighlights: Phaser.GameObjects.Graphics[] = [];
@@ -19,7 +22,10 @@ export class GroundDisplayer extends FightSceneDisplayer {
         gameStore: GameStore,
         private readonly classStore: ClassStore,
         private readonly playerStore: PlayerStore,
-        private readonly groundStore: GroundStore,
+        private readonly gridStore: GridStore,
+        private readonly characterDisplayer: CharactersDisplayer,
+        private readonly actionService: ActionsService,
+        private readonly rangeService: RangeService,
     ) {
         super(scene, gameStore);
     }
@@ -29,7 +35,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
     }
 
     clean(): this {
-        this.groundStore.groundLayer?.destroy();
+        this.gridStore.groundLayer?.destroy();
         this.tileHighlights.forEach((highlight) => highlight.destroy());
         for (let x = 0; x < this.scene.gridPositions.length; x++) {
             for (let y = 0; y < this.scene.gridPositions[x].length; y++) {
@@ -81,18 +87,18 @@ export class GroundDisplayer extends FightSceneDisplayer {
         );
         console.log(layer);
 
-        this.groundStore.setGroundLayer(layer);
+        this.gridStore.setGroundLayer(layer);
 
-        if (!this.groundStore.groundLayer) {
+        if (!this.gridStore.groundLayer) {
             throw new Error("Ground layer seemingly inexistent");
         }
 
-        this.groundStore.groundLayer.setScale(this.scene.scaleFactor);
-        this.groundStore.groundLayer.setDepth(Depth.GRID_BASE_OFFSET);
+        this.gridStore.groundLayer.setScale(this.scene.scaleFactor);
+        this.gridStore.groundLayer.setDepth(Depth.GRID_BASE_OFFSET);
     }
 
     private displayEntitiesHighlights() {
-        if (!this.groundStore.groundLayer) {
+        if (!this.gridStore.groundLayer) {
             this.renderGroundLayer();
         }
         for (const highlightEntity of this.tileHighlights) {
@@ -103,7 +109,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
                 const caseTile = this.gameStore.game.plateau[x][y];
                 // Ground part
-                const tile = this.groundStore.groundLayer?.getTileAt?.(x, y);
+                const tile = this.gridStore.groundLayer?.getTileAt?.(x, y);
                 if (tile) {
                     tile.setVisible(true);
                     if (caseTile.isHole) {
@@ -137,7 +143,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
     }
 
     private generatePlayGrid() {
-        if (!this.groundStore.groundLayer) {
+        if (!this.gridStore.groundLayer) {
             return;
         }
         for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
@@ -145,7 +151,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
                 this.scene.gridPositions[x] = [];
             }
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
-                const tile = this.groundStore.groundLayer.getTileAt(x, y);
+                const tile = this.gridStore.groundLayer.getTileAt(x, y);
                 const caseTile = this.gameStore.game.plateau[x][y];
 
                 const worldX = tile.getCenterX();
@@ -187,12 +193,10 @@ export class GroundDisplayer extends FightSceneDisplayer {
                     // --- DEBUG VISUEL ---
                     //this.gridShower(DIAMOND, worldX, worldY, layer);
                     zone.on("pointerdown", () => {
-                        this.scene.character.changeDirection({ x, y });
-                        if (this.scene.actionManager.currentAction) {
-                            if (
-                                this.scene.rangeVisualizer.isInRange({ x, y })
-                            ) {
-                                this.scene.actionManager.launchAction({ x, y });
+                        this.characterDisplayer.changeDirection({ x, y });
+                        if (this.actionService.currentAction) {
+                            if (this.rangeService.isInRange({ x, y })) {
+                                this.actionService.launchAction({ x, y });
                             }
                         } else {
                             const tile = this.gameStore.game.plateau[x][y];
@@ -200,8 +204,8 @@ export class GroundDisplayer extends FightSceneDisplayer {
                                 this.scene.inspectCharacter(tile.entityId);
                             }
                         }
-                        this.scene.rangeVisualizer.clearRange();
-                        this.scene.actionManager.clearCurrentAction();
+                        this.rangeService.clearRange();
+                        this.actionService.clearCurrentAction();
                     });
                     zone.on("pointerover", () => {
                         hoverGraphics.setVisible(true);
@@ -210,7 +214,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
                                 this.gameStore.game.plateau[x][y].entityId,
                             );
 
-                            if (!this.scene.actionManager.currentAction) {
+                            if (!this.actionService.currentAction) {
                                 this.scene.tooltip.showNow(
                                     this.classStore.getClass(entity.classId)
                                         .name,
@@ -224,14 +228,14 @@ export class GroundDisplayer extends FightSceneDisplayer {
                                 );
                             }
                         }
-                        if (this.scene.actionManager.currentAction) {
+                        if (this.actionService.currentAction) {
                             this.manageToolTip(x, y);
                         }
                     });
                     zone.on("pointerout", () => {
                         hoverGraphics.setVisible(false);
                         this.scene.tooltip.hide();
-                        this.scene.rangeVisualizer.clearZonePreview();
+                        this.rangeService.clearZonePreview();
                     });
 
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -298,10 +302,10 @@ export class GroundDisplayer extends FightSceneDisplayer {
     }
 
     manageToolTip(x: number, y: number) {
-        const action = this.scene.actionManager.currentAction;
+        const action = this.actionService.currentAction;
         if (!action) return;
 
-        const zoneCells = this.scene.rangeVisualizer.spellZonePreview(action, {
+        const zoneCells = this.rangeService.getSpellZonePreview(action, {
             x,
             y,
         });
@@ -324,13 +328,13 @@ export class GroundDisplayer extends FightSceneDisplayer {
             const targetEntity = this.gameStore.getEntity(entityId);
             if (!targetEntity) return;
 
-            const minDamage = this.scene.actionManager.calculateFinalDamage(
+            const minDamage = this.actionService.calculateFinalDamage(
                 action.damage?.min ?? 0,
                 action,
                 this.playerStore.playerEntity,
                 targetEntity,
             );
-            const maxDamage = this.scene.actionManager.calculateFinalDamage(
+            const maxDamage = this.actionService.calculateFinalDamage(
                 action.damage?.max ?? 0,
                 action,
                 this.playerStore.playerEntity,

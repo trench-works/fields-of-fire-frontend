@@ -1,4 +1,4 @@
-export class GroundStore {
+export class GridStore {
     public groundLayer: Phaser.Tilemaps.TilemapLayer | null;
 
     constructor() {

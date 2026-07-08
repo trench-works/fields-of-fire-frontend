@@ -1,29 +1,52 @@
 import { Position } from "../../../core";
 import { Action, ActionType } from "../../../Model/Action";
 import { Entity } from "../../../Model/Entity";
-import { FightScene } from "../fight.scene";
 import { Ran } from "../../../core/Types/Ran";
 import { EffectAction } from "../../../Model/Effect";
 import { PositionUtils } from "../../../core/Utils/Sizing";
 import { StatsUtils } from "../../../Model/Stats";
+import { ActionDisplayer } from "../display/action.displayer";
+import { GamePlayerSocket } from "../repositories/player.socket";
 
-export class ActionManager {
+export class ActionsService {
     public currentAction: Action | undefined;
-    public scene!: FightScene;
 
-    constructor(scene: FightScene) {
-        this.scene = scene;
+    constructor(
+        private readonly actions: ActionDisplayer,
+        private readonly playerSocket: GamePlayerSocket,
+    ) {}
+
+    lock() {
+        if (this.lockLevel === 0) {
+            this.actions.actionElements.forEach((action) => {
+                action.setIsActivated(false);
+            });
+            this.endTurnButton.setIsActivated(false);
+        }
+        this.lockLevel++;
+    }
+
+    unlock() {
+        if (this.lockLevel > 0) {
+            this.lockLevel--;
+            if (this.lockLevel === 0) {
+                this.actions.update();
+            }
+        }
     }
 
     public clearCurrentAction() {
         this.currentAction = undefined;
+        this.actions.actionElements.forEach((action) =>
+            action.hightlight(false),
+        );
     }
 
     async launchAction(pos: Position) {
-        this.scene.actions.lock();
+        this.actions.lock();
         const action = this.currentAction;
-        this.scene.actions.clearAction();
-        await this.scene.playerSocket.action({
+        this.actions.clearAction();
+        await this.playerSocket.action({
             actionId: action?.id ?? "",
             target: pos,
         });

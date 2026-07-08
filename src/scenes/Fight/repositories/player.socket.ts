@@ -118,6 +118,7 @@ export class GamePlayerSocket
 
     disconnect() {
         this.send(GamePlayerActions.DISCONNECT);
+        this.close();
     }
 
     async action(actionPlayer: ActionPlayer) {

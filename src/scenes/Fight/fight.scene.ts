@@ -7,21 +7,20 @@ import {
     SoundEffect,
     Timeout,
     KeyBindUtils,
-    SoundLevel,
 } from "../../core";
 import { SceneConfig } from "../../config/SceneConfig";
-import { RangeVisualizer } from "./objects/RangeVisualizer";
+import { RangeService } from "./services/range.service";
 import {
     GameEventAnimation,
     GamePlayerSocket,
     GameUpdateEvent,
 } from "./repositories/player.socket";
-import { ActionManager } from "./objects/ActionManager";
+import { ActionsService } from "./services/actions.service";
 import { Tooltip } from "../../core/UI/Tooltip";
 import { Game } from "../../Model/Game";
 import { ClassesRepository } from "../Lobby/repositories/classes.repository";
 import { MainMenu } from "../MainMenu/main-menu.scene";
-import { ActionDisplayer } from "./components/ActionDisplayer";
+import { ActionDisplayer } from "./display/action.displayer";
 import {
     ActionAnimationAsset,
     ActionAsset,
@@ -38,25 +37,25 @@ import {
     SoundEffectAssetId,
 } from "../../assets";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
-import { ClassStore } from "./stores/ClassStore";
-import { GameStore } from "./stores/GameStore";
-import { PlayerStore } from "./stores/PlayerStore";
-import { BoardDisplayer } from "./components/board/BoardDisplayer";
-import { CharactersDisplayer } from "./components/character/CharactersDisplayer";
-import { TurnDisplayer } from "./components/TurnsDisplayer";
-import { StatsDisplayer } from "./components/StatsDisplayer";
+import { ClassStore } from "./stores/class.store";
+import { GameStore } from "./stores/game.store";
+import { PlayerStore } from "./stores/player.store";
+import { BoardDisplayer } from "./display/board.displayer";
+import { CharactersDisplayer } from "./display/characters.displayer";
+import { TurnDisplayer } from "./display/turns.displayer";
+import { StatsDisplayer } from "./display/stats.displayer";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { ParticleAsset } from "../../assets/ParticleAsset";
-import { AttackDisplayer } from "./components/attack/AttackDisplayer";
+import { AttackDisplayer } from "./display/attack.displayer";
 import { EffectAsset } from "../../assets/EffectAsset";
 import { PositionUtils } from "../../core/Utils/Sizing";
-import { EndFightDisplayer } from "./components/EndFightDisplayer/EndFightDisplayer";
+import { EndFightDisplayer } from "./display/end-fight.displayer";
 import { Toaster } from "./components/Toaster";
-import { ParticleDisplayer } from "./components/Particle/ParticleDisplayer";
+import { ParticleDisplayer } from "./display/particles.displayer";
 import { BoostAsset } from "../../assets/BoostAsset";
 import { ConnectionLoader } from "../../core/Objects/Loader";
 import { KeyBinds } from "../../core/keybinds/keybinds";
-import { SoundParam } from "../../core/Utils/SoundLevel";
+import { FightSceneRoot } from "./fight-scene.root";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -89,37 +88,39 @@ export type FightSceneInit = {
 export class FightScene extends BaseScene<FightSceneInit> {
     public renderConfig: SceneRenderConfig;
 
+    public root: FightSceneRoot;
+
     /**
      * Stores
      */
-    protected classStore: ClassStore;
-    protected gameStore: GameStore;
-    protected playerStore: PlayerStore;
+    private classStore: ClassStore;
+    private gameStore: GameStore;
+    private playerStore: PlayerStore;
 
     /**
      * Displayers
      */
-    public actions: ActionDisplayer;
+    private actions: ActionDisplayer;
     private board: BoardDisplayer;
-    public character: CharactersDisplayer;
+    private character: CharactersDisplayer;
     private turns: TurnDisplayer;
     private playerStats: StatsDisplayer;
     private inspectStats: StatsDisplayer;
     private attacks: AttackDisplayer;
     private endFight: EndFightDisplayer;
-    public toaster: Toaster;
+    private toaster: Toaster;
 
     /**
      * Sockets
      */
-    public playerSocket!: GamePlayerSocket;
+    private playerSocket!: GamePlayerSocket;
     private gameUpdateQueue!: EventQueue<GameUpdateEvent>;
 
     /**
      * Utils
      */
-    public actionManager: ActionManager;
-    public rangeVisualizer: RangeVisualizer;
+    private actionManager: ActionsService;
+    private rangeVisualizer: RangeService;
 
     public tooltip!: Tooltip;
     protected windEmitter!: Phaser.GameObjects.Particles.ParticleEmitter;
@@ -134,6 +135,8 @@ export class FightScene extends BaseScene<FightSceneInit> {
         super(SceneAssetId.FIGHT, BackgroundAssetId.FIGHT);
 
         this.keyBinds = KeyBindUtils.getKeyBinds();
+
+        this.root = new FightSceneRoot(this);
 
         /**
          * Stores
@@ -150,9 +153,26 @@ export class FightScene extends BaseScene<FightSceneInit> {
         );
 
         /**
+         * Utils
+         */
+        this.actionManager = new ActionsService(
+            this,
+            this.actions,
+            this.playerSocket,
+        );
+        this.rangeVisualizer = new RangeService(this, this.gameStore);
+
+        /**
          * Displayers
          */
         this.actions = new ActionDisplayer(
+            this,
+            this.gameStore,
+            this.playerStore,
+            this.rangeVisualizer,
+            this.actionManager,
+        );
+        this.character = new CharactersDisplayer(
             this,
             this.gameStore,
             this.playerStore,
@@ -162,11 +182,9 @@ export class FightScene extends BaseScene<FightSceneInit> {
             this.gameStore,
             this.classStore,
             this.playerStore,
-        );
-        this.character = new CharactersDisplayer(
-            this,
-            this.gameStore,
-            this.playerStore,
+            this.character,
+            this.actionManager,
+            this.rangeVisualizer,
         );
         this.turns = new TurnDisplayer(this, this.gameStore, this.classStore);
         this.playerStats = new StatsDisplayer(this, this.gameStore, {
@@ -177,19 +195,18 @@ export class FightScene extends BaseScene<FightSceneInit> {
             x: 8,
             y: 7,
         });
-        this.attacks = new AttackDisplayer(this, this.gameStore);
+        this.attacks = new AttackDisplayer(
+            this,
+            this.gameStore,
+            this.character,
+        );
         this.endFight = new EndFightDisplayer(
             this,
             this.gameStore,
             this.playerStore,
+            this.playerSocket,
         );
         this.toaster = new Toaster(this);
-
-        /**
-         * Utils
-         */
-        this.actionManager = new ActionManager(this);
-        this.rangeVisualizer = new RangeVisualizer(this, this.gameStore);
 
         const config = new SceneConfig().loadConfig().getConfig("scene_1");
         if (!config) {
@@ -378,11 +395,6 @@ export class FightScene extends BaseScene<FightSceneInit> {
 
     create() {
         super.create();
-        console.log(
-            "musicSound - FIGHT : ",
-            SoundLevel.get(SoundParam.BACKGROUND),
-        );
-        this.playBackgroundMusic(MusicAssetId.FIGHT);
         this.tooltip = Tooltip.getInstance(this, {
             textColor: "#000000",
             fontSize: 14,

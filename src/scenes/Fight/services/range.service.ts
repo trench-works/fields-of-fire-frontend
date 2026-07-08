@@ -1,10 +1,10 @@
 import { Depth, GRID_LEVELS_OFFSET, Position } from "../../../core";
-import { applyFovToRange } from "../../../Model";
+import { applyFovToRange, Case } from "../../../Model";
 import { Action, ActionLevel, ActionZoneType } from "../../../Model/Action";
 import { Cell, FightScene } from "../fight.scene";
-import { GameStore } from "../stores/GameStore";
+import { GameStore } from "../stores/game.store";
 
-export class RangeVisualizer {
+export class RangeService {
     private cellsInRange: Cell[] = [];
     private zoneHighlights: Phaser.GameObjects.Graphics[] = [];
 
@@ -35,7 +35,7 @@ export class RangeVisualizer {
                 GRID_LEVELS_OFFSET.HIGHTLIGHT_3,
             ),
         );
-        return g; // ✅ ne stocke plus sur cell.highlight ici
+        return g;
     }
 
     showRange(): this {
@@ -59,11 +59,24 @@ export class RangeVisualizer {
         return this;
     }
 
-    getCellsInMoveRange(start: Position, range: number): this {
-        //TODO: this one will avoid walls, holes and entity
+    calculateCellsInMoveRange(
+        start: Position,
+        range: number,
+        action: Action,
+    ): this {
         const inRangeCells: Map<string, Position> = new Map();
 
-        const cellsAround = this.getCellsAround(start, 1, range);
+        const cellsAround = this.getCellsAround(start, 1, range, (cell) => {
+            switch (action.level) {
+                case ActionLevel.GROUND:
+                    return !cell.isHole && !cell.isWall && !cell.entityId;
+                case ActionLevel.UNDERGROUND:
+                    return !cell.isHole;
+                case ActionLevel.OVERGROUND:
+                default:
+                    return true;
+            }
+        });
         for (const cellInRange of cellsAround) {
             inRangeCells.set(`${cellInRange.x},${cellInRange.y}`, cellInRange);
         }
@@ -77,6 +90,7 @@ export class RangeVisualizer {
         pos: Position,
         explorationI: number,
         maxRange: number,
+        exploreCell: (cell: Case) => boolean,
     ): Position[] {
         if (explorationI > maxRange) {
             return [];
@@ -87,12 +101,7 @@ export class RangeVisualizer {
             for (let y = pos.y - 1; y <= pos.y + 1; y++) {
                 if (x === pos.x || y === pos.y) {
                     const cell = board[x]?.[y];
-                    if (
-                        cell &&
-                        !cell.isHole &&
-                        !cell.isWall &&
-                        !cell.entityId
-                    ) {
+                    if (cell && exploreCell(cell)) {
                         const cellPos = { x, y };
                         cells.push(
                             cellPos,
@@ -100,6 +109,7 @@ export class RangeVisualizer {
                                 cellPos,
                                 explorationI + 1,
                                 maxRange,
+                                exploreCell,
                             ),
                         );
                     }
@@ -109,11 +119,7 @@ export class RangeVisualizer {
         return cells;
     }
 
-    getCellsInAttackRange(start: Position, action: Action): this {
-        //TODO: this one will avoid only walls and is directional
-        /**
-         * 1 - determinate forbidden angles ranges on distance like -> "cant shoot from angle 185 to 190 starting from 30 pixel away"
-         */
+    calculateCellsInAttackRange(start: Position, action: Action): this {
         const result: Cell[] = [];
         const board = this.gameStore.game.plateau;
 
@@ -195,8 +201,8 @@ export class RangeVisualizer {
         this.zoneHighlights = [];
     }
 
-    spellZonePreview(action: Action, target: Position) {
-        this.clearZonePreview(); // ✅ nettoie avant de redessiner
+    getSpellZonePreview(action: Action, target: Position) {
+        this.clearZonePreview();
         const zoneCells: Cell[] = [];
 
         if (!this.isInRange(target)) return;

@@ -5,8 +5,8 @@ import {
     MiscAnimationId,
     SoundEffectAsset,
     SoundEffectAssetId,
-} from "../../../../assets";
-import { ParticleAssetId } from "../../../../assets/ParticleAsset";
+} from "../../../assets";
+import { ParticleAssetId } from "../../../assets/ParticleAsset";
 import {
     Depth,
     DirectionUtils,
@@ -15,21 +15,26 @@ import {
     Position,
     SoundEffect,
     Timeout,
-} from "../../../../core";
-import { Game } from "../../../../Model/Game";
-import { FightScene } from "../../fight.scene";
-import { GameAttackAnimation } from "../../repositories/player.socket";
-import { GameStore } from "../../stores/GameStore";
-import { FightSceneDisplayer } from "../FightSceneDisplayer";
-import { ParticleDisplayer } from "../Particle/ParticleDisplayer";
-import { Toaster } from "../Toaster";
+} from "../../../core";
+import { Game } from "../../../Model/Game";
+import { FightScene } from "../fight.scene";
+import { GameAttackAnimation } from "../repositories/player.socket";
+import { GameStore } from "../stores/game.store";
+import { CharactersDisplayer } from "./characters.displayer";
+import { FightSceneDisplayer } from "./base/fight-scene.displayer";
+import { ParticleDisplayer } from "./particles.displayer";
+import { Toaster } from "../components/Toaster";
 
 export class AttackDisplayer extends FightSceneDisplayer {
     protected readonly particleDisplayer: ParticleDisplayer;
 
     protected readonly toaster: Toaster;
 
-    constructor(scene: FightScene, gameStore: GameStore) {
+    constructor(
+        scene: FightScene,
+        gameStore: GameStore,
+        private readonly character: CharactersDisplayer,
+    ) {
         super(scene, gameStore);
         this.particleDisplayer = new ParticleDisplayer(scene);
         this.toaster = new Toaster(scene);
@@ -47,8 +52,8 @@ export class AttackDisplayer extends FightSceneDisplayer {
         switch (actionId) {
             case ActionAssetId.SHOOT:
                 {
-                    this.scene.character.changeDirection(target, entityId);
-                    this.scene.character.scope(entityId, 700);
+                    this.character.changeDirection(target, entityId);
+                    this.character.scope(entityId, 700);
                     await Timeout(200);
                     new SoundEffect(
                         this.scene,
@@ -56,33 +61,33 @@ export class AttackDisplayer extends FightSceneDisplayer {
                     ).play();
                     this.playDamages(this.gameStore.game, hits, origin, target);
                     this.scene.cameras.main.shake(200, 0.001);
-                    this.scene.toaster.attackToast(animation);
+                    this.toaster.attackToast(animation);
                     await this.toaster.attackToast(animation);
                     await Timeout(200);
                 }
                 break;
             case ActionAssetId.BAYONET:
                 {
-                    this.scene.character.changeDirection(target, entityId);
-                    this.scene.character.scope(entityId, 700);
+                    this.character.changeDirection(target, entityId);
+                    this.character.scope(entityId, 700);
                     await Timeout(200);
                     this.playDamages(this.gameStore.game, hits, origin, target);
                     this.scene.cameras.main.shake(200, 0.001);
-                    this.scene.toaster.attackToast(animation);
+                    this.toaster.attackToast(animation);
                     await this.toaster.attackToast(animation);
                     await Timeout(200);
                 }
                 break;
             case ActionAssetId.AMPUTATE:
                 {
-                    this.scene.character.changeDirection(target, entityId);
+                    this.character.changeDirection(target, entityId);
                     new SoundEffect(
                         this.scene,
                         SoundEffectAsset.getAssetKey(
                             SoundEffectAssetId.AMPUTATE,
                         ),
                     ).play();
-                    this.scene.toaster.attackToast(animation);
+                    this.toaster.attackToast(animation);
                     await this.playDamages(
                         this.gameStore.game,
                         hits,
@@ -94,7 +99,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.INTIMIDATION:
                 {
-                    this.scene.character.changeDirection(target, entityId);
+                    this.character.changeDirection(target, entityId);
                     new SoundEffect(
                         this.scene,
                         SoundEffectAsset.getAssetKey(
@@ -122,7 +127,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         this.scene,
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.DOPAGE),
                     ).play();
-                    this.scene.character.changeDirection(target, entityId);
+                    this.character.changeDirection(target, entityId);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.HEAL,
                         cell.pixelPosition.x,
@@ -137,7 +142,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.ARTILLERY_SUPPORT:
                 {
-                    this.scene.character.changeDirection(target, entityId);
+                    this.character.changeDirection(target, entityId);
                     await this.playActionAnimation(
                         ActionAssetId.ARTILLERY_SUPPORT,
                         target,
@@ -169,7 +174,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                 break;
             case ActionAssetId.DOPAGE:
                 {
-                    this.scene.character.changeDirection(target, entityId);
+                    this.character.changeDirection(target, entityId);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.BOOST,
                         cell.pixelPosition.x,
@@ -192,7 +197,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
                         this.scene,
                         SoundEffectAsset.getAssetKey(SoundEffectAssetId.DOPAGE),
                     ).play();
-                    this.scene.character.changeDirection(target, entityId);
+                    this.character.changeDirection(target, entityId);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.BOOST,
                         cell.pixelPosition.x,
@@ -257,7 +262,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
             case ActionAssetId.BREAK:
                 {
                     //this.scene.character.changeDirection(target, entityId);
-                    this.scene.character.scope(entityId, 700);
+                    this.character.scope(entityId, 700);
                     await Timeout(350);
                     new SoundEffect(
                         this.scene,

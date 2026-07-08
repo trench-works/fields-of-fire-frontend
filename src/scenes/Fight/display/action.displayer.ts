@@ -16,9 +16,9 @@ import { KeyBind } from "../../../core/keybinds/keybinds";
 import { Action } from "../../../Model/Action";
 import { StatsUtils } from "../../../Model/Stats";
 import { FightScene } from "../fight.scene";
-import { GameStore } from "../stores/GameStore";
-import { PlayerStore } from "../stores/PlayerStore";
-import { FightSceneDisplayer } from "./FightSceneDisplayer";
+import { GameStore } from "../stores/game.store";
+import { PlayerStore } from "../stores/player.store";
+import { FightSceneDisplayer } from "./base/fight-scene.displayer";
 
 export class ActionDisplayer extends FightSceneDisplayer {
     protected actionArea!: GridArea;
@@ -26,12 +26,12 @@ export class ActionDisplayer extends FightSceneDisplayer {
      * Displayed Elements
      */
     protected actionPanel!: DisplayContainer;
-    protected actionElements: Map<string, Button> = new Map();
+    public actionElements: Map<string, Button> = new Map();
     protected orderedActions: Action[] = [];
     protected endTurnButton!: Button;
     protected actionsList!: List;
 
-    protected lockLevel: number;
+    protected selectedAction: ActionAssetId | null;
 
     public root!: DisplayRoot;
 
@@ -41,8 +41,8 @@ export class ActionDisplayer extends FightSceneDisplayer {
         private readonly playerStore: PlayerStore,
     ) {
         super(scene, gameStore);
-        this.lockLevel = 0;
         this.root = new DisplayRoot();
+        this.selectedAction = null;
 
         window.addEventListener("keydown", (event) =>
             this.handleKeyClick(event),
@@ -54,96 +54,93 @@ export class ActionDisplayer extends FightSceneDisplayer {
         switch (event.code) {
             case binds[KeyBind.ONE]:
                 event.preventDefault();
-                this.selectAction(0);
+                this.handleActionKey(0);
                 break;
             case binds[KeyBind.TWO]:
                 event.preventDefault();
-                this.selectAction(1);
+                this.handleActionKey(1);
                 break;
             case binds[KeyBind.THREE]:
                 event.preventDefault();
-                this.selectAction(2);
+                this.handleActionKey(2);
                 break;
             case binds[KeyBind.FOUR]:
                 event.preventDefault();
-                this.selectAction(3);
+                this.handleActionKey(3);
                 break;
             case binds[KeyBind.FIVE]:
                 event.preventDefault();
-                this.selectAction(4);
+                this.handleActionKey(4);
                 break;
             case binds[KeyBind.SIX]:
                 event.preventDefault();
-                this.selectAction(5);
+                this.handleActionKey(5);
                 break;
             case binds[KeyBind.SEVEN]:
                 event.preventDefault();
-                this.selectAction(6);
+                this.handleActionKey(6);
                 break;
             case binds[KeyBind.EIGHT]:
                 event.preventDefault();
-                this.selectAction(7);
+                this.handleActionKey(7);
                 break;
             case binds[KeyBind.NINE]:
                 event.preventDefault();
-                this.selectAction(8);
+                this.handleActionKey(8);
                 break;
             case binds[KeyBind.ZERO]:
                 event.preventDefault();
-                this.selectAction(9);
+                this.handleActionKey(9);
                 break;
         }
     }
 
-    selectAction(index: number) {
+    handleActionKey(index: number) {
         const action = this.orderedActions[index];
-        if (action && !this.lockLevel) {
+        if (action && !this.lockLevel && !this.selectedAction) {
             this.handleActionSelection(action);
         } else {
-            this.clearAction();
+            this.scene.root.controllers.actions.clearAction();
         }
     }
 
-    clearAction() {
-        this.scene.rangeVisualizer.clearRange();
-        this.scene.rangeVisualizer.clearZonePreview();
-        this.scene.actionManager.clearCurrentAction();
-        this.actionElements.forEach((action) => action.hightlight(false));
+    handleActionClick(action: Action) {
+        if (!this.lockLevel && !this.selectedAction) {
+            this.handleActionSelection(action);
+        } else {
+            this.scene.root.controllers.actions.clearAction();
+        }
     }
 
     protected handleActionSelection(action: Action) {
-        const isPlayerTurn =
-            this.gameStore.game.playerTurns[0] ===
-            this.playerStore.playerEntity.id;
-        if (!isPlayerTurn) {
-            return;
-        }
         const stats = StatsUtils.fromEntity(this.playerStore.playerEntity);
-        this.clearAction();
+        this.scene.root.controllers.actions.clearAction();
+        this.selectedAction = action.id;
         switch (action.id) {
             case ActionAssetId.WALK:
                 if (!stats.mouvement) {
                     return;
                 }
-                this.scene.rangeVisualizer.getCellsInMoveRange(
+                this.rangeService.calculateCellsInMoveRange(
                     this.playerStore.playerEntity.position,
                     stats.mouvement,
+                    action,
                 );
                 break;
             default:
                 if (stats.energy < action.cost) {
                     return;
                 }
-                this.scene.rangeVisualizer.getCellsInAttackRange(
+                this.rangeService.calculateCellsInAttackRange(
                     this.playerStore.playerEntity.position,
                     action,
                 );
                 break;
         }
 
-        this.scene.rangeVisualizer.showRange();
+        this.rangeService.showRange();
         this.actionElements.get(action.id)?.hightlight(true);
-        this.scene.actionManager.currentAction = action;
+        this.actionManager.currentAction = action;
     }
 
     destroy(): this {
@@ -163,7 +160,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
             borderWidth: 7,
             opacity: 0.5,
             outterRadius: { tl: 0, bl: 0, tr: 10, br: 10 },
-            onClick: () => this.clearAction(),
+            onClick: () => this.scene.root.controllers.actions.clearAction(),
         });
         this.root.add(this.actionPanel);
 
@@ -323,25 +320,6 @@ export class ActionDisplayer extends FightSceneDisplayer {
 
     async animate(): Promise<this> {
         return this;
-    }
-
-    lock() {
-        if (this.lockLevel === 0) {
-            this.actionElements.forEach((action) => {
-                action.setIsActivated(false);
-            });
-            this.endTurnButton.setIsActivated(false);
-        }
-        this.lockLevel++;
-    }
-
-    unlock() {
-        if (this.lockLevel > 0) {
-            this.lockLevel--;
-            if (this.lockLevel === 0) {
-                this.update();
-            }
-        }
     }
 }
 

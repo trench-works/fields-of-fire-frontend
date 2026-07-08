@@ -1,13 +1,13 @@
-import { FightSceneDisplayer } from "../FightSceneDisplayer";
-import { FightScene } from "../../fight.scene";
-import { GameStore } from "../../stores/GameStore";
-import { CharacterAssetId, CharacterSpriteAsset } from "../../../../assets";
-import { GameMoveAnimation } from "../../repositories/player.socket";
-import { Game } from "../../../../Model/Game";
-import { Depth, GRID_LEVELS_OFFSET, Position, Timeout } from "../../../../core";
-import { PositionUtils } from "../../../../core/Utils/Sizing";
+import { FightSceneDisplayer } from "./base/fight-scene.displayer";
+import { FightScene } from "../fight.scene";
+import { GameStore } from "../stores/game.store";
+import { CharacterAssetId, CharacterSpriteAsset } from "../../../assets";
+import { GameMoveAnimation } from "../repositories/player.socket";
+import { Game } from "../../../Model/Game";
+import { Depth, GRID_LEVELS_OFFSET, Position, Timeout } from "../../../core";
+import { PositionUtils } from "../../../core/Utils/Sizing";
 
-export class Character extends FightSceneDisplayer {
+export class EntityDisplayer extends FightSceneDisplayer {
     protected direction: "UR" | "UL" | "DR" | "DL" = "DR";
 
     constructor(

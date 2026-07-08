@@ -1,16 +1,16 @@
-import { FightScene } from "../../fight.scene";
-import { Character } from "./Character";
-import { GameStore } from "../../stores/GameStore";
-import { FightSceneDisplayer } from "../FightSceneDisplayer";
-import { GameMoveAnimation } from "../../repositories/player.socket";
-import { Game } from "../../../../Model/Game";
-import { Position, SoundEffect, Timeout } from "../../../../core";
-import { SoundEffectAsset, SoundEffectAssetId } from "../../../../assets";
-import { PlayerStore } from "../../stores/PlayerStore";
-import { PositionUtils } from "../../../../core/Utils/Sizing";
+import { FightScene } from "../fight.scene";
+import { EntityDisplayer } from "./entity.displayer";
+import { GameStore } from "../stores/game.store";
+import { FightSceneDisplayer } from "./base/fight-scene.displayer";
+import { GameMoveAnimation } from "../repositories/player.socket";
+import { Game } from "../../../Model/Game";
+import { Position, SoundEffect, Timeout } from "../../../core";
+import { SoundEffectAsset, SoundEffectAssetId } from "../../../assets";
+import { PlayerStore } from "../stores/player.store";
+import { PositionUtils } from "../../../core/Utils/Sizing";
 
 export class CharactersDisplayer extends FightSceneDisplayer {
-    characters: Character[] = [];
+    characters: EntityDisplayer[] = [];
 
     constructor(
         scene: FightScene,
@@ -29,7 +29,7 @@ export class CharactersDisplayer extends FightSceneDisplayer {
         this.characters = this.gameStore.game.entities
             .filter((entity) => !entity.dead)
             .map((entity) =>
-                new Character(this.scene, this.gameStore, entity.id)
+                new EntityDisplayer(this.scene, this.gameStore, entity.id)
                     .preRender()
                     .render(),
             );
@@ -45,7 +45,7 @@ export class CharactersDisplayer extends FightSceneDisplayer {
         for (const entity of this.gameStore.game.entities) {
             if (!entity.dead && !currentEntityIds.includes(entity.id)) {
                 this.characters.push(
-                    new Character(this.scene, this.gameStore, entity.id)
+                    new EntityDisplayer(this.scene, this.gameStore, entity.id)
                         .preRender()
                         .render(),
                 );

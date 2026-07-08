@@ -1,32 +1,41 @@
-import { FightScene } from "../../fight.scene";
-import { ClassStore } from "../../stores/ClassStore";
-import { GameStore } from "../../stores/GameStore";
-import { GroundStore } from "../../stores/GroundStore";
-import { PlayerStore } from "../../stores/PlayerStore";
-import { FightSceneDisplayer } from "../FightSceneDisplayer";
-import { GroundDisplayer } from "./GroundDisplayer";
-import { WallDisplayer } from "./WallDisplayer";
+import { FightScene } from "../fight.scene";
+import { ClassStore } from "../stores/class.store";
+import { GameStore } from "../stores/game.store";
+import { GridStore } from "../stores/grid.store";
+import { PlayerStore } from "../stores/player.store";
+import { ActionsService } from "../services/actions.service";
+import { RangeService } from "../services/range.service";
+import { CharactersDisplayer } from "./characters.displayer";
+import { FightSceneDisplayer } from "./base/fight-scene.displayer";
+import { GroundDisplayer } from "./ground.displayer";
+import { WallDisplayer } from "./wall.displayer";
 
 export class BoardDisplayer extends FightSceneDisplayer {
     private groundDisplayer: GroundDisplayer;
     private wallDisplayer: WallDisplayer;
 
-    private groundStore: GroundStore;
+    private groundStore: GridStore;
 
     constructor(
         scene: FightScene,
         gameStore: GameStore,
         classStore: ClassStore,
         playerStore: PlayerStore,
+        character: CharactersDisplayer,
+        actionManager: ActionsService,
+        rangeManager: RangeService,
     ) {
         super(scene, gameStore);
-        this.groundStore = new GroundStore();
+        this.groundStore = new GridStore();
         this.groundDisplayer = new GroundDisplayer(
             scene,
             gameStore,
             classStore,
             playerStore,
             this.groundStore,
+            character,
+            actionManager,
+            rangeManager,
         );
         this.wallDisplayer = new WallDisplayer(scene, gameStore);
     }

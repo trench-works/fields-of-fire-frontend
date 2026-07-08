@@ -7,3 +7,4 @@ export type ParticleAnimationProps = {
     quantity?: { min: number; max: number };
     depth: number;
 };
+

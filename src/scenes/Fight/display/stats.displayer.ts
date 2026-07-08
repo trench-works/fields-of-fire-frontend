@@ -19,8 +19,8 @@ import { Effect } from "../../../Model/Effect";
 import { Entity } from "../../../Model/Entity";
 import { Stats, StatsUtils } from "../../../Model/Stats";
 import { FightScene } from "../fight.scene";
-import { GameStore } from "../stores/GameStore";
-import { FightSceneDisplayer } from "./FightSceneDisplayer";
+import { GameStore } from "../stores/game.store";
+import { FightSceneDisplayer } from "./base/fight-scene.displayer";
 
 const statDescriptions: Record<string, string> = {
     life: "Points de vie. S'ils tombent à 0, vous mourrez.",

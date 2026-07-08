@@ -1,8 +1,8 @@
 import { CharacterClass } from "../../../Model/CharacterClass";
 import { Entity } from "../../../Model/Entity";
 import { Player } from "../../../Model/Player";
-import { ClassStore } from "./ClassStore";
-import { GameStore } from "./GameStore";
+import { ClassStore } from "./class.store";
+import { GameStore } from "./game.store";
 
 export class PlayerStore {
     playerId!: string;
@@ -21,7 +21,6 @@ export class PlayerStore {
     }
 
     update() {
-        console.log(this.gameStore.game);
         this.player = this.gameStore.game.players.find(
             (player) => player.id === this.playerId,
         )!;
