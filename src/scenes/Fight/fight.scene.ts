@@ -67,7 +67,6 @@ export class FightScene extends BaseScene<FightSceneInit> {
     public root: FightSceneRoot;
 
     public tooltip!: Tooltip;
-    protected windEmitter!: Phaser.GameObjects.Particles.ParticleEmitter;
 
     public fightMap = "chessmap";
     public scaleFactor: number = 1;
