@@ -1,132 +1,19 @@
 import { Position } from "../../../core";
-import { StatsUtils } from "../../../Model/Stats";
-import { CharactersDisplayer } from "../display/characters.displayer";
-import { FightScene } from "../fight.scene";
-import { ActionsService } from "../services/actions.service";
-import { RangeService } from "../services/range.service";
-import { ClassStore } from "../stores/class.store";
-import { GameStore } from "../stores/game.store";
-import { GridStore } from "../stores/grid.store";
-import { PlayerStore } from "../stores/player.store";
+import { GridService } from "../services/grid.service";
 
 export class GridController {
-    constructor(
-        // Scene
-        private readonly scene: FightScene,
-        // Stores
-        private readonly gameStore: GameStore,
-        private readonly groundStore: GridStore,
-        private readonly classStore: ClassStore,
-        private readonly playerStore: PlayerStore,
-        // Services
-        private readonly actionService: ActionsService,
-        private readonly rangeService: RangeService,
-        // Displayers
-        private readonly characterDisplayer: CharactersDisplayer,
-    ) {}
+    constructor(private readonly gridService: GridService) {}
 
-    cellClick({ x, y }: Position) {
-        this.characterDisplayer.changeDirection({ x, y });
-        if (this.actionService.currentAction) {
-            if (this.rangeService.isInRange({ x, y })) {
-                this.actionService.launchAction({ x, y });
-            }
-        } else {
-            const tile = this.gameStore.game.plateau[x][y];
-            if (tile.entityId) {
-                this.scene.root.controllers.game.inspectCharacter(
-                    tile.entityId,
-                );
-            }
-        }
-        this.rangeService.clearRange();
-        this.actionService.clearCurrentAction();
-    }
+    cellClick = (position: Position) => {
+        this.gridService.cellClick(position);
+    };
 
-    cellHover({ x, y }: Position) {
-        const cell = this.groundStore.gridPositions[x][y];
-        cell.hoverGraphics?.setVisible(true);
-        if (this.gameStore.game.plateau[x][y].entityId) {
-            const entity = this.gameStore.getEntity(
-                this.gameStore.game.plateau[x][y].entityId,
-            );
+    cellHover = (position: Position) => {
+        this.gridService.cellHover(position);
+    };
 
-            if (!this.actionService.currentAction) {
-                this.scene.tooltip.showNow(
-                    this.classStore.getClass(entity.classId).name,
-                    `❤️ ${StatsUtils.fromEntity(entity).life} PV`,
-                    {
-                        x: cell.pixelPosition.x,
-                        y: cell.pixelPosition.y - 140 * this.scene.scaleFactor,
-                    },
-                );
-            }
-        }
-        if (this.actionService.currentAction) {
-            this.manageToolTip(x, y);
-        }
-    }
-
-    cellHoverOut({ x, y }: Position) {
-        const cell = this.groundStore.gridPositions[x][y];
-        cell.hoverGraphics?.setVisible(false);
-        this.scene.tooltip.hide();
-        this.rangeService.clearZonePreview();
-    }
-
-    manageToolTip(x: number, y: number) {
-        const action = this.actionService.currentAction;
-        if (!action) return;
-
-        const zoneCells = this.rangeService.getSpellZonePreview(action, {
-            x,
-            y,
-        });
-        if (!zoneCells || action.id === "walk") return;
-
-        // ✅ collecte tous les tooltips à afficher
-        const tooltipItems: {
-            text: string;
-            title?: string;
-            position: { x: number; y: number };
-        }[] = [];
-
-        zoneCells.forEach((cell) => {
-            const entityId =
-                this.gameStore.game.plateau[cell.gridPosition.x][
-                    cell.gridPosition.y
-                ].entityId;
-            if (!entityId) return;
-
-            const targetEntity = this.gameStore.getEntity(entityId);
-            if (!targetEntity) return;
-
-            const minDamage = this.actionService.calculateFinalDamage(
-                action.damage?.min ?? 0,
-                action,
-                this.playerStore.playerEntity,
-                targetEntity,
-            );
-            const maxDamage = this.actionService.calculateFinalDamage(
-                action.damage?.max ?? 0,
-                action,
-                this.playerStore.playerEntity,
-                targetEntity,
-            );
-
-            const isHeal = (action.damage?.max ?? 0) <= 0;
-
-            tooltipItems.push({
-                text: `${isHeal ? "🩹" : "⚔️"} ${isHeal ? -minDamage.defenserDamage : minDamage.defenserDamage}-${isHeal ? -maxDamage.defenserDamage : maxDamage.defenserDamage}`,
-                title: this.classStore.getClass(targetEntity.classId).name,
-                position: {
-                    x: cell.pixelPosition.x,
-                    y: cell.pixelPosition.y - 130 * this.scene.scaleFactor,
-                },
-            });
-        });
-
-        this.scene.tooltip.showFightingTooltip(tooltipItems);
-    }
+    cellHoverOut = (position: Position) => {
+        this.gridService.cellHoverOut(position);
+    };
 }
 

@@ -46,6 +46,13 @@ export class ActionsService {
         }
     }
 
+    clearAction() {
+        this.actionStore.selectedAction = null;
+        this.rangeService.clearRange();
+        this.rangeService.clearZonePreview();
+        this.clearCurrentAction();
+    }
+
     public clearCurrentAction() {
         this.currentAction = undefined;
         this.actions.actionElements.forEach((action) =>

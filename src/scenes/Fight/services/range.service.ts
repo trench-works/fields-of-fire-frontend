@@ -3,6 +3,7 @@ import { applyFovToRange, Case } from "../../../Model";
 import { Action, ActionLevel, ActionZoneType } from "../../../Model/Action";
 import { Cell, FightScene } from "../fight.scene";
 import { GameStore } from "../stores/game.store";
+import { GridStore } from "../stores/grid.store";
 
 export class RangeService {
     private cellsInRange: Cell[] = [];
@@ -11,6 +12,7 @@ export class RangeService {
     constructor(
         private readonly scene: FightScene,
         private readonly gameStore: GameStore,
+        private readonly gridStore: GridStore,
     ) {}
 
     private highlightCell(
@@ -81,7 +83,7 @@ export class RangeService {
             inRangeCells.set(`${cellInRange.x},${cellInRange.y}`, cellInRange);
         }
         this.cellsInRange = Array.from(inRangeCells.values()).map(
-            ({ x, y }) => this.scene.gridPositions[x]?.[y],
+            ({ x, y }) => this.gridStore.gridPositions[x]?.[y],
         );
         return this;
     }
@@ -125,8 +127,8 @@ export class RangeService {
 
         console.log("typeof actionRange is ", action.rangeType);
 
-        for (let x = 0; x < this.scene.gridPositions.length; x++) {
-            for (let y = 0; y < this.scene.gridPositions[x].length; y++) {
+        for (let x = 0; x < this.gridStore.gridPositions.length; x++) {
+            for (let y = 0; y < this.gridStore.gridPositions[x].length; y++) {
                 let isInRange = false;
                 const cell = board[x]?.[y];
                 const dist = Math.abs(start.x - x) + Math.abs(start.y - y);
@@ -174,7 +176,7 @@ export class RangeService {
                     }
                 }
                 if (isInRange) {
-                    result.push(this.scene.gridPositions[x]?.[y]);
+                    result.push(this.gridStore.gridPositions[x]?.[y]);
                 }
             }
         }
@@ -225,7 +227,7 @@ export class RangeService {
                             Math.abs(target.x - x) + Math.abs(target.y - y) <=
                             zoneSize
                         ) {
-                            const cell = this.scene.gridPositions[x]?.[y];
+                            const cell = this.gridStore.gridPositions[x]?.[y];
                             const boardCell =
                                 this.gameStore.game.plateau[x]?.[y];
                             if (

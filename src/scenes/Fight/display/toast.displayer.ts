@@ -8,7 +8,8 @@ import {
     UI_LEVELS_OFFSET,
 } from "../../../core";
 import { FightScene } from "../fight.scene";
-import { GameAttackAnimation } from "../repositories/player.socket";
+import { GameAttackAnimation } from "../repositories/game.repository";
+import { GridStore } from "../stores/grid.store";
 
 class Toast extends DisplayRoot {
     text: DisplayText;
@@ -43,8 +44,11 @@ class Toast extends DisplayRoot {
     }
 }
 
-export class Toaster {
-    constructor(protected readonly scene: FightScene) {}
+export class ToastDisplayer {
+    constructor(
+        private readonly scene: FightScene,
+        private readonly gridStore: GridStore,
+    ) {}
 
     async attackToast(animation: GameAttackAnimation) {
         const {
@@ -54,11 +58,13 @@ export class Toaster {
             hits.map((hit) =>
                 new Toast(
                     this.scene,
-                    this.scene.gridPositions[hit.x][hit.y].pixelPosition,
+                    this.gridStore.gridPositions[hit.x][hit.y].pixelPosition,
                     1,
                 )
                     .setText(
-                        hit.damage === 0 ? i18n.translate("fight.actions.dodged"): `${-hit.damage} ❤️`,
+                        hit.damage === 0
+                            ? i18n.translate("fight.actions.dodged")
+                            : `${-hit.damage} ❤️`,
                         hit.damage === 0 ? "#00FF00" : "#FF0000",
                     )
                     .animate(1000),

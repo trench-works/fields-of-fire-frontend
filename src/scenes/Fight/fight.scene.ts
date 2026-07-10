@@ -70,7 +70,6 @@ export class FightScene extends BaseScene<FightSceneInit> {
     protected windEmitter!: Phaser.GameObjects.Particles.ParticleEmitter;
 
     public fightMap = "chessmap";
-    public gridPositions: Cell[][] = [];
     public scaleFactor: number = 1;
     public particleDisplayer: ParticleDisplayer = new ParticleDisplayer(this);
     public keyBinds: KeyBinds;

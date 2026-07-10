@@ -28,11 +28,11 @@ export class GroundDisplayer extends FightSceneDisplayer {
     clean(): this {
         this.gridStore.groundLayer?.destroy();
         this.tileHighlights.forEach((highlight) => highlight.destroy());
-        for (let x = 0; x < this.scene.gridPositions.length; x++) {
-            for (let y = 0; y < this.scene.gridPositions[x].length; y++) {
-                this.scene.gridPositions[x][y].highlight?.destroy();
-                this.scene.gridPositions[x][y].hoverGraphics?.destroy();
-                this.scene.gridPositions[x][y].zone?.destroy();
+        for (let x = 0; x < this.gridStore.gridPositions.length; x++) {
+            for (let y = 0; y < this.gridStore.gridPositions[x].length; y++) {
+                this.gridStore.gridPositions[x][y].highlight?.destroy();
+                this.gridStore.gridPositions[x][y].hoverGraphics?.destroy();
+                this.gridStore.gridPositions[x][y].zone?.destroy();
             }
         }
         return this;
@@ -138,8 +138,8 @@ export class GroundDisplayer extends FightSceneDisplayer {
             return;
         }
         for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
-            if (!this.scene.gridPositions[x]) {
-                this.scene.gridPositions[x] = [];
+            if (!this.gridStore.gridPositions[x]) {
+                this.gridStore.gridPositions[x] = [];
             }
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
                 const tile = this.gridStore.groundLayer.getTileAt(x, y);
@@ -148,7 +148,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
                 const worldX = tile.getCenterX();
                 const worldY = tile.getCenterY();
 
-                this.scene.gridPositions[x][y] = {
+                this.gridStore.gridPositions[x][y] = {
                     gridPosition: { x, y },
                     pixelPosition: {
                         x: worldX,
@@ -173,13 +173,13 @@ export class GroundDisplayer extends FightSceneDisplayer {
                         },
                     );
                     hoverGraphics.setVisible(false);
-                    this.scene.gridPositions[x][y].hoverGraphics =
+                    this.gridStore.gridPositions[x][y].hoverGraphics =
                         hoverGraphics;
 
                     const zone = this.getTileInteractiveZone({ x, y }, tile, {
                         DIAMOND,
                     });
-                    this.scene.gridPositions[x][y].zone = zone;
+                    this.gridStore.gridPositions[x][y].zone = zone;
 
                     // --- DEBUG VISUEL ---
                     //this.gridShower(DIAMOND, worldX, worldY, layer);

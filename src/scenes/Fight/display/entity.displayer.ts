@@ -2,10 +2,10 @@ import { FightSceneDisplayer } from "./base/fight-scene.displayer";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/game.store";
 import { CharacterAssetId, CharacterSpriteAsset } from "../../../assets";
-import { GameMoveAnimation } from "../repositories/player.socket";
-import { Game } from "../../../Model/Game";
 import { Depth, GRID_LEVELS_OFFSET, Position, Timeout } from "../../../core";
 import { PositionUtils } from "../../../core/Utils/Sizing";
+import { GridStore } from "../stores/grid.store";
+import { GameMoveAnimation } from "../repositories/game.repository";
 
 export class EntityDisplayer extends FightSceneDisplayer {
     protected direction: "UR" | "UL" | "DR" | "DL" = "DR";
@@ -13,6 +13,7 @@ export class EntityDisplayer extends FightSceneDisplayer {
     constructor(
         scene: FightScene,
         gameStore: GameStore,
+        private readonly gridStore: GridStore,
         public readonly entityId: string,
     ) {
         super(scene, gameStore);
@@ -63,7 +64,7 @@ export class EntityDisplayer extends FightSceneDisplayer {
     render(): this {
         const entity = this.gameStore.getEntity(this.entityId);
         const { x, y } = entity.position;
-        const cell = this.scene.gridPositions[x][y];
+        const cell = this.gridStore.gridPositions[x][y];
 
         if (cell) {
             this.sprite = this.scene.physics.add.sprite(
@@ -132,7 +133,7 @@ export class EntityDisplayer extends FightSceneDisplayer {
         const entity = this.gameStore.getEntity(this.entityId);
 
         const { x, y } = entity.position;
-        const cell = this.scene.gridPositions[x][y];
+        const cell = this.gridStore.gridPositions[x][y];
 
         this.sprite.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
         this.sprite.setDepth(
@@ -143,8 +144,8 @@ export class EntityDisplayer extends FightSceneDisplayer {
     }
 
     changeDirection(origin: Position, target: Position) {
-        const startCell = this.scene.gridPositions[origin.x]?.[origin.y];
-        const endCell = this.scene.gridPositions[target.x]?.[target.y];
+        const startCell = this.gridStore.gridPositions[origin.x]?.[origin.y];
+        const endCell = this.gridStore.gridPositions[target.x]?.[target.y];
         const horizontalDirection =
             startCell.pixelPosition.x - endCell.pixelPosition.x < 0 ? "R" : "L";
         const verticalDirection =
@@ -156,8 +157,8 @@ export class EntityDisplayer extends FightSceneDisplayer {
 
     async slide(start: Position, end: Position, steps: number) {
         if (!this.sprite) return this;
-        const startCell = this.scene.gridPositions[start.x]?.[start.y];
-        const endCell = this.scene.gridPositions[end.x]?.[end.y];
+        const startCell = this.gridStore.gridPositions[start.x]?.[start.y];
+        const endCell = this.gridStore.gridPositions[end.x]?.[end.y];
 
         const moveLine = PositionUtils.subtract(
             endCell.pixelPosition,
@@ -178,7 +179,7 @@ export class EntityDisplayer extends FightSceneDisplayer {
     setPosition({ x, y }: Position): this {
         if (!this.sprite) return this;
 
-        const cell = this.scene.gridPositions[x]?.[y];
+        const cell = this.gridStore.gridPositions[x]?.[y];
 
         this.sprite.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
         this.sprite.setDepth(
@@ -187,7 +188,7 @@ export class EntityDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    async animate(animation: GameMoveAnimation, newGame: Game): Promise<this> {
+    async animate(animation: GameMoveAnimation): Promise<this> {
         for (let i = 1; i < animation.data.path.length; i++) {
             const precedentPosition = animation.data.path[i - 1];
             const newPosition = animation.data.path[i];

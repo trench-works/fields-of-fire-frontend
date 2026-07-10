@@ -21,6 +21,10 @@ import {
 } from "./repositories/game.repository";
 import { GamePlayerSocket } from "./repositories/player.socket";
 import { ActionsService } from "./services/actions.service";
+import { GameUpdateService } from "./services/game-update.service";
+import { GameService } from "./services/game.service";
+import { GridService } from "./services/grid.service";
+import { InspectCharacterService } from "./services/inspect-character.service";
 import { RangeService } from "./services/range.service";
 import { ActionsStore } from "./stores/actions.store";
 import { ClassStore } from "./stores/class.store";
@@ -46,9 +50,6 @@ export class FightSceneRoot {
         const gameStore = new GameStore();
         const gridStore = new GridStore();
         const playerStore = new PlayerStore(classStore, gameStore);
-        const gameUpdateQueue = new EventQueue<GameUpdateEvent>((event) =>
-            this.controllers.game.handleUpdate(event.data, event.animations),
-        );
 
         /**
          * Displayers
@@ -57,6 +58,7 @@ export class FightSceneRoot {
             scene,
             gameStore,
             playerStore,
+            gridStore,
         );
         const actionDisplayer = new ActionDisplayer(
             scene,
@@ -78,7 +80,7 @@ export class FightSceneRoot {
             playerStore,
             gridStore,
         );
-        const wallDisplayer = new WallDisplayer(scene, gameStore);
+        const wallDisplayer = new WallDisplayer(scene, gameStore, gridStore);
         const boardDisplayer = new BoardDisplayer(
             scene,
             groundDisplayer,
@@ -94,6 +96,7 @@ export class FightSceneRoot {
             scene,
             gameStore,
             characterDisplayer,
+            gridStore,
         );
 
         /**
@@ -107,7 +110,7 @@ export class FightSceneRoot {
         /**
          * Services
          */
-        const rangeService = new RangeService(scene, gameStore);
+        const rangeService = new RangeService(scene, gameStore, gridStore);
         const actionService = new ActionsService(
             playerStore,
             actionsStore,
@@ -115,47 +118,64 @@ export class FightSceneRoot {
             rangeService,
             actionDisplayer,
         );
+        const gridService = new GridService(
+            scene,
+            gameStore,
+            gridStore,
+            classStore,
+            playerStore,
+            actionService,
+            rangeService,
+            characterDisplayer,
+        );
+        const inspectStatsService = new InspectCharacterService(
+            gameStore,
+            classStore,
+            inspectStatsDisplayer,
+        );
+        const gameUpdateService = new GameUpdateService(
+            gameStore,
+            playerStore,
+            actionService,
+            inspectStatsService,
+            boardDisplayer,
+            actionDisplayer,
+            turnsDisplayer,
+            characterDisplayer,
+            playerStatsDisplayer,
+            inspectStatsDisplayer,
+            attackDisplayer,
+        );
+        const gameUpdateQueue = new EventQueue<GameUpdateEvent>((event) =>
+            gameUpdateService.handleUpdate(event.data, event.animations),
+        );
+        const gameService = new GameService(
+            this,
+            scene,
+            gameStore,
+            playerStore,
+            gameUpdateQueue,
+            actionService,
+            inspectStatsService,
+            connectingRepository,
+            gameRepository,
+            actionRepository,
+            boardDisplayer,
+            actionDisplayer,
+            turnsDisplayer,
+            characterDisplayer,
+            playerStatsDisplayer,
+            inspectStatsDisplayer,
+            endFightDisplayer,
+        );
 
         /**
          *  Controllers
          */
         this.controllers = {
-            game: new GameController(
-                this,
-                scene,
-                gameStore,
-                playerStore,
-                classStore,
-                gameUpdateQueue,
-                actionService,
-                connectingRepository,
-                gameRepository,
-                actionRepository,
-                boardDisplayer,
-                actionDisplayer,
-                turnsDisplayer,
-                characterDisplayer,
-                playerStatsDisplayer,
-                inspectStatsDisplayer,
-                attackDisplayer,
-                endFightDisplayer,
-            ),
-            actions: new ActionsController(
-                actionsStore,
-                actionRepository,
-                rangeService,
-                actionService,
-            ),
-            grid: new GridController(
-                scene,
-                gameStore,
-                gridStore,
-                classStore,
-                playerStore,
-                actionService,
-                rangeService,
-                characterDisplayer,
-            ),
+            game: new GameController(gameService, inspectStatsService),
+            actions: new ActionsController(actionService),
+            grid: new GridController(gridService),
         };
 
         /**

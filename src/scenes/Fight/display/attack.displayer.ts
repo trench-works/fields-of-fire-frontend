@@ -22,22 +22,24 @@ import { GameStore } from "../stores/game.store";
 import { CharactersDisplayer } from "./characters.displayer";
 import { FightSceneDisplayer } from "./base/fight-scene.displayer";
 import { ParticleDisplayer } from "./particles.displayer";
-import { Toaster } from "../components/Toaster";
+import { ToastDisplayer } from "./toast.displayer";
 import { GameAttackAnimation } from "../repositories/game.repository";
+import { GridStore } from "../stores/grid.store";
 
 export class AttackDisplayer extends FightSceneDisplayer {
     protected readonly particleDisplayer: ParticleDisplayer;
 
-    protected readonly toaster: Toaster;
+    protected readonly toaster: ToastDisplayer;
 
     constructor(
         scene: FightScene,
         gameStore: GameStore,
         private readonly character: CharactersDisplayer,
+        private readonly gridStore: GridStore,
     ) {
         super(scene, gameStore);
         this.particleDisplayer = new ParticleDisplayer(scene);
-        this.toaster = new Toaster(scene);
+        this.toaster = new ToastDisplayer(scene, gridStore);
     }
 
     async animate(animation: GameAttackAnimation): Promise<this> {
@@ -45,7 +47,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
             data: { entityId, actionId, target, origin, hits },
         } = animation;
         const { x, y } = target;
-        const cell = this.scene.gridPositions[x][y];
+        const cell = this.gridStore.gridPositions[x][y];
         switch (actionId) {
             case ActionAssetId.SHOOT:
                 {
@@ -281,7 +283,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
         origin: Position = { x: 0.5, y: 0.95 },
         depth: number = 1,
     ) {
-        const cell = this.scene.gridPositions[x][y];
+        const cell = this.gridStore.gridPositions[x][y];
         return await new DisplayAnimation(
             this.scene,
             ActionAnimationAsset.getAssetKey(animationId),
@@ -338,16 +340,16 @@ export class AttackDisplayer extends FightSceneDisplayer {
         origin: Position,
         target: Position,
     ) {
-        const hitCell = this.scene.gridPositions[x][y];
+        const hitCell = this.gridStore.gridPositions[x][y];
         let direction: number;
         if (target.x === x && target.y === y) {
-            const originCell = this.scene.gridPositions[origin.x][origin.y];
+            const originCell = this.gridStore.gridPositions[origin.x][origin.y];
             direction = DirectionUtils.getDirection(
                 originCell.pixelPosition,
                 hitCell.pixelPosition,
             );
         } else {
-            const targetCell = this.scene.gridPositions[target.x][target.y];
+            const targetCell = this.gridStore.gridPositions[target.x][target.y];
             direction = DirectionUtils.getDirection(
                 targetCell.pixelPosition,
                 hitCell.pixelPosition,
