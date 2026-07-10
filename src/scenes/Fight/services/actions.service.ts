@@ -13,8 +13,6 @@ import { RangeService } from "./range.service";
 import { ActionRepository } from "../repositories/action.repository";
 
 export class ActionsService {
-    public currentAction: Action | undefined;
-
     constructor(
         // Stores
         private readonly playerStore: PlayerStore,
@@ -54,15 +52,16 @@ export class ActionsService {
     }
 
     public clearCurrentAction() {
-        this.currentAction = undefined;
+        this.actionStore.selectedAction = null;
         this.actions.actionElements.forEach((action) =>
             action.hightlight(false),
         );
     }
 
     async launchAction(pos: Position) {
+        console.log(pos);
         this.lock();
-        const action = this.currentAction;
+        const action = this.actionStore.selectedAction;
         this.clearCurrentAction();
         await this.actionRepository.action({
             actionId: action?.id ?? "",

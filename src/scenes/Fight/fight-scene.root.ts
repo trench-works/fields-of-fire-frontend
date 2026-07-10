@@ -118,20 +118,22 @@ export class FightSceneRoot {
             rangeService,
             actionDisplayer,
         );
+        const inspectStatsService = new InspectCharacterService(
+            gameStore,
+            classStore,
+            inspectStatsDisplayer,
+        );
         const gridService = new GridService(
             scene,
             gameStore,
             gridStore,
             classStore,
             playerStore,
+            actionsStore,
             actionService,
             rangeService,
+            inspectStatsService,
             characterDisplayer,
-        );
-        const inspectStatsService = new InspectCharacterService(
-            gameStore,
-            classStore,
-            inspectStatsDisplayer,
         );
         const gameUpdateService = new GameUpdateService(
             gameStore,

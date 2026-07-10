@@ -4,10 +4,12 @@ import { CharactersDisplayer } from "../display/characters.displayer";
 import { FightScene } from "../fight.scene";
 import { ActionsService } from "../services/actions.service";
 import { RangeService } from "../services/range.service";
+import { ActionsStore } from "../stores/actions.store";
 import { ClassStore } from "../stores/class.store";
 import { GameStore } from "../stores/game.store";
 import { GridStore } from "../stores/grid.store";
 import { PlayerStore } from "../stores/player.store";
+import { InspectCharacterService } from "./inspect-character.service";
 
 export class GridService {
     constructor(
@@ -18,25 +20,26 @@ export class GridService {
         private readonly groundStore: GridStore,
         private readonly classStore: ClassStore,
         private readonly playerStore: PlayerStore,
+        private readonly actionStore: ActionsStore,
         // Services
         private readonly actionService: ActionsService,
         private readonly rangeService: RangeService,
+        private readonly inspectService: InspectCharacterService,
         // Displayers
         private readonly characterDisplayer: CharactersDisplayer,
     ) {}
 
     cellClick({ x, y }: Position) {
         this.characterDisplayer.changeDirection({ x, y });
-        if (this.actionService.currentAction) {
+        console.log(this.actionStore.selectedAction);
+        if (this.actionStore.selectedAction) {
             if (this.rangeService.isInRange({ x, y })) {
                 this.actionService.launchAction({ x, y });
             }
         } else {
             const tile = this.gameStore.game.plateau[x][y];
             if (tile.entityId) {
-                this.scene.root.controllers.game.inspectCharacter(
-                    tile.entityId,
-                );
+                this.inspectService.inspectCharacter(tile.entityId);
             }
         }
         this.rangeService.clearRange();
@@ -51,7 +54,7 @@ export class GridService {
                 this.gameStore.game.plateau[x][y].entityId,
             );
 
-            if (!this.actionService.currentAction) {
+            if (!this.actionStore.selectedAction) {
                 this.scene.tooltip.showNow(
                     this.classStore.getClass(entity.classId).name,
                     `❤️ ${StatsUtils.fromEntity(entity).life} PV`,
@@ -62,7 +65,7 @@ export class GridService {
                 );
             }
         }
-        if (this.actionService.currentAction) {
+        if (this.actionStore.selectedAction) {
             this.manageToolTip(x, y);
         }
     }
@@ -75,7 +78,7 @@ export class GridService {
     }
 
     manageToolTip(x: number, y: number) {
-        const action = this.actionService.currentAction;
+        const action = this.actionStore.selectedAction;
         if (!action) return;
 
         const zoneCells = this.rangeService.getSpellZonePreview(action, {
