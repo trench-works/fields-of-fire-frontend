@@ -18,12 +18,12 @@ import {
 } from "../../../core";
 import { Game } from "../../../Model/Game";
 import { FightScene } from "../fight.scene";
-import { GameAttackAnimation } from "../repositories/player.socket";
 import { GameStore } from "../stores/game.store";
 import { CharactersDisplayer } from "./characters.displayer";
 import { FightSceneDisplayer } from "./base/fight-scene.displayer";
 import { ParticleDisplayer } from "./particles.displayer";
 import { Toaster } from "../components/Toaster";
+import { GameAttackAnimation } from "../repositories/game.repository";
 
 export class AttackDisplayer extends FightSceneDisplayer {
     protected readonly particleDisplayer: ParticleDisplayer;
@@ -40,10 +40,7 @@ export class AttackDisplayer extends FightSceneDisplayer {
         this.toaster = new Toaster(scene);
     }
 
-    async animate(
-        animation: GameAttackAnimation,
-        newGame: Game,
-    ): Promise<this> {
+    async animate(animation: GameAttackAnimation): Promise<this> {
         const {
             data: { entityId, actionId, target, origin, hits },
         } = animation;

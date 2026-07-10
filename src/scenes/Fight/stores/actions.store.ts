@@ -1,9 +1,9 @@
-import { ActionAssetId } from "../../../assets";
+import { Action } from "../../../Model/Action";
 
 export class ActionsStore {
-    selectedAction: ActionAssetId | null;
+    selectedAction: Action | null;
 
-    protected lockLevel: number;
+    lockLevel: number;
 
     constructor() {
         this.selectedAction = null;

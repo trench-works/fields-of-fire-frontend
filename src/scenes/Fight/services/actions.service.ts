@@ -6,30 +6,41 @@ import { EffectAction } from "../../../Model/Effect";
 import { PositionUtils } from "../../../core/Utils/Sizing";
 import { StatsUtils } from "../../../Model/Stats";
 import { ActionDisplayer } from "../display/action.displayer";
-import { GamePlayerSocket } from "../repositories/player.socket";
+import { PlayerStore } from "../stores/player.store";
+import { ActionsStore } from "../stores/actions.store";
+import { ActionAssetId } from "../../../assets";
+import { RangeService } from "./range.service";
+import { ActionRepository } from "../repositories/action.repository";
 
 export class ActionsService {
     public currentAction: Action | undefined;
 
     constructor(
+        // Stores
+        private readonly playerStore: PlayerStore,
+        private readonly actionStore: ActionsStore,
+        // Repository
+        private readonly actionRepository: ActionRepository,
+        // Services
+        private readonly rangeService: RangeService,
+        // Displayer
         private readonly actions: ActionDisplayer,
-        private readonly playerSocket: GamePlayerSocket,
     ) {}
 
     lock() {
-        if (this.lockLevel === 0) {
+        if (this.actionStore.lockLevel === 0) {
             this.actions.actionElements.forEach((action) => {
                 action.setIsActivated(false);
             });
-            this.endTurnButton.setIsActivated(false);
+            this.actions.endTurnButton.setIsActivated(false);
         }
-        this.lockLevel++;
+        this.actionStore.lockLevel++;
     }
 
     unlock() {
-        if (this.lockLevel > 0) {
-            this.lockLevel--;
-            if (this.lockLevel === 0) {
+        if (this.actionStore.lockLevel > 0) {
+            this.actionStore.lockLevel--;
+            if (this.actionStore.lockLevel === 0) {
                 this.actions.update();
             }
         }
@@ -43,10 +54,10 @@ export class ActionsService {
     }
 
     async launchAction(pos: Position) {
-        this.actions.lock();
+        this.lock();
         const action = this.currentAction;
-        this.actions.clearAction();
-        await this.playerSocket.action({
+        this.clearCurrentAction();
+        await this.actionRepository.action({
             actionId: action?.id ?? "",
             target: pos,
         });
@@ -147,6 +158,42 @@ export class ActionsService {
             attackerDamage: Math.ceil(attackerDamage),
             defenserDamage: Math.ceil(defenserDamage),
         };
+    }
+
+    finishTurn() {
+        this.actionRepository.finishTurn();
+        this.rangeService.clearRange();
+        this.rangeService.clearZonePreview();
+    }
+
+    handleActionSelection(action: Action) {
+        const stats = StatsUtils.fromEntity(this.playerStore.playerEntity);
+        this.clearCurrentAction();
+        this.actionStore.selectedAction = action;
+        switch (action.id) {
+            case ActionAssetId.WALK:
+                if (!stats.mouvement) {
+                    return;
+                }
+                this.rangeService.calculateCellsInMoveRange(
+                    this.playerStore.playerEntity.position,
+                    stats.mouvement,
+                    action,
+                );
+                break;
+            default:
+                if (stats.energy < action.cost) {
+                    return;
+                }
+                this.rangeService.calculateCellsInAttackRange(
+                    this.playerStore.playerEntity.position,
+                    action,
+                );
+                break;
+        }
+
+        this.rangeService.showRange();
+        this.actions.actionElements.get(action.id)?.hightlight(true);
     }
 }
 

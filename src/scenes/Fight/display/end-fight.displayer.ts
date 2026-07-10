@@ -17,7 +17,6 @@ import { Boost } from "../../../Model/Boost";
 import { Entity } from "../../../Model/Entity";
 import { MainMenu } from "../../MainMenu/main-menu.scene";
 import { FightScene } from "../fight.scene";
-import { GamePlayerSocket } from "../repositories/player.socket";
 import { GameStore } from "../stores/game.store";
 import { PlayerStore } from "../stores/player.store";
 import { FightSceneDisplayer } from "./base/fight-scene.displayer";
@@ -50,7 +49,6 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         scene: FightScene,
         gameStore: GameStore,
         private readonly playerStore: PlayerStore,
-        private readonly playerSocket: GamePlayerSocket,
     ) {
         super(scene, gameStore);
         this.root = new DisplayRoot();
@@ -272,7 +270,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         console.log("onReady method called with boost : ", this.boostId);
         if (!this.isReady) {
             this.isReady = true;
-            this.playerSocket.readyForNewGame(this.boostId);
+            this.scene.root.controllers.game.readyForNewGame(this.boostId);
         }
         this.temporaryRoot.destroy();
     }
@@ -584,7 +582,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 {
                     onClick: () => {
                         console.log("Leave");
-                        this.playerSocket.disconnect();
+                        this.scene.root.controllers.game.disconnect();
                         MainMenu.start(this.scene, { keepMusic: false });
                     },
                     text: "Retour Menu",

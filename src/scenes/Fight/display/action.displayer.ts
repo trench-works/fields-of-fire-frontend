@@ -16,6 +16,7 @@ import { KeyBind } from "../../../core/keybinds/keybinds";
 import { Action } from "../../../Model/Action";
 import { StatsUtils } from "../../../Model/Stats";
 import { FightScene } from "../fight.scene";
+import { ActionsStore } from "../stores/actions.store";
 import { GameStore } from "../stores/game.store";
 import { PlayerStore } from "../stores/player.store";
 import { FightSceneDisplayer } from "./base/fight-scene.displayer";
@@ -28,7 +29,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
     protected actionPanel!: DisplayContainer;
     public actionElements: Map<string, Button> = new Map();
     protected orderedActions: Action[] = [];
-    protected endTurnButton!: Button;
+    public endTurnButton!: Button;
     protected actionsList!: List;
 
     protected selectedAction: ActionAssetId | null;
@@ -39,6 +40,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
         scene: FightScene,
         gameStore: GameStore,
         private readonly playerStore: PlayerStore,
+        private readonly actionStore: ActionsStore,
     ) {
         super(scene, gameStore);
         this.root = new DisplayRoot();
@@ -97,50 +99,19 @@ export class ActionDisplayer extends FightSceneDisplayer {
 
     handleActionKey(index: number) {
         const action = this.orderedActions[index];
-        if (action && !this.lockLevel && !this.selectedAction) {
-            this.handleActionSelection(action);
+        if (action && !this.actionStore.lockLevel && !this.selectedAction) {
+            this.scene.root.controllers.actions.handleActionSelection(action);
         } else {
             this.scene.root.controllers.actions.clearAction();
         }
     }
 
     handleActionClick(action: Action) {
-        if (!this.lockLevel && !this.selectedAction) {
-            this.handleActionSelection(action);
+        if (!this.actionStore.lockLevel && !this.selectedAction) {
+            this.scene.root.controllers.actions.handleActionSelection(action);
         } else {
             this.scene.root.controllers.actions.clearAction();
         }
-    }
-
-    protected handleActionSelection(action: Action) {
-        const stats = StatsUtils.fromEntity(this.playerStore.playerEntity);
-        this.scene.root.controllers.actions.clearAction();
-        this.selectedAction = action.id;
-        switch (action.id) {
-            case ActionAssetId.WALK:
-                if (!stats.mouvement) {
-                    return;
-                }
-                this.rangeService.calculateCellsInMoveRange(
-                    this.playerStore.playerEntity.position,
-                    stats.mouvement,
-                    action,
-                );
-                break;
-            default:
-                if (stats.energy < action.cost) {
-                    return;
-                }
-                this.rangeService.calculateCellsInAttackRange(
-                    this.playerStore.playerEntity.position,
-                    action,
-                );
-                break;
-        }
-
-        this.rangeService.showRange();
-        this.actionElements.get(action.id)?.hightlight(true);
-        this.actionManager.currentAction = action;
     }
 
     destroy(): this {
@@ -219,7 +190,10 @@ export class ActionDisplayer extends FightSceneDisplayer {
                     );
                     const button = new Button(this.scene, buttonArea, {
                         image: ActionAsset.getAssetKey(action.id),
-                        onClick: () => this.handleActionSelection(action),
+                        onClick: () =>
+                            this.scene.root.controllers.actions.handleActionSelection(
+                                action,
+                            ),
                     });
                     if (action.cost > 0) {
                         const buttonGrid = buttonArea.getGrid({
@@ -276,7 +250,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
 
         this.endTurnButton
             .setOnClick(() => {
-                this.scene.finishTurn();
+                this.scene.root.controllers.actions.finishTurn();
             })
             .setIsActivated(true);
 

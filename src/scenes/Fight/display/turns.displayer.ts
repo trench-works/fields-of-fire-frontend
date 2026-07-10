@@ -107,7 +107,9 @@ export class TurnDisplayer extends FightSceneDisplayer {
                         ),
                         opacity: isFirstCell ? 1 : 0.7,
                         onClick: () => {
-                            this.scene.inspectCharacter(entityId);
+                            this.scene.root.controllers.game.inspectCharacter(
+                                entityId,
+                            );
                         },
                     },
                 ).setDepth(

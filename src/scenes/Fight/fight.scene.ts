@@ -2,25 +2,13 @@ import {
     Position,
     MenuButton,
     BaseScene,
-    EventQueue,
     BaseSceneInit,
-    SoundEffect,
-    Timeout,
     KeyBindUtils,
 } from "../../core";
 import { SceneConfig } from "../../config/SceneConfig";
-import { RangeService } from "./services/range.service";
-import {
-    GameEventAnimation,
-    GamePlayerSocket,
-    GameUpdateEvent,
-} from "./repositories/player.socket";
-import { ActionsService } from "./services/actions.service";
 import { Tooltip } from "../../core/UI/Tooltip";
 import { Game } from "../../Model/Game";
-import { ClassesRepository } from "../Lobby/repositories/classes.repository";
 import { MainMenu } from "../MainMenu/main-menu.scene";
-import { ActionDisplayer } from "./display/action.displayer";
 import {
     ActionAnimationAsset,
     ActionAsset,
@@ -34,26 +22,14 @@ import {
     SoundEffectAsset,
     MiscAnimationId,
     MiscAnimationAsset,
-    SoundEffectAssetId,
 } from "../../assets";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
-import { ClassStore } from "./stores/class.store";
-import { GameStore } from "./stores/game.store";
-import { PlayerStore } from "./stores/player.store";
-import { BoardDisplayer } from "./display/board.displayer";
-import { CharactersDisplayer } from "./display/characters.displayer";
-import { TurnDisplayer } from "./display/turns.displayer";
-import { StatsDisplayer } from "./display/stats.displayer";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { ParticleAsset } from "../../assets/ParticleAsset";
-import { AttackDisplayer } from "./display/attack.displayer";
 import { EffectAsset } from "../../assets/EffectAsset";
 import { PositionUtils } from "../../core/Utils/Sizing";
-import { EndFightDisplayer } from "./display/end-fight.displayer";
-import { Toaster } from "./components/Toaster";
 import { ParticleDisplayer } from "./display/particles.displayer";
 import { BoostAsset } from "../../assets/BoostAsset";
-import { ConnectionLoader } from "../../core/Objects/Loader";
 import { KeyBinds } from "../../core/keybinds/keybinds";
 import { FightSceneRoot } from "./fight-scene.root";
 
@@ -90,38 +66,6 @@ export class FightScene extends BaseScene<FightSceneInit> {
 
     public root: FightSceneRoot;
 
-    /**
-     * Stores
-     */
-    private classStore: ClassStore;
-    private gameStore: GameStore;
-    private playerStore: PlayerStore;
-
-    /**
-     * Displayers
-     */
-    private actions: ActionDisplayer;
-    private board: BoardDisplayer;
-    private character: CharactersDisplayer;
-    private turns: TurnDisplayer;
-    private playerStats: StatsDisplayer;
-    private inspectStats: StatsDisplayer;
-    private attacks: AttackDisplayer;
-    private endFight: EndFightDisplayer;
-    private toaster: Toaster;
-
-    /**
-     * Sockets
-     */
-    private playerSocket!: GamePlayerSocket;
-    private gameUpdateQueue!: EventQueue<GameUpdateEvent>;
-
-    /**
-     * Utils
-     */
-    private actionManager: ActionsService;
-    private rangeVisualizer: RangeService;
-
     public tooltip!: Tooltip;
     protected windEmitter!: Phaser.GameObjects.Particles.ParticleEmitter;
 
@@ -138,84 +82,10 @@ export class FightScene extends BaseScene<FightSceneInit> {
 
         this.root = new FightSceneRoot(this);
 
-        /**
-         * Stores
-         */
-        this.classStore = new ClassStore();
-        this.gameStore = new GameStore();
-        this.playerStore = new PlayerStore(this.classStore, this.gameStore);
-
-        /**
-         * Usecases
-         */
-        this.gameUpdateQueue = new EventQueue<GameUpdateEvent>((event) =>
-            this.handleUpdate(event.data, event.animations),
-        );
-
-        /**
-         * Utils
-         */
-        this.actionManager = new ActionsService(
-            this,
-            this.actions,
-            this.playerSocket,
-        );
-        this.rangeVisualizer = new RangeService(this, this.gameStore);
-
-        /**
-         * Displayers
-         */
-        this.actions = new ActionDisplayer(
-            this,
-            this.gameStore,
-            this.playerStore,
-            this.rangeVisualizer,
-            this.actionManager,
-        );
-        this.character = new CharactersDisplayer(
-            this,
-            this.gameStore,
-            this.playerStore,
-        );
-        this.board = new BoardDisplayer(
-            this,
-            this.gameStore,
-            this.classStore,
-            this.playerStore,
-            this.character,
-            this.actionManager,
-            this.rangeVisualizer,
-        );
-        this.turns = new TurnDisplayer(this, this.gameStore, this.classStore);
-        this.playerStats = new StatsDisplayer(this, this.gameStore, {
-            x: 1,
-            y: 7,
-        });
-        this.inspectStats = new StatsDisplayer(this, this.gameStore, {
-            x: 8,
-            y: 7,
-        });
-        this.attacks = new AttackDisplayer(
-            this,
-            this.gameStore,
-            this.character,
-        );
-        this.endFight = new EndFightDisplayer(
-            this,
-            this.gameStore,
-            this.playerStore,
-            this.playerSocket,
-        );
-        this.toaster = new Toaster(this);
-
         const config = new SceneConfig().loadConfig().getConfig("scene_1");
         if (!config) {
             throw new Error("Config doesnt exist");
         }
-
-        new ClassesRepository()
-            .getClasses()
-            .then((data) => this.classStore.setClasses(data));
 
         this.renderConfig = {
             tileSize: config.render_config.tile_size,
@@ -227,147 +97,15 @@ export class FightScene extends BaseScene<FightSceneInit> {
         );
     }
 
-    private async reset(game: Game) {
-        /**
-         * Update Store
-         */
-        this.gameStore.setGame(game);
-        this.playerStore.update();
-        /**
-         * Update Displayers
-         */
-        this.board.reset();
-        this.actions.destroy().preRender().render().update();
-        this.turns.update();
-        this.character.render().update();
-        this.playerStats
-            .setEntity(this.playerStore.playerEntity)
-            .setCharacterClass(this.playerStore.playerClass)
-            .setName(user?.username ?? "NO_NAME")
-            .update();
-        if (this.inspectStats.isShow) {
-            this.inspectCharacter(this.inspectStats.entityId);
-        }
-
-        await Timeout(1000);
-        this.actions.unlock();
-    }
-
     static start(scene: BaseScene, data: BaseSceneInit<FightSceneInit>) {
         data.config ??= {};
         data.config.keepMusic = false;
         super.startScene(scene, SceneAssetId.FIGHT, data);
     }
 
-    private async handleUpdate(
-        game: Game,
-        animations: GameEventAnimation[],
-    ): Promise<void> {
-        /**
-         * Do animations !!!!!
-         */
-        for (const animation of animations) {
-            switch (animation.key) {
-                case "move":
-                    await this.character.animate(animation, game);
-                    break;
-                case "attack":
-                    await this.attacks.animate(animation, game);
-                    break;
-                case "death":
-                    if (
-                        animation.data.entityId === this.inspectStats.entityId
-                    ) {
-                        this.inspectStats.setIsShow(false);
-                    }
-                    if (
-                        animation.data.entityId ===
-                        this.playerStore.playerEntity.id
-                    ) {
-                        this.playerStats.blurOut();
-                        this.actions.root.blur();
-                    }
-                    this.character.kill(animation.data.entityId);
-                    break;
-            }
-        }
-
-        /**
-         * Update Store
-         */
-        this.gameStore.setGame(game);
-        this.playerStore.update();
-        /**
-         * Update Displayers
-         */
-        this.board.update();
-        this.actions.update();
-        this.turns.update();
-        this.character.update();
-        this.playerStats
-            .setEntity(this.playerStore.playerEntity)
-            .setCharacterClass(this.playerStore.playerClass)
-            .setName(user?.username ?? "NO_NAME")
-            .update();
-        if (this.inspectStats.isShow) {
-            this.inspectCharacter(this.inspectStats.entityId);
-        }
-
-        this.actions.unlock();
-    }
-
     init(init: BaseSceneInit<FightSceneInit>) {
         super.init(init);
-        const {
-            data: {
-                game,
-                player: { id: playerId },
-            },
-        } = init;
-        this.gameStore.setGame(game);
-        this.playerStore.setPlayerId(playerId);
-
-        this.actions.preRender();
-        this.board.preRender();
-        this.turns.preRender();
-        this.character.preRender();
-        this.playerStats.preRender();
-        this.inspectStats.preRender();
-        this.endFight.preRender();
-
-        this.playerSocket = new GamePlayerSocket(game.id, playerId);
-        new ConnectionLoader(this, this.playerSocket);
-        this.playerSocket.onClose(() =>
-            MainMenu.start(this, { keepMusic: false }),
-        );
-        this.playerSocket.onUpdate((event) => this.gameUpdateQueue.add(event));
-        this.playerSocket.onActionCancel(() => {
-            //TODO: afficher quelque part event.reason (peut être faire un mapping avec des messages plus clairs)
-            this.actions.unlock();
-        });
-        this.playerSocket.onGameEnd(async (event) => {
-            await this.gameUpdateQueue.waitForCompletion();
-            if (event.playerWin) {
-                new SoundEffect(
-                    this,
-                    SoundEffectAsset.getAssetKey(SoundEffectAssetId.VICTORY),
-                ).play();
-            }
-            //TODO: DISPLAY POPUP WIasync TH INFO event.playerWin (true|false)
-            //this.playBackgroundMusic(MusicAssetId.MENU, true);
-            this.endFight.show(event.playerWin, event.boosts);
-        });
-
-        this.playerSocket.onGameRenew(async (event) => {
-            this.reset(event.data);
-            this.endFight.reset();
-        });
-    }
-
-    public finishTurn() {
-        this.playerSocket.finishTurn();
-        this.rangeVisualizer.clearRange();
-        this.rangeVisualizer.clearZonePreview();
+        this.root.controllers.game.init(init.data);
     }
 
     preload() {
@@ -401,18 +139,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
             delay: 750,
         });
 
-        this.actions.render().update();
-        this.board.render().update();
-        this.character.render().update();
-        this.turns.render();
-        this.playerStats
-            .setEntity(this.playerStore.playerEntity)
-            .setCharacterClass(this.playerStore.playerClass)
-            .setName(user?.username ?? "NO_NAME")
-            .render()
-            .update();
-        this.inspectStats.render().setIsShow(false);
-        this.endFight.render();
+        this.root.controllers.game.create();
 
         // Créer le bouton Menu
         new MenuButton(this, {
@@ -424,7 +151,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
                 console.log("Options - À implémenter");
             },
             onMainMenuClick: () => {
-                this.playerSocket.disconnect();
+                this.root.controllers.game.disconnect();
                 MainMenu.start(this, { keepMusic: false });
             },
         });
@@ -434,19 +161,8 @@ export class FightScene extends BaseScene<FightSceneInit> {
         // --- Placement des icônes ---
 
         this.events.on("characterClicked", (entityId: string) => {
-            this.inspectCharacter(entityId);
+            this.root.controllers.game.inspectCharacter(entityId);
         });
-    }
-
-    public inspectCharacter(entityId: string) {
-        const entity = this.gameStore.getEntity(entityId);
-        const charClass = this.classStore.getClass(entity.classId);
-        this.inspectStats
-            .setEntity(entity)
-            .setCharacterClass(charClass)
-            .setName(charClass.name.split(" ")[0])
-            .update()
-            .setIsShow(true);
     }
 }
 
