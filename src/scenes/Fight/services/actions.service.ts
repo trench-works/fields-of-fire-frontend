@@ -1,29 +1,69 @@
 import { Position } from "../../../core";
 import { Action, ActionType } from "../../../Model/Action";
 import { Entity } from "../../../Model/Entity";
-import { FightScene } from "../fight.scene";
 import { Ran } from "../../../core/Types/Ran";
 import { EffectAction } from "../../../Model/Effect";
 import { PositionUtils } from "../../../core/Utils/Sizing";
 import { StatsUtils } from "../../../Model/Stats";
+import { ActionDisplayer } from "../display/action.displayer";
+import { PlayerStore } from "../stores/player.store";
+import { ActionsStore } from "../stores/actions.store";
+import { ActionAssetId } from "../../../assets";
+import { RangeService } from "./range.service";
+import { ActionRepository } from "../repositories/action.repository";
 
-export class ActionManager {
-    public currentAction: Action | undefined;
-    public scene!: FightScene;
+export class ActionsService {
+    constructor(
+        // Stores
+        private readonly playerStore: PlayerStore,
+        private readonly actionStore: ActionsStore,
+        // Repository
+        private readonly actionRepository: ActionRepository,
+        // Services
+        private readonly rangeService: RangeService,
+        // Displayer
+        private readonly actions: ActionDisplayer,
+    ) {}
 
-    constructor(scene: FightScene) {
-        this.scene = scene;
+    lock() {
+        if (this.actionStore.lockLevel === 0) {
+            this.actions.actionElements.forEach((action) => {
+                action.setIsActivated(false);
+            });
+            this.actions.endTurnButton.setIsActivated(false);
+        }
+        this.actionStore.lockLevel++;
+    }
+
+    unlock() {
+        if (this.actionStore.lockLevel > 0) {
+            this.actionStore.lockLevel--;
+            if (this.actionStore.lockLevel === 0) {
+                this.actions.update();
+            }
+        }
+    }
+
+    clearAction() {
+        this.actionStore.selectedAction = null;
+        this.rangeService.clearRange();
+        this.rangeService.clearZonePreview();
+        this.clearCurrentAction();
     }
 
     public clearCurrentAction() {
-        this.currentAction = undefined;
+        this.actionStore.selectedAction = null;
+        this.actions.actionElements.forEach((action) =>
+            action.hightlight(false),
+        );
     }
 
     async launchAction(pos: Position) {
-        this.scene.actions.lock();
-        const action = this.currentAction;
-        this.scene.actions.clearAction();
-        await this.scene.playerSocket.action({
+        console.log(pos);
+        this.lock();
+        const action = this.actionStore.selectedAction;
+        this.clearCurrentAction();
+        await this.actionRepository.action({
             actionId: action?.id ?? "",
             target: pos,
         });
@@ -124,6 +164,42 @@ export class ActionManager {
             attackerDamage: Math.ceil(attackerDamage),
             defenserDamage: Math.ceil(defenserDamage),
         };
+    }
+
+    finishTurn() {
+        this.actionRepository.finishTurn();
+        this.rangeService.clearRange();
+        this.rangeService.clearZonePreview();
+    }
+
+    handleActionSelection(action: Action) {
+        const stats = StatsUtils.fromEntity(this.playerStore.playerEntity);
+        this.clearCurrentAction();
+        this.actionStore.selectedAction = action;
+        switch (action.id) {
+            case ActionAssetId.WALK:
+                if (!stats.mouvement) {
+                    return;
+                }
+                this.rangeService.calculateCellsInMoveRange(
+                    this.playerStore.playerEntity.position,
+                    stats.mouvement,
+                    action,
+                );
+                break;
+            default:
+                if (stats.energy < action.cost) {
+                    return;
+                }
+                this.rangeService.calculateCellsInAttackRange(
+                    this.playerStore.playerEntity.position,
+                    action,
+                );
+                break;
+        }
+
+        this.rangeService.showRange();
+        this.actions.actionElements.get(action.id)?.hightlight(true);
     }
 }
 

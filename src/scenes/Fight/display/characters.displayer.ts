@@ -1,21 +1,22 @@
-import { FightScene } from "../../fight.scene";
-import { Character } from "./Character";
-import { GameStore } from "../../stores/GameStore";
-import { FightSceneDisplayer } from "../FightSceneDisplayer";
-import { GameMoveAnimation } from "../../repositories/player.socket";
-import { Game } from "../../../../Model/Game";
-import { Position, SoundEffect, Timeout } from "../../../../core";
-import { SoundEffectAsset, SoundEffectAssetId } from "../../../../assets";
-import { PlayerStore } from "../../stores/PlayerStore";
-import { PositionUtils } from "../../../../core/Utils/Sizing";
+import { FightScene } from "../fight.scene";
+import { EntityDisplayer } from "./entity.displayer";
+import { GameStore } from "../stores/game.store";
+import { FightSceneDisplayer } from "./base/fight-scene.displayer";
+import { Position, SoundEffect, Timeout } from "../../../core";
+import { SoundEffectAsset, SoundEffectAssetId } from "../../../assets";
+import { PlayerStore } from "../stores/player.store";
+import { PositionUtils } from "../../../core/Utils/Sizing";
+import { GridStore } from "../stores/grid.store";
+import { GameMoveAnimation } from "../repositories/game.repository";
 
 export class CharactersDisplayer extends FightSceneDisplayer {
-    characters: Character[] = [];
+    characters: EntityDisplayer[] = [];
 
     constructor(
         scene: FightScene,
         gameStore: GameStore,
         protected readonly playerStore: PlayerStore,
+        private readonly gridStore: GridStore,
     ) {
         super(scene, gameStore);
     }
@@ -29,7 +30,12 @@ export class CharactersDisplayer extends FightSceneDisplayer {
         this.characters = this.gameStore.game.entities
             .filter((entity) => !entity.dead)
             .map((entity) =>
-                new Character(this.scene, this.gameStore, entity.id)
+                new EntityDisplayer(
+                    this.scene,
+                    this.gameStore,
+                    this.gridStore,
+                    entity.id,
+                )
                     .preRender()
                     .render(),
             );
@@ -45,7 +51,12 @@ export class CharactersDisplayer extends FightSceneDisplayer {
         for (const entity of this.gameStore.game.entities) {
             if (!entity.dead && !currentEntityIds.includes(entity.id)) {
                 this.characters.push(
-                    new Character(this.scene, this.gameStore, entity.id)
+                    new EntityDisplayer(
+                        this.scene,
+                        this.gameStore,
+                        this.gridStore,
+                        entity.id,
+                    )
                         .preRender()
                         .render(),
                 );
@@ -104,10 +115,10 @@ export class CharactersDisplayer extends FightSceneDisplayer {
         }
     }
 
-    async animate(animation: GameMoveAnimation, newGame: Game): Promise<this> {
+    async animate(animation: GameMoveAnimation): Promise<this> {
         await this.characters
             .find((character) => character.entityId === animation.data.entityId)
-            ?.animate(animation, newGame);
+            ?.animate(animation);
         await Timeout(100);
         return this;
     }

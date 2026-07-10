@@ -1,6 +1,6 @@
-import { CharacterCloseupAsset } from "../../../../assets";
-import { BoostAsset, BoostAssetId } from "../../../../assets/BoostAsset";
-import { Color } from "../../../../config/ColorConfig";
+import { CharacterCloseupAsset } from "../../../assets";
+import { BoostAsset, BoostAssetId } from "../../../assets/BoostAsset";
+import { Color } from "../../../config/ColorConfig";
 import {
     Button,
     Depth,
@@ -11,15 +11,15 @@ import {
     List,
     ScaleMode,
     UI_LEVELS_OFFSET,
-} from "../../../../core";
-import { DisplayImage } from "../../../../core/UI/DisplayImage";
-import { Boost } from "../../../../Model/Boost";
-import { Entity } from "../../../../Model/Entity";
-import { MainMenu } from "../../../MainMenu/main-menu.scene";
-import { FightScene } from "../../fight.scene";
-import { GameStore } from "../../stores/GameStore";
-import { PlayerStore } from "../../stores/PlayerStore";
-import { FightSceneDisplayer } from "../FightSceneDisplayer";
+} from "../../../core";
+import { DisplayImage } from "../../../core/UI/DisplayImage";
+import { Boost } from "../../../Model/Boost";
+import { Entity } from "../../../Model/Entity";
+import { MainMenu } from "../../MainMenu/main-menu.scene";
+import { FightScene } from "../fight.scene";
+import { GameStore } from "../stores/game.store";
+import { PlayerStore } from "../stores/player.store";
+import { FightSceneDisplayer } from "./base/fight-scene.displayer";
 
 export class EndFightDisplayer extends FightSceneDisplayer {
     /**
@@ -270,7 +270,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         console.log("onReady method called with boost : ", this.boostId);
         if (!this.isReady) {
             this.isReady = true;
-            this.scene.playerSocket.readyForNewGame(this.boostId);
+            this.scene.root.controllers.game.readyForNewGame(this.boostId);
         }
         this.temporaryRoot.destroy();
     }
@@ -418,21 +418,21 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 statLine = "Vol de vie : +10%";
                 break;
             case BoostAssetId.MASOCHISTIC:
-                statLine =[
-                    "+20% de dommages", 
+                statLine = [
+                    "+20% de dommages",
                     "vous subisser la moitiée",
-                    "de ces dommages"
+                    "de ces dommages",
                 ].join("\n");
                 break;
             case BoostAssetId.REACTION:
-            statLine = [
-                "life: +8",
-                "strength: +10",
-                "precision: +10",
-                "initiative: +15",
-                "esquive: +2",
-                "armor: +5",
-            ].join("\n");
+                statLine = [
+                    "life: +8",
+                    "strength: +10",
+                    "precision: +10",
+                    "initiative: +15",
+                    "esquive: +2",
+                    "armor: +5",
+                ].join("\n");
                 break;
             case BoostAssetId.CRIT_CHANCE:
                 statLine = "chance de critique : +3%";
@@ -441,13 +441,14 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 statLine = "dégats de critique : +25%";
                 break;
             default:
-            statLine = boost.boosts
-                .flatMap((stat) => Object.entries(stat))
-                .filter(([, value]) => value !== undefined && value !== 0)
-                .map(
-                    ([key, value]) => `${key}: ${value > 0 ? "+" : ""}${value}`,
-                )
-                .join("\n");
+                statLine = boost.boosts
+                    .flatMap((stat) => Object.entries(stat))
+                    .filter(([, value]) => value !== undefined && value !== 0)
+                    .map(
+                        ([key, value]) =>
+                            `${key}: ${value > 0 ? "+" : ""}${value}`,
+                    )
+                    .join("\n");
         }
 
         if (statLine) {
@@ -581,7 +582,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 {
                     onClick: () => {
                         console.log("Leave");
-                        this.scene.playerSocket.disconnect();
+                        this.scene.root.controllers.game.disconnect();
                         MainMenu.start(this.scene, { keepMusic: false });
                     },
                     text: "Retour Menu",

@@ -7,9 +7,9 @@ import {
     UI_LEVELS_OFFSET,
 } from "../../../core";
 import { FightScene } from "../fight.scene";
-import { ClassStore } from "../stores/ClassStore";
-import { GameStore } from "../stores/GameStore";
-import { FightSceneDisplayer } from "./FightSceneDisplayer";
+import { ClassStore } from "../stores/class.store";
+import { GameStore } from "../stores/game.store";
+import { FightSceneDisplayer } from "./base/fight-scene.displayer";
 
 export class TurnDisplayer extends FightSceneDisplayer {
     private turnPanel!: DisplayContainer;
@@ -107,7 +107,9 @@ export class TurnDisplayer extends FightSceneDisplayer {
                         ),
                         opacity: isFirstCell ? 1 : 0.7,
                         onClick: () => {
-                            this.scene.inspectCharacter(entityId);
+                            this.scene.root.controllers.game.inspectCharacter(
+                                entityId,
+                            );
                         },
                     },
                 ).setDepth(

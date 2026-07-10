@@ -50,6 +50,12 @@ export class DisplayInput implements Displayable {
             }
         });
     }
+    blur(): this {
+        throw new Error("Method not implemented.");
+    }
+    unblur(): this {
+        throw new Error("Method not implemented.");
+    }
 
     focus(): this {
         this.inputElement.focus();

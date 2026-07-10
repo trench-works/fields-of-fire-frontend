@@ -1,10 +1,7 @@
-import {
-    ParticleAsset,
-    ParticleAssetId,
-} from "../../../../assets/ParticleAsset";
-import { BACKGROUND_LEVELS_OFFSET, Depth, Displayer } from "../../../../core";
-import { FightScene } from "../../fight.scene";
-import { ParticleAnimationProps } from "./ParticleAnimation";
+import { ParticleAsset, ParticleAssetId } from "../../../assets/ParticleAsset";
+import { BACKGROUND_LEVELS_OFFSET, Depth, Displayer } from "../../../core";
+import { FightScene } from "../fight.scene";
+import { ParticleAnimationProps } from "./base/particles.animation";
 
 export enum ParticleDirectionEnum {
     UP = "up",
@@ -140,7 +137,7 @@ export class ParticleDisplayer extends Displayer<FightScene> {
         await new Promise<void>((resolve) => {
             this.buffEmitter.addEmitZone(
                 new Phaser.GameObjects.Particles.Zones.RandomZone({
-                    getRandomPoint: (point: any) => {
+                    getRandomPoint: (point) => {
                         point.x = Phaser.Math.Between(-30, 30);
                         point.y = Phaser.Math.Between(0, 20);
                         return point;
@@ -183,7 +180,7 @@ export class ParticleDisplayer extends Displayer<FightScene> {
 
         buffEmitter.addEmitZone(
             new Phaser.GameObjects.Particles.Zones.RandomZone({
-                getRandomPoint: (point: any) => {
+                getRandomPoint: (point) => {
                     point.x = Phaser.Math.Between(0, window.innerWidth);
                     point.y = Phaser.Math.Between(0, window.innerHeight);
                     return point;
@@ -225,7 +222,7 @@ export class ParticleDisplayer extends Displayer<FightScene> {
 
         buffEmitter.addEmitZone(
             new Phaser.GameObjects.Particles.Zones.RandomZone({
-                getRandomPoint: (point: any) => {
+                getRandomPoint: (point) => {
                     point.x = Phaser.Math.Between(0, window.innerWidth);
                     point.y = Phaser.Math.Between(0, window.innerHeight);
                     return point;

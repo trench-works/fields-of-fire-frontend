@@ -1,15 +1,13 @@
-import { MiscAsset, MiscAssetId } from "../../../../assets";
-import { Depth, GRID_LEVELS_OFFSET, Position } from "../../../../core";
-import { Diamond } from "../../../../core/Objects/Diamond";
-import { scaleAndCenter } from "../../../../core/Utils/Scale";
-import { PositionUtils } from "../../../../core/Utils/Sizing";
-import { StatsUtils } from "../../../../Model/Stats";
-import { FightScene } from "../../fight.scene";
-import { ClassStore } from "../../stores/ClassStore";
-import { GameStore } from "../../stores/GameStore";
-import { GroundStore } from "../../stores/GroundStore";
-import { PlayerStore } from "../../stores/PlayerStore";
-import { FightSceneDisplayer } from "../FightSceneDisplayer";
+import { MiscAsset, MiscAssetId } from "../../../assets";
+import { Depth, GRID_LEVELS_OFFSET, Position } from "../../../core";
+import { Diamond } from "../../../core/Objects/Diamond";
+import { scaleAndCenter } from "../../../core/Utils/Scale";
+import { PositionUtils } from "../../../core/Utils/Sizing";
+import { FightScene } from "../fight.scene";
+import { GameStore } from "../stores/game.store";
+import { GridStore } from "../stores/grid.store";
+import { PlayerStore } from "../stores/player.store";
+import { FightSceneDisplayer } from "./base/fight-scene.displayer";
 
 export class GroundDisplayer extends FightSceneDisplayer {
     private tileHighlights: Phaser.GameObjects.Graphics[] = [];
@@ -17,9 +15,8 @@ export class GroundDisplayer extends FightSceneDisplayer {
     constructor(
         scene: FightScene,
         gameStore: GameStore,
-        private readonly classStore: ClassStore,
         private readonly playerStore: PlayerStore,
-        private readonly groundStore: GroundStore,
+        private readonly gridStore: GridStore,
     ) {
         super(scene, gameStore);
     }
@@ -29,13 +26,13 @@ export class GroundDisplayer extends FightSceneDisplayer {
     }
 
     clean(): this {
-        this.groundStore.groundLayer?.destroy();
+        this.gridStore.groundLayer?.destroy();
         this.tileHighlights.forEach((highlight) => highlight.destroy());
-        for (let x = 0; x < this.scene.gridPositions.length; x++) {
-            for (let y = 0; y < this.scene.gridPositions[x].length; y++) {
-                this.scene.gridPositions[x][y].highlight?.destroy();
-                this.scene.gridPositions[x][y].hoverGraphics?.destroy();
-                this.scene.gridPositions[x][y].zone?.destroy();
+        for (let x = 0; x < this.gridStore.gridPositions.length; x++) {
+            for (let y = 0; y < this.gridStore.gridPositions[x].length; y++) {
+                this.gridStore.gridPositions[x][y].highlight?.destroy();
+                this.gridStore.gridPositions[x][y].hoverGraphics?.destroy();
+                this.gridStore.gridPositions[x][y].zone?.destroy();
             }
         }
         return this;
@@ -81,18 +78,18 @@ export class GroundDisplayer extends FightSceneDisplayer {
         );
         console.log(layer);
 
-        this.groundStore.setGroundLayer(layer);
+        this.gridStore.setGroundLayer(layer);
 
-        if (!this.groundStore.groundLayer) {
+        if (!this.gridStore.groundLayer) {
             throw new Error("Ground layer seemingly inexistent");
         }
 
-        this.groundStore.groundLayer.setScale(this.scene.scaleFactor);
-        this.groundStore.groundLayer.setDepth(Depth.GRID_BASE_OFFSET);
+        this.gridStore.groundLayer.setScale(this.scene.scaleFactor);
+        this.gridStore.groundLayer.setDepth(Depth.GRID_BASE_OFFSET);
     }
 
     private displayEntitiesHighlights() {
-        if (!this.groundStore.groundLayer) {
+        if (!this.gridStore.groundLayer) {
             this.renderGroundLayer();
         }
         for (const highlightEntity of this.tileHighlights) {
@@ -103,7 +100,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
                 const caseTile = this.gameStore.game.plateau[x][y];
                 // Ground part
-                const tile = this.groundStore.groundLayer?.getTileAt?.(x, y);
+                const tile = this.gridStore.groundLayer?.getTileAt?.(x, y);
                 if (tile) {
                     tile.setVisible(true);
                     if (caseTile.isHole) {
@@ -137,21 +134,21 @@ export class GroundDisplayer extends FightSceneDisplayer {
     }
 
     private generatePlayGrid() {
-        if (!this.groundStore.groundLayer) {
+        if (!this.gridStore.groundLayer) {
             return;
         }
         for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
-            if (!this.scene.gridPositions[x]) {
-                this.scene.gridPositions[x] = [];
+            if (!this.gridStore.gridPositions[x]) {
+                this.gridStore.gridPositions[x] = [];
             }
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
-                const tile = this.groundStore.groundLayer.getTileAt(x, y);
+                const tile = this.gridStore.groundLayer.getTileAt(x, y);
                 const caseTile = this.gameStore.game.plateau[x][y];
 
                 const worldX = tile.getCenterX();
                 const worldY = tile.getCenterY();
 
-                this.scene.gridPositions[x][y] = {
+                this.gridStore.gridPositions[x][y] = {
                     gridPosition: { x, y },
                     pixelPosition: {
                         x: worldX,
@@ -176,63 +173,25 @@ export class GroundDisplayer extends FightSceneDisplayer {
                         },
                     );
                     hoverGraphics.setVisible(false);
-                    this.scene.gridPositions[x][y].hoverGraphics =
+                    this.gridStore.gridPositions[x][y].hoverGraphics =
                         hoverGraphics;
 
                     const zone = this.getTileInteractiveZone({ x, y }, tile, {
                         DIAMOND,
                     });
-                    this.scene.gridPositions[x][y].zone = zone;
+                    this.gridStore.gridPositions[x][y].zone = zone;
 
                     // --- DEBUG VISUEL ---
                     //this.gridShower(DIAMOND, worldX, worldY, layer);
-                    zone.on("pointerdown", () => {
-                        this.scene.character.changeDirection({ x, y });
-                        if (this.scene.actionManager.currentAction) {
-                            if (
-                                this.scene.rangeVisualizer.isInRange({ x, y })
-                            ) {
-                                this.scene.actionManager.launchAction({ x, y });
-                            }
-                        } else {
-                            const tile = this.gameStore.game.plateau[x][y];
-                            if (tile.entityId) {
-                                this.scene.inspectCharacter(tile.entityId);
-                            }
-                        }
-                        this.scene.rangeVisualizer.clearRange();
-                        this.scene.actionManager.clearCurrentAction();
-                    });
-                    zone.on("pointerover", () => {
-                        hoverGraphics.setVisible(true);
-                        if (this.gameStore.game.plateau[x][y].entityId) {
-                            const entity = this.gameStore.getEntity(
-                                this.gameStore.game.plateau[x][y].entityId,
-                            );
-
-                            if (!this.scene.actionManager.currentAction) {
-                                this.scene.tooltip.showNow(
-                                    this.classStore.getClass(entity.classId)
-                                        .name,
-                                    `❤️ ${StatsUtils.fromEntity(entity).life} PV`,
-                                    {
-                                        x: zone.x,
-                                        y:
-                                            zone.y -
-                                            140 * this.scene.scaleFactor,
-                                    },
-                                );
-                            }
-                        }
-                        if (this.scene.actionManager.currentAction) {
-                            this.manageToolTip(x, y);
-                        }
-                    });
-                    zone.on("pointerout", () => {
-                        hoverGraphics.setVisible(false);
-                        this.scene.tooltip.hide();
-                        this.scene.rangeVisualizer.clearZonePreview();
-                    });
+                    zone.on("pointerdown", () =>
+                        this.scene.root.controllers.grid.cellClick({ x, y }),
+                    );
+                    zone.on("pointerover", () =>
+                        this.scene.root.controllers.grid.cellHover({ x, y }),
+                    );
+                    zone.on("pointerout", () =>
+                        this.scene.root.controllers.grid.cellHoverOut({ x, y }),
+                    );
 
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     (tile as any).zone = zone;
@@ -295,61 +254,6 @@ export class GroundDisplayer extends FightSceneDisplayer {
     update(): this {
         this.displayEntitiesHighlights();
         return this;
-    }
-
-    manageToolTip(x: number, y: number) {
-        const action = this.scene.actionManager.currentAction;
-        if (!action) return;
-
-        const zoneCells = this.scene.rangeVisualizer.spellZonePreview(action, {
-            x,
-            y,
-        });
-        if (!zoneCells || action.id === "walk") return;
-
-        // ✅ collecte tous les tooltips à afficher
-        const tooltipItems: {
-            text: string;
-            title?: string;
-            position: { x: number; y: number };
-        }[] = [];
-
-        zoneCells.forEach((cell) => {
-            const entityId =
-                this.gameStore.game.plateau[cell.gridPosition.x][
-                    cell.gridPosition.y
-                ].entityId;
-            if (!entityId) return;
-
-            const targetEntity = this.gameStore.getEntity(entityId);
-            if (!targetEntity) return;
-
-            const minDamage = this.scene.actionManager.calculateFinalDamage(
-                action.damage?.min ?? 0,
-                action,
-                this.playerStore.playerEntity,
-                targetEntity,
-            );
-            const maxDamage = this.scene.actionManager.calculateFinalDamage(
-                action.damage?.max ?? 0,
-                action,
-                this.playerStore.playerEntity,
-                targetEntity,
-            );
-
-            const isHeal = (action.damage?.max ?? 0) <= 0;
-
-            tooltipItems.push({
-                text: `${isHeal ? "🩹" : "⚔️"} ${isHeal ? -minDamage.defenserDamage : minDamage.defenserDamage}-${isHeal ? -maxDamage.defenserDamage : maxDamage.defenserDamage}`,
-                title: this.classStore.getClass(targetEntity.classId).name,
-                position: {
-                    x: cell.pixelPosition.x,
-                    y: cell.pixelPosition.y - 130 * this.scene.scaleFactor,
-                },
-            });
-        });
-
-        this.scene.tooltip.showFightingTooltip(tooltipItems);
     }
 
     async animate(): Promise<this> {

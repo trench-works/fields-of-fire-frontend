@@ -25,7 +25,7 @@ import { ClassesRepository } from "./repositories/classes.repository";
 import { MainMenu } from "../MainMenu/main-menu.scene";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
-import { ClassStore } from "../Fight/stores/ClassStore";
+import { ClassStore } from "../Fight/stores/class.store";
 import { LobbyStore } from "./stores/LobbyStore";
 import { LobbyData } from "../LobbyList/interfaces/LobbyData";
 import { SoundParam } from "../../core/Utils/SoundLevel";

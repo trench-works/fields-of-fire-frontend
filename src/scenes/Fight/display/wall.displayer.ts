@@ -3,17 +3,22 @@ import {
     DisplayRoot,
     GRID_LEVELS_OFFSET,
     GridArea,
-} from "../../../../core";
-import { FightScene } from "../../fight.scene";
-import { GameStore } from "../../stores/GameStore";
-import { FightSceneDisplayer } from "../FightSceneDisplayer";
-import { DisplayImage } from "../../../../core/UI/DisplayImage";
-import { MiscAsset, MiscAssetId } from "../../../../assets";
+} from "../../../core";
+import { FightScene } from "../fight.scene";
+import { GameStore } from "../stores/game.store";
+import { FightSceneDisplayer } from "./base/fight-scene.displayer";
+import { DisplayImage } from "../../../core/UI/DisplayImage";
+import { MiscAsset, MiscAssetId } from "../../../assets";
+import { GridStore } from "../stores/grid.store";
 
 export class WallDisplayer extends FightSceneDisplayer {
     protected root: DisplayRoot;
 
-    constructor(scene: FightScene, gameStore: GameStore) {
+    constructor(
+        scene: FightScene,
+        gameStore: GameStore,
+        private readonly gridStore: GridStore,
+    ) {
         super(scene, gameStore);
         this.root = new DisplayRoot();
     }
@@ -38,7 +43,7 @@ export class WallDisplayer extends FightSceneDisplayer {
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
                 const tile = this.gameStore.game.plateau[x][y];
                 if (tile.isWall) {
-                    const cell = this.scene.gridPositions[x][y];
+                    const cell = this.gridStore.gridPositions[x][y];
                     this.root.add(
                         new DisplayImage(
                             this.scene,
