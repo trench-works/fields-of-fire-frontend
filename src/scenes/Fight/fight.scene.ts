@@ -1,10 +1,4 @@
-import {
-    Position,
-    MenuButton,
-    BaseScene,
-    BaseSceneInit,
-    KeyBindUtils,
-} from "../../core";
+import { Position, MenuButton, BaseScene, BaseSceneInit } from "../../core";
 import { SceneConfig } from "../../config/SceneConfig";
 import { Tooltip } from "../../core/UI/Tooltip";
 import { Game } from "../../Model/Game";
@@ -30,7 +24,6 @@ import { EffectAsset } from "../../assets/EffectAsset";
 import { PositionUtils } from "../../core/Utils/Sizing";
 import { ParticleDisplayer } from "./display/particles.displayer";
 import { BoostAsset } from "../../assets/BoostAsset";
-import { KeyBinds } from "../../core/keybinds/keybinds";
 import { FightSceneRoot } from "./fight-scene.root";
 
 export type SceneRenderConfig = {
@@ -71,12 +64,9 @@ export class FightScene extends BaseScene<FightSceneInit> {
     public fightMap = "chessmap";
     public scaleFactor: number = 1;
     public particleDisplayer: ParticleDisplayer = new ParticleDisplayer(this);
-    public keyBinds: KeyBinds;
 
     constructor() {
         super(SceneAssetId.FIGHT, BackgroundAssetId.FIGHT);
-
-        this.keyBinds = KeyBindUtils.getKeyBinds();
 
         this.root = new FightSceneRoot(this);
 

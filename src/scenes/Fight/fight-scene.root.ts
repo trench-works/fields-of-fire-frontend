@@ -64,7 +64,6 @@ export class FightSceneRoot {
             scene,
             gameStore,
             playerStore,
-            actionsStore,
         );
         const playerStatsDisplayer = new StatsDisplayer(scene, gameStore, {
             x: 1,

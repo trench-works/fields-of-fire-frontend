@@ -12,11 +12,9 @@ import {
     UI_LEVELS_OFFSET,
     i18n,
 } from "../../../core";
-import { KeyBind } from "../../../core/keybinds/keybinds";
 import { Action } from "../../../Model/Action";
 import { StatsUtils } from "../../../Model/Stats";
 import { FightScene } from "../fight.scene";
-import { ActionsStore } from "../stores/actions.store";
 import { GameStore } from "../stores/game.store";
 import { PlayerStore } from "../stores/player.store";
 import { FightSceneDisplayer } from "./base/fight-scene.displayer";
@@ -28,7 +26,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
      */
     protected actionPanel!: DisplayContainer;
     public actionElements: Map<string, Button> = new Map();
-    protected orderedActions: Action[] = [];
+    public orderedActions: Action[] = [];
     public endTurnButton!: Button;
     protected actionsList!: List;
 
@@ -40,78 +38,10 @@ export class ActionDisplayer extends FightSceneDisplayer {
         scene: FightScene,
         gameStore: GameStore,
         private readonly playerStore: PlayerStore,
-        private readonly actionStore: ActionsStore,
     ) {
         super(scene, gameStore);
         this.root = new DisplayRoot();
         this.selectedAction = null;
-
-        window.addEventListener("keydown", (event) =>
-            this.handleKeyClick(event),
-        );
-    }
-
-    handleKeyClick(event: KeyboardEvent) {
-        const binds = this.scene.keyBinds;
-        switch (event.code) {
-            case binds[KeyBind.ONE]:
-                event.preventDefault();
-                this.handleActionKey(0);
-                break;
-            case binds[KeyBind.TWO]:
-                event.preventDefault();
-                this.handleActionKey(1);
-                break;
-            case binds[KeyBind.THREE]:
-                event.preventDefault();
-                this.handleActionKey(2);
-                break;
-            case binds[KeyBind.FOUR]:
-                event.preventDefault();
-                this.handleActionKey(3);
-                break;
-            case binds[KeyBind.FIVE]:
-                event.preventDefault();
-                this.handleActionKey(4);
-                break;
-            case binds[KeyBind.SIX]:
-                event.preventDefault();
-                this.handleActionKey(5);
-                break;
-            case binds[KeyBind.SEVEN]:
-                event.preventDefault();
-                this.handleActionKey(6);
-                break;
-            case binds[KeyBind.EIGHT]:
-                event.preventDefault();
-                this.handleActionKey(7);
-                break;
-            case binds[KeyBind.NINE]:
-                event.preventDefault();
-                this.handleActionKey(8);
-                break;
-            case binds[KeyBind.ZERO]:
-                event.preventDefault();
-                this.handleActionKey(9);
-                break;
-        }
-    }
-
-    handleActionKey(index: number) {
-        const action = this.orderedActions[index];
-        if (action && !this.actionStore.lockLevel && !this.selectedAction) {
-            this.scene.root.controllers.actions.handleActionSelection(action);
-        } else {
-            this.scene.root.controllers.actions.clearAction();
-        }
-    }
-
-    handleActionClick(action: Action) {
-        if (!this.actionStore.lockLevel && !this.selectedAction) {
-            this.scene.root.controllers.actions.handleActionSelection(action);
-        } else {
-            this.scene.root.controllers.actions.clearAction();
-        }
     }
 
     destroy(): this {

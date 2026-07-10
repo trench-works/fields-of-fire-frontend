@@ -1,4 +1,4 @@
-import { Position } from "../../../core";
+import { KeyBindUtils, Position } from "../../../core";
 import { Action, ActionType } from "../../../Model/Action";
 import { Entity } from "../../../Model/Entity";
 import { Ran } from "../../../core/Types/Ran";
@@ -11,8 +11,11 @@ import { ActionsStore } from "../stores/actions.store";
 import { ActionAssetId } from "../../../assets";
 import { RangeService } from "./range.service";
 import { ActionRepository } from "../repositories/action.repository";
+import { KeyBind, KeyBinds } from "../../../core/keybinds/keybinds";
 
 export class ActionsService {
+    public keyBinds: KeyBinds;
+
     constructor(
         // Stores
         private readonly playerStore: PlayerStore,
@@ -23,7 +26,12 @@ export class ActionsService {
         private readonly rangeService: RangeService,
         // Displayer
         private readonly actions: ActionDisplayer,
-    ) {}
+    ) {
+        this.keyBinds = KeyBindUtils.getKeyBinds();
+        window.addEventListener("keydown", (event) =>
+            this.handleKeyClick(event),
+        );
+    }
 
     lock() {
         if (this.actionStore.lockLevel === 0) {
@@ -56,6 +64,73 @@ export class ActionsService {
         this.actions.actionElements.forEach((action) =>
             action.hightlight(false),
         );
+    }
+
+    handleKeyClick(event: KeyboardEvent) {
+        const binds = this.keyBinds;
+        switch (event.code) {
+            case binds[KeyBind.ONE]:
+                event.preventDefault();
+                this.handleActionKey(0);
+                break;
+            case binds[KeyBind.TWO]:
+                event.preventDefault();
+                this.handleActionKey(1);
+                break;
+            case binds[KeyBind.THREE]:
+                event.preventDefault();
+                this.handleActionKey(2);
+                break;
+            case binds[KeyBind.FOUR]:
+                event.preventDefault();
+                this.handleActionKey(3);
+                break;
+            case binds[KeyBind.FIVE]:
+                event.preventDefault();
+                this.handleActionKey(4);
+                break;
+            case binds[KeyBind.SIX]:
+                event.preventDefault();
+                this.handleActionKey(5);
+                break;
+            case binds[KeyBind.SEVEN]:
+                event.preventDefault();
+                this.handleActionKey(6);
+                break;
+            case binds[KeyBind.EIGHT]:
+                event.preventDefault();
+                this.handleActionKey(7);
+                break;
+            case binds[KeyBind.NINE]:
+                event.preventDefault();
+                this.handleActionKey(8);
+                break;
+            case binds[KeyBind.ZERO]:
+                event.preventDefault();
+                this.handleActionKey(9);
+                break;
+        }
+    }
+
+    handleActionKey(index: number) {
+        const action = this.actions.orderedActions[index];
+        if (
+            action &&
+            !this.actionStore.lockLevel &&
+            !this.actionStore.selectedAction
+        ) {
+            this.handleActionSelection(action);
+        } else {
+            this.clearAction();
+        }
+    }
+
+    handleActionClick(action: Action) {
+        if (!this.actionStore.lockLevel && !this.actionStore.selectedAction) {
+            this.handleActionSelection(action);
+        } else {
+            this.clearAction();
+        }
     }
 
     async launchAction(pos: Position) {
