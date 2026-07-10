@@ -44,6 +44,10 @@ export class ActionDisplayer extends FightSceneDisplayer {
         this.selectedAction = null;
     }
 
+    public clearCurrentAction() {
+        this.actionElements.forEach((action) => action.hightlight(false));
+    }
+
     destroy(): this {
         this.root.destroy();
         return this;

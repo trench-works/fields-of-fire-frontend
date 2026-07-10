@@ -56,14 +56,7 @@ export class ActionsService {
         this.actionStore.selectedAction = null;
         this.rangeService.clearRange();
         this.rangeService.clearZonePreview();
-        this.clearCurrentAction();
-    }
-
-    public clearCurrentAction() {
-        this.actionStore.selectedAction = null;
-        this.actions.actionElements.forEach((action) =>
-            action.hightlight(false),
-        );
+        this.actions.clearCurrentAction();
     }
 
     handleKeyClick(event: KeyboardEvent) {
@@ -137,7 +130,7 @@ export class ActionsService {
         console.log(pos);
         this.lock();
         const action = this.actionStore.selectedAction;
-        this.clearCurrentAction();
+        this.clearAction();
         await this.actionRepository.action({
             actionId: action?.id ?? "",
             target: pos,
@@ -249,7 +242,7 @@ export class ActionsService {
 
     handleActionSelection(action: Action) {
         const stats = StatsUtils.fromEntity(this.playerStore.playerEntity);
-        this.clearCurrentAction();
+        this.clearAction();
         this.actionStore.selectedAction = action;
         switch (action.id) {
             case ActionAssetId.WALK:

@@ -43,7 +43,7 @@ export class GridService {
             }
         }
         this.rangeService.clearRange();
-        this.actionService.clearCurrentAction();
+        this.actionService.clearAction();
     }
 
     cellHover({ x, y }: Position) {
