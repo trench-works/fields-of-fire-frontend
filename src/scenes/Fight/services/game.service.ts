@@ -7,6 +7,7 @@ import { ActionDisplayer } from "../display/action.displayer";
 import { BoardDisplayer } from "../display/board.displayer";
 import { CharactersDisplayer } from "../display/characters.displayer";
 import { EndFightDisplayer } from "../display/end-fight.displayer";
+import { ParticleDisplayer } from "../display/particles.displayer";
 import { StatsDisplayer } from "../display/stats.displayer";
 import { TurnDisplayer } from "../display/turns.displayer";
 import { FightSceneRoot } from "../fight-scene.root";
@@ -46,6 +47,7 @@ export class GameService {
         private readonly playerStats: StatsDisplayer,
         private readonly inspectStats: StatsDisplayer,
         private readonly endFight: EndFightDisplayer,
+        private readonly particleDisplayer: ParticleDisplayer,
     ) {}
 
     readyForNewGame(boostId: string | null) {
@@ -140,6 +142,7 @@ export class GameService {
             .update();
         this.inspectStats.render().setIsShow(false);
         this.endFight.render();
+        this.particleDisplayer.windAnimation();
     }
 
     disconnect() {

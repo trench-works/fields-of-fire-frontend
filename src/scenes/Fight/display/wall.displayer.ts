@@ -3,6 +3,7 @@ import {
     DisplayRoot,
     GRID_LEVELS_OFFSET,
     GridArea,
+    Position,
 } from "../../../core";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/game.store";
@@ -28,7 +29,7 @@ export class WallDisplayer extends FightSceneDisplayer {
     }
 
     render(): this {
-        this.displayTiles();
+        this.displayWalls();
         return this;
     }
 
@@ -37,44 +38,44 @@ export class WallDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    private displayTiles() {
+    private displayWalls() {
         this.clean();
         for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
                 const tile = this.gameStore.game.plateau[x][y];
                 if (tile.isWall) {
-                    const cell = this.gridStore.gridPositions[x][y];
-                    this.root.add(
-                        new DisplayImage(
-                            this.scene,
-                            new GridArea(
-                                cell.pixelPosition.x -
-                                    32 * this.scene.scaleFactor,
-                                cell.pixelPosition.y -
-                                    32 * this.scene.scaleFactor -
-                                    16 * this.scene.scaleFactor,
-                                64 * this.scene.scaleFactor,
-                                64 * this.scene.scaleFactor,
-                            ),
-                        )
-                            .setImage(
-                                MiscAsset.getAssetKey(MiscAssetId.WALL),
-                                1,
-                            )
-                            .setDepth(
-                                Depth.getFromGridPosition(
-                                    { x, y },
-                                    GRID_LEVELS_OFFSET.OBJECT,
-                                ),
-                            ),
-                    );
+                    this.addWall({ x, y });
                 }
             }
         }
     }
 
+    private addWall({ x, y }: Position) {
+        const cell = this.gridStore.gridPositions[x][y];
+        this.root.add(
+            new DisplayImage(
+                this.scene,
+                new GridArea(
+                    cell.pixelPosition.x - 32 * this.scene.scaleFactor,
+                    cell.pixelPosition.y -
+                        32 * this.scene.scaleFactor -
+                        16 * this.scene.scaleFactor,
+                    64 * this.scene.scaleFactor,
+                    64 * this.scene.scaleFactor,
+                ),
+            )
+                .setImage(MiscAsset.getAssetKey(MiscAssetId.WALL), 1)
+                .setDepth(
+                    Depth.getFromGridPosition(
+                        { x, y },
+                        GRID_LEVELS_OFFSET.OBJECT,
+                    ),
+                ),
+        );
+    }
+
     update(): this {
-        this.displayTiles();
+        this.displayWalls();
         return this;
     }
 

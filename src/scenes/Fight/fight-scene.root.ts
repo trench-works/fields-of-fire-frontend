@@ -9,7 +9,9 @@ import { BoardDisplayer } from "./display/board.displayer";
 import { CharactersDisplayer } from "./display/characters.displayer";
 import { EndFightDisplayer } from "./display/end-fight.displayer";
 import { GroundDisplayer } from "./display/ground.displayer";
+import { ParticleDisplayer } from "./display/particles.displayer";
 import { StatsDisplayer } from "./display/stats.displayer";
+import { ToastDisplayer } from "./display/toast.displayer";
 import { TurnDisplayer } from "./display/turns.displayer";
 import { WallDisplayer } from "./display/wall.displayer";
 import { FightScene } from "./fight.scene";
@@ -21,6 +23,7 @@ import {
 } from "./repositories/game.repository";
 import { GamePlayerSocket } from "./repositories/player.socket";
 import { ActionsService } from "./services/actions.service";
+import { AnimationService } from "./services/animation.service";
 import { GameUpdateService } from "./services/game-update.service";
 import { GameService } from "./services/game.service";
 import { GridService } from "./services/grid.service";
@@ -91,10 +94,11 @@ export class FightSceneRoot {
             gameStore,
             playerStore,
         );
+        const particleDisplayer = new ParticleDisplayer(scene);
+        const toaster = new ToastDisplayer(scene, gridStore);
         const attackDisplayer = new AttackDisplayer(
             scene,
             gameStore,
-            characterDisplayer,
             gridStore,
         );
 
@@ -134,18 +138,27 @@ export class FightSceneRoot {
             inspectStatsService,
             characterDisplayer,
         );
+        const animationService = new AnimationService(
+            scene,
+            gridStore,
+            gameStore,
+            attackDisplayer,
+            characterDisplayer,
+            toaster,
+            particleDisplayer,
+        );
         const gameUpdateService = new GameUpdateService(
             gameStore,
             playerStore,
             actionService,
             inspectStatsService,
+            animationService,
             boardDisplayer,
             actionDisplayer,
             turnsDisplayer,
             characterDisplayer,
             playerStatsDisplayer,
             inspectStatsDisplayer,
-            attackDisplayer,
         );
         const gameUpdateQueue = new EventQueue<GameUpdateEvent>((event) =>
             gameUpdateService.handleUpdate(event.data, event.animations),
@@ -168,13 +181,14 @@ export class FightSceneRoot {
             playerStatsDisplayer,
             inspectStatsDisplayer,
             endFightDisplayer,
+            particleDisplayer,
         );
 
         /**
          *  Controllers
          */
         this.controllers = {
-            game: new GameController(gameService, inspectStatsService),
+            game: new GameController(scene, gameService, inspectStatsService),
             actions: new ActionsController(actionService),
             grid: new GridController(gridService),
         };

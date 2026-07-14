@@ -22,7 +22,6 @@ import { SceneAssetId } from "../../assets/ScenesAsset";
 import { ParticleAsset } from "../../assets/ParticleAsset";
 import { EffectAsset } from "../../assets/EffectAsset";
 import { PositionUtils } from "../../core/Utils/Sizing";
-import { ParticleDisplayer } from "./display/particles.displayer";
 import { BoostAsset } from "../../assets/BoostAsset";
 import { FightSceneRoot } from "./fight-scene.root";
 
@@ -63,7 +62,6 @@ export class FightScene extends BaseScene<FightSceneInit> {
 
     public fightMap = "chessmap";
     public scaleFactor: number = 1;
-    public particleDisplayer: ParticleDisplayer = new ParticleDisplayer(this);
 
     constructor() {
         super(SceneAssetId.FIGHT, BackgroundAssetId.FIGHT);
@@ -142,14 +140,6 @@ export class FightScene extends BaseScene<FightSceneInit> {
                 this.root.controllers.game.disconnect();
                 MainMenu.start(this, { keepMusic: false });
             },
-        });
-
-        this.particleDisplayer.windAnimation();
-
-        // --- Placement des icônes ---
-
-        this.events.on("characterClicked", (entityId: string) => {
-            this.root.controllers.game.inspectCharacter(entityId);
         });
     }
 }

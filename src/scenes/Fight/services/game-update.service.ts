@@ -1,6 +1,5 @@
 import { Game } from "../../../Model/Game";
 import { ActionDisplayer } from "../display/action.displayer";
-import { AttackDisplayer } from "../display/attack.displayer";
 import { BoardDisplayer } from "../display/board.displayer";
 import { CharactersDisplayer } from "../display/characters.displayer";
 import { StatsDisplayer } from "../display/stats.displayer";
@@ -10,6 +9,7 @@ import { ActionsService } from "./actions.service";
 import { GameStore } from "../stores/game.store";
 import { PlayerStore } from "../stores/player.store";
 import { InspectCharacterService } from "./inspect-character.service";
+import { AnimationService } from "./animation.service";
 
 export class GameUpdateService {
     constructor(
@@ -19,6 +19,7 @@ export class GameUpdateService {
         // Services
         private readonly actionsService: ActionsService,
         private readonly inspectService: InspectCharacterService,
+        private readonly animationService: AnimationService,
         // Displayers
         private readonly board: BoardDisplayer,
         private readonly actions: ActionDisplayer,
@@ -26,7 +27,6 @@ export class GameUpdateService {
         private readonly character: CharactersDisplayer,
         private readonly playerStats: StatsDisplayer,
         private readonly inspectStats: StatsDisplayer,
-        private readonly attacks: AttackDisplayer,
     ) {}
 
     async handleUpdate(
@@ -42,7 +42,7 @@ export class GameUpdateService {
                     await this.character.animate(animation);
                     break;
                 case "attack":
-                    await this.attacks.animate(animation);
+                    await this.animationService.animateAttack(animation);
                     break;
                 case "death":
                     if (
