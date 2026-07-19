@@ -1,3 +1,4 @@
+import { BaseScene } from "../Objects";
 import { Size } from "../Types";
 
 export abstract class AssetManager<AssetId extends string, AssetType> {
@@ -144,6 +145,58 @@ export abstract class SpriteAssetManager<
             this.getAssetFileLink(this.assetKey, asset),
             this.frameConfigs[id],
         );
+    }
+}
+
+export abstract class SpriteSheetAssetManager<
+    AssetId extends string,
+    AssetType,
+> extends SpriteAssetManager<AssetId, AssetType> {
+    constructor(
+        assetKey: string,
+        assets: Partial<Record<AssetId, AssetType>>,
+        frameConfigs: Partial<Record<AssetId, AnimationConfiguration>>,
+        private readonly animations: Record<AssetId, Record<string, number[]>>,
+    ) {
+        super(assetKey, assets, frameConfigs);
+    }
+
+    loadAllAnimations(scene: BaseScene) {
+        for (const assetId of Object.keys(this.animations)) {
+            this.loadAssetAnimations(scene, assetId as AssetId);
+        }
+    }
+
+    loadAssetAnimations(scene: BaseScene, assetId: AssetId) {
+        for (const [key, frames] of Object.entries(this.animations[assetId])) {
+            this.loadAnimation(
+                scene,
+                assetId,
+                `${this.getAssetKey(assetId)}-${key}`,
+                frames,
+            );
+        }
+    }
+
+    loadAnimation(
+        scene: BaseScene,
+        assetId: AssetId,
+        animationName: string,
+        frames: number[],
+    ) {
+        if (!scene.anims.exists(animationName)) {
+            scene.anims.create({
+                key: animationName,
+                frames: scene.anims.generateFrameNumbers(
+                    this.getAssetKey(assetId),
+                    {
+                        frames,
+                    },
+                ),
+                frameRate: 2,
+                repeat: -1,
+            });
+        }
     }
 }
 

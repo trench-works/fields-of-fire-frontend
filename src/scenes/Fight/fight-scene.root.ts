@@ -188,7 +188,7 @@ export class FightSceneRoot {
          *  Controllers
          */
         this.controllers = {
-            game: new GameController(scene, gameService, inspectStatsService),
+            game: new GameController(gameService, inspectStatsService),
             actions: new ActionsController(actionService),
             grid: new GridController(gridService),
         };
