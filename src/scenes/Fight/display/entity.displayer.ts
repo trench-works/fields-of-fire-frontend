@@ -1,7 +1,11 @@
 import { FightSceneDisplayer } from "./base/fight-scene.displayer";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/game.store";
-import { CharacterAssetId, CharacterSpriteAsset } from "../../../assets";
+import {
+    CharacterAnimation,
+    CharacterAssetId,
+    CharacterSpriteAsset,
+} from "../../../assets";
 import { Depth, GRID_LEVELS_OFFSET, Position, Timeout } from "../../../core";
 import { PositionUtils } from "../../../core/Utils/Sizing";
 import { GridStore } from "../stores/grid.store";
@@ -30,13 +34,13 @@ export class EntityDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    //Joue l'animation d'idle par défaut du personnage, ou une animation spécifique si une clé est fournie
-    playAnimation(key?: string) {
-        if (
-            !this.sprite ||
-            !key ||
-            this.sprite.anims.currentAnim?.key === key
-        ) {
+    private playAnimation(
+        classId: CharacterAssetId,
+        animation: CharacterAnimation,
+    ) {
+        const assetKey = CharacterSpriteAsset.getAssetKey(classId);
+        const key = `${assetKey}-${animation}-${this.direction}`;
+        if (!this.sprite || this.sprite.anims.currentAnim?.key === key) {
             return;
         }
 
@@ -45,17 +49,15 @@ export class EntityDisplayer extends FightSceneDisplayer {
 
     playIdleAnimation() {
         const entity = this.gameStore.getEntity(this.entityId);
-        const assetKey = CharacterSpriteAsset.getAssetKey(entity.classId);
-        this.playAnimation(`${assetKey}-idle-${this.direction}`);
+        this.playAnimation(entity.classId, CharacterAnimation.IDLE);
     }
 
     async scope(time: number): Promise<void> {
         new Promise<void>((resolve) => {
             const entity = this.gameStore.getEntity(this.entityId);
-            const assetKey = CharacterSpriteAsset.getAssetKey(entity.classId);
-            this.playAnimation(`${assetKey}-scope-${this.direction}`);
+            this.playAnimation(entity.classId, CharacterAnimation.SCOPE);
             setTimeout(() => {
-                this.playAnimation(`${assetKey}-idle-${this.direction}`);
+                this.playAnimation(entity.classId, CharacterAnimation.IDLE);
                 resolve();
             }, time);
         });

@@ -74,19 +74,24 @@ class CharacterCloseupAssetManager extends ImageAssetManager<
 
 export const CharacterCloseupAsset = new CharacterCloseupAssetManager();
 
+export enum CharacterAnimation {
+    IDLE = "IDLE",
+    SCOPE = "SCOPE",
+}
+
 const defaultIdleAnimations = {
-    "idle-DR": [0, 1],
-    "idle-DL": [2, 3],
-    "idle-UL": [4, 5],
-    "idle-UR": [6, 7],
+    "IDLE-DR": [0, 1],
+    "IDLE-DL": [2, 3],
+    "IDLE-UL": [4, 5],
+    "IDLE-UR": [6, 7],
 };
 
 const defaultAnimations = {
     ...defaultIdleAnimations,
-    "scope-DR": [8],
-    "scope-DL": [9],
-    "scope-UL": [10],
-    "scope-UR": [11],
+    "SCOPE-DR": [8],
+    "SCOPE-DL": [9],
+    "SCOPE-UL": [10],
+    "SCOPE-UR": [11],
 };
 
 class CharacterSpriteAssetManager extends SpriteSheetAssetManager<
@@ -153,10 +158,10 @@ class CharacterSpriteAssetManager extends SpriteSheetAssetManager<
                 [CharacterAssetId.ENTENTE_CAPORAL]: defaultAnimations,
                 [CharacterAssetId.ENTENTE_BRISE_BARRICADE]: {
                     ...defaultIdleAnimations,
-                    "scope-DR": [8, 9],
-                    "scope-DL": [10, 11],
-                    "scope-UL": [12, 13],
-                    "scope-UR": [14, 15],
+                    "SCOPE-DR": [8, 9],
+                    "SCOPE-DL": [10, 11],
+                    "SCOPE-UL": [12, 13],
+                    "SCOPE-UR": [14, 15],
                 },
                 [CharacterAssetId.ALLIANCE_FANTASSIN]: defaultAnimations,
                 [CharacterAssetId.ALLIANCE_MEDIC]: defaultAnimations,
