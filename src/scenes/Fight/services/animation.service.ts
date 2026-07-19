@@ -34,7 +34,7 @@ export class AnimationService {
 
     async animateAttack(animation: GameAttackAnimation): Promise<this> {
         const {
-            data: { entityId, actionId, target, origin, hits },
+            data: { entityId, actionId, target, origin, hits, path },
         } = animation;
         const { x, y } = target;
         const cell = this.gridStore.gridPositions[x][y];
@@ -249,6 +249,12 @@ export class AnimationService {
                 break;
             case ActionAssetId.SHIELD_RUSH:
                 {
+                    if (path) {
+                        await this.character.animate({
+                            key: "move",
+                            data: { entityId, path },
+                        });
+                    }
                     new SoundEffect(
                         this.scene,
                         SoundEffectAsset.getAssetKey(

@@ -24,6 +24,7 @@ export type GameAttackAnimation = GameAnimation<
         origin: Position;
         target: Position;
         hits: (Position & { damage: number })[];
+        path?: Position[];
     }
 >;
 export type GameDeathAnimation = GameAnimation<
