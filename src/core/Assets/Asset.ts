@@ -36,7 +36,7 @@ export abstract class AssetManager<AssetId extends string, AssetType> {
         this.loader(load, id, asset);
     }
 
-    abstract loader(
+    protected abstract loader(
         load: Phaser.Loader.LoaderPlugin,
         id: string,
         asset: Record<AssetId, AssetType>[AssetId],
@@ -63,7 +63,7 @@ export abstract class ImageAssetManager<
         super(assetKey, assets);
     }
 
-    loader(
+    protected loader(
         load: Phaser.Loader.LoaderPlugin,
         id: AssetId,
         asset: Record<AssetId, AssetType>[AssetId],
@@ -96,7 +96,7 @@ export abstract class SoundAssetManager<
         return this.level[assetId] ?? 1;
     }
 
-    loader(
+    protected loader(
         load: Phaser.Loader.LoaderPlugin,
         id: AssetId,
         asset: Record<AssetId, AssetType>[AssetId],
@@ -135,7 +135,7 @@ export abstract class SpriteAssetManager<
         return this.frameConfigs[assetId]!;
     }
 
-    loader(
+    protected loader(
         load: Phaser.Loader.LoaderPlugin,
         id: AssetId,
         asset: Record<AssetId, AssetType>[AssetId],
@@ -148,6 +148,11 @@ export abstract class SpriteAssetManager<
     }
 }
 
+export type AnimationSheetConfiguration = {
+    frames: number[];
+    duration: number[];
+};
+
 export abstract class SpriteSheetAssetManager<
     AssetId extends string,
     AssetType,
@@ -156,7 +161,10 @@ export abstract class SpriteSheetAssetManager<
         assetKey: string,
         assets: Partial<Record<AssetId, AssetType>>,
         frameConfigs: Partial<Record<AssetId, AnimationConfiguration>>,
-        private readonly animations: Record<AssetId, Record<string, number[]>>,
+        private readonly animations: Record<
+            AssetId,
+            Record<string, AnimationSheetConfiguration>
+        >,
     ) {
         super(assetKey, assets, frameConfigs);
     }
@@ -168,7 +176,9 @@ export abstract class SpriteSheetAssetManager<
     }
 
     loadAssetAnimations(scene: BaseScene, assetId: AssetId) {
-        for (const [key, frames] of Object.entries(this.animations[assetId])) {
+        for (const [key, { frames }] of Object.entries(
+            this.animations[assetId],
+        )) {
             this.loadAnimation(
                 scene,
                 assetId,
@@ -187,13 +197,11 @@ export abstract class SpriteSheetAssetManager<
         if (!scene.anims.exists(animationName)) {
             scene.anims.create({
                 key: animationName,
-                frames: scene.anims.generateFrameNumbers(
-                    this.getAssetKey(assetId),
-                    {
+                frames: scene.anims
+                    .generateFrameNumbers(this.getAssetKey(assetId), {
                         frames,
-                    },
-                ),
-                frameRate: 2,
+                    })
+                    .map((animation) => ({ ...animation, duration: 500 })),
                 repeat: -1,
             });
         }

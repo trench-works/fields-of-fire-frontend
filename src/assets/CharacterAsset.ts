@@ -80,18 +80,18 @@ export enum CharacterAnimation {
 }
 
 const defaultIdleAnimations = {
-    "IDLE-DR": [0, 1],
-    "IDLE-DL": [2, 3],
-    "IDLE-UL": [4, 5],
-    "IDLE-UR": [6, 7],
+    "IDLE-DR": { frames: [0, 1], duration: [500, 500] },
+    "IDLE-DL": { frames: [2, 3], duration: [500, 500] },
+    "IDLE-UL": { frames: [4, 5], duration: [500, 500] },
+    "IDLE-UR": { frames: [6, 7], duration: [500, 500] },
 };
 
 const defaultAnimations = {
     ...defaultIdleAnimations,
-    "SCOPE-DR": [8],
-    "SCOPE-DL": [9],
-    "SCOPE-UL": [10],
-    "SCOPE-UR": [11],
+    "SCOPE-DR": { frames: [8], duration: [1000] },
+    "SCOPE-DL": { frames: [9], duration: [1000] },
+    "SCOPE-UL": { frames: [10], duration: [1000] },
+    "SCOPE-UR": { frames: [11], duration: [1000] },
 };
 
 class CharacterSpriteAssetManager extends SpriteSheetAssetManager<
@@ -158,10 +158,10 @@ class CharacterSpriteAssetManager extends SpriteSheetAssetManager<
                 [CharacterAssetId.ENTENTE_CAPORAL]: defaultAnimations,
                 [CharacterAssetId.ENTENTE_BRISE_BARRICADE]: {
                     ...defaultIdleAnimations,
-                    "SCOPE-DR": [8, 9],
-                    "SCOPE-DL": [10, 11],
-                    "SCOPE-UL": [12, 13],
-                    "SCOPE-UR": [14, 15],
+                    "SCOPE-DR": { frames: [8, 9], duration: [500, 500] },
+                    "SCOPE-DL": { frames: [10, 11], duration: [500, 500] },
+                    "SCOPE-UL": { frames: [12, 13], duration: [500, 500] },
+                    "SCOPE-UR": { frames: [14, 15], duration: [500, 500] },
                 },
                 [CharacterAssetId.ALLIANCE_FANTASSIN]: defaultAnimations,
                 [CharacterAssetId.ALLIANCE_MEDIC]: defaultAnimations,

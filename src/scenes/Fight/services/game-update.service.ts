@@ -10,6 +10,7 @@ import { GameStore } from "../stores/game.store";
 import { PlayerStore } from "../stores/player.store";
 import { InspectCharacterService } from "./inspect-character.service";
 import { AnimationService } from "./animation.service";
+import { Timeout } from "../../../core";
 
 export class GameUpdateService {
     constructor(
@@ -84,6 +85,7 @@ export class GameUpdateService {
         }
 
         this.actionsService.unlock();
+        await Timeout(1000);
     }
 }
 
