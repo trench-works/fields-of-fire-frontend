@@ -1,4 +1,10 @@
-import { Position, MenuButton, BaseScene, BaseSceneInit } from "../../core";
+import {
+    Position,
+    MenuButton,
+    BaseScene,
+    BaseSceneInit,
+    i18n,
+} from "../../core";
 import { SceneConfig } from "../../config/SceneConfig";
 import { Tooltip } from "../../core/UI/Tooltip";
 import { Game } from "../../Model/Game";
@@ -118,6 +124,23 @@ export class FightScene extends BaseScene<FightSceneInit> {
     }
 
     create() {
+        // Créer le bouton Menu
+        new MenuButton(this, {
+            position: "topRight",
+            buttons: [
+                {
+                    title: i18n.translate("menuPanel.back"),
+                    close: true,
+                },
+                {
+                    title: i18n.translate("menuPanel.leaveGame"),
+                    onClick: () => {
+                        this.root.controllers.game.disconnect();
+                        MainMenu.start(this, { keepMusic: false });
+                    },
+                },
+            ],
+        });
         super.create();
         this.tooltip = Tooltip.getInstance(this, {
             textColor: "#000000",
@@ -126,21 +149,6 @@ export class FightScene extends BaseScene<FightSceneInit> {
         });
 
         this.root.controllers.game.create();
-
-        // Créer le bouton Menu
-        new MenuButton(this, {
-            position: "topRight",
-            onResumeClick: () => {
-                // Reprendre le jeu (le menu se ferme automatiquement)
-            },
-            onSettingsClick: () => {
-                console.log("Options - À implémenter");
-            },
-            onMainMenuClick: () => {
-                this.root.controllers.game.disconnect();
-                MainMenu.start(this, { keepMusic: false });
-            },
-        });
     }
 }
 

@@ -1,5 +1,4 @@
 import { Game } from "../../../Model/Game";
-import { ActionDisplayer } from "../display/action.displayer";
 import { BoardDisplayer } from "../display/board.displayer";
 import { CharactersDisplayer } from "../display/characters.displayer";
 import { StatsDisplayer } from "../display/stats.displayer";
@@ -11,6 +10,7 @@ import { PlayerStore } from "../stores/player.store";
 import { InspectCharacterService } from "./inspect-character.service";
 import { AnimationService } from "./animation.service";
 import { Timeout } from "../../../core";
+import { ActionDisplayer } from "../display/action.displayer";
 
 export class GameUpdateService {
     constructor(

@@ -10,7 +10,9 @@
         "title": "Menu",
         "back": "Reprendre",
         "options": "Options",
-        "mainMenu": "Retour au Menu"
+        "mainMenu": "Retour au Menu",
+        "leaveLobby": "Quitter le Lobby",
+        "leaveGame": "Quitter la partie"
     },
     "mainMenu": {
         "play": "Jouer",

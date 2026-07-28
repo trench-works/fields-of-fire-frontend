@@ -8,6 +8,7 @@ import {
     DisplayText,
     BaseSceneInit,
     StartSceneConfig,
+    i18n,
 } from "../../core";
 import { FightScene } from "../Fight/fight.scene";
 import { MainMenu } from "../MainMenu/main-menu.scene";
@@ -203,15 +204,18 @@ export class LobbyListScene extends BaseScene {
         // Créer le bouton Menu
         new MenuButton(this, {
             position: "topRight",
-            onResumeClick: () => {
-                // Reprendre le jeu (le menu se ferme automatiquement)
-            },
-            onSettingsClick: () => {
-                console.log("Options - À implémenter");
-            },
-            onMainMenuClick: () => {
-                MainMenu.start(this);
-            },
+            buttons: [
+                {
+                    title: i18n.translate("menuPanel.back"),
+                    close: true,
+                },
+                {
+                    title: i18n.translate("menuPanel.mainMenu"),
+                    onClick: () => {
+                        MainMenu.start(this);
+                    },
+                },
+            ],
         });
     }
 }

@@ -5,18 +5,17 @@ import { BaseScene } from "../Objects";
 import { Depth, UI_LEVELS_OFFSET } from "../Utils";
 import { i18n } from "../i18n";
 
-interface MenuPanelConfig {
-    onResumeClick?: () => void;
-    onSettingsClick?: () => void;
-    onMainMenuClick?: () => void;
-}
+export type MenuPanelButton = {
+    title: string;
+    onClick: () => void;
+};
 
 export class MenuPanel extends Phaser.GameObjects.Container {
     private overlay!: Phaser.GameObjects.Rectangle;
     private panel!: Phaser.GameObjects.Rectangle;
     private isVisible: boolean = false;
 
-    constructor(scene: BaseScene, config: MenuPanelConfig) {
+    constructor(scene: BaseScene, configs: MenuPanelButton[]) {
         super(scene, 0, 0);
         scene.add.existing(this);
         this.setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP));
@@ -67,71 +66,30 @@ export class MenuPanel extends Phaser.GameObjects.Container {
             .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3);
         this.add(titleText);
 
-        // Bouton Reprendre
-        const resumeButton = new Button(
-            scene,
-            {
-                x: scene.scale.width / 2 - 150,
-                y: scene.scale.height / 2 - 80 - 25,
-                width: 300,
-                height: 50,
-            },
-            {
-                text: i18n.translate("menuPanel.back"),
-                fontSize: 24,
-                onClick: () => {
-                    this.hide();
-                    config.onResumeClick?.();
+        let i = 0;
+        for (const config of configs) {
+            const button = new Button(
+                scene,
+                {
+                    x: scene.scale.width / 2 - 150,
+                    y: scene.scale.height / 2 + (-80 + 80 * i) - 25,
+                    width: 300,
+                    height: 50,
                 },
-            },
-        )
-            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3)
-            .setScrollFactor(0);
-        this.add(resumeButton);
-
-        // Bouton Paramètres
-        const settingsButton = new Button(
-            scene,
-            {
-                x: scene.scale.width / 2 - 150,
-                y: scene.scale.height / 2 - 25,
-                width: 300,
-                height: 50,
-            },
-            {
-                text: i18n.translate("menuPanel.options"),
-                fontSize: 24,
-                onClick: () => {
-                    this.hide();
-                    config.onSettingsClick?.();
+                {
+                    text: config.title,
+                    fontSize: 24,
+                    onClick: () => {
+                        this.hide();
+                        config.onClick?.();
+                    },
                 },
-            },
-        )
-            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3)
-            .setScrollFactor(0);
-        this.add(settingsButton);
-
-        // Bouton Retour au Menu Principal
-        const mainMenuButton = new Button(
-            scene,
-            {
-                x: scene.scale.width / 2 - 150,
-                y: scene.scale.height / 2 + 80 - 25,
-                width: 300,
-                height: 50,
-            },
-            {
-                text: i18n.translate("menuPanel.mainMenu"),
-                fontSize: 24,
-                onClick: () => {
-                    this.hide();
-                    config.onMainMenuClick?.();
-                },
-            },
-        )
-            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3)
-            .setScrollFactor(0);
-        this.add(mainMenuButton);
+            )
+                .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3)
+                .setScrollFactor(0);
+            this.add(button);
+            i++;
+        }
 
         // Masquer le panneau par défaut
         this.hide();

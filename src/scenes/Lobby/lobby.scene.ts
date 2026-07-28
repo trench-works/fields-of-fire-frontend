@@ -10,6 +10,7 @@ import {
     ScaleMode,
     BaseSceneInit,
     SoundLevel,
+    i18n,
 } from "../../core";
 import { Color } from "../../config/ColorConfig";
 import { LobbySocket } from "./repositories/lobby.socket";
@@ -298,16 +299,19 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         // Créer le bouton Menu
         new MenuButton(this, {
             position: "topRight",
-            onResumeClick: () => {
-                // Reprendre le jeu (le menu se ferme automatiquement)
-            },
-            onSettingsClick: () => {
-                console.log("Options - À implémenter");
-            },
-            onMainMenuClick: () => {
-                this.lobbySocket.leaveLobby();
-                MainMenu.start(this);
-            },
+            buttons: [
+                {
+                    title: i18n.translate("menuPanel.back"),
+                    close: true,
+                },
+                {
+                    title: i18n.translate("menuPanel.leaveLobby"),
+                    onClick: () => {
+                        this.lobbySocket.leaveLobby();
+                        MainMenu.start(this);
+                    },
+                },
+            ],
         });
     }
 

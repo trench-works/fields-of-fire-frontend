@@ -3,10 +3,15 @@ import { MenuPanel } from "./MenuPanel";
 import { BaseScene } from "../Objects";
 import { Depth, UI_LEVELS_OFFSET } from "../Utils";
 
-interface MenuButtonConfig {
-    onResumeClick?: () => void;
-    onSettingsClick?: () => void;
-    onMainMenuClick?: () => void;
+export type MenuConfigButton = {
+    title: string;
+} & (
+    | { onClick: () => void; close?: never }
+    | { onClick?: () => void; close: true }
+);
+
+interface MenuConfig {
+    buttons: MenuConfigButton[];
     position?: "topRight" | "topLeft" | "bottomRight" | "bottomLeft";
 }
 
@@ -15,15 +20,17 @@ export class MenuButton {
     private menuPanel!: MenuPanel;
     private scene: BaseScene;
 
-    constructor(scene: BaseScene, config: MenuButtonConfig) {
+    constructor(scene: BaseScene, config: MenuConfig) {
         this.scene = scene;
 
         // Créer le panneau du menu
-        this.menuPanel = new MenuPanel(scene, {
-            onResumeClick: config.onResumeClick,
-            onSettingsClick: config.onSettingsClick,
-            onMainMenuClick: config.onMainMenuClick,
-        });
+        this.menuPanel = new MenuPanel(
+            scene,
+            config.buttons.map((button) => ({
+                title: button.title,
+                onClick: button.onClick ?? (() => this.closeMenu()),
+            })),
+        );
 
         // Déterminer la position du bouton
         const positionConfig = this.getPosition(config.position);
