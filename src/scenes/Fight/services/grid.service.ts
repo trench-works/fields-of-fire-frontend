@@ -46,27 +46,30 @@ export class GridService {
         this.actionService.clearAction();
     }
 
-    cellHover({ x, y }: Position) {
-        const cell = this.groundStore.gridPositions[x][y];
-        cell.hoverGraphics?.setVisible(true);
-        if (this.gameStore.game.plateau[x][y].entityId) {
-            const entity = this.gameStore.getEntity(
-                this.gameStore.game.plateau[x][y].entityId,
-            );
+    cellHover(pos: Position) {
+        const cell = this.groundStore.get(pos);
+        const boardCell = this.gameStore.getCell(pos);
+        if (cell && boardCell) {
+            cell.hoverGraphics?.setVisible(true);
+            if (boardCell.entityId) {
+                const entity = this.gameStore.getEntity(boardCell.entityId);
 
-            if (!this.actionStore.selectedAction) {
-                this.scene.tooltip.showNow(
-                    this.classStore.getClass(entity.classId).name,
-                    `❤️ ${StatsUtils.fromEntity(entity).life} PV`,
-                    {
-                        x: cell.pixelPosition.x,
-                        y: cell.pixelPosition.y - 140 * this.scene.scaleFactor,
-                    },
-                );
+                if (!this.actionStore.selectedAction) {
+                    this.scene.tooltip.showNow(
+                        this.classStore.getClass(entity.classId).name,
+                        `❤️ ${StatsUtils.fromEntity(entity).life} PV`,
+                        {
+                            x: cell.pixelPosition.x,
+                            y:
+                                cell.pixelPosition.y -
+                                140 * this.scene.scaleFactor,
+                        },
+                    );
+                }
             }
-        }
-        if (this.actionStore.selectedAction) {
-            this.manageToolTip(x, y);
+            if (this.actionStore.selectedAction) {
+                this.manageToolTip(pos.x, pos.y);
+            }
         }
     }
 

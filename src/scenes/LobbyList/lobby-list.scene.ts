@@ -15,7 +15,7 @@ import { MainMenu } from "../MainMenu/main-menu.scene";
 import { LobbyRow } from "./objects/LobbyRow";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
-import { LobbyListStore } from "./stores/LobbyListStore";
+import { LobbyListStore } from "./stores/lobby-list.store";
 import { MusicAsset, MusicAssetId } from "../../assets";
 
 export class LobbyListScene extends BaseScene {
@@ -119,7 +119,8 @@ export class LobbyListScene extends BaseScene {
                         id: lobby.id,
                         name: lobby.name ?? "NO_NAME",
                         creator: lobby.creator ?? "NO_NAME",
-                        playersNum: lobby.players.length,
+                        playersNum: lobby.teams.flatMap((team) => team.players)
+                            .length,
                         maxPlayers: lobby.maxPlayers,
                     },
                     () => {

@@ -56,7 +56,7 @@ export class PositionUtils {
     }
 
     static equals(a: Position, b: Position): boolean {
-        return a.x === b.y && a.y === b.y;
+        return a.x === b.x && a.y === b.y;
     }
 }
 
