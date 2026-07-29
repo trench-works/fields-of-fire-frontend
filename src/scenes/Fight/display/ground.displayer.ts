@@ -3,6 +3,7 @@ import { Depth, GRID_LEVELS_OFFSET, Position } from "../../../core";
 import { Diamond } from "../../../core/Objects/Diamond";
 import { scaleAndCenter } from "../../../core/Utils/Scale";
 import { PositionUtils } from "../../../core/Utils/Sizing";
+import { TEAM_COLORS, TeamColor } from "../../../Model/Team";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/game.store";
 import { GridStore } from "../stores/grid.store";
@@ -11,6 +12,7 @@ import { FightSceneDisplayer } from "./base/fight-scene.displayer";
 
 export class GroundDisplayer extends FightSceneDisplayer {
     private tileHighlights: Phaser.GameObjects.Graphics[] = [];
+    private teamColorHighlights: Phaser.GameObjects.Graphics[] = [];
 
     constructor(
         scene: FightScene,
@@ -28,6 +30,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
     clean(): this {
         this.gridStore.groundLayer?.destroy();
         this.tileHighlights.forEach((highlight) => highlight.destroy());
+        this.teamColorHighlights.forEach((highlight) => highlight.destroy());
         for (let x = 0; x < this.gridStore.gridPositions.length; x++) {
             for (let y = 0; y < this.gridStore.gridPositions[x].length; y++) {
                 this.gridStore.gridPositions[x][y].highlight?.destroy();
@@ -95,7 +98,12 @@ export class GroundDisplayer extends FightSceneDisplayer {
         for (const highlightEntity of this.tileHighlights) {
             highlightEntity.destroy();
         }
+        for (const highlightEntity of this.teamColorHighlights) {
+            highlightEntity.destroy();
+        }
         this.tileHighlights = [];
+        this.teamColorHighlights = [];
+        console.log(this.gameStore.game.plateau);
         for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
                 const caseTile = this.gameStore.game.plateau[x][y];
@@ -106,22 +114,32 @@ export class GroundDisplayer extends FightSceneDisplayer {
                     if (caseTile.isHole) {
                         tile.setVisible(false);
                     } else if (!caseTile.isWall) {
-                        if (
-                            caseTile.entityId &&
-                            caseTile.entityId ===
-                                this.gameStore.game.playerTurns[0]
-                        ) {
-                            const entity = this.gameStore.game.entities.find(
-                                (entity) => entity.id === caseTile.entityId,
+                        if (caseTile.entityId) {
+                            const entity = this.gameStore.getEntity(
+                                caseTile.entityId,
                             );
                             if (entity) {
-                                this.tileHighlights.push(
-                                    this.getTileHighlights({ x, y }, tile, {
-                                        color:
-                                            entity.teamId ===
-                                            this.playerStore.playerEntity.teamId
-                                                ? 0x00ff00
-                                                : 0xff0000,
+                                if (
+                                    caseTile.entityId ===
+                                    this.gameStore.game.playerTurns[0]
+                                ) {
+                                    this.tileHighlights.push(
+                                        this.getTileHighlights({ x, y }, tile, {
+                                            color:
+                                                entity.teamId ===
+                                                this.playerStore.playerEntity
+                                                    .teamId
+                                                    ? 0x00ff00
+                                                    : 0xff0000,
+                                            depth: Math.max(x * 10, y * 10),
+                                        }),
+                                    );
+                                }
+                                this.teamColorHighlights.push(
+                                    this.getTileTeamColor({ x, y }, tile, {
+                                        color: this.gameStore.getTeam(
+                                            entity.teamId,
+                                        ).color,
                                         depth: Math.max(x * 10, y * 10),
                                     }),
                                 );
@@ -217,6 +235,34 @@ export class GroundDisplayer extends FightSceneDisplayer {
         graphics.lineStyle(2, props?.color ?? 0xffffff, 1);
         graphics.strokePoints(DIAMOND.points, true);
         graphics.setPosition(worldX, worldY);
+        graphics.setDepth(
+            Depth.getFromGridPosition(
+                position,
+                GRID_LEVELS_OFFSET.HIGHTLIGHT_1,
+            ),
+        );
+
+        return graphics;
+    }
+
+    getTileTeamColor(
+        position: Position,
+        tile: Phaser.Tilemaps.Tile,
+        props: { color: TeamColor; depth?: number },
+    ): Phaser.GameObjects.Graphics {
+        const tileX = tile.getCenterX();
+        const tileY = tile.getCenterY();
+
+        // Create Graphic
+        const graphics = this.scene.add.graphics();
+        graphics.fillStyle(TEAM_COLORS[props.color], 0.5);
+        graphics.fillEllipse(
+            0,
+            -16 * this.scene.scaleFactor,
+            32 * this.scene.scaleFactor,
+            16 * this.scene.scaleFactor,
+        );
+        graphics.setPosition(tileX, tileY);
         graphics.setDepth(
             Depth.getFromGridPosition(
                 position,

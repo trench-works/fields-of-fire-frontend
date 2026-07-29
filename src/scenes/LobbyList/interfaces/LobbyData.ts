@@ -1,11 +1,5 @@
 import { CharacterAssetId } from "../../../assets";
-
-export enum TeamColor {
-    BLUE = "BLUE",
-    REd = "RED",
-    YELLOW = "YELLOW",
-    GREEN = "GREEN",
-}
+import { TeamColor } from "../../../Model/Team";
 
 export class LobbyPlayer {
     userId!: string;

@@ -3,6 +3,7 @@ import { Case } from "../../../Model/Case";
 import { Entity } from "../../../Model/Entity";
 import { Game } from "../../../Model/Game";
 import { Player } from "../../../Model/Player";
+import { Team } from "../../../Model/Team";
 
 export class GameStore {
     game!: Game;
@@ -21,6 +22,10 @@ export class GameStore {
 
     getPlayer(playerId: string): Player {
         return this.game.players.find((player) => player.id === playerId)!;
+    }
+
+    getTeam(teamId: string): Team {
+        return this.game.teams.find((team) => team.id === teamId)!;
     }
 }
 

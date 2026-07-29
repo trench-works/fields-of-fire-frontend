@@ -48,6 +48,7 @@ export type Cell = {
     zone?: Phaser.GameObjects.Zone;
     hoverGraphics?: Phaser.GameObjects.Graphics;
     highlight?: Phaser.GameObjects.Graphics;
+    teamColor?: Phaser.GameObjects.Graphics;
 };
 
 export interface Displayable {
