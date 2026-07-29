@@ -23,6 +23,7 @@ export enum UI_LEVELS_OFFSET {
     BUTTON = 200,
     TOOLTIP = 300,
     POPUP = 500,
+    POPUP_2 = 550,
     LOADER_1 = 1000,
     LOADER_2 = 1050,
 }

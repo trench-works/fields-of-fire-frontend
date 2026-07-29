@@ -54,7 +54,9 @@ export class MenuButton {
         );
 
         this.button.setScrollFactor(0);
-        this.button.setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.BUTTON));
+        this.button.setDepth(
+            Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP_2 - 1),
+        );
 
         // Ajouter un écouteur pour la touche Échap
         scene.input.keyboard?.on("keydown-ESC", () => {
