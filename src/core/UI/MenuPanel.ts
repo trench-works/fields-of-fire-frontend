@@ -18,7 +18,7 @@ export class MenuPanel extends Phaser.GameObjects.Container {
     constructor(scene: BaseScene, configs: MenuPanelButton[]) {
         super(scene, 0, 0);
         scene.add.existing(this);
-        this.setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP));
+        this.setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP_2));
 
         // Créer un overlay semi-transparent qui capture TOUS les clics
         this.overlay = scene.add
@@ -32,7 +32,7 @@ export class MenuPanel extends Phaser.GameObjects.Container {
             )
             .setInteractive()
             .setScrollFactor(0)
-            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1);
+            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP_2) + 1);
         this.add(this.overlay);
 
         // Créer le panneau du menu
@@ -45,7 +45,7 @@ export class MenuPanel extends Phaser.GameObjects.Container {
                 Phaser.Display.Color.HexStringToColor(Color.containerBg).color,
             )
             .setScrollFactor(0)
-            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2)
+            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP_2) + 2)
             .setStrokeStyle(3, 0xffffff);
         this.add(this.panel);
 
@@ -63,7 +63,7 @@ export class MenuPanel extends Phaser.GameObjects.Container {
             )
             .setOrigin(0.5)
             .setScrollFactor(0)
-            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3);
+            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP_2) + 3);
         this.add(titleText);
 
         let i = 0;
@@ -85,7 +85,7 @@ export class MenuPanel extends Phaser.GameObjects.Container {
                     },
                 },
             )
-                .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3)
+                .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP_2) + 3)
                 .setScrollFactor(0);
             this.add(button);
             i++;

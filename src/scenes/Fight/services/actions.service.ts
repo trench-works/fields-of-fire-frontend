@@ -107,19 +107,7 @@ export class ActionsService {
 
     handleActionKey(index: number) {
         const action = this.actions.orderedActions[index];
-        if (
-            action &&
-            !this.actionStore.lockLevel &&
-            !this.actionStore.selectedAction
-        ) {
-            this.handleActionSelection(action);
-        } else {
-            this.clearAction();
-        }
-    }
-
-    handleActionClick(action: Action) {
-        if (!this.actionStore.lockLevel && !this.actionStore.selectedAction) {
+        if (action && !this.actionStore.lockLevel) {
             this.handleActionSelection(action);
         } else {
             this.clearAction();

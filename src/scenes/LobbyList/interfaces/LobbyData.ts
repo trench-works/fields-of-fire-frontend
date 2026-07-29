@@ -1,10 +1,23 @@
 import { CharacterAssetId } from "../../../assets";
 
+export enum TeamColor {
+    BLUE = "BLUE",
+    REd = "RED",
+    YELLOW = "YELLOW",
+    GREEN = "GREEN",
+}
+
 export class LobbyPlayer {
     userId!: string;
     playerId!: string;
     classId!: CharacterAssetId;
     name!: string;
+}
+
+export class LobbyTeam {
+    players!: LobbyPlayer[];
+    ai!: number;
+    color!: TeamColor;
 }
 
 export class LobbyData {
@@ -13,8 +26,8 @@ export class LobbyData {
     creator!: string;
     maxPlayers!: number;
     creatorId!: string;
-    players!: LobbyPlayer[];
-    playerReady !: string[];
+    playerReady!: string[];
+    teams!: LobbyTeam[];
 }
 
 export enum LobbyStatus {

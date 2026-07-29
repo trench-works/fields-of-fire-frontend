@@ -1,4 +1,5 @@
-import { Depth, GRID_LEVELS_OFFSET, Position } from "../../../core";
+import { Depth, GRID_LEVELS_OFFSET, isDefined, Position } from "../../../core";
+import { PositionUtils } from "../../../core/Utils/Sizing";
 import { applyFovToRange, Case } from "../../../Model";
 import { Action, ActionLevel, ActionZoneType } from "../../../Model/Action";
 import { Cell, FightScene } from "../fight.scene";
@@ -82,9 +83,9 @@ export class RangeService {
         for (const cellInRange of cellsAround) {
             inRangeCells.set(`${cellInRange.x},${cellInRange.y}`, cellInRange);
         }
-        this.cellsInRange = Array.from(inRangeCells.values()).map(
-            ({ x, y }) => this.gridStore.gridPositions[x]?.[y],
-        );
+        this.cellsInRange = Array.from(inRangeCells.values())
+            .map(this.gridStore.get)
+            .filter(isDefined);
         return this;
     }
 
@@ -97,18 +98,17 @@ export class RangeService {
         if (explorationI > maxRange) {
             return [];
         }
-        const board = this.gameStore.game.plateau;
         const cells: Position[] = [];
         for (let x = pos.x - 1; x <= pos.x + 1; x++) {
             for (let y = pos.y - 1; y <= pos.y + 1; y++) {
                 if (x === pos.x || y === pos.y) {
-                    const cell = board[x]?.[y];
+                    const pos = { x, y };
+                    const cell = this.gameStore.getCell(pos);
                     if (cell && exploreCell(cell)) {
-                        const cellPos = { x, y };
                         cells.push(
-                            cellPos,
+                            pos,
                             ...this.getCellsAround(
-                                cellPos,
+                                pos,
                                 explorationI + 1,
                                 maxRange,
                                 exploreCell,
@@ -130,7 +130,7 @@ export class RangeService {
         for (let x = 0; x < this.gridStore.gridPositions.length; x++) {
             for (let y = 0; y < this.gridStore.gridPositions[x].length; y++) {
                 let isInRange = false;
-                const cell = board[x]?.[y];
+                const cell = this.gameStore.getCell({ x, y });
                 const dist = Math.abs(start.x - x) + Math.abs(start.y - y);
 
                 switch (action.rangeType) {
@@ -176,7 +176,10 @@ export class RangeService {
                     }
                 }
                 if (isInRange) {
-                    result.push(this.gridStore.gridPositions[x]?.[y]);
+                    const cell = this.gridStore.get({ x, y });
+                    if (cell) {
+                        result.push(cell);
+                    }
                 }
             }
         }
@@ -189,12 +192,11 @@ export class RangeService {
         return this;
     }
 
-    isInRange({ x, y }: Position): boolean {
+    isInRange(pos: Position): boolean {
         return this.cellsInRange
             .filter(Boolean)
-            .some(
-                ({ gridPosition }) =>
-                    gridPosition.x === x && gridPosition.y === y,
+            .some(({ gridPosition }) =>
+                PositionUtils.equals(pos, gridPosition),
             );
     }
 
@@ -223,17 +225,17 @@ export class RangeService {
                         y <= target.y + zoneSize;
                         y++
                     ) {
+                        const pos = { x, y };
                         if (
                             Math.abs(target.x - x) + Math.abs(target.y - y) <=
                             zoneSize
                         ) {
-                            const cell = this.gridStore.gridPositions[x]?.[y];
-                            const boardCell =
-                                this.gameStore.game.plateau[x]?.[y];
+                            const cell = this.gridStore.get(pos);
+                            const boardCell = this.gameStore.getCell(pos);
                             if (
                                 cell &&
-                                !boardCell.isHole &&
-                                !boardCell.isWall
+                                !boardCell?.isHole &&
+                                !boardCell?.isWall
                             ) {
                                 this.zoneHighlights.push(
                                     this.highlightCell(cell, 0x42a97b),

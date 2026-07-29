@@ -27,7 +27,7 @@ import { MainMenu } from "../MainMenu/main-menu.scene";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { ClassStore } from "../Fight/stores/class.store";
-import { LobbyStore } from "./stores/LobbyStore";
+import { LobbyStore } from "./stores/lobby.store";
 import { LobbyData } from "../LobbyList/interfaces/LobbyData";
 import { SoundParam } from "../../core/Utils/SoundLevel";
 
@@ -73,9 +73,9 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         if (init?.data) {
             const { lobby } = init.data;
             this.lobby = lobby;
-            const player = lobby.players.find(
-                (player) => player.userId === globalThis.user?.id,
-            )!;
+            const player = lobby.teams
+                .flatMap((team) => team.players)
+                .find((player) => player.userId === globalThis.user?.id)!;
             this.playerId = player.playerId!;
             this.lobbyStore.setLobby(lobby);
             this.buildPlayerList();
@@ -263,7 +263,8 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
 
         const isCreator = this.lobby.creatorId === globalThis.user?.id;
         const allReady =
-            this.lobby.playerReady.length === this.lobby.players.length;
+            this.lobby.playerReady.length ===
+            this.lobby.teams.flatMap((team) => team.players).length;
         const iAmReady = this.lobby.playerReady.includes(this.playerId);
 
         console.log(
@@ -359,7 +360,8 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
 
         this.settingsRoot.destroy();
 
-        const players = this.lobbyStore.lobby?.players ?? [];
+        const players =
+            this.lobbyStore.lobby?.teams?.flatMap((team) => team.players) ?? [];
         const listGrid = this.settingsArea.getGrid({
             division: { horizontal: 1, vertical: 4 },
             padding: 5,
@@ -424,7 +426,8 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             { division: { horizontal: 4, vertical: 1 } },
         );
 
-        const players = this.lobbyStore.lobby?.players ?? [];
+        const players =
+            this.lobbyStore.lobby?.teams?.flatMap((team) => team.players) ?? [];
         const playerReady = this.lobbyStore.lobby?.playerReady ?? []; // 👈
 
         for (let i = 0; i < 4; i++) {
@@ -459,7 +462,8 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         const isCreator = this.lobby.creatorId === globalThis.user?.id;
         const allReady =
             (this.lobbyStore.lobby?.playerReady.length ?? 0) ===
-            (this.lobbyStore.lobby?.players.length ?? 0);
+            (this.lobbyStore.lobby?.teams?.flatMap((team) => team.players)
+                ?.length ?? 0);
         const iAmReady =
             this.lobbyStore.lobby?.playerReady.includes(this.playerId) ?? false;
 
