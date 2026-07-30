@@ -50,7 +50,22 @@ export class GroundDisplayer extends FightSceneDisplayer {
 
     renderGroundLayer() {
         const map = this.scene.make.tilemap({
-            key: this.scene.fightMap,
+            data: [
+                [1, 3, 1, 2, 1, 2, 1, 4, 3, 2],
+                [2, 1, 2, 1, 3, 1, 2, 1, 2, 1],
+                [1, 2, 1, 2, 2, 3, 1, 4, 1, 2],
+                [2, 1, 2, 1, 4, 1, 2, 1, 2, 1],
+                [4, 3, 1, 2, 1, 2, 1, 2, 3, 2],
+                [4, 1, 2, 1, 2, 1, 2, 1, 2, 4],
+                [1, 2, 1, 2, 1, 2, 1, 2, 4, 2],
+                [2, 1, 2, 1, 2, 1, 2, 1, 2, 1],
+                [1, 2, 1, 2, 2, 2, 1, 3, 1, 2],
+                [2, 3, 3, 1, 2, 1, 2, 1, 4, 1],
+            ],
+            height: 10,
+            width: 10,
+            tileWidth: 64,
+            tileHeight: 64,
         });
         const tileset = map.addTilesetImage(
             MiscAssetId.GROUND,
@@ -72,14 +87,6 @@ export class GroundDisplayer extends FightSceneDisplayer {
             { x: centerMap.offset.x, y: centerMap.offset.y },
         );
         this.scene.scaleFactor = centerMap.scaleFactor;
-
-        const layer = map.createLayer(
-            "Ground",
-            tileset!,
-            centerMap.offset.x,
-            centerMap.offset.y,
-        );
-        console.log(layer);
 
         this.gridStore.setGroundLayer(layer);
 

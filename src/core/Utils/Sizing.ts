@@ -48,6 +48,13 @@ export class PositionUtils {
         return { x: 0, y: 0 };
     }
 
+    static multiply({ x, y }: Position, multiplier: number): Position {
+        return {
+            x: x * multiplier,
+            y: y * multiplier,
+        };
+    }
+
     static divide({ x, y }: Position, divider: number): Position {
         return {
             x: x / divider,
