@@ -37,7 +37,6 @@ export class StatsUtils {
                 }),
         );
 
-        //console.log(` from entity data (after add): ${JSON.stringify(entity)}`)
         // Caper energy and mouvement à 0
         total.energy = Math.max(total.energy, 0);
         total.mouvement = Math.max(total.mouvement, 0);

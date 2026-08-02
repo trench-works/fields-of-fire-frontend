@@ -76,7 +76,6 @@ export class DisplayText implements Displayable {
             );
 
             const fontSize = Math.max(minSize, 11);
-            console.log("ligneCount", lineCount);
             this.text.setFontSize(`${fontSize}px`);
         }
 

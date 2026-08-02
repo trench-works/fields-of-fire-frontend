@@ -267,7 +267,6 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     }
 
     onReady() {
-        console.log("onReady method called with boost : ", this.boostId);
         if (!this.isReady) {
             this.isReady = true;
             this.scene.root.controllers.game.readyForNewGame(this.boostId);
@@ -312,7 +311,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     height: 3,
                 }),
             )
-                .setImage(CharacterCloseupAsset.getAssetKey(entity.classId), 1)
+                .setImage(CharacterCloseupAsset.getAssetKey(entity.classId))
                 .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2),
         );
 

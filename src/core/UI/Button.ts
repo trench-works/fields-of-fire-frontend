@@ -253,7 +253,6 @@ export class Button
     }
 
     setImage(imageKey: string): this {
-        console.log("test", this.imageDisplay);
         this.imageDisplay?.setImage(imageKey);
         return this;
     }

@@ -51,27 +51,29 @@ export class WallDisplayer extends FightSceneDisplayer {
     }
 
     private addWall({ x, y }: Position) {
-        const cell = this.gridStore.gridPositions[x][y];
-        this.root.add(
-            new DisplayImage(
-                this.scene,
-                new GridArea(
-                    cell.pixelPosition.x - 32 * this.scene.scaleFactor,
-                    cell.pixelPosition.y -
-                        32 * this.scene.scaleFactor -
-                        16 * this.scene.scaleFactor,
-                    64 * this.scene.scaleFactor,
-                    64 * this.scene.scaleFactor,
-                ),
-            )
-                .setImage(MiscAsset.getAssetKey(MiscAssetId.WALL), 1)
-                .setDepth(
-                    Depth.getFromGridPosition(
-                        { x, y },
-                        GRID_LEVELS_OFFSET.OBJECT,
+        const cell = this.gridStore.get({ x, y });
+        if (cell) {
+            this.root.add(
+                new DisplayImage(
+                    this.scene,
+                    new GridArea(
+                        cell.pixelPosition.x - 32 * this.scene.scaleFactor,
+                        cell.pixelPosition.y -
+                            32 * this.scene.scaleFactor -
+                            16 * this.scene.scaleFactor,
+                        64 * this.scene.scaleFactor,
+                        64 * this.scene.scaleFactor,
                     ),
-                ),
-        );
+                )
+                    .setImage(MiscAsset.getAssetKey(MiscAssetId.WALL))
+                    .setDepth(
+                        Depth.getFromGridPosition(
+                            { x, y },
+                            GRID_LEVELS_OFFSET.OBJECT,
+                        ),
+                    ),
+            );
+        }
     }
 
     update(): this {

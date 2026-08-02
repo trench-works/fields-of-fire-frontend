@@ -1,14 +1,16 @@
+import { Tile } from "../UI/TileLayer";
+
 export class Diamond extends Phaser.Geom.Polygon {
-    constructor(tile: Phaser.Tilemaps.Tile, scaleFactor: number) {
+    constructor(tile: Tile, scaleFactor: number) {
         super([
             //point1 (left corner)
             0 - 32 * scaleFactor,
-            (-tile.height * scaleFactor) / 4,
+            -tile.height / 4,
             //point2 (top corner)
             0,
-            (-tile.height * scaleFactor) / 2,
+            -tile.height / 2,
             //point3 (right corner)
-            (tile.width * scaleFactor) / 2,
+            tile.width / 2,
             0 - 16 * scaleFactor,
             //point4 (bottom corner)
             0,

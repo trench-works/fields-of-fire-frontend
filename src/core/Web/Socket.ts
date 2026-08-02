@@ -78,7 +78,6 @@ export class Socket<
                 console.error("Socket is not connected yet...");
                 return new Error("Socket is not connected yet...");
             }
-            console.log("CALL SERVER WITH MESSAGE", this.key, action, payload);
             this.socket.send(
                 JSON.stringify({ actionId: action, payload: payload ?? {} }),
             );

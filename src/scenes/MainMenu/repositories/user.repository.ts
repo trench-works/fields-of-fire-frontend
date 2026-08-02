@@ -19,7 +19,6 @@ export class UserRepository {
         });
         if (user) {
             globalThis.user = user;
-            console.log("global user is then -> ", globalThis.user);
         }
     }
 }

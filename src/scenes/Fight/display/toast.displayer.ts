@@ -52,23 +52,22 @@ export class ToastDisplayer {
 
     async attackToast(animation: GameAttackAnimation) {
         const {
-            data: { actionId, hits },
+            data: { hits },
         } = animation;
         await Promise.all(
-            hits.map((hit) =>
-                new Toast(
-                    this.scene,
-                    this.gridStore.gridPositions[hit.x][hit.y].pixelPosition,
-                    1,
-                )
-                    .setText(
-                        hit.damage === 0
-                            ? i18n.translate("fight.actions.dodged")
-                            : `${-hit.damage} ❤️`,
-                        hit.damage === 0 ? "#00FF00" : "#FF0000",
-                    )
-                    .animate(1000),
-            ),
+            hits.map((hit) => {
+                const cell = this.gridStore.get(hit);
+                if (cell) {
+                    return new Toast(this.scene, cell.pixelPosition, 1)
+                        .setText(
+                            hit.damage === 0
+                                ? i18n.translate("fight.actions.dodged")
+                                : `${-hit.damage} ❤️`,
+                            hit.damage === 0 ? "#00FF00" : "#FF0000",
+                        )
+                        .animate(1000);
+                }
+            }),
         );
     }
 }

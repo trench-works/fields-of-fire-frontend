@@ -111,7 +111,6 @@ export class MainMenu extends BaseScene {
                 text: i18n.translate("mainMenu.settings"),
                 image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
                 onClick: () => {
-                    console.log("Paramètres - À implémenter");
                     ParameterScene.start(this);
                 },
             },
@@ -150,10 +149,6 @@ export class MainMenu extends BaseScene {
                             if (globalThis.user) {
                                 this.playButton.alpha = 1;
                                 this.registerButton.setIsActivated(false);
-                                console.log(
-                                    "register globo : ",
-                                    globalThis.user.username,
-                                );
                                 this.registerButton.displayText(
                                     globalThis.user.username,
                                 );
@@ -210,10 +205,6 @@ export class MainMenu extends BaseScene {
                                     this.playButton.alpha = 1;
                                     this.registerButton.setIsActivated(false);
                                     this.registerButton.displayText(
-                                        globalThis.user.username,
-                                    );
-                                    console.log(
-                                        " authent globo : ",
                                         globalThis.user.username,
                                     );
                                     localStorage.setItem(

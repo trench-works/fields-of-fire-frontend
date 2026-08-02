@@ -1,8 +1,9 @@
 import { Position } from "../../../core";
+import { TileLayer } from "../../../core/UI/TileLayer";
 import { Cell } from "../fight.scene";
 
 export class GridStore {
-    public groundLayer: Phaser.Tilemaps.TilemapLayer | null;
+    public groundLayer: TileLayer | null;
     public gridPositions: Cell[][] = [];
 
     constructor() {
@@ -13,7 +14,7 @@ export class GridStore {
         return this.gridPositions?.[x]?.[y];
     };
 
-    setGroundLayer(groundLayer: Phaser.Tilemaps.TilemapLayer | null) {
+    setGroundLayer(groundLayer: TileLayer | null) {
         this.groundLayer = groundLayer;
     }
 

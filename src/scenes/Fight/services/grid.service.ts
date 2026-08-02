@@ -31,7 +31,6 @@ export class GridService {
 
     cellClick({ x, y }: Position) {
         this.characterDisplayer.changeDirection({ x, y });
-        console.log(this.actionStore.selectedAction);
         if (this.actionStore.selectedAction) {
             if (this.rangeService.isInRange({ x, y })) {
                 this.actionService.launchAction({ x, y });
