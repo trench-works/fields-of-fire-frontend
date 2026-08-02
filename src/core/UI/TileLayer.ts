@@ -50,7 +50,6 @@ export class Tile {
     }
 
     display(): this {
-        console.log(this.scene.textures.get(this.asset));
         this.image = new DisplayImage(
             this.scene,
             new GridArea(
@@ -108,8 +107,8 @@ export class TileLayer {
                             PositionUtils.multiply(position, scale),
                             this.position,
                             {
-                                x: -TILE_SIZE.width * scale,
-                                y: -TILE_SIZE.height * scale,
+                                x: (-TILE_SIZE.width / 2) * scale,
+                                y: (-TILE_SIZE.height / 2) * scale,
                             },
                         ),
                         {
