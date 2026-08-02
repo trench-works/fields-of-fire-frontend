@@ -267,7 +267,6 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     }
 
     onReady() {
-        console.log("onReady method called with boost : ", this.boostId);
         if (!this.isReady) {
             this.isReady = true;
             this.scene.root.controllers.game.readyForNewGame(this.boostId);

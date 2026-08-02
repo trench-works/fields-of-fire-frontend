@@ -96,7 +96,6 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         this.lobbySocket = new LobbySocket(this.lobby.id);
         this.lobbySocket.onClose(() => MainMenu.start(this));
         this.lobbySocket.onLobbyUpdate((event) => {
-            console.log("RECEIVED LOBBY UPDATE", event.lobby);
             this.lobbyStore.setLobby(event.lobby);
             this.buildPlayerList();
             this.buildReadyList();

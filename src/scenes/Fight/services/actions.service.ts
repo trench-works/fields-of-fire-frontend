@@ -115,7 +115,6 @@ export class ActionsService {
     }
 
     async launchAction(pos: Position) {
-        console.log(pos);
         this.lock();
         const action = this.actionStore.selectedAction;
         this.clearAction();
