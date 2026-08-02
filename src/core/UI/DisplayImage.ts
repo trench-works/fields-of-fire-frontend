@@ -37,12 +37,15 @@ export class DisplayImage implements Displayable {
         throw new Error("Method not implemented.");
     }
 
-    setImage(texture: string, scale?: number): this {
-        this.image.setTexture(texture);
+    setImage(
+        texture: string,
+        options?: { scale?: number; frame?: string | number },
+    ): this {
+        this.image.setTexture(texture, options?.frame);
         //size
         let size: Size;
-        if (scale) {
-            size = ScaleUtils.fitFromScale(this.area, scale);
+        if (options?.scale) {
+            size = ScaleUtils.fitFromScale(this.area, options?.scale);
         } else {
             size = this.area;
         }

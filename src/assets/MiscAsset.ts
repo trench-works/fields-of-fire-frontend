@@ -37,6 +37,9 @@ class MiscAssetManager extends ImageAssetManager<MiscAssetId, string> {
                 [MiscAssetId.BUTTON_BLUE]: { width: 180, height: 50 },
                 [MiscAssetId.BUTTON_ROUND]: { width: 50, height: 50 },
             },
+            {
+                [MiscAssetId.GROUND]: { frameWidth: 64, frameHeight: 64 },
+            },
         );
     }
 }

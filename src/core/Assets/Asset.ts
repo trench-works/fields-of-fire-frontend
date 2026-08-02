@@ -51,6 +51,11 @@ export abstract class AssetManager<AssetId extends string, AssetType> {
     }
 }
 
+export type FrameConfiguration = {
+    frameWidth: number;
+    frameHeight: number;
+};
+
 export abstract class ImageAssetManager<
     AssetId extends string,
     AssetType,
@@ -59,6 +64,9 @@ export abstract class ImageAssetManager<
         assetKey: string,
         assets: Partial<Record<AssetId, AssetType>>,
         protected readonly assetScale: Record<AssetId, Size>,
+        protected readonly frameConfigs?: Partial<
+            Record<AssetId, FrameConfiguration>
+        >,
     ) {
         super(assetKey, assets);
     }
@@ -68,10 +76,20 @@ export abstract class ImageAssetManager<
         id: AssetId,
         asset: Record<AssetId, AssetType>[AssetId],
     ) {
-        load.image(
-            this.getAssetKey(id),
-            this.getAssetFileLink(this.assetKey, asset),
-        );
+        const frameConfig = this.frameConfigs?.[id];
+        if (frameConfig) {
+            load.spritesheet(
+                this.getAssetKey(id),
+                this.getAssetFileLink(this.assetKey, asset),
+                frameConfig,
+            );
+        } else {
+            load.image({
+                key: this.getAssetKey(id),
+                url: this.getAssetFileLink(this.assetKey, asset),
+                frameConfig: this.frameConfigs?.[id],
+            });
+        }
     }
 
     getAssetScale(id: string): number {

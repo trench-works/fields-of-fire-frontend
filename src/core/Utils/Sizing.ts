@@ -1,11 +1,13 @@
 import { FourAxis, Position, TwoAxis } from "../Types/Sizing";
 
 export class PositionUtils {
-    static add(a: Position, b: Position): Position {
-        return {
-            x: a.x + b.x,
-            y: a.y + b.y,
-        };
+    static add(a: Position, ...other: Position[]): Position {
+        const pos: Position = { ...a };
+        for (const some of other) {
+            pos.x += some.x;
+            pos.y += some.y;
+        }
+        return pos;
     }
 
     static distance(a: Position, b: Position): number {

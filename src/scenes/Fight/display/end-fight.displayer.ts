@@ -312,7 +312,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     height: 3,
                 }),
             )
-                .setImage(CharacterCloseupAsset.getAssetKey(entity.classId), 1)
+                .setImage(CharacterCloseupAsset.getAssetKey(entity.classId))
                 .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2),
         );
 

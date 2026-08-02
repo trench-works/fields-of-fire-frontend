@@ -254,10 +254,9 @@ export class StatsDisplayer extends FightSceneDisplayer {
                         y: 1,
                     })
                     .scaleFromCenter(1, ScaleMode.FIT),
-            ).setImage(
-                StatsIconAsset.getAssetKey(icon),
-                StatsIconAsset.getAssetScale(icon),
-            );
+            ).setImage(StatsIconAsset.getAssetKey(icon), {
+                scale: StatsIconAsset.getAssetScale(icon),
+            });
             if (image) {
                 image.setInteractive(true);
                 this.scene.tooltip.attachTo(
@@ -353,7 +352,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 this.scene,
                 area.scaleFromCenter(1, ScaleMode.FIT),
             )
-                .setImage(EffectAsset.getAssetKey(id), 1.2)
+                .setImage(EffectAsset.getAssetKey(id), { scale: 1.2 })
                 .setInteractive(true);
             if (this.entity.dead) {
                 //image.blur();

@@ -30,13 +30,11 @@ export class GroundDisplayer extends FightSceneDisplayer {
     clean(): this {
         this.tileHighlights.forEach((highlight) => highlight.destroy());
         this.teamColorHighlights.forEach((highlight) => highlight.destroy());
-        for (let x = 0; x < this.gridStore.gridPositions.length; x++) {
-            for (let y = 0; y < this.gridStore.gridPositions[x].length; y++) {
-                this.gridStore.gridPositions[x][y].highlight?.destroy();
-                this.gridStore.gridPositions[x][y].hoverGraphics?.destroy();
-                this.gridStore.gridPositions[x][y].zone?.destroy();
-            }
-        }
+        this.gridStore.gridPositions.flat().forEach((cell) => {
+            cell.highlight?.destroy();
+            cell.hoverGraphics?.destroy();
+            cell.zone?.destroy();
+        });
         return this;
     }
 
@@ -57,13 +55,13 @@ export class GroundDisplayer extends FightSceneDisplayer {
             isometricVariation: true,
         });
 
-        this.scene.scaleFactor = centerMap.scaleFactor;
+        this.scene.scaleFactor = centerMap.scaleFactor * 2;
 
         this.gridStore.setGroundLayer(
             new TileLayer(this.scene, {
                 width: 10,
                 height: 10,
-                assets: [MiscAsset.getAssetKey(MiscAssetId.GROUND)],
+                asset: MiscAsset.getAssetKey(MiscAssetId.GROUND),
                 scale: this.scene.scaleFactor,
             }),
         );
@@ -81,7 +79,6 @@ export class GroundDisplayer extends FightSceneDisplayer {
         }
         this.tileHighlights = [];
         this.teamColorHighlights = [];
-        console.log(this.gameStore.game.plateau);
         for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
                 const caseTile = this.gameStore.game.plateau[x][y];
