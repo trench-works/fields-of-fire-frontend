@@ -127,68 +127,47 @@ export class GroundDisplayer extends FightSceneDisplayer {
         if (!this.gridStore.groundLayer) {
             return;
         }
-        for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
-            for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
-                const tile = this.gridStore.get({ x, y });
-                const caseTile = this.gameStore.getCell({ x, y });
-                if (caseTile && tile) {
-                    tile.setVisible(true);
-                    if (caseTile.isHole) {
-                        tile.setVisible(false);
-                    } else if (!caseTile.isWall) {
-                        if (!tile) continue;
-                        const DIAMOND = new Diamond(
-                            tile,
-                            this.scene.scaleFactor,
-                        );
+        this.gridStore.forEach((tile) => {
+            const caseTile = this.gameStore.getCell(tile.index);
+            if (caseTile && tile) {
+                tile.setVisible(true);
+                if (caseTile.isHole) {
+                    tile.setVisible(false);
+                } else if (!caseTile.isWall) {
+                    const DIAMOND = new Diamond(tile, this.scene.scaleFactor);
 
-                        const hoverGraphics = this.getTileHighlights(
-                            { x, y },
-                            tile,
-                            {
-                                color: 0xffffff,
-                                DIAMOND,
-                            },
-                        );
-                        hoverGraphics.setVisible(false);
-                        tile.hoverGraphics = hoverGraphics;
+                    const hoverGraphics = this.getTileHighlights(
+                        tile.index,
+                        tile,
+                        {
+                            color: 0xffffff,
+                            DIAMOND,
+                        },
+                    );
+                    hoverGraphics.setVisible(false);
+                    tile.hoverGraphics = hoverGraphics;
 
-                        const zone = this.getTileInteractiveZone(
-                            { x, y },
-                            tile,
-                            {
-                                DIAMOND,
-                            },
-                        );
-                        tile.zone = zone;
+                    const zone = this.getTileInteractiveZone(tile.index, tile, {
+                        DIAMOND,
+                    });
+                    tile.zone = zone;
 
-                        // --- DEBUG VISUEL ---
-                        //this.gridShower(DIAMOND, worldX, worldY, layer);
-                        zone.on("pointerdown", () =>
-                            this.scene.root.controllers.grid.cellClick({
-                                x,
-                                y,
-                            }),
-                        );
-                        zone.on("pointerover", () =>
-                            this.scene.root.controllers.grid.cellHover({
-                                x,
-                                y,
-                            }),
-                        );
-                        zone.on("pointerout", () =>
-                            this.scene.root.controllers.grid.cellHoverOut({
-                                x,
-                                y,
-                            }),
-                        );
-
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        (tile as any).zone = zone;
-                    }
+                    // --- DEBUG VISUEL ---
+                    //this.gridShower(DIAMOND, worldX, worldY, layer);
+                    zone.on("pointerdown", () =>
+                        this.scene.root.controllers.grid.cellClick(tile.index),
+                    );
+                    zone.on("pointerover", () =>
+                        this.scene.root.controllers.grid.cellHover(tile.index),
+                    );
+                    zone.on("pointerout", () =>
+                        this.scene.root.controllers.grid.cellHoverOut(
+                            tile.index,
+                        ),
+                    );
                 }
             }
-        }
+        });
     }
 
     getTileHighlights(
@@ -229,9 +208,9 @@ export class GroundDisplayer extends FightSceneDisplayer {
         graphics.fillStyle(TEAM_COLORS[props.color], 0.5);
         graphics.fillEllipse(
             0,
-            -16 * this.scene.scaleFactor,
-            32 * this.scene.scaleFactor,
-            16 * this.scene.scaleFactor,
+            (-TILE_SIZE.height / 4) * this.scene.scaleFactor,
+            (TILE_SIZE.width / 2) * this.scene.scaleFactor,
+            (TILE_SIZE.height / 4) * this.scene.scaleFactor,
         );
         graphics.setPosition(x, y);
         graphics.setDepth(

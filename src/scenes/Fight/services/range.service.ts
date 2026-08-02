@@ -1,4 +1,5 @@
 import { Depth, GRID_LEVELS_OFFSET, isDefined, Position } from "../../../core";
+import { TILE_SIZE } from "../../../core/UI/TileLayer";
 import { PositionUtils } from "../../../core/Utils/Sizing";
 import { applyFovToRange, Case } from "../../../Model";
 import { Action, ActionLevel, ActionZoneType } from "../../../Model/Action";
@@ -24,10 +25,22 @@ export class RangeService {
         g.fillStyle(color, 0.6);
         g.fillPoints(
             [
-                new Phaser.Geom.Point(-32 * this.scene.scaleFactor, 0),
-                new Phaser.Geom.Point(0, -16 * this.scene.scaleFactor),
-                new Phaser.Geom.Point(32 * this.scene.scaleFactor, 0),
-                new Phaser.Geom.Point(0, 16 * this.scene.scaleFactor),
+                new Phaser.Geom.Point(
+                    (-TILE_SIZE.height / 2) * this.scene.scaleFactor,
+                    0,
+                ),
+                new Phaser.Geom.Point(
+                    0,
+                    (-TILE_SIZE.height / 4) * this.scene.scaleFactor,
+                ),
+                new Phaser.Geom.Point(
+                    (TILE_SIZE.height / 2) * this.scene.scaleFactor,
+                    0,
+                ),
+                new Phaser.Geom.Point(
+                    0,
+                    (TILE_SIZE.height / 4) * this.scene.scaleFactor,
+                ),
             ],
             true,
         );
