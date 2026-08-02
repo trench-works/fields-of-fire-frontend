@@ -4,7 +4,7 @@ import { Diamond } from "../../../core/Objects/Diamond";
 import { Tile, TILE_SIZE, TileLayer } from "../../../core/UI/TileLayer";
 import { scaleAndCenter } from "../../../core/Utils/Scale";
 import { TEAM_COLORS, TeamColor } from "../../../Model/Team";
-import { FightScene } from "../fight.scene";
+import { Cell, FightScene } from "../fight.scene";
 import { GameStore } from "../stores/game.store";
 import { GridStore } from "../stores/grid.store";
 import { PlayerStore } from "../stores/player.store";
@@ -30,7 +30,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
     clean(): this {
         this.tileHighlights.forEach((highlight) => highlight.destroy());
         this.teamColorHighlights.forEach((highlight) => highlight.destroy());
-        this.gridStore.gridPositions.flat().forEach((cell) => {
+        this.gridStore.groundLayer?.tiles.flat().forEach((cell) => {
             cell.highlight?.destroy();
             cell.hoverGraphics?.destroy();
             cell.zone?.destroy();
@@ -58,12 +58,16 @@ export class GroundDisplayer extends FightSceneDisplayer {
         this.scene.scaleFactor = centerMap.scaleFactor * 2;
 
         this.gridStore.setGroundLayer(
-            new TileLayer(this.scene, {
-                width: 10,
-                height: 10,
-                asset: MiscAsset.getAssetKey(MiscAssetId.GROUND),
-                scale: this.scene.scaleFactor,
-            }),
+            new TileLayer(
+                this.scene,
+                {
+                    width: 10,
+                    height: 10,
+                    asset: MiscAsset.getAssetKey(MiscAssetId.GROUND),
+                    scale: this.scene.scaleFactor,
+                },
+                Cell,
+            ),
         );
     }
 
@@ -131,23 +135,10 @@ export class GroundDisplayer extends FightSceneDisplayer {
             return;
         }
         for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
-            if (!this.gridStore.gridPositions[x]) {
-                this.gridStore.gridPositions[x] = [];
-            }
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
                 const tile = this.gridStore.groundLayer.getTile({ x, y });
                 if (tile) {
                     const caseTile = this.gameStore.game.plateau[x][y];
-
-                    const { x: worldX, y: worldY } = tile.getPosition();
-
-                    this.gridStore.gridPositions[x][y] = {
-                        gridPosition: { x, y },
-                        pixelPosition: {
-                            x: worldX,
-                            y: worldY - 16 * this.scene.scaleFactor,
-                        },
-                    };
 
                     tile.setVisible(true);
                     if (caseTile.isHole) {
@@ -169,8 +160,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
                             },
                         );
                         hoverGraphics.setVisible(false);
-                        this.gridStore.gridPositions[x][y].hoverGraphics =
-                            hoverGraphics;
+                        tile.hoverGraphics = hoverGraphics;
 
                         const zone = this.getTileInteractiveZone(
                             { x, y },
@@ -179,7 +169,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
                                 DIAMOND,
                             },
                         );
-                        this.gridStore.gridPositions[x][y].zone = zone;
+                        tile.zone = zone;
 
                         // --- DEBUG VISUEL ---
                         //this.gridShower(DIAMOND, worldX, worldY, layer);

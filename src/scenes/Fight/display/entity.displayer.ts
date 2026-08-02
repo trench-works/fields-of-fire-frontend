@@ -65,18 +65,20 @@ export class EntityDisplayer extends FightSceneDisplayer {
 
     render(): this {
         const entity = this.gameStore.getEntity(this.entityId);
-        const { x, y } = entity.position;
-        const cell = this.gridStore.gridPositions[x][y];
+        const cell = this.gridStore.get(entity.position);
 
         if (cell) {
             this.sprite = this.scene.physics.add.sprite(
-                cell.pixelPosition.x,
-                cell.pixelPosition.y,
+                cell.position.x,
+                cell.position.y - cell.height / 4,
                 CharacterSpriteAsset.getAssetKey(entity.classId),
             );
 
             this.sprite.setDepth(
-                Depth.getFromGridPosition({ x, y }, GRID_LEVELS_OFFSET.OBJECT),
+                Depth.getFromGridPosition(
+                    entity.position,
+                    GRID_LEVELS_OFFSET.OBJECT,
+                ),
             );
             if (entity.classId === CharacterAssetId.BARRICADE) {
                 this.sprite.setOrigin(0.5, 0.75);
@@ -100,24 +102,34 @@ export class EntityDisplayer extends FightSceneDisplayer {
 
         const entity = this.gameStore.getEntity(this.entityId);
 
-        const { x, y } = entity.position;
-        const cell = this.gridStore.gridPositions[x][y];
-
-        this.sprite.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
+        const cell = this.gridStore.get(entity.position);
+        if (!cell) {
+            return this;
+        }
+        this.sprite.setPosition(
+            cell.position.x,
+            cell.position.y - cell.height / 4,
+        );
         this.sprite.setDepth(
-            Depth.getFromGridPosition({ x, y }, GRID_LEVELS_OFFSET.OBJECT),
+            Depth.getFromGridPosition(
+                entity.position,
+                GRID_LEVELS_OFFSET.OBJECT,
+            ),
         );
 
         return this;
     }
 
     changeDirection(origin: Position, target: Position) {
-        const startCell = this.gridStore.gridPositions[origin.x]?.[origin.y];
-        const endCell = this.gridStore.gridPositions[target.x]?.[target.y];
+        const startCell = this.gridStore.get(origin);
+        const endCell = this.gridStore.get(target);
+        if (!startCell || !endCell) {
+            return;
+        }
         const horizontalDirection =
-            startCell.pixelPosition.x - endCell.pixelPosition.x < 0 ? "R" : "L";
+            startCell.position.x - endCell.position.x < 0 ? "R" : "L";
         const verticalDirection =
-            startCell.pixelPosition.y - endCell.pixelPosition.y < 0 ? "D" : "U";
+            startCell.position.y - endCell.position.y < 0 ? "D" : "U";
 
         this.direction = `${verticalDirection}${horizontalDirection}`;
         this.playIdleAnimation();
@@ -125,12 +137,15 @@ export class EntityDisplayer extends FightSceneDisplayer {
 
     async slide(start: Position, end: Position, steps: number) {
         if (!this.sprite) return this;
-        const startCell = this.gridStore.gridPositions[start.x]?.[start.y];
-        const endCell = this.gridStore.gridPositions[end.x]?.[end.y];
+        const startCell = this.gridStore.get(start);
+        const endCell = this.gridStore.get(end);
+        if (!startCell || !endCell) {
+            return;
+        }
 
         const moveLine = PositionUtils.subtract(
-            endCell.pixelPosition,
-            startCell.pixelPosition,
+            endCell.position,
+            startCell.position,
         );
         const moveStep = PositionUtils.divide(moveLine, steps);
         for (let i = 0; i < steps; i++) {
@@ -144,14 +159,20 @@ export class EntityDisplayer extends FightSceneDisplayer {
         this.setPosition(end);
     }
 
-    setPosition({ x, y }: Position): this {
+    setPosition(pos: Position): this {
         if (!this.sprite) return this;
 
-        const cell = this.gridStore.gridPositions[x]?.[y];
+        const cell = this.gridStore.get(pos);
+        if (!cell) {
+            return this;
+        }
 
-        this.sprite.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
+        this.sprite.setPosition(
+            cell.position.x,
+            cell.position.y - cell.height / 4,
+        );
         this.sprite.setDepth(
-            Depth.getFromGridPosition({ x, y }, GRID_LEVELS_OFFSET.OBJECT),
+            Depth.getFromGridPosition(pos, GRID_LEVELS_OFFSET.OBJECT),
         );
         return this;
     }

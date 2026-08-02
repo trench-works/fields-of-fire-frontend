@@ -1,5 +1,6 @@
 import { BaseScene } from "../Objects";
 import { Position, Size } from "../Types";
+import { Instantiable } from "../Types/Instantiable";
 import { Depth, GridArea } from "../Utils";
 import { ranInt } from "../Utils/Random";
 import { PositionUtils } from "../Utils/Sizing";
@@ -23,8 +24,8 @@ export class Tile {
 
     constructor(
         private readonly scene: BaseScene,
-        private readonly index: Position,
-        private readonly position: Position,
+        public readonly index: Position,
+        public readonly position: Position,
         { asset, scale }: TileProps,
     ) {
         this.asset = asset;
@@ -81,14 +82,15 @@ export type TileLayerConfig = {
     scale: number;
 };
 
-export class TileLayer {
-    tiles: Tile[][];
+export class TileLayer<T extends Tile> {
+    tiles: T[][];
 
     position: Position;
 
     constructor(
         scene: BaseScene,
         { width, height, asset, scale }: TileLayerConfig,
+        constructor: Instantiable<T>,
     ) {
         this.position = {
             x: window.innerWidth / 2,
@@ -96,11 +98,11 @@ export class TileLayer {
         };
         this.tiles = [];
         for (let x = 0; x < width; x++) {
-            const line: Tile[] = [];
+            const line: T[] = [];
             for (let y = 0; y < height; y++) {
                 const position = this.getTilePosition({ x, y });
                 line.push(
-                    new Tile(
+                    new constructor(
                         scene,
                         { x, y },
                         PositionUtils.add(
@@ -122,7 +124,7 @@ export class TileLayer {
         }
     }
 
-    getTile({ x, y }: Position): Tile | undefined {
+    getTile({ x, y }: Position): T | undefined {
         return this.tiles[x]?.[y];
     }
 

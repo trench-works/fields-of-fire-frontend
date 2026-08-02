@@ -31,10 +31,10 @@ export class RangeService {
             ],
             true,
         );
-        g.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
+        g.setPosition(cell.position.x, cell.position.y - cell.height / 4);
         g.setDepth(
             Depth.getFromGridPosition(
-                cell.gridPosition,
+                cell.index,
                 GRID_LEVELS_OFFSET.HIGHTLIGHT_3,
             ),
         );
@@ -127,62 +127,60 @@ export class RangeService {
 
         console.log("typeof actionRange is ", action.rangeType);
 
-        for (let x = 0; x < this.gridStore.gridPositions.length; x++) {
-            for (let y = 0; y < this.gridStore.gridPositions[x].length; y++) {
-                let isInRange = false;
-                const cell = this.gameStore.getCell({ x, y });
-                const dist = Math.abs(start.x - x) + Math.abs(start.y - y);
+        this.gridStore.forEach(({ index: { x, y } }) => {
+            let isInRange = false;
+            const cell = this.gameStore.getCell({ x, y });
+            const dist = Math.abs(start.x - x) + Math.abs(start.y - y);
 
-                switch (action.rangeType) {
-                    case ActionZoneType.DIAMOND:
-                    case ActionZoneType.CIRCLE:
-                        if (
-                            dist <= action.range.max &&
-                            dist >= action.range.min &&
-                            cell &&
-                            !cell.isHole &&
-                            !cell.isWall
-                        ) {
+            switch (action.rangeType) {
+                case ActionZoneType.DIAMOND:
+                case ActionZoneType.CIRCLE:
+                    if (
+                        dist <= action.range.max &&
+                        dist >= action.range.min &&
+                        cell &&
+                        !cell.isHole &&
+                        !cell.isWall
+                    ) {
+                        isInRange = true;
+                    }
+                    break;
+                case ActionZoneType.PLUS:
+                    if (
+                        dist <= action.range.max &&
+                        dist >= action.range.min &&
+                        cell &&
+                        !cell.isHole &&
+                        !cell.isWall
+                    ) {
+                        if (x === start.x || y === start.y) {
                             isInRange = true;
                         }
-                        break;
-                    case ActionZoneType.PLUS:
-                        if (
-                            dist <= action.range.max &&
-                            dist >= action.range.min &&
-                            cell &&
-                            !cell.isHole &&
-                            !cell.isWall
-                        ) {
-                            if (x === start.x || y === start.y) {
-                                isInRange = true;
-                            }
-                        }
-                        break;
-                    case ActionZoneType.XCROSS: {
-                        const dx = Math.abs(start.x - x);
-                        const dy = Math.abs(start.y - y);
-                        if (
-                            cell &&
-                            !cell.isHole &&
-                            !cell.isWall &&
-                            dx === dy &&
-                            dx >= action.range.min &&
-                            dx <= action.range.max
-                        ) {
-                            isInRange = true;
-                        }
-                        break;
                     }
-                }
-                if (isInRange) {
-                    const cell = this.gridStore.get({ x, y });
-                    if (cell) {
-                        result.push(cell);
+                    break;
+                case ActionZoneType.XCROSS: {
+                    const dx = Math.abs(start.x - x);
+                    const dy = Math.abs(start.y - y);
+                    if (
+                        cell &&
+                        !cell.isHole &&
+                        !cell.isWall &&
+                        dx === dy &&
+                        dx >= action.range.min &&
+                        dx <= action.range.max
+                    ) {
+                        isInRange = true;
                     }
+                    break;
                 }
             }
-        }
+            if (isInRange) {
+                const cell = this.gridStore.get({ x, y });
+                if (cell) {
+                    result.push(cell);
+                }
+            }
+        });
 
         if (action.level === ActionLevel.GROUND) {
             this.cellsInRange = applyFovToRange(start, result, board);
@@ -195,9 +193,7 @@ export class RangeService {
     isInRange(pos: Position): boolean {
         return this.cellsInRange
             .filter(Boolean)
-            .some(({ gridPosition }) =>
-                PositionUtils.equals(pos, gridPosition),
-            );
+            .some(({ index }) => PositionUtils.equals(pos, index));
     }
 
     clearZonePreview() {
