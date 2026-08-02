@@ -5,7 +5,6 @@ import {
     BaseSceneInit,
     i18n,
 } from "../../core";
-import { SceneConfig } from "../../config/SceneConfig";
 import { Tooltip } from "../../core/UI/Tooltip";
 import { Game } from "../../Model/Game";
 import { MainMenu } from "../MainMenu/main-menu.scene";
@@ -27,13 +26,11 @@ import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { ParticleAsset } from "../../assets/ParticleAsset";
 import { EffectAsset } from "../../assets/EffectAsset";
-import { PositionUtils } from "../../core/Utils/Sizing";
 import { BoostAsset } from "../../assets/BoostAsset";
 import { FightSceneRoot } from "./fight-scene.root";
 
 export type SceneRenderConfig = {
     tileSize: number;
-    renderType: string;
     offset: Position;
 };
 
@@ -61,33 +58,16 @@ export type FightSceneInit = {
 };
 
 export class FightScene extends BaseScene<FightSceneInit> {
-    public renderConfig: SceneRenderConfig;
-
     public root: FightSceneRoot;
 
     public tooltip!: Tooltip;
 
-    public fightMap = "chessmap";
     public scaleFactor: number = 1;
 
     constructor() {
         super(SceneAssetId.FIGHT, BackgroundAssetId.FIGHT);
 
         this.root = new FightSceneRoot(this);
-
-        const config = new SceneConfig().loadConfig().getConfig("scene_1");
-        if (!config) {
-            throw new Error("Config doesnt exist");
-        }
-
-        this.renderConfig = {
-            tileSize: config.render_config.tile_size,
-            renderType: config.render_config.render_type,
-            offset: { x: 0, y: 0 },
-        };
-        this.renderConfig.offset = PositionUtils.getMapOffset(
-            this.renderConfig,
-        );
     }
 
     static start(scene: BaseScene, data: BaseSceneInit<FightSceneInit>) {
@@ -103,11 +83,6 @@ export class FightScene extends BaseScene<FightSceneInit> {
 
     preload() {
         super.preload();
-
-        this.load.tilemapTiledJSON(
-            this.fightMap,
-            `assets/${this.fightMap}.json`,
-        );
 
         ActionAsset.loadAll(this.load);
         ActionAnimationAsset.loadAll(this.load);

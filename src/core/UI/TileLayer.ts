@@ -1,17 +1,23 @@
 import { BaseScene } from "../Objects";
 import { Position, Size } from "../Types";
-import { Depth, GRID_LEVELS_OFFSET, GridArea } from "../Utils";
+import { Depth, GridArea } from "../Utils";
 import { ranIn } from "../Utils/Random";
 import { PositionUtils } from "../Utils/Sizing";
 import { DisplayImage } from "./DisplayImage";
 
-const TILE_SIZE: Size = {
+export const TILE_SIZE: Size = {
     width: 64,
     height: 64,
 };
 
+export type TileProps = {
+    scale: number;
+    asset: string;
+};
+
 export class Tile {
-    private depth: number;
+    private asset: string;
+    private scale: number;
 
     private image: DisplayImage | null;
 
@@ -19,16 +25,23 @@ export class Tile {
         private readonly scene: BaseScene,
         private readonly index: Position,
         private readonly position: Position,
-        private readonly asset: string,
-        private scale: number,
+        { asset, scale }: TileProps,
     ) {
-        this.depth = 0;
+        this.asset = asset;
+        this.scale = scale;
         this.image = null;
     }
 
-    setDepth(depth: number): this {
-        this.depth = depth;
-        return this;
+    get height() {
+        return TILE_SIZE.height * this.scale;
+    }
+
+    get width() {
+        return TILE_SIZE.width * this.scale;
+    }
+
+    getPosition(): Position {
+        return this.position;
     }
 
     setScale(scale: number): this {
@@ -40,19 +53,19 @@ export class Tile {
         this.image = new DisplayImage(
             this.scene,
             new GridArea(
-                this.position.x - (TILE_SIZE.width / 2) * this.scale,
-                this.position.y - (TILE_SIZE.height / 2) * this.scale,
-                TILE_SIZE.width * this.scale,
-                TILE_SIZE.height * this.scale,
+                this.position.x - this.width / 2,
+                this.position.y - this.height / 2,
+                this.width,
+                this.height,
             ),
         )
             .setImage(this.asset, 1)
-            .setDepth(
-                Depth.getFromGridPosition(
-                    this.index,
-                    GRID_LEVELS_OFFSET.OBJECT,
-                ),
-            );
+            .setDepth(Depth.getFromGridPosition(this.index));
+        return this;
+    }
+
+    setVisible(visible: boolean): this {
+        this.image?.setVisible(visible);
         return this;
     }
 }
@@ -81,18 +94,20 @@ export class TileLayer {
         for (let x = 0; x < width; x++) {
             const line: Tile[] = [];
             for (let y = 0; y < height; y++) {
+                const position = this.getTilePosition({ x, y });
                 line.push(
-                    new Tile(
-                        scene,
-                        { x, y },
-                        { x: 0, y: 0 },
-                        ranIn(assets),
+                    new Tile(scene, { x, y }, position, {
+                        asset: ranIn(assets),
                         scale,
-                    ),
+                    }),
                 );
             }
             this.tiles.push([]);
         }
+    }
+
+    getTile({ x, y }: Position): Tile | undefined {
+        return this.tiles[x]?.[y];
     }
 
     getTilePosition(index: Position): Position {
