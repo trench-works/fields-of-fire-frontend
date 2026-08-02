@@ -46,12 +46,12 @@ export class GroundDisplayer extends FightSceneDisplayer {
     }
 
     renderGroundLayer() {
-        const game = this.gameStore.game;
+        const size = this.gameStore.game.plateau.length;
         const centerMap = scaleAndCenter({
             parent: this.scene.scale,
             child: {
-                width: game.plateau.length * TILE_SIZE.width,
-                height: game.plateau.length * TILE_SIZE.height,
+                width: size * TILE_SIZE.width,
+                height: size * TILE_SIZE.height,
             },
             isometricVariation: true,
         });
@@ -62,8 +62,8 @@ export class GroundDisplayer extends FightSceneDisplayer {
             new TileLayer(
                 this.scene,
                 {
-                    width: game.plateau.length,
-                    height: game.plateau.length,
+                    width: size,
+                    height: size,
                     asset: MiscAsset.getAssetKey(MiscAssetId.GROUND),
                     scale: this.scene.scaleFactor,
                 },
@@ -84,51 +84,43 @@ export class GroundDisplayer extends FightSceneDisplayer {
         }
         this.tileHighlights = [];
         this.teamColorHighlights = [];
-        for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
-            for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
-                const caseTile = this.gameStore.game.plateau[x][y];
-                // Ground part
-                const tile = this.gridStore.groundLayer?.getTile?.({ x, y });
-                if (tile) {
-                    tile.setVisible(true);
-                    if (caseTile.isHole) {
-                        tile.setVisible(false);
-                    } else if (!caseTile.isWall) {
-                        if (caseTile.entityId) {
-                            const entity = this.gameStore.getEntity(
-                                caseTile.entityId,
-                            );
-                            if (entity) {
-                                if (
-                                    caseTile.entityId ===
-                                    this.gameStore.game.playerTurns[0]
-                                ) {
-                                    this.tileHighlights.push(
-                                        this.getTileHighlights({ x, y }, tile, {
-                                            color:
-                                                entity.teamId ===
-                                                this.playerStore.playerEntity
-                                                    .teamId
-                                                    ? 0x00ff00
-                                                    : 0xff0000,
-                                            depth: Math.max(x * 10, y * 10),
-                                        }),
-                                    );
-                                }
-                                this.teamColorHighlights.push(
-                                    this.getTileTeamColor({ x, y }, tile, {
-                                        color: this.gameStore.getTeam(
-                                            entity.teamId,
-                                        ).color,
-                                        depth: Math.max(x * 10, y * 10),
+        this.gridStore.forEach((tile) => {
+            const caseTile = this.gameStore.getCell(tile.index);
+            if (caseTile && tile) {
+                tile.setVisible(true);
+                if (caseTile.isHole) {
+                    tile.setVisible(false);
+                } else if (!caseTile.isWall) {
+                    if (caseTile.entityId) {
+                        const entity = this.gameStore.getEntity(
+                            caseTile.entityId,
+                        );
+                        if (entity) {
+                            if (
+                                caseTile.entityId ===
+                                this.gameStore.game.playerTurns[0]
+                            ) {
+                                this.tileHighlights.push(
+                                    this.getTileHighlights(tile.index, tile, {
+                                        color:
+                                            entity.teamId ===
+                                            this.playerStore.playerEntity.teamId
+                                                ? 0x00ff00
+                                                : 0xff0000,
                                     }),
                                 );
                             }
+                            this.teamColorHighlights.push(
+                                this.getTileTeamColor(tile.index, tile, {
+                                    color: this.gameStore.getTeam(entity.teamId)
+                                        .color,
+                                }),
+                            );
                         }
                     }
                 }
             }
-        }
+        });
     }
 
     private generatePlayGrid() {
@@ -137,10 +129,9 @@ export class GroundDisplayer extends FightSceneDisplayer {
         }
         for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
             for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
-                const tile = this.gridStore.groundLayer.getTile({ x, y });
-                if (tile) {
-                    const caseTile = this.gameStore.game.plateau[x][y];
-
+                const tile = this.gridStore.get({ x, y });
+                const caseTile = this.gameStore.getCell({ x, y });
+                if (caseTile && tile) {
                     tile.setVisible(true);
                     if (caseTile.isHole) {
                         tile.setVisible(false);
@@ -157,7 +148,6 @@ export class GroundDisplayer extends FightSceneDisplayer {
                             {
                                 color: 0xffffff,
                                 DIAMOND,
-                                depth: 2,
                             },
                         );
                         hoverGraphics.setVisible(false);
@@ -204,7 +194,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
     getTileHighlights(
         position: Position,
         tile: Tile,
-        props?: { color: number; DIAMOND?: Diamond; depth?: number },
+        props?: { color: number; DIAMOND?: Diamond },
     ): Phaser.GameObjects.Graphics {
         let DIAMOND: Diamond | undefined = props?.DIAMOND;
         if (!DIAMOND) {
@@ -230,7 +220,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
     getTileTeamColor(
         position: Position,
         tile: Tile,
-        props: { color: TeamColor; depth?: number },
+        props: { color: TeamColor },
     ): Phaser.GameObjects.Graphics {
         const { x, y } = tile.getPosition();
 
