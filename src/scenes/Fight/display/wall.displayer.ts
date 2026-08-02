@@ -57,10 +57,8 @@ export class WallDisplayer extends FightSceneDisplayer {
                 new DisplayImage(
                     this.scene,
                     new GridArea(
-                        cell.position.x - 32 * this.scene.scaleFactor,
-                        cell.position.y -
-                            32 * this.scene.scaleFactor -
-                            16 * this.scene.scaleFactor,
+                        cell.position.x - cell.height / 2,
+                        cell.position.y - cell.height,
                         64 * this.scene.scaleFactor,
                         64 * this.scene.scaleFactor,
                     ),

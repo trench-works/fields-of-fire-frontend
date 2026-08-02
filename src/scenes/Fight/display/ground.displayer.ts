@@ -46,11 +46,12 @@ export class GroundDisplayer extends FightSceneDisplayer {
     }
 
     renderGroundLayer() {
+        const game = this.gameStore.game;
         const centerMap = scaleAndCenter({
             parent: this.scene.scale,
             child: {
-                width: 10 * TILE_SIZE.width,
-                height: 10 * TILE_SIZE.height,
+                width: game.plateau.length * TILE_SIZE.width,
+                height: game.plateau.length * TILE_SIZE.height,
             },
             isometricVariation: true,
         });
@@ -61,8 +62,8 @@ export class GroundDisplayer extends FightSceneDisplayer {
             new TileLayer(
                 this.scene,
                 {
-                    width: 10,
-                    height: 10,
+                    width: game.plateau.length,
+                    height: game.plateau.length,
                     asset: MiscAsset.getAssetKey(MiscAssetId.GROUND),
                     scale: this.scene.scaleFactor,
                 },
