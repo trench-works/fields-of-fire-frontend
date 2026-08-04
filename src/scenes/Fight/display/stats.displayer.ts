@@ -12,6 +12,8 @@ import {
     GridArea,
     ScaleMode,
     i18n,
+    Depth,
+    UI_LEVELS_OFFSET,
 } from "../../../core";
 import { DisplayImage } from "../../../core/UI/DisplayImage";
 import { CharacterClass } from "../../../Model/CharacterClass";
@@ -103,7 +105,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
             borderWidth: 7,
             opacity: 0.5,
             outterRadius: { tl: 10, tr: 10, bl: 0, br: 0 },
-        });
+        }).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER));
 
         const statsGrid = this.statsArea.getGrid();
 
@@ -115,7 +117,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 backgroundImage: "unknown",
                 outterRadius: { tl: 10, tr: 0, bl: 0, br: 0 },
             },
-        );
+        ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 1);
 
         this.statsClassName = new DisplayContainer(
             this.scene,
@@ -130,7 +132,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 bgColor: Color.containerBorder,
                 outterRadius: { tl: 0, tr: 10, bl: 0, br: 0 },
             },
-        );
+        ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 1);
 
         this.statsClassNameText = new DisplayText(
             this.scene,
@@ -140,7 +142,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 width: 6,
                 height: 1,
             }),
-        );
+        ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER + 1));
 
         this.playerName = new DisplayContainer(
             this.scene,
@@ -155,7 +157,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 bgColor: Color.containerBorder,
                 outterRadius: { tl: 0, tr: 0, bl: 0, br: 10 },
             },
-        );
+        ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER + 1));
 
         this.playerNameText = new DisplayText(
             this.scene,
@@ -165,7 +167,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 width: 3,
                 height: 1,
             }),
-        );
+        ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER + 2));
 
         this.statsValuesGrid = statsGrid.getSubGrid(
             {
@@ -254,9 +256,13 @@ export class StatsDisplayer extends FightSceneDisplayer {
                         y: 1,
                     })
                     .scaleFromCenter(1, ScaleMode.FIT),
-            ).setImage(StatsIconAsset.getAssetKey(icon), {
-                scale: StatsIconAsset.getAssetScale(icon),
-            });
+            )
+                .setImage(StatsIconAsset.getAssetKey(icon), {
+                    scale: StatsIconAsset.getAssetScale(icon),
+                })
+                .setDepth(
+                    Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER + 1),
+                );
             if (image) {
                 image.setInteractive(true);
                 this.scene.tooltip.attachTo(
@@ -274,7 +280,11 @@ export class StatsDisplayer extends FightSceneDisplayer {
                         x: 2,
                         y: 1,
                     }),
-                ).setText("N/A"),
+                )
+                    .setText("N/A")
+                    .setDepth(
+                        Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER + 1),
+                    ),
                 image,
             });
         });
@@ -353,7 +363,10 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 area.scaleFromCenter(1, ScaleMode.FIT),
             )
                 .setImage(EffectAsset.getAssetKey(id), { scale: 1.2 })
-                .setInteractive(true);
+                .setInteractive(true)
+                .setDepth(
+                    Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER + 2),
+                );
             if (this.entity.dead) {
                 //image.blur();
             }

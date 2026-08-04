@@ -66,7 +66,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
             opacity: 0.5,
             outterRadius: { tl: 0, bl: 0, tr: 10, br: 10 },
             onClick: () => this.scene.root.controllers.actions.clearAction(),
-        });
+        }).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER));
         this.root.add(this.actionPanel);
 
         const actionGrid = this.actionArea.getGrid({
@@ -89,7 +89,9 @@ export class ActionDisplayer extends FightSceneDisplayer {
             },
         );
 
-        this.actionsList = new List(this.scene, actionListGrid);
+        this.actionsList = new List(this.scene, actionListGrid).setDepth(
+            Depth.getUIElementDepth(UI_LEVELS_OFFSET.BUTTON),
+        );
         this.root.add(this.actionsList);
 
         this.endTurnButton = new Button(
@@ -106,7 +108,9 @@ export class ActionDisplayer extends FightSceneDisplayer {
                 borderWidth: 2,
                 onClick: () => {},
             },
-        ).setIsActivated(false);
+        )
+            .setIsActivated(false)
+            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.BUTTON));
         this.root.add(this.endTurnButton);
 
         return this;
@@ -128,7 +132,9 @@ export class ActionDisplayer extends FightSceneDisplayer {
                             this.scene.root.controllers.actions.handleActionSelection(
                                 action,
                             ),
-                    });
+                    }).setDepth(
+                        Depth.getUIElementDepth(UI_LEVELS_OFFSET.BUTTON),
+                    );
                     if (action.cost > 0) {
                         const buttonGrid = buttonArea.getGrid({
                             division: { vertical: 3, horizontal: 3 },
@@ -141,7 +147,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
                             .setDepth(
                                 Depth.getUIElementDepth(
                                     UI_LEVELS_OFFSET.BUTTON,
-                                ),
+                                ) + 1,
                             );
                         this.root.add(text);
                     }

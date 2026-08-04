@@ -91,12 +91,12 @@ export class GroundDisplayer extends FightSceneDisplayer {
         if (!this.gridStore.groundLayer) {
             this.renderGroundLayer();
         }
-        for (const highlightEntity of this.tileHighlights) {
-            highlightEntity.destroy();
-        }
-        for (const highlightEntity of this.teamColorHighlights) {
-            highlightEntity.destroy();
-        }
+        this.tileHighlights.forEach((highlightEntity) =>
+            highlightEntity.destroy(),
+        );
+        this.teamColorHighlights.forEach((highlightEntity) =>
+            highlightEntity.destroy(),
+        );
         this.tileHighlights = [];
         this.teamColorHighlights = [];
         this.gridStore.forEach((tile) => {

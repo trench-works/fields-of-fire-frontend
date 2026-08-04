@@ -107,6 +107,13 @@ export class Button
         scene.add.existing(this);
     }
 
+    setDepth(value: number): this {
+        this.imageDisplay?.setDepth(value);
+        this.textDisplay?.setDepth(value);
+        this.background?.setDepth(value);
+        return this;
+    }
+
     blur() {
         if (!this.blurred) {
             this.blurred = this.postFX?.addBlur();

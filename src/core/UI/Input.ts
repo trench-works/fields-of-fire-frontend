@@ -1,4 +1,4 @@
-import { Position, Size, PlacementOrigin } from "../Types";
+import { Position, Size } from "../Types";
 import { GridArea } from "../Utils";
 import { Displayable } from "./DisplayRoot";
 
@@ -74,12 +74,12 @@ export class DisplayInput implements Displayable {
         throw new Error("Method not implemented.");
     }
 
-    place(position: Position, size: Size, origin: PlacementOrigin): void {
+    place(area: Position & Size): void {
         Object.assign(this.inputElement.style, {
-            left: `${position.x}px`,
-            top: `${position.y}px`,
-            width: `${size.width}px`,
-            height: `${size.height}px`,
+            left: `${area.x}px`,
+            top: `${area.y}px`,
+            width: `${area.width}px`,
+            height: `${area.height}px`,
         });
     }
 
