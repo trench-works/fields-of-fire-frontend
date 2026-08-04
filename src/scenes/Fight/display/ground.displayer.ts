@@ -73,6 +73,17 @@ export class GroundDisplayer extends FightSceneDisplayer {
     }
 
     scale(): this {
+        this.displayEntitiesHighlights();
+        this.gridStore.forEach((tile) => {
+            const { x, y } = tile.position;
+            const diamond = new Diamond(tile, tile.scale);
+            tile.zone?.setPosition(x, y);
+            tile.zone?.setInteractive(diamond, Phaser.Geom.Polygon.Contains);
+            tile.hoverGraphics?.clear();
+            tile.hoverGraphics?.lineStyle(1.5 * tile.scale, 0xffffff, 1);
+            tile.hoverGraphics?.strokePoints(diamond.points, true);
+            tile.hoverGraphics?.setPosition(x, y);
+        });
         return this;
     }
 
@@ -138,7 +149,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
                 if (caseTile.isHole) {
                     tile.setVisible(false);
                 } else if (!caseTile.isWall) {
-                    const DIAMOND = new Diamond(tile, this.scene.scaleFactor);
+                    const DIAMOND = new Diamond(tile, tile.scale);
 
                     const hoverGraphics = this.getTileHighlights(
                         tile.index,
@@ -181,13 +192,13 @@ export class GroundDisplayer extends FightSceneDisplayer {
     ): Phaser.GameObjects.Graphics {
         let DIAMOND: Diamond | undefined = props?.DIAMOND;
         if (!DIAMOND) {
-            DIAMOND = new Diamond(tile, this.scene.scaleFactor);
+            DIAMOND = new Diamond(tile, tile.scale);
         }
         const { x, y } = tile.getPosition();
 
         // Create Graphic
         const graphics = this.scene.add.graphics();
-        graphics.lineStyle(2, props?.color ?? 0xffffff, 1);
+        graphics.lineStyle(1.5 * tile.scale, props?.color ?? 0xffffff, 1);
         graphics.strokePoints(DIAMOND.points, true);
         graphics.setPosition(x, y);
         graphics.setDepth(
@@ -212,9 +223,9 @@ export class GroundDisplayer extends FightSceneDisplayer {
         graphics.fillStyle(TEAM_COLORS[props.color], 0.5);
         graphics.fillEllipse(
             0,
-            (-TILE_SIZE.height / 4) * this.scene.scaleFactor,
-            (TILE_SIZE.width / 2) * this.scene.scaleFactor,
-            (TILE_SIZE.height / 4) * this.scene.scaleFactor,
+            (-TILE_SIZE.height / 4) * tile.scale,
+            (TILE_SIZE.width / 2) * tile.scale,
+            (TILE_SIZE.height / 4) * tile.scale,
         );
         graphics.setPosition(x, y);
         graphics.setDepth(
@@ -234,7 +245,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
     ): Phaser.GameObjects.Zone {
         let DIAMOND: Diamond | undefined = props?.DIAMOND;
         if (!DIAMOND) {
-            DIAMOND = new Diamond(tile, this.scene.scaleFactor);
+            DIAMOND = new Diamond(tile, tile.scale);
         }
         const { x, y } = tile.getPosition();
 
