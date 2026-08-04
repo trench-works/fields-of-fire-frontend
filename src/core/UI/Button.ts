@@ -140,7 +140,7 @@ export class Button
         return this;
     }
 
-    place(position: Position, size: Size, origin: PlacementOrigin): void {
+    place(area: Position & Size, origin: PlacementOrigin): void {
         throw new Error("Method not implemented.");
     }
 

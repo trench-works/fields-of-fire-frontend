@@ -85,11 +85,23 @@ export class EntityDisplayer extends FightSceneDisplayer {
             } else {
                 this.sprite.setOrigin(0.5, 0.95);
             }
-            this.sprite.setScale(this.scene.scaleFactor / 1.5);
+            this.sprite.setScale(cell.scale / 1.5);
 
             this.createAnimations(entity.classId);
         }
         return this;
+    }
+
+    scale() {
+        const entity = this.gameStore.getEntity(this.entityId);
+        const cell = this.gridStore.get(entity.position);
+        if (cell) {
+            this.sprite?.setPosition(
+                cell.position.x,
+                cell.position.y - cell.height / 4,
+            );
+            this.sprite?.setScale(cell.scale / 1.5);
+        }
     }
 
     private createAnimations(classId: CharacterAssetId) {

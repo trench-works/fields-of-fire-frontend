@@ -1,19 +1,55 @@
-import {
-    Depth,
-    DisplayRoot,
-    GRID_LEVELS_OFFSET,
-    GridArea,
-    Position,
-} from "../../../core";
+import { Depth, GRID_LEVELS_OFFSET, GridArea, Position } from "../../../core";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/game.store";
 import { FightSceneDisplayer } from "./base/fight-scene.displayer";
 import { DisplayImage } from "../../../core/UI/DisplayImage";
 import { MiscAsset, MiscAssetId } from "../../../assets";
 import { GridStore } from "../stores/grid.store";
+import { TILE_SIZE } from "../../../core/UI/TileLayer";
+
+export class Wall {
+    private image: DisplayImage;
+
+    constructor(
+        scene: FightScene,
+        private readonly gridStore: GridStore,
+        private readonly position: Position,
+    ) {
+        const cell = this.gridStore.get(position)!;
+        this.image = new DisplayImage(
+            scene,
+            new GridArea(
+                cell.position.x - cell.height / 2,
+                cell.position.y - cell.height,
+                TILE_SIZE.width * cell.scale,
+                TILE_SIZE.height * cell.scale,
+            ),
+        )
+            .setImage(MiscAsset.getAssetKey(MiscAssetId.WALL))
+            .setDepth(
+                Depth.getFromGridPosition(position, GRID_LEVELS_OFFSET.OBJECT),
+            );
+    }
+
+    destroy() {
+        this.image.destroy();
+    }
+
+    scale() {
+        const cell = this.gridStore.get(this.position)!;
+        this.image.place(
+            new GridArea(
+                cell.position.x - cell.height / 2,
+                cell.position.y - cell.height,
+                TILE_SIZE.width * cell.scale,
+                TILE_SIZE.height * cell.scale,
+            ),
+        );
+    }
+}
 
 export class WallDisplayer extends FightSceneDisplayer {
-    protected root: DisplayRoot;
+    protected walls: Wall[][];
 
     constructor(
         scene: FightScene,
@@ -21,7 +57,12 @@ export class WallDisplayer extends FightSceneDisplayer {
         private readonly gridStore: GridStore,
     ) {
         super(scene, gameStore);
-        this.root = new DisplayRoot();
+        this.walls = [];
+    }
+
+    scale(): this {
+        this.walls.flat().forEach((wall) => wall.scale());
+        return this;
     }
 
     preRender(): this {
@@ -34,43 +75,26 @@ export class WallDisplayer extends FightSceneDisplayer {
     }
 
     clean(): this {
-        this.root.destroy();
+        this.walls.flat().forEach((wall) => wall.destroy());
         return this;
     }
 
     private displayWalls() {
         this.clean();
-        for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
-            for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
-                const tile = this.gameStore.game.plateau[x][y];
-                if (tile.isWall) {
-                    this.addWall({ x, y });
-                }
-            }
+        for (let i = 0; i < this.gameStore.game.plateau.length; i++) {
+            this.walls.push([]);
         }
+        this.gameStore.game.plateau.flat().forEach((tile) => {
+            if (tile.isWall) {
+                this.addWall(tile.position);
+            }
+        });
     }
 
     private addWall({ x, y }: Position) {
         const cell = this.gridStore.get({ x, y });
         if (cell) {
-            this.root.add(
-                new DisplayImage(
-                    this.scene,
-                    new GridArea(
-                        cell.position.x - cell.height / 2,
-                        cell.position.y - cell.height,
-                        64 * this.scene.scaleFactor,
-                        64 * this.scene.scaleFactor,
-                    ),
-                )
-                    .setImage(MiscAsset.getAssetKey(MiscAssetId.WALL))
-                    .setDepth(
-                        Depth.getFromGridPosition(
-                            { x, y },
-                            GRID_LEVELS_OFFSET.OBJECT,
-                        ),
-                    ),
-            );
+            this.walls[x][y] = new Wall(this.scene, this.gridStore, { x, y });
         }
     }
 

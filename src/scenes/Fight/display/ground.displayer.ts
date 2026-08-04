@@ -72,6 +72,10 @@ export class GroundDisplayer extends FightSceneDisplayer {
         );
     }
 
+    scale(): this {
+        return this;
+    }
+
     private displayEntitiesHighlights() {
         if (!this.gridStore.groundLayer) {
             this.renderGroundLayer();

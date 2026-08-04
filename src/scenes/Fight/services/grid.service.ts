@@ -1,5 +1,6 @@
 import { Position } from "../../../core";
 import { StatsUtils } from "../../../Model/Stats";
+import { BoardDisplayer } from "../display/board.displayer";
 import { CharactersDisplayer } from "../display/characters.displayer";
 import { FightScene } from "../fight.scene";
 import { ActionsService } from "../services/actions.service";
@@ -27,7 +28,20 @@ export class GridService {
         private readonly inspectService: InspectCharacterService,
         // Displayers
         private readonly characterDisplayer: CharactersDisplayer,
-    ) {}
+        private readonly boardDisplayer: BoardDisplayer,
+    ) {
+        window.addEventListener("wheel", (event) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const direction = Math.sign((event as any)["wheelDelta"]);
+            if (direction === 1) {
+                this.groundStore.groundLayer?.zoomIn(this.scene.scaleFactor);
+            } else {
+                this.groundStore.groundLayer?.zoomOut(this.scene.scaleFactor);
+            }
+            this.characterDisplayer.scale();
+            this.boardDisplayer.scale();
+        });
+    }
 
     cellClick({ x, y }: Position) {
         this.characterDisplayer.changeDirection({ x, y });

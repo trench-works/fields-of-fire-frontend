@@ -65,6 +65,11 @@ export class CharactersDisplayer extends FightSceneDisplayer {
         return this;
     }
 
+    scale(): this {
+        this.characters.forEach((character) => character.scale());
+        return this;
+    }
+
     async kill(entityId: string): Promise<this> {
         const entity = this.gameStore.getEntity(entityId);
         return new Promise((resolve) => {

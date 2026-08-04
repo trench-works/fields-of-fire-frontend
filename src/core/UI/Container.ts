@@ -66,7 +66,7 @@ export class DisplayContainer
         throw new Error("Method not implemented.");
     }
 
-    place({ x, y }: Position, { width, height }: Size): void {
+    place({ x, y, width, height }: Size & Position): void {
         this.setSize(width, height);
         this.setX(x + width / 2);
         this.setY(y + height / 2);
@@ -96,7 +96,7 @@ export class DisplayContainer
 
         super(scene, x, y);
 
-        this.place({ x, y }, { width, height });
+        this.place({ x, y, width, height });
 
         this.bgColor = bgColor; // <--- IMPORTANT
         this.bgOpacity = opacity;

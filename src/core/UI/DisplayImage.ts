@@ -1,5 +1,5 @@
 import { BaseScene } from "../Objects";
-import { PlacementOrigin, Position, Size } from "../Types";
+import { Size } from "../Types";
 import { GridArea, ScaleUtils } from "../Utils";
 import { Displayable } from "./DisplayRoot";
 
@@ -10,7 +10,7 @@ export class DisplayImage implements Displayable {
 
     constructor(
         protected readonly scene: BaseScene,
-        protected readonly area: GridArea,
+        protected area: GridArea,
     ) {
         this.image = this.scene.add.image(area.center.x, area.center.y, "");
     }
@@ -33,8 +33,12 @@ export class DisplayImage implements Displayable {
         return this;
     }
 
-    place(position: Position, size: Size, origin: PlacementOrigin): void {
-        throw new Error("Method not implemented.");
+    place(area: GridArea): void {
+        this.area = area;
+        this.image.setDisplaySize(area.width, area.height);
+        // position
+        this.image.setX(this.area.center.x);
+        this.image.setY(this.area.center.y);
     }
 
     setImage(

@@ -18,19 +18,29 @@ export type TileProps = {
 
 export class Tile {
     private asset: string;
-    private scale: number;
+    public scale: number;
+    public position: Position;
 
     private image: DisplayImage | null;
 
     constructor(
         private readonly scene: BaseScene,
         public readonly index: Position,
-        public readonly position: Position,
+        offset: Position,
         { asset, scale }: TileProps,
     ) {
         this.asset = asset;
         this.scale = scale;
         this.image = null;
+        const position = getTilePosition(this.index);
+        this.position = PositionUtils.add(
+            PositionUtils.multiply(position, this.scale),
+            offset,
+            {
+                x: (-TILE_SIZE.width / 2) * this.scale,
+                y: (-TILE_SIZE.height / 2) * this.scale,
+            },
+        );
     }
 
     get height() {
@@ -45,8 +55,25 @@ export class Tile {
         return this.position;
     }
 
-    setScale(scale: number): this {
-        this.scale = scale;
+    setScale(scale: number, zoom: number, offset: Position): this {
+        this.scale = scale * zoom;
+        const position = getTilePosition(this.index);
+        this.position = PositionUtils.add(
+            PositionUtils.multiply(position, this.scale),
+            offset,
+            {
+                x: (-TILE_SIZE.width / 2) * this.scale,
+                y: (-TILE_SIZE.height / 2) * this.scale,
+            },
+        );
+        this.image?.place(
+            new GridArea(
+                this.position.x - this.width / 2,
+                this.position.y - this.height / 2,
+                this.width,
+                this.height,
+            ),
+        );
         return this;
     }
 
@@ -85,39 +112,33 @@ export type TileLayerConfig = {
 export class TileLayer<T extends Tile> {
     tiles: T[][];
 
-    position: Position;
+    zoom: number = 1;
+
+    width: number;
+    height: number;
 
     constructor(
         scene: BaseScene,
         { width, height, asset, scale }: TileLayerConfig,
         constructor: Instantiable<T>,
     ) {
-        this.position = {
+        this.width = width;
+        this.height = height;
+        const offset = {
             x: window.innerWidth / 2,
-            y: window.innerHeight / 2 - (height * TILE_SIZE.height) / 2,
+            y:
+                window.innerHeight / 2 -
+                (this.height * TILE_SIZE.height * scale * this.zoom) / 4,
         };
         this.tiles = [];
         for (let x = 0; x < width; x++) {
             const line: T[] = [];
             for (let y = 0; y < height; y++) {
-                const position = this.getTilePosition({ x, y });
                 line.push(
-                    new constructor(
-                        scene,
-                        { x, y },
-                        PositionUtils.add(
-                            PositionUtils.multiply(position, scale),
-                            this.position,
-                            {
-                                x: (-TILE_SIZE.width / 2) * scale,
-                                y: (-TILE_SIZE.height / 2) * scale,
-                            },
-                        ),
-                        {
-                            asset,
-                            scale,
-                        },
-                    ).display(),
+                    new constructor(scene, { x, y }, offset, {
+                        asset,
+                        scale,
+                    }).display(),
                 );
             }
             this.tiles.push(line);
@@ -128,31 +149,51 @@ export class TileLayer<T extends Tile> {
         return this.tiles[x]?.[y];
     }
 
-    getTilePosition(index: Position): Position {
-        let position: Position = {
-            x: TILE_SIZE.width / 2,
-            y: TILE_SIZE.height / 2,
-        };
-
-        // add x position
-        position = PositionUtils.add(
-            position,
-            PositionUtils.multiply(
-                { x: TILE_SIZE.width / 2, y: TILE_SIZE.height / 4 },
-                index.x,
-            ),
-        );
-
-        // add y position
-        position = PositionUtils.add(
-            position,
-            PositionUtils.multiply(
-                { x: -(TILE_SIZE.width / 2), y: TILE_SIZE.height / 4 },
-                index.y,
-            ),
-        );
-
-        return position;
+    zoomIn(scale: number) {
+        this.zoom = Math.min(2, this.zoom + 0.1);
+        this.scale(scale, this.zoom);
     }
+
+    zoomOut(scale: number) {
+        this.zoom = Math.max(0.1, this.zoom - 0.1);
+        this.scale(scale, this.zoom);
+    }
+
+    scale(scale: number, zoom: number) {
+        const offset = {
+            x: window.innerWidth / 2,
+            y:
+                window.innerHeight / 2 -
+                (this.height * TILE_SIZE.height * scale * zoom) / 4,
+        };
+        this.tiles.flat().forEach((tile) => tile.setScale(scale, zoom, offset));
+    }
+}
+
+function getTilePosition(index: Position): Position {
+    let position: Position = {
+        x: TILE_SIZE.width / 2,
+        y: TILE_SIZE.height / 2,
+    };
+
+    // add x position
+    position = PositionUtils.add(
+        position,
+        PositionUtils.multiply(
+            { x: TILE_SIZE.width / 2, y: TILE_SIZE.height / 4 },
+            index.x,
+        ),
+    );
+
+    // add y position
+    position = PositionUtils.add(
+        position,
+        PositionUtils.multiply(
+            { x: -(TILE_SIZE.width / 2), y: TILE_SIZE.height / 4 },
+            index.y,
+        ),
+    );
+
+    return position;
 }
 
