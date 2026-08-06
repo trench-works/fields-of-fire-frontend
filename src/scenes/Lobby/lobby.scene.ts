@@ -30,6 +30,7 @@ import { ClassStore } from "../Fight/stores/class.store";
 import { LobbyStore } from "./stores/lobby.store";
 import { LobbyData } from "../LobbyList/interfaces/LobbyData";
 import { SoundParam } from "../../core/Utils/SoundLevel";
+import { SettingsDisplayer } from "./display/settings.displayer";
 
 export type LobbySceneInit = {
     lobby: LobbyData;
@@ -54,6 +55,8 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
     protected isPlayerTabActive: boolean = false;
     protected readyListContainers: DisplayContainer[] = [];
     protected startButton!: Button;
+
+    protected settings!: SettingsDisplayer;
 
     constructor() {
         super(SceneAssetId.LOBBY, BackgroundAssetId.LOBBY);
@@ -118,16 +121,34 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             "musicSound - LOBBY : ",
             SoundLevel.get(SoundParam.BACKGROUND),
         );
+        this.settings = new SettingsDisplayer(this);
         //title BOX
         new DisplayText(
             this,
             this.rootGrid.getArea({
-                x: 1,
+                x: 2,
                 y: 1,
-                width: 9,
+                width: 7,
                 height: 1,
             }),
         ).setText(this.lobby.name ?? "NO_NAME");
+
+        if (this.lobby.creatorId === global.user?.id) {
+            new Button(
+                this,
+                this.rootGrid.getArea({
+                    x: 1,
+                    y: 1,
+                    width: 1,
+                    height: 1,
+                    margin: { horizontal: 5, vertical: 20 },
+                }),
+                {
+                    text: "Options ⚙",
+                    onClick: () => this.settings.show(),
+                },
+            );
+        }
 
         //tab BOX
         const tabManager = new TabManager(
