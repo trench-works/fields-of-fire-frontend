@@ -14,10 +14,10 @@ export class PositionUtils {
         return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
     }
 
-    static subtract(a: Position, b: Position): Position {
+    static subtract(a: Position, b: Partial<Position>): Position {
         return {
-            x: a.x - b.x,
-            y: a.y - b.y,
+            x: b.x ? a.x - b.x : a.x,
+            y: b.y ? a.y - b.y : a.y,
         };
     }
 

@@ -77,9 +77,14 @@ export class GroundDisplayer extends FightSceneDisplayer {
         this.scene.root.controllers.grid.clearHover();
         this.displayEntitiesHighlights();
         this.gridStore.forEach((tile) => {
+            const caseTile = this.gameStore.getCell(tile.index);
             const { x, y } = tile.position;
             const diamond = new Diamond(tile, tile.scale);
-            this.setInteractive(tile, { diamond });
+            if (caseTile) {
+                this.setZone(tile, !caseTile.isHole && !caseTile.isWall, {
+                    diamond,
+                });
+            }
             //redimensionne hover graphics
             tile.hoverGraphics?.setVisible(false);
             tile.hoverGraphics?.clear();
@@ -143,16 +148,15 @@ export class GroundDisplayer extends FightSceneDisplayer {
         this.gridStore.forEach((tile) => {
             const caseTile = this.gameStore.getCell(tile.index);
             if (caseTile && tile) {
+                const diamond = new Diamond(tile, tile.scale);
+                this.setZone(tile, !caseTile.isHole && !caseTile.isWall, {
+                    diamond,
+                });
                 tile.setVisible(true);
                 if (caseTile.isHole) {
                     tile.setVisible(false);
                 } else if (!caseTile.isWall) {
-                    const diamond = new Diamond(tile, tile.scale);
-
                     this.setHoverGraphics(tile, {
-                        diamond,
-                    });
-                    this.setInteractive(tile, {
                         diamond,
                     });
                 }
@@ -235,7 +239,11 @@ export class GroundDisplayer extends FightSceneDisplayer {
         this.teamColorHighlights.push(graphics);
     }
 
-    setInteractive(tile: Cell, props?: { diamond?: Diamond }): void {
+    setZone(
+        tile: Cell,
+        interactive: boolean,
+        props?: { diamond?: Diamond },
+    ): void {
         if (tile.zone) {
             tile.zone.destroy();
         }
@@ -255,18 +263,22 @@ export class GroundDisplayer extends FightSceneDisplayer {
             ),
         );
         tile.zone = zone;
-
-        // --- DEBUG VISUEL ---
-        //this.gridShower(DIAMOND, worldX, worldY, layer);
-        zone.on("pointerdown", () =>
-            this.scene.root.controllers.grid.cellClick(tile.index),
-        );
-        zone.on("pointerover", () =>
-            this.scene.root.controllers.grid.cellHover(tile.index),
-        );
-        zone.on("pointerout", () =>
-            this.scene.root.controllers.grid.cellHoverOut(tile.index),
-        );
+        if (interactive) {
+            zone.on("pointerdown", () =>
+                this.scene.root.controllers.grid.cellClick(tile.index),
+            );
+            zone.on("pointerover", () => {
+                this.gridStore.hover = tile.index;
+                this.scene.root.controllers.grid.cellHover(tile.index);
+            });
+            zone.on("pointerout", () => {
+                this.gridStore.hover = undefined;
+                this.scene.root.controllers.grid.cellHoverOut(tile.index);
+            });
+        } else {
+            zone.on("pointerover", () => (this.gridStore.hover = tile.index));
+            zone.on("pointerout", () => (this.gridStore.hover = undefined));
+        }
     }
 
     update(): this {

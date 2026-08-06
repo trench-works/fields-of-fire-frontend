@@ -34,9 +34,15 @@ export class GridService {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const direction = Math.sign((event as any)["wheelDelta"]);
             if (direction === 1) {
-                this.groundStore.groundLayer?.zoomIn(this.scene.scaleFactor);
+                this.groundStore.groundLayer?.zoomIn(
+                    this.scene.scaleFactor,
+                    this.groundStore.hover,
+                );
             } else {
-                this.groundStore.groundLayer?.zoomOut(this.scene.scaleFactor);
+                this.groundStore.groundLayer?.zoomOut(
+                    this.scene.scaleFactor,
+                    this.groundStore.hover,
+                );
             }
             this.characterDisplayer.scale();
             this.boardDisplayer.scale();
