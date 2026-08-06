@@ -50,6 +50,7 @@ export class DisplayContainer
         | number;
 
     setDepth(value: number): this {
+        super.setDepth(value);
         this.background?.setDepth(value);
         this.border?.setDepth(value);
         this.outterBorder?.setDepth(value);

@@ -108,6 +108,7 @@ export class Button
     }
 
     setDepth(value: number): this {
+        super.setDepth(value);
         this.imageDisplay?.setDepth(value);
         this.textDisplay?.setDepth(value);
         this.background?.setDepth(value);

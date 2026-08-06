@@ -43,8 +43,9 @@ export type RenderResult = {
 export class Cell extends Tile {
     zone?: Phaser.GameObjects.Zone;
     hoverGraphics?: Phaser.GameObjects.Graphics;
-    highlight?: Phaser.GameObjects.Graphics;
+    rangeHighlight?: Phaser.GameObjects.Graphics;
     teamColor?: Phaser.GameObjects.Graphics;
+    spellHighlight?: Phaser.GameObjects.Graphics;
 }
 
 export interface Displayable {

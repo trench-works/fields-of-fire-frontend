@@ -1,5 +1,5 @@
 import { Depth, GRID_LEVELS_OFFSET, isDefined, Position } from "../../../core";
-import { TILE_SIZE } from "../../../core/UI/TileLayer";
+import { Diamond } from "../../../core/Objects/Diamond";
 import { PositionUtils } from "../../../core/Utils/Sizing";
 import { applyFovToRange, Case } from "../../../Model";
 import { Action, ActionLevel, ActionZoneType } from "../../../Model/Action";
@@ -9,7 +9,6 @@ import { GridStore } from "../stores/grid.store";
 
 export class RangeService {
     private cellsInRange: Cell[] = [];
-    private zoneHighlights: Phaser.GameObjects.Graphics[] = [];
 
     constructor(
         private readonly scene: FightScene,
@@ -23,28 +22,8 @@ export class RangeService {
     ): Phaser.GameObjects.Graphics {
         const g = this.scene.add.graphics();
         g.fillStyle(color, 0.6);
-        g.fillPoints(
-            [
-                new Phaser.Geom.Point(
-                    (-TILE_SIZE.height / 2) * this.scene.scaleFactor,
-                    0,
-                ),
-                new Phaser.Geom.Point(
-                    0,
-                    (-TILE_SIZE.height / 4) * this.scene.scaleFactor,
-                ),
-                new Phaser.Geom.Point(
-                    (TILE_SIZE.height / 2) * this.scene.scaleFactor,
-                    0,
-                ),
-                new Phaser.Geom.Point(
-                    0,
-                    (TILE_SIZE.height / 4) * this.scene.scaleFactor,
-                ),
-            ],
-            true,
-        );
-        g.setPosition(cell.position.x, cell.position.y - cell.height / 4);
+        g.fillPoints(new Diamond(cell, cell.scale).points, true);
+        g.setPosition(cell.position.x, cell.position.y);
         g.setDepth(
             Depth.getFromGridPosition(
                 cell.index,
@@ -58,7 +37,7 @@ export class RangeService {
         this.clearRange();
         this.cellsInRange.forEach((cell) => {
             if (cell) {
-                cell.highlight = this.highlightCell(cell);
+                cell.rangeHighlight = this.highlightCell(cell);
             }
         });
         return this;
@@ -67,9 +46,9 @@ export class RangeService {
     clearRange(): this {
         this.clearZonePreview();
         for (const cell of this.cellsInRange) {
-            if (cell?.highlight) {
-                cell.highlight.destroy();
-                delete cell.highlight;
+            if (cell?.rangeHighlight) {
+                cell.rangeHighlight.destroy();
+                cell.rangeHighlight = undefined;
             }
         }
         return this;
@@ -210,8 +189,14 @@ export class RangeService {
     }
 
     clearZonePreview() {
-        this.zoneHighlights.forEach((g) => g.destroy());
-        this.zoneHighlights = [];
+        this.gridStore.forEach((cell) => {
+            cell.spellHighlight?.destroy();
+            cell.spellHighlight = undefined;
+        });
+    }
+
+    setZoneHighlight(cell: Cell) {
+        cell.spellHighlight = this.highlightCell(cell, 0x42a97b);
     }
 
     getSpellZonePreview(action: Action, target: Position) {
@@ -246,9 +231,7 @@ export class RangeService {
                                 !boardCell?.isHole &&
                                 !boardCell?.isWall
                             ) {
-                                this.zoneHighlights.push(
-                                    this.highlightCell(cell, 0x42a97b),
-                                );
+                                this.setZoneHighlight(cell);
                                 zoneCells.push(cell);
                             }
                         }

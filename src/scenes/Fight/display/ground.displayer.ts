@@ -32,7 +32,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
         this.tileHighlights.forEach((highlight) => highlight.destroy());
         this.teamColorHighlights.forEach((highlight) => highlight.destroy());
         this.gridStore.groundLayer?.tiles.flat().forEach((cell) => {
-            cell.highlight?.destroy();
+            cell.rangeHighlight?.destroy();
             cell.hoverGraphics?.destroy();
             cell.zone?.destroy();
         });
@@ -74,17 +74,26 @@ export class GroundDisplayer extends FightSceneDisplayer {
     }
 
     scale(): this {
-        this.displayEntitiesHighlights();
         this.scene.root.controllers.grid.clearHover();
+        this.displayEntitiesHighlights();
         this.gridStore.forEach((tile) => {
             const { x, y } = tile.position;
             const diamond = new Diamond(tile, tile.scale);
             this.setInteractive(tile, { diamond });
+            //redimensionne hover graphics
             tile.hoverGraphics?.setVisible(false);
             tile.hoverGraphics?.clear();
             tile.hoverGraphics?.lineStyle(1.5 * tile.scale, 0xffffff, 1);
             tile.hoverGraphics?.strokePoints(diamond.points, true);
             tile.hoverGraphics?.setPosition(x, y);
+            //redimensionne range highlight
+            tile.rangeHighlight?.clear();
+            tile.rangeHighlight?.fillStyle(0x00aaff, 0.6);
+            tile.rangeHighlight?.fillPoints(diamond.points, true);
+            tile.rangeHighlight?.setPosition(x, y);
+
+            //destroy spell highlight
+            tile.spellHighlight?.destroy();
         });
         return this;
     }

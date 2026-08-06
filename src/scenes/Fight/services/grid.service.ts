@@ -93,7 +93,6 @@ export class GridService {
 
     clearHover() {
         this.scene.tooltip.hide();
-        this.rangeService.clearZonePreview();
     }
 
     manageToolTip(x: number, y: number) {
@@ -140,7 +139,7 @@ export class GridService {
                 title: this.classStore.getClass(targetEntity.classId).name,
                 position: {
                     x: cell.position.x,
-                    y: cell.position.y - 130 * this.scene.scaleFactor,
+                    y: cell.position.y - 130 * cell.scale,
                 },
             });
         });
