@@ -263,22 +263,26 @@ export class GroundDisplayer extends FightSceneDisplayer {
             ),
         );
         tile.zone = zone;
-        if (interactive) {
-            zone.on("pointerdown", () =>
-                this.scene.root.controllers.grid.cellClick(tile.index),
-            );
-            zone.on("pointerover", () => {
-                this.gridStore.hover = tile.index;
+        zone.on("pointerdown", () => {
+            this.gridStore.dragging = true;
+        });
+        zone.on("pointerup", () => {
+            if (interactive) {
+                this.scene.root.controllers.grid.cellClick(tile.index);
+            }
+        });
+        zone.on("pointerover", () => {
+            this.gridStore.setHover(tile.index);
+            if (interactive) {
                 this.scene.root.controllers.grid.cellHover(tile.index);
-            });
-            zone.on("pointerout", () => {
-                this.gridStore.hover = undefined;
+            }
+        });
+        zone.on("pointerout", () => {
+            this.gridStore.setHover(undefined);
+            if (interactive) {
                 this.scene.root.controllers.grid.cellHoverOut(tile.index);
-            });
-        } else {
-            zone.on("pointerover", () => (this.gridStore.hover = tile.index));
-            zone.on("pointerout", () => (this.gridStore.hover = undefined));
-        }
+            }
+        });
     }
 
     update(): this {

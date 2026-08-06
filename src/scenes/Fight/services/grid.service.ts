@@ -1,4 +1,5 @@
 import { Position } from "../../../core";
+import { PositionUtils } from "../../../core/Utils/Sizing";
 import { StatsUtils } from "../../../Model/Stats";
 import { BoardDisplayer } from "../display/board.displayer";
 import { CharactersDisplayer } from "../display/characters.displayer";
@@ -46,6 +47,31 @@ export class GridService {
             }
             this.characterDisplayer.scale();
             this.boardDisplayer.scale();
+        });
+        window.addEventListener("mouseup", () => {
+            this.groundStore.dragging = false;
+        });
+        window.addEventListener("mousemove", (event) => {
+            if (this.groundStore.dragging && this.groundStore.hover) {
+                console.log(
+                    event.clientX,
+                    event.clientY,
+                    this.groundStore.get(this.groundStore.hover)?.position,
+                );
+                const hoveringTile = this.groundStore.get(
+                    this.groundStore.hover,
+                );
+                if (hoveringTile) {
+                    this.groundStore.groundLayer?.move(
+                        PositionUtils.subtract(
+                            { x: event.clientX, y: event.clientY },
+                            hoveringTile.position,
+                        ),
+                    );
+                    this.characterDisplayer.scale();
+                    this.boardDisplayer.scale();
+                }
+            }
         });
     }
 

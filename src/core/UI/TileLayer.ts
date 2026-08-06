@@ -35,6 +35,18 @@ export class Tile {
         this.position = this.getFullPosition();
     }
 
+    public move(position: Position) {
+        this.position = PositionUtils.add(this.position, position);
+        this.image?.place(
+            new GridArea(
+                this.position.x - this.width / 2,
+                this.position.y - this.height / 2,
+                this.width,
+                this.height,
+            ),
+        );
+    }
+
     private getFullPosition(): Position {
         const position = getTilePosition(this.index);
         return PositionUtils.add(
@@ -148,6 +160,11 @@ export class TileLayer<T extends Tile> {
             }
             this.tiles.push(line);
         }
+    }
+
+    move(position: Position) {
+        this.position = PositionUtils.add(this.position, position);
+        this.tiles.flat().forEach((tile) => tile.move(position));
     }
 
     getTile({ x, y }: Position): T | undefined {

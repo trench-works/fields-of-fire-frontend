@@ -5,10 +5,18 @@ import { Cell } from "../fight.scene";
 export class GridStore {
     public groundLayer: TileLayer<Cell> | undefined;
     public hover: Position | undefined;
+    public dragging: boolean;
 
     constructor() {
         this.groundLayer = undefined;
         this.hover = undefined;
+        this.dragging = false;
+    }
+
+    setHover(position: Position | undefined) {
+        if (!this.dragging) {
+            this.hover = position;
+        }
     }
 
     get = (pos: Position): Cell | undefined => {
