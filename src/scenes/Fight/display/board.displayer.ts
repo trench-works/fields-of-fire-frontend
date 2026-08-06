@@ -12,6 +12,12 @@ export class BoardDisplayer extends Displayer<FightScene> {
         super(scene);
     }
 
+    scale(): this {
+        this.groundDisplayer.scale();
+        this.wallDisplayer.scale();
+        return this;
+    }
+
     preRender(): this {
         this.groundDisplayer.preRender();
         this.wallDisplayer.preRender();

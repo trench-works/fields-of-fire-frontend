@@ -6,6 +6,7 @@ export type Case = {
     isWall: boolean;
     isHole: boolean;
     entityId: string;
+    position: Position;
 };
 
 export function applyFovToRange(
@@ -27,17 +28,17 @@ export function applyFovToRange(
             if (blocked) {
                 return true;
             }
-            const notInRange = !inRange.some(({ gridPosition }) =>
-                PositionUtils.equals(gridPosition, { x, y }),
+            const notInRange = !inRange.some(({ index }) =>
+                PositionUtils.equals(index, { x, y }),
             );
             return notInRange;
         },
         (pos) => {
-            const cell = inRange.find(({ gridPosition }) =>
-                PositionUtils.equals(gridPosition, pos),
+            const cell = inRange.find(({ index }) =>
+                PositionUtils.equals(index, pos),
             );
-            const inFovCell = inFovCells.find(({ gridPosition }) =>
-                PositionUtils.equals(gridPosition, pos),
+            const inFovCell = inFovCells.find(({ index }) =>
+                PositionUtils.equals(index, pos),
             );
             if (cell && !inFovCell) {
                 inFovCells.push(cell);

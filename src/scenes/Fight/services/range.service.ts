@@ -1,4 +1,5 @@
 import { Depth, GRID_LEVELS_OFFSET, isDefined, Position } from "../../../core";
+import { Diamond } from "../../../core/Objects/Diamond";
 import { PositionUtils } from "../../../core/Utils/Sizing";
 import { applyFovToRange, Case } from "../../../Model";
 import { Action, ActionLevel, ActionZoneType } from "../../../Model/Action";
@@ -8,7 +9,6 @@ import { GridStore } from "../stores/grid.store";
 
 export class RangeService {
     private cellsInRange: Cell[] = [];
-    private zoneHighlights: Phaser.GameObjects.Graphics[] = [];
 
     constructor(
         private readonly scene: FightScene,
@@ -22,19 +22,11 @@ export class RangeService {
     ): Phaser.GameObjects.Graphics {
         const g = this.scene.add.graphics();
         g.fillStyle(color, 0.6);
-        g.fillPoints(
-            [
-                new Phaser.Geom.Point(-32 * this.scene.scaleFactor, 0),
-                new Phaser.Geom.Point(0, -16 * this.scene.scaleFactor),
-                new Phaser.Geom.Point(32 * this.scene.scaleFactor, 0),
-                new Phaser.Geom.Point(0, 16 * this.scene.scaleFactor),
-            ],
-            true,
-        );
-        g.setPosition(cell.pixelPosition.x, cell.pixelPosition.y);
+        g.fillPoints(new Diamond(cell, cell.scale).points, true);
+        g.setPosition(cell.position.x, cell.position.y);
         g.setDepth(
             Depth.getFromGridPosition(
-                cell.gridPosition,
+                cell.index,
                 GRID_LEVELS_OFFSET.HIGHTLIGHT_3,
             ),
         );
@@ -45,7 +37,7 @@ export class RangeService {
         this.clearRange();
         this.cellsInRange.forEach((cell) => {
             if (cell) {
-                cell.highlight = this.highlightCell(cell);
+                cell.rangeHighlight = this.highlightCell(cell);
             }
         });
         return this;
@@ -54,9 +46,9 @@ export class RangeService {
     clearRange(): this {
         this.clearZonePreview();
         for (const cell of this.cellsInRange) {
-            if (cell?.highlight) {
-                cell.highlight.destroy();
-                delete cell.highlight;
+            if (cell?.rangeHighlight) {
+                cell.rangeHighlight.destroy();
+                cell.rangeHighlight = undefined;
             }
         }
         return this;
@@ -127,62 +119,60 @@ export class RangeService {
 
         console.log("typeof actionRange is ", action.rangeType);
 
-        for (let x = 0; x < this.gridStore.gridPositions.length; x++) {
-            for (let y = 0; y < this.gridStore.gridPositions[x].length; y++) {
-                let isInRange = false;
-                const cell = this.gameStore.getCell({ x, y });
-                const dist = Math.abs(start.x - x) + Math.abs(start.y - y);
+        this.gridStore.forEach(({ index: { x, y } }) => {
+            let isInRange = false;
+            const cell = this.gameStore.getCell({ x, y });
+            const dist = Math.abs(start.x - x) + Math.abs(start.y - y);
 
-                switch (action.rangeType) {
-                    case ActionZoneType.DIAMOND:
-                    case ActionZoneType.CIRCLE:
-                        if (
-                            dist <= action.range.max &&
-                            dist >= action.range.min &&
-                            cell &&
-                            !cell.isHole &&
-                            !cell.isWall
-                        ) {
+            switch (action.rangeType) {
+                case ActionZoneType.DIAMOND:
+                case ActionZoneType.CIRCLE:
+                    if (
+                        dist <= action.range.max &&
+                        dist >= action.range.min &&
+                        cell &&
+                        !cell.isHole &&
+                        !cell.isWall
+                    ) {
+                        isInRange = true;
+                    }
+                    break;
+                case ActionZoneType.PLUS:
+                    if (
+                        dist <= action.range.max &&
+                        dist >= action.range.min &&
+                        cell &&
+                        !cell.isHole &&
+                        !cell.isWall
+                    ) {
+                        if (x === start.x || y === start.y) {
                             isInRange = true;
                         }
-                        break;
-                    case ActionZoneType.PLUS:
-                        if (
-                            dist <= action.range.max &&
-                            dist >= action.range.min &&
-                            cell &&
-                            !cell.isHole &&
-                            !cell.isWall
-                        ) {
-                            if (x === start.x || y === start.y) {
-                                isInRange = true;
-                            }
-                        }
-                        break;
-                    case ActionZoneType.XCROSS: {
-                        const dx = Math.abs(start.x - x);
-                        const dy = Math.abs(start.y - y);
-                        if (
-                            cell &&
-                            !cell.isHole &&
-                            !cell.isWall &&
-                            dx === dy &&
-                            dx >= action.range.min &&
-                            dx <= action.range.max
-                        ) {
-                            isInRange = true;
-                        }
-                        break;
                     }
-                }
-                if (isInRange) {
-                    const cell = this.gridStore.get({ x, y });
-                    if (cell) {
-                        result.push(cell);
+                    break;
+                case ActionZoneType.XCROSS: {
+                    const dx = Math.abs(start.x - x);
+                    const dy = Math.abs(start.y - y);
+                    if (
+                        cell &&
+                        !cell.isHole &&
+                        !cell.isWall &&
+                        dx === dy &&
+                        dx >= action.range.min &&
+                        dx <= action.range.max
+                    ) {
+                        isInRange = true;
                     }
+                    break;
                 }
             }
-        }
+            if (isInRange) {
+                const cell = this.gridStore.get({ x, y });
+                if (cell) {
+                    result.push(cell);
+                }
+            }
+        });
 
         if (action.level === ActionLevel.GROUND) {
             this.cellsInRange = applyFovToRange(start, result, board);
@@ -195,14 +185,18 @@ export class RangeService {
     isInRange(pos: Position): boolean {
         return this.cellsInRange
             .filter(Boolean)
-            .some(({ gridPosition }) =>
-                PositionUtils.equals(pos, gridPosition),
-            );
+            .some(({ index }) => PositionUtils.equals(pos, index));
     }
 
     clearZonePreview() {
-        this.zoneHighlights.forEach((g) => g.destroy());
-        this.zoneHighlights = [];
+        this.gridStore.forEach((cell) => {
+            cell.spellHighlight?.destroy();
+            cell.spellHighlight = undefined;
+        });
+    }
+
+    setZoneHighlight(cell: Cell) {
+        cell.spellHighlight = this.highlightCell(cell, 0x42a97b);
     }
 
     getSpellZonePreview(action: Action, target: Position) {
@@ -237,9 +231,7 @@ export class RangeService {
                                 !boardCell?.isHole &&
                                 !boardCell?.isWall
                             ) {
-                                this.zoneHighlights.push(
-                                    this.highlightCell(cell, 0x42a97b),
-                                );
+                                this.setZoneHighlight(cell);
                                 zoneCells.push(cell);
                             }
                         }

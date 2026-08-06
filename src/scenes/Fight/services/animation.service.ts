@@ -36,8 +36,10 @@ export class AnimationService {
         const {
             data: { entityId, actionId, target, origin, hits, path },
         } = animation;
-        const { x, y } = target;
-        const cell = this.gridStore.gridPositions[x][y];
+        const cell = this.gridStore.get(target);
+        if (!cell) {
+            return this;
+        }
         switch (actionId) {
             case ActionAssetId.SHOOT:
                 {
@@ -111,10 +113,10 @@ export class AnimationService {
                     );
                     await this.particleDisplayer.animate(
                         ParticleAssetId.DEBUFF,
-                        cell.pixelPosition.x,
-                        cell.pixelPosition.y,
+                        cell.position.x,
+                        cell.position.y,
                         Depth.getFromGridPosition(
-                            cell.gridPosition,
+                            cell.index,
                             GRID_LEVELS_OFFSET.ANIMATION_4,
                         ),
                     );
@@ -129,10 +131,10 @@ export class AnimationService {
                     this.character.changeDirection(target, entityId);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.HEAL,
-                        cell.pixelPosition.x,
-                        cell.pixelPosition.y,
+                        cell.position.x,
+                        cell.position.y,
                         Depth.getFromGridPosition(
-                            cell.gridPosition,
+                            cell.index,
                             GRID_LEVELS_OFFSET.ANIMATION_4,
                         ),
                     );
@@ -166,10 +168,10 @@ export class AnimationService {
                     ); //TODO mage particle blood splatter
                     await this.particleDisplayer.animate(
                         ParticleAssetId.SMOKE,
-                        cell.pixelPosition.x,
-                        cell.pixelPosition.y,
+                        cell.position.x,
+                        cell.position.y,
                         Depth.getFromGridPosition(
-                            cell.gridPosition,
+                            cell.index,
                             GRID_LEVELS_OFFSET.ANIMATION_4,
                         ),
                     );
@@ -181,10 +183,10 @@ export class AnimationService {
                     this.character.changeDirection(target, entityId);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.BOOST,
-                        cell.pixelPosition.x,
-                        cell.pixelPosition.y,
+                        cell.position.x,
+                        cell.position.y,
                         Depth.getFromGridPosition(
-                            cell.gridPosition,
+                            cell.index,
                             GRID_LEVELS_OFFSET.ANIMATION_4,
                         ),
                     );
@@ -204,10 +206,10 @@ export class AnimationService {
                     this.character.changeDirection(target, entityId);
                     await this.particleDisplayer.animate(
                         ParticleAssetId.BOOST,
-                        cell.pixelPosition.x,
-                        cell.pixelPosition.y,
+                        cell.position.x,
+                        cell.position.y,
                         Depth.getFromGridPosition(
-                            cell.gridPosition,
+                            cell.index,
                             GRID_LEVELS_OFFSET.ANIMATION_4,
                         ),
                     );
@@ -222,10 +224,10 @@ export class AnimationService {
                     ).play();
                     await this.particleDisplayer.animate(
                         ParticleAssetId.BOOST,
-                        cell.pixelPosition.x,
-                        cell.pixelPosition.y,
+                        cell.position.x,
+                        cell.position.y,
                         Depth.getFromGridPosition(
-                            cell.gridPosition,
+                            cell.index,
                             GRID_LEVELS_OFFSET.ANIMATION_4,
                         ),
                     );

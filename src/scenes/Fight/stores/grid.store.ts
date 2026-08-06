@@ -3,23 +3,32 @@ import { TileLayer } from "../../../core/UI/TileLayer";
 import { Cell } from "../fight.scene";
 
 export class GridStore {
-    public groundLayer: TileLayer | null;
-    public gridPositions: Cell[][] = [];
+    public groundLayer: TileLayer<Cell> | undefined;
+    public hover: Position | undefined;
+    public dragging: boolean;
 
     constructor() {
-        this.groundLayer = null;
+        this.groundLayer = undefined;
+        this.hover = undefined;
+        this.dragging = false;
     }
 
-    get = ({ x, y }: Position): Cell | undefined => {
-        return this.gridPositions?.[x]?.[y];
+    setHover(position: Position | undefined) {
+        if (!this.dragging) {
+            this.hover = position;
+        }
+    }
+
+    get = (pos: Position): Cell | undefined => {
+        return this.groundLayer?.getTile(pos);
     };
 
-    setGroundLayer(groundLayer: TileLayer | null) {
-        this.groundLayer = groundLayer;
-    }
+    forEach = (forEach: (cell: Cell) => void) => {
+        this.groundLayer?.tiles.flat().forEach(forEach);
+    };
 
-    setGridPositions(gridPositions: Cell[][]) {
-        this.gridPositions = gridPositions;
+    setGroundLayer(groundLayer: TileLayer<Cell>) {
+        this.groundLayer = groundLayer;
     }
 }
 

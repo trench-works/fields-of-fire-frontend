@@ -137,6 +137,7 @@ export class FightSceneRoot {
             rangeService,
             inspectStatsService,
             characterDisplayer,
+            boardDisplayer,
         );
         const animationService = new AnimationService(
             scene,

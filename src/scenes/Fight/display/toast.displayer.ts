@@ -58,7 +58,7 @@ export class ToastDisplayer {
             hits.map((hit) => {
                 const cell = this.gridStore.get(hit);
                 if (cell) {
-                    return new Toast(this.scene, cell.pixelPosition, 1)
+                    return new Toast(this.scene, cell.position, 1)
                         .setText(
                             hit.damage === 0
                                 ? i18n.translate("fight.actions.dodged")

@@ -1,10 +1,11 @@
 import { MiscAsset, MiscAssetId } from "../../../assets";
-import { Depth, GRID_LEVELS_OFFSET, Position } from "../../../core";
+import { Depth, GRID_LEVELS_OFFSET } from "../../../core";
 import { Diamond } from "../../../core/Objects/Diamond";
 import { Tile, TILE_SIZE, TileLayer } from "../../../core/UI/TileLayer";
 import { scaleAndCenter } from "../../../core/Utils/Scale";
-import { TEAM_COLORS, TeamColor } from "../../../Model/Team";
-import { FightScene } from "../fight.scene";
+import { Entity } from "../../../Model/Entity";
+import { TEAM_COLORS } from "../../../Model/Team";
+import { Cell, FightScene } from "../fight.scene";
 import { GameStore } from "../stores/game.store";
 import { GridStore } from "../stores/grid.store";
 import { PlayerStore } from "../stores/player.store";
@@ -30,8 +31,8 @@ export class GroundDisplayer extends FightSceneDisplayer {
     clean(): this {
         this.tileHighlights.forEach((highlight) => highlight.destroy());
         this.teamColorHighlights.forEach((highlight) => highlight.destroy());
-        this.gridStore.gridPositions.flat().forEach((cell) => {
-            cell.highlight?.destroy();
+        this.gridStore.groundLayer?.tiles.flat().forEach((cell) => {
+            cell.rangeHighlight?.destroy();
             cell.hoverGraphics?.destroy();
             cell.zone?.destroy();
         });
@@ -46,11 +47,12 @@ export class GroundDisplayer extends FightSceneDisplayer {
     }
 
     renderGroundLayer() {
+        const size = this.gameStore.game.plateau.length;
         const centerMap = scaleAndCenter({
             parent: this.scene.scale,
             child: {
-                width: 10 * TILE_SIZE.width,
-                height: 10 * TILE_SIZE.height,
+                width: size * TILE_SIZE.width,
+                height: size * TILE_SIZE.height,
             },
             isometricVariation: true,
         });
@@ -58,177 +60,148 @@ export class GroundDisplayer extends FightSceneDisplayer {
         this.scene.scaleFactor = centerMap.scaleFactor * 2;
 
         this.gridStore.setGroundLayer(
-            new TileLayer(this.scene, {
-                width: 10,
-                height: 10,
-                asset: MiscAsset.getAssetKey(MiscAssetId.GROUND),
-                scale: this.scene.scaleFactor,
-            }),
+            new TileLayer(
+                this.scene,
+                {
+                    width: size,
+                    height: size,
+                    asset: MiscAsset.getAssetKey(MiscAssetId.GROUND),
+                    scale: this.scene.scaleFactor,
+                },
+                Cell,
+            ),
         );
+    }
+
+    scale(): this {
+        this.scene.root.controllers.grid.clearHover();
+        this.displayEntitiesHighlights();
+        this.gridStore.forEach((tile) => {
+            const caseTile = this.gameStore.getCell(tile.index);
+            const { x, y } = tile.position;
+            const diamond = new Diamond(tile, tile.scale);
+            if (caseTile) {
+                this.setZone(tile, !caseTile.isHole && !caseTile.isWall, {
+                    diamond,
+                });
+            }
+            //redimensionne hover graphics
+            tile.hoverGraphics?.setVisible(false);
+            tile.hoverGraphics?.clear();
+            tile.hoverGraphics?.lineStyle(1.5 * tile.scale, 0xffffff, 1);
+            tile.hoverGraphics?.strokePoints(diamond.points, true);
+            tile.hoverGraphics?.setPosition(x, y);
+            //redimensionne range highlight
+            tile.rangeHighlight?.clear();
+            tile.rangeHighlight?.fillStyle(0x00aaff, 0.6);
+            tile.rangeHighlight?.fillPoints(diamond.points, true);
+            tile.rangeHighlight?.setPosition(x, y);
+
+            //destroy spell highlight
+            tile.spellHighlight?.destroy();
+        });
+        return this;
     }
 
     private displayEntitiesHighlights() {
         if (!this.gridStore.groundLayer) {
             this.renderGroundLayer();
         }
-        for (const highlightEntity of this.tileHighlights) {
-            highlightEntity.destroy();
-        }
-        for (const highlightEntity of this.teamColorHighlights) {
-            highlightEntity.destroy();
-        }
+        this.tileHighlights.forEach((highlightEntity) =>
+            highlightEntity.destroy(),
+        );
+        this.teamColorHighlights.forEach((highlightEntity) =>
+            highlightEntity.destroy(),
+        );
         this.tileHighlights = [];
         this.teamColorHighlights = [];
-        for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
-            for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
-                const caseTile = this.gameStore.game.plateau[x][y];
-                // Ground part
-                const tile = this.gridStore.groundLayer?.getTile?.({ x, y });
-                if (tile) {
-                    tile.setVisible(true);
-                    if (caseTile.isHole) {
-                        tile.setVisible(false);
-                    } else if (!caseTile.isWall) {
-                        if (caseTile.entityId) {
-                            const entity = this.gameStore.getEntity(
-                                caseTile.entityId,
-                            );
-                            if (entity) {
-                                if (
-                                    caseTile.entityId ===
-                                    this.gameStore.game.playerTurns[0]
-                                ) {
-                                    this.tileHighlights.push(
-                                        this.getTileHighlights({ x, y }, tile, {
-                                            color:
-                                                entity.teamId ===
-                                                this.playerStore.playerEntity
-                                                    .teamId
-                                                    ? 0x00ff00
-                                                    : 0xff0000,
-                                            depth: Math.max(x * 10, y * 10),
-                                        }),
-                                    );
-                                }
-                                this.teamColorHighlights.push(
-                                    this.getTileTeamColor({ x, y }, tile, {
-                                        color: this.gameStore.getTeam(
-                                            entity.teamId,
-                                        ).color,
-                                        depth: Math.max(x * 10, y * 10),
-                                    }),
-                                );
+        this.gridStore.forEach((tile) => {
+            const caseTile = this.gameStore.getCell(tile.index);
+            if (caseTile && tile) {
+                tile.setVisible(true);
+                if (caseTile.isHole) {
+                    tile.setVisible(false);
+                } else if (!caseTile.isWall) {
+                    if (caseTile.entityId) {
+                        const entity = this.gameStore.getEntity(
+                            caseTile.entityId,
+                        );
+                        if (entity) {
+                            if (
+                                caseTile.entityId ===
+                                this.gameStore.game.playerTurns[0]
+                            ) {
+                                this.setPlayerTurnHighlight(tile, entity);
                             }
+                            this.setTileTeamColor(tile, entity);
                         }
                     }
                 }
             }
-        }
+        });
     }
 
     private generatePlayGrid() {
         if (!this.gridStore.groundLayer) {
             return;
         }
-        for (let x = 0; x < this.gameStore.game.plateau.length; x++) {
-            if (!this.gridStore.gridPositions[x]) {
-                this.gridStore.gridPositions[x] = [];
-            }
-            for (let y = 0; y < this.gameStore.game.plateau.length; y++) {
-                const tile = this.gridStore.groundLayer.getTile({ x, y });
-                if (tile) {
-                    const caseTile = this.gameStore.game.plateau[x][y];
-
-                    const { x: worldX, y: worldY } = tile.getPosition();
-
-                    this.gridStore.gridPositions[x][y] = {
-                        gridPosition: { x, y },
-                        pixelPosition: {
-                            x: worldX,
-                            y: worldY - 16 * this.scene.scaleFactor,
-                        },
-                    };
-
-                    tile.setVisible(true);
-                    if (caseTile.isHole) {
-                        tile.setVisible(false);
-                    } else if (!caseTile.isWall) {
-                        if (!tile) continue;
-                        const DIAMOND = new Diamond(
-                            tile,
-                            this.scene.scaleFactor,
-                        );
-
-                        const hoverGraphics = this.getTileHighlights(
-                            { x, y },
-                            tile,
-                            {
-                                color: 0xffffff,
-                                DIAMOND,
-                                depth: 2,
-                            },
-                        );
-                        hoverGraphics.setVisible(false);
-                        this.gridStore.gridPositions[x][y].hoverGraphics =
-                            hoverGraphics;
-
-                        const zone = this.getTileInteractiveZone(
-                            { x, y },
-                            tile,
-                            {
-                                DIAMOND,
-                            },
-                        );
-                        this.gridStore.gridPositions[x][y].zone = zone;
-
-                        // --- DEBUG VISUEL ---
-                        //this.gridShower(DIAMOND, worldX, worldY, layer);
-                        zone.on("pointerdown", () =>
-                            this.scene.root.controllers.grid.cellClick({
-                                x,
-                                y,
-                            }),
-                        );
-                        zone.on("pointerover", () =>
-                            this.scene.root.controllers.grid.cellHover({
-                                x,
-                                y,
-                            }),
-                        );
-                        zone.on("pointerout", () =>
-                            this.scene.root.controllers.grid.cellHoverOut({
-                                x,
-                                y,
-                            }),
-                        );
-
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        (tile as any).zone = zone;
-                    }
+        this.gridStore.forEach((tile) => {
+            const caseTile = this.gameStore.getCell(tile.index);
+            if (caseTile && tile) {
+                const diamond = new Diamond(tile, tile.scale);
+                this.setZone(tile, !caseTile.isHole && !caseTile.isWall, {
+                    diamond,
+                });
+                tile.setVisible(true);
+                if (caseTile.isHole) {
+                    tile.setVisible(false);
+                } else if (!caseTile.isWall) {
+                    this.setHoverGraphics(tile, {
+                        diamond,
+                    });
                 }
             }
-        }
+        });
     }
 
-    getTileHighlights(
-        position: Position,
+    setPlayerTurnHighlight(tile: Cell, entity: Entity) {
+        this.tileHighlights.push(
+            this.getTileHighlight(tile, {
+                color:
+                    entity.teamId === this.playerStore.playerEntity.teamId
+                        ? 0x00ff00
+                        : 0xff0000,
+            }),
+        );
+    }
+
+    setHoverGraphics(tile: Cell, props?: { diamond?: Diamond }) {
+        const hoverGraphics = this.getTileHighlight(tile, {
+            color: 0xffffff,
+            diamond: props?.diamond,
+        });
+        hoverGraphics.setVisible(false);
+        tile.hoverGraphics = hoverGraphics;
+    }
+
+    getTileHighlight(
         tile: Tile,
-        props?: { color: number; DIAMOND?: Diamond; depth?: number },
+        props?: { color: number; diamond?: Diamond },
     ): Phaser.GameObjects.Graphics {
-        let DIAMOND: Diamond | undefined = props?.DIAMOND;
-        if (!DIAMOND) {
-            DIAMOND = new Diamond(tile, this.scene.scaleFactor);
+        let diamond: Diamond | undefined = props?.diamond;
+        if (!diamond) {
+            diamond = new Diamond(tile, tile.scale);
         }
         const { x, y } = tile.getPosition();
 
         // Create Graphic
         const graphics = this.scene.add.graphics();
-        graphics.lineStyle(2, props?.color ?? 0xffffff, 1);
-        graphics.strokePoints(DIAMOND.points, true);
+        graphics.lineStyle(1.5 * tile.scale, props?.color ?? 0xffffff, 1);
+        graphics.strokePoints(diamond.points, true);
         graphics.setPosition(x, y);
         graphics.setDepth(
             Depth.getFromGridPosition(
-                position,
+                tile.index,
                 GRID_LEVELS_OFFSET.HIGHTLIGHT_1,
             ),
         );
@@ -236,54 +209,80 @@ export class GroundDisplayer extends FightSceneDisplayer {
         return graphics;
     }
 
-    getTileTeamColor(
-        position: Position,
-        tile: Tile,
-        props: { color: TeamColor; depth?: number },
-    ): Phaser.GameObjects.Graphics {
+    setTileTeamColor(tile: Cell, entity: Entity) {
+        if (tile.teamColor) {
+            tile.teamColor.destroy();
+        }
         const { x, y } = tile.getPosition();
+
+        const color = this.gameStore.getTeam(entity.teamId).color;
 
         // Create Graphic
         const graphics = this.scene.add.graphics();
-        graphics.fillStyle(TEAM_COLORS[props.color], 0.5);
+        graphics.fillStyle(TEAM_COLORS[color], 0.5);
         graphics.fillEllipse(
             0,
-            -16 * this.scene.scaleFactor,
-            32 * this.scene.scaleFactor,
-            16 * this.scene.scaleFactor,
+            (-TILE_SIZE.height / 4) * tile.scale,
+            (TILE_SIZE.width / 2) * tile.scale,
+            (TILE_SIZE.height / 4) * tile.scale,
         );
         graphics.setPosition(x, y);
         graphics.setDepth(
             Depth.getFromGridPosition(
-                position,
+                tile.index,
                 GRID_LEVELS_OFFSET.HIGHTLIGHT_1,
             ),
         );
 
-        return graphics;
+        tile.teamColor = graphics;
+
+        this.teamColorHighlights.push(graphics);
     }
 
-    getTileInteractiveZone(
-        position: Position,
-        tile: Tile,
-        props?: { DIAMOND?: Diamond },
-    ): Phaser.GameObjects.Zone {
-        let DIAMOND: Diamond | undefined = props?.DIAMOND;
-        if (!DIAMOND) {
-            DIAMOND = new Diamond(tile, this.scene.scaleFactor);
+    setZone(
+        tile: Cell,
+        interactive: boolean,
+        props?: { diamond?: Diamond },
+    ): void {
+        if (tile.zone) {
+            tile.zone.destroy();
+        }
+        let diamond: Diamond | undefined = props?.diamond;
+        if (!diamond) {
+            diamond = new Diamond(tile, tile.scale);
         }
         const { x, y } = tile.getPosition();
 
         // Create Zone
         const zone = this.scene.add.zone(x, y, 10, 10);
-        zone.setInteractive(DIAMOND, Phaser.Geom.Polygon.Contains);
+        zone.setInteractive(diamond, Phaser.Geom.Polygon.Contains);
         zone.setDepth(
             Depth.getFromGridPosition(
-                position,
+                tile.index,
                 GRID_LEVELS_OFFSET.HIGHTLIGHT_2,
             ),
         );
-        return zone;
+        tile.zone = zone;
+        zone.on("pointerdown", () => {
+            this.gridStore.dragging = true;
+        });
+        zone.on("pointerup", () => {
+            if (interactive) {
+                this.scene.root.controllers.grid.cellClick(tile.index);
+            }
+        });
+        zone.on("pointerover", () => {
+            this.gridStore.setHover(tile.index);
+            if (interactive) {
+                this.scene.root.controllers.grid.cellHover(tile.index);
+            }
+        });
+        zone.on("pointerout", () => {
+            this.gridStore.setHover(undefined);
+            if (interactive) {
+                this.scene.root.controllers.grid.cellHoverOut(tile.index);
+            }
+        });
     }
 
     update(): this {

@@ -15,5 +15,9 @@ export class GridController {
     cellHoverOut = (position: Position) => {
         this.gridService.cellHoverOut(position);
     };
+
+    clearHover = () => {
+        this.gridService.clearHover();
+    };
 }
 

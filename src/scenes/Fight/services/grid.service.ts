@@ -1,5 +1,7 @@
 import { Position } from "../../../core";
+import { PositionUtils } from "../../../core/Utils/Sizing";
 import { StatsUtils } from "../../../Model/Stats";
+import { BoardDisplayer } from "../display/board.displayer";
 import { CharactersDisplayer } from "../display/characters.displayer";
 import { FightScene } from "../fight.scene";
 import { ActionsService } from "../services/actions.service";
@@ -27,7 +29,51 @@ export class GridService {
         private readonly inspectService: InspectCharacterService,
         // Displayers
         private readonly characterDisplayer: CharactersDisplayer,
-    ) {}
+        private readonly boardDisplayer: BoardDisplayer,
+    ) {
+        window.addEventListener("wheel", (event) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const direction = Math.sign((event as any)["wheelDelta"]);
+            if (direction === 1) {
+                this.groundStore.groundLayer?.zoomIn(
+                    this.scene.scaleFactor,
+                    this.groundStore.hover,
+                );
+            } else {
+                this.groundStore.groundLayer?.zoomOut(
+                    this.scene.scaleFactor,
+                    this.groundStore.hover,
+                );
+            }
+            this.characterDisplayer.scale();
+            this.boardDisplayer.scale();
+        });
+        window.addEventListener("mouseup", () => {
+            this.groundStore.dragging = false;
+        });
+        window.addEventListener("mousemove", (event) => {
+            if (this.groundStore.dragging && this.groundStore.hover) {
+                console.log(
+                    event.clientX,
+                    event.clientY,
+                    this.groundStore.get(this.groundStore.hover)?.position,
+                );
+                const hoveringTile = this.groundStore.get(
+                    this.groundStore.hover,
+                );
+                if (hoveringTile) {
+                    this.groundStore.groundLayer?.move(
+                        PositionUtils.subtract(
+                            { x: event.clientX, y: event.clientY },
+                            hoveringTile.position,
+                        ),
+                    );
+                    this.characterDisplayer.scale();
+                    this.boardDisplayer.scale();
+                }
+            }
+        });
+    }
 
     cellClick({ x, y }: Position) {
         this.characterDisplayer.changeDirection({ x, y });
@@ -58,10 +104,8 @@ export class GridService {
                         this.classStore.getClass(entity.classId).name,
                         `❤️ ${StatsUtils.fromEntity(entity).life} PV`,
                         {
-                            x: cell.pixelPosition.x,
-                            y:
-                                cell.pixelPosition.y -
-                                140 * this.scene.scaleFactor,
+                            x: cell.position.x,
+                            y: cell.position.y - 140 * this.scene.scaleFactor,
                         },
                     );
                 }
@@ -72,11 +116,15 @@ export class GridService {
         }
     }
 
-    cellHoverOut({ x, y }: Position) {
-        const cell = this.groundStore.gridPositions[x][y];
-        cell.hoverGraphics?.setVisible(false);
+    cellHoverOut(pos: Position) {
+        const cell = this.groundStore.get(pos);
+        cell?.hoverGraphics?.setVisible(false);
         this.scene.tooltip.hide();
         this.rangeService.clearZonePreview();
+    }
+
+    clearHover() {
+        this.scene.tooltip.hide();
     }
 
     manageToolTip(x: number, y: number) {
@@ -97,10 +145,7 @@ export class GridService {
         }[] = [];
 
         zoneCells.forEach((cell) => {
-            const entityId =
-                this.gameStore.game.plateau[cell.gridPosition.x][
-                    cell.gridPosition.y
-                ].entityId;
+            const entityId = this.gameStore.getCell(cell.index)?.entityId;
             if (!entityId) return;
 
             const targetEntity = this.gameStore.getEntity(entityId);
@@ -125,8 +170,8 @@ export class GridService {
                 text: `${isHeal ? "🩹" : "⚔️"} ${isHeal ? -minDamage.defenserDamage : minDamage.defenserDamage}-${isHeal ? -maxDamage.defenserDamage : maxDamage.defenserDamage}`,
                 title: this.classStore.getClass(targetEntity.classId).name,
                 position: {
-                    x: cell.pixelPosition.x,
-                    y: cell.pixelPosition.y - 130 * this.scene.scaleFactor,
+                    x: cell.position.x,
+                    y: cell.position.y - 130 * cell.scale,
                 },
             });
         });

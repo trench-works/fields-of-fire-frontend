@@ -28,6 +28,7 @@ import { ParticleAsset } from "../../assets/ParticleAsset";
 import { EffectAsset } from "../../assets/EffectAsset";
 import { BoostAsset } from "../../assets/BoostAsset";
 import { FightSceneRoot } from "./fight-scene.root";
+import { Tile } from "../../core/UI/TileLayer";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -39,14 +40,13 @@ export type RenderResult = {
     sprite: string;
 };
 
-export type Cell = {
-    gridPosition: Position;
-    pixelPosition: Position;
+export class Cell extends Tile {
     zone?: Phaser.GameObjects.Zone;
     hoverGraphics?: Phaser.GameObjects.Graphics;
-    highlight?: Phaser.GameObjects.Graphics;
+    rangeHighlight?: Phaser.GameObjects.Graphics;
     teamColor?: Phaser.GameObjects.Graphics;
-};
+    spellHighlight?: Phaser.GameObjects.Graphics;
+}
 
 export interface Displayable {
     render(renderConfig: SceneRenderConfig): RenderResult | RenderResult[];

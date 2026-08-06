@@ -28,22 +28,25 @@ export class AttackDisplayer {
 
     async playActionAnimation(
         animationId: ActionAssetId,
-        { x, y }: Position,
+        pos: Position,
         origin: Position = { x: 0.5, y: 0.95 },
         depth: number = 1,
     ) {
-        const cell = this.gridStore.gridPositions[x][y];
+        const cell = this.gridStore.get(pos);
+        if (!cell) {
+            return;
+        }
         return await new DisplayAnimation(
             this.scene,
             ActionAnimationAsset.getAssetKey(animationId),
             ActionAnimationAsset.getFrameConfig(animationId),
         ).animate(
             {
-                x: cell.pixelPosition.x,
-                y: cell.pixelPosition.y,
+                x: cell.position.x,
+                y: cell.position.y,
             },
             {
-                depth: Depth.getFromGridPosition({ x, y }) + depth,
+                depth: Depth.getFromGridPosition(pos) + depth,
                 scale: this.scene.scaleFactor / 1.5,
                 origin,
             },
@@ -84,28 +87,33 @@ export class AttackDisplayer {
         );
     }
 
-    async playBloodSplatter(
-        { x, y }: Position,
-        origin: Position,
-        target: Position,
-    ) {
-        const hitCell = this.gridStore.gridPositions[x][y];
+    async playBloodSplatter(hit: Position, origin: Position, target: Position) {
+        const hitCell = this.gridStore.get(hit);
+        if (!hitCell) {
+            return;
+        }
         let direction: number;
-        if (target.x === x && target.y === y) {
-            const originCell = this.gridStore.gridPositions[origin.x][origin.y];
+        if (target.x === hit.x && target.y === hit.y) {
+            const originCell = this.gridStore.get(origin);
+            if (!originCell) {
+                return;
+            }
             direction = DirectionUtils.getDirection(
-                originCell.pixelPosition,
-                hitCell.pixelPosition,
+                originCell.position,
+                hitCell.position,
             );
         } else {
-            const targetCell = this.gridStore.gridPositions[target.x][target.y];
+            const targetCell = this.gridStore.get(target);
+            if (!targetCell) {
+                return;
+            }
             direction = DirectionUtils.getDirection(
-                targetCell.pixelPosition,
-                hitCell.pixelPosition,
+                targetCell.position,
+                hitCell.position,
             );
         }
-        const tile = this.gameStore.game.plateau[x][y];
-        if (tile.entityId) {
+        const tile = this.gameStore.getCell(hit);
+        if (tile?.entityId) {
             return new DisplayAnimation(
                 this.scene,
 
@@ -115,12 +123,12 @@ export class AttackDisplayer {
                 ),
             ).animate(
                 {
-                    x: hitCell.pixelPosition.x,
-                    y: hitCell.pixelPosition.y - 40 * this.scene.scaleFactor,
+                    x: hitCell.position.x,
+                    y: hitCell.position.y - 40 * this.scene.scaleFactor,
                 },
                 {
                     depth: Depth.getFromGridPosition(
-                        { x, y },
+                        hit,
                         GRID_LEVELS_OFFSET.ANIMATION_2,
                     ),
                     scale: 0.2 * this.scene.scaleFactor,

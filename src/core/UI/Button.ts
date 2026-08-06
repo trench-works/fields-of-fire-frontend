@@ -107,6 +107,14 @@ export class Button
         scene.add.existing(this);
     }
 
+    setDepth(value: number): this {
+        super.setDepth(value);
+        this.imageDisplay?.setDepth(value);
+        this.textDisplay?.setDepth(value);
+        this.background?.setDepth(value);
+        return this;
+    }
+
     blur() {
         if (!this.blurred) {
             this.blurred = this.postFX?.addBlur();
@@ -140,7 +148,7 @@ export class Button
         return this;
     }
 
-    place(position: Position, size: Size, origin: PlacementOrigin): void {
+    place(area: Position & Size, origin: PlacementOrigin): void {
         throw new Error("Method not implemented.");
     }
 
