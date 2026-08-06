@@ -1,9 +1,10 @@
 import { MiscAsset, MiscAssetId } from "../../../assets";
-import { Depth, GRID_LEVELS_OFFSET, Position } from "../../../core";
+import { Depth, GRID_LEVELS_OFFSET } from "../../../core";
 import { Diamond } from "../../../core/Objects/Diamond";
 import { Tile, TILE_SIZE, TileLayer } from "../../../core/UI/TileLayer";
 import { scaleAndCenter } from "../../../core/Utils/Scale";
-import { TEAM_COLORS, TeamColor } from "../../../Model/Team";
+import { Entity } from "../../../Model/Entity";
+import { TEAM_COLORS } from "../../../Model/Team";
 import { Cell, FightScene } from "../fight.scene";
 import { GameStore } from "../stores/game.store";
 import { GridStore } from "../stores/grid.store";
@@ -74,11 +75,12 @@ export class GroundDisplayer extends FightSceneDisplayer {
 
     scale(): this {
         this.displayEntitiesHighlights();
+        this.scene.root.controllers.grid.clearHover();
         this.gridStore.forEach((tile) => {
             const { x, y } = tile.position;
             const diamond = new Diamond(tile, tile.scale);
-            tile.zone?.setPosition(x, y);
-            tile.zone?.setInteractive(diamond, Phaser.Geom.Polygon.Contains);
+            this.setInteractive(tile, { diamond });
+            tile.hoverGraphics?.setVisible(false);
             tile.hoverGraphics?.clear();
             tile.hoverGraphics?.lineStyle(1.5 * tile.scale, 0xffffff, 1);
             tile.hoverGraphics?.strokePoints(diamond.points, true);
@@ -115,22 +117,9 @@ export class GroundDisplayer extends FightSceneDisplayer {
                                 caseTile.entityId ===
                                 this.gameStore.game.playerTurns[0]
                             ) {
-                                this.tileHighlights.push(
-                                    this.getTileHighlights(tile.index, tile, {
-                                        color:
-                                            entity.teamId ===
-                                            this.playerStore.playerEntity.teamId
-                                                ? 0x00ff00
-                                                : 0xff0000,
-                                    }),
-                                );
+                                this.setPlayerTurnHighlight(tile, entity);
                             }
-                            this.teamColorHighlights.push(
-                                this.getTileTeamColor(tile.index, tile, {
-                                    color: this.gameStore.getTeam(entity.teamId)
-                                        .color,
-                                }),
-                            );
+                            this.setTileTeamColor(tile, entity);
                         }
                     }
                 }
@@ -149,61 +138,57 @@ export class GroundDisplayer extends FightSceneDisplayer {
                 if (caseTile.isHole) {
                     tile.setVisible(false);
                 } else if (!caseTile.isWall) {
-                    const DIAMOND = new Diamond(tile, tile.scale);
+                    const diamond = new Diamond(tile, tile.scale);
 
-                    const hoverGraphics = this.getTileHighlights(
-                        tile.index,
-                        tile,
-                        {
-                            color: 0xffffff,
-                            DIAMOND,
-                        },
-                    );
-                    hoverGraphics.setVisible(false);
-                    tile.hoverGraphics = hoverGraphics;
-
-                    const zone = this.getTileInteractiveZone(tile.index, tile, {
-                        DIAMOND,
+                    this.setHoverGraphics(tile, {
+                        diamond,
                     });
-                    tile.zone = zone;
-
-                    // --- DEBUG VISUEL ---
-                    //this.gridShower(DIAMOND, worldX, worldY, layer);
-                    zone.on("pointerdown", () =>
-                        this.scene.root.controllers.grid.cellClick(tile.index),
-                    );
-                    zone.on("pointerover", () =>
-                        this.scene.root.controllers.grid.cellHover(tile.index),
-                    );
-                    zone.on("pointerout", () =>
-                        this.scene.root.controllers.grid.cellHoverOut(
-                            tile.index,
-                        ),
-                    );
+                    this.setInteractive(tile, {
+                        diamond,
+                    });
                 }
             }
         });
     }
 
-    getTileHighlights(
-        position: Position,
+    setPlayerTurnHighlight(tile: Cell, entity: Entity) {
+        this.tileHighlights.push(
+            this.getTileHighlight(tile, {
+                color:
+                    entity.teamId === this.playerStore.playerEntity.teamId
+                        ? 0x00ff00
+                        : 0xff0000,
+            }),
+        );
+    }
+
+    setHoverGraphics(tile: Cell, props?: { diamond?: Diamond }) {
+        const hoverGraphics = this.getTileHighlight(tile, {
+            color: 0xffffff,
+            diamond: props?.diamond,
+        });
+        hoverGraphics.setVisible(false);
+        tile.hoverGraphics = hoverGraphics;
+    }
+
+    getTileHighlight(
         tile: Tile,
-        props?: { color: number; DIAMOND?: Diamond },
+        props?: { color: number; diamond?: Diamond },
     ): Phaser.GameObjects.Graphics {
-        let DIAMOND: Diamond | undefined = props?.DIAMOND;
-        if (!DIAMOND) {
-            DIAMOND = new Diamond(tile, tile.scale);
+        let diamond: Diamond | undefined = props?.diamond;
+        if (!diamond) {
+            diamond = new Diamond(tile, tile.scale);
         }
         const { x, y } = tile.getPosition();
 
         // Create Graphic
         const graphics = this.scene.add.graphics();
         graphics.lineStyle(1.5 * tile.scale, props?.color ?? 0xffffff, 1);
-        graphics.strokePoints(DIAMOND.points, true);
+        graphics.strokePoints(diamond.points, true);
         graphics.setPosition(x, y);
         graphics.setDepth(
             Depth.getFromGridPosition(
-                position,
+                tile.index,
                 GRID_LEVELS_OFFSET.HIGHTLIGHT_1,
             ),
         );
@@ -211,16 +196,17 @@ export class GroundDisplayer extends FightSceneDisplayer {
         return graphics;
     }
 
-    getTileTeamColor(
-        position: Position,
-        tile: Tile,
-        props: { color: TeamColor },
-    ): Phaser.GameObjects.Graphics {
+    setTileTeamColor(tile: Cell, entity: Entity) {
+        if (tile.teamColor) {
+            tile.teamColor.destroy();
+        }
         const { x, y } = tile.getPosition();
+
+        const color = this.gameStore.getTeam(entity.teamId).color;
 
         // Create Graphic
         const graphics = this.scene.add.graphics();
-        graphics.fillStyle(TEAM_COLORS[props.color], 0.5);
+        graphics.fillStyle(TEAM_COLORS[color], 0.5);
         graphics.fillEllipse(
             0,
             (-TILE_SIZE.height / 4) * tile.scale,
@@ -230,35 +216,48 @@ export class GroundDisplayer extends FightSceneDisplayer {
         graphics.setPosition(x, y);
         graphics.setDepth(
             Depth.getFromGridPosition(
-                position,
+                tile.index,
                 GRID_LEVELS_OFFSET.HIGHTLIGHT_1,
             ),
         );
 
-        return graphics;
+        tile.teamColor = graphics;
+
+        this.teamColorHighlights.push(graphics);
     }
 
-    getTileInteractiveZone(
-        position: Position,
-        tile: Tile,
-        props?: { DIAMOND?: Diamond },
-    ): Phaser.GameObjects.Zone {
-        let DIAMOND: Diamond | undefined = props?.DIAMOND;
-        if (!DIAMOND) {
-            DIAMOND = new Diamond(tile, tile.scale);
+    setInteractive(tile: Cell, props?: { diamond?: Diamond }): void {
+        if (tile.zone) {
+            tile.zone.destroy();
+        }
+        let diamond: Diamond | undefined = props?.diamond;
+        if (!diamond) {
+            diamond = new Diamond(tile, tile.scale);
         }
         const { x, y } = tile.getPosition();
 
         // Create Zone
         const zone = this.scene.add.zone(x, y, 10, 10);
-        zone.setInteractive(DIAMOND, Phaser.Geom.Polygon.Contains);
+        zone.setInteractive(diamond, Phaser.Geom.Polygon.Contains);
         zone.setDepth(
             Depth.getFromGridPosition(
-                position,
+                tile.index,
                 GRID_LEVELS_OFFSET.HIGHTLIGHT_2,
             ),
         );
-        return zone;
+        tile.zone = zone;
+
+        // --- DEBUG VISUEL ---
+        //this.gridShower(DIAMOND, worldX, worldY, layer);
+        zone.on("pointerdown", () =>
+            this.scene.root.controllers.grid.cellClick(tile.index),
+        );
+        zone.on("pointerover", () =>
+            this.scene.root.controllers.grid.cellHover(tile.index),
+        );
+        zone.on("pointerout", () =>
+            this.scene.root.controllers.grid.cellHoverOut(tile.index),
+        );
     }
 
     update(): this {

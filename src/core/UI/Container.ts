@@ -49,6 +49,14 @@ export class DisplayContainer
         | Phaser.Types.GameObjects.Graphics.RoundedRectRadius
         | number;
 
+    setDepth(value: number): this {
+        this.background?.setDepth(value);
+        this.border?.setDepth(value);
+        this.outterBorder?.setDepth(value);
+        this.titleText?.setDepth(value);
+        return this;
+    }
+
     blur() {
         if (!this.blurred) {
             this.blurred = this.postFX?.addBlur();

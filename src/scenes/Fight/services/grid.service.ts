@@ -91,6 +91,11 @@ export class GridService {
         this.rangeService.clearZonePreview();
     }
 
+    clearHover() {
+        this.scene.tooltip.hide();
+        this.rangeService.clearZonePreview();
+    }
+
     manageToolTip(x: number, y: number) {
         const action = this.actionStore.selectedAction;
         if (!action) return;
