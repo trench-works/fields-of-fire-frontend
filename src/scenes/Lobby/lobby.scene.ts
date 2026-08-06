@@ -121,7 +121,11 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             "musicSound - LOBBY : ",
             SoundLevel.get(SoundParam.BACKGROUND),
         );
-        this.settings = new SettingsDisplayer(this);
+        this.settings = new SettingsDisplayer(
+            this,
+            this.lobbyStore,
+            this.lobbySocket,
+        );
         //title BOX
         new DisplayText(
             this,
@@ -145,7 +149,10 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 }),
                 {
                     text: "Options ⚙",
-                    onClick: () => this.settings.show(),
+                    onClick: () => {
+                        this.lobbyStore.resetSettings();
+                        this.settings.show();
+                    },
                 },
             );
         }

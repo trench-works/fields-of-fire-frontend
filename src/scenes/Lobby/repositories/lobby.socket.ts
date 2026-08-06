@@ -14,7 +14,7 @@ type ChangeClass = {
 
 type PlayerReady = {
     playerId: string;
-}
+};
 
 type LobbyUpdated = {
     lobby: LobbyData;
@@ -26,7 +26,8 @@ enum LobbyActions {
     START = "start",
     LEAVE = "leave",
     CHANGE_CLASS = "change-class",
-    READY = "ready"
+    UPDATE = "update",
+    READY = "ready",
 }
 
 enum LobbyEvents {
@@ -59,12 +60,19 @@ export class LobbySocket extends Socket<LobbyKey, LobbyActions, LobbyEvents> {
         return this.send(LobbyActions.CHANGE_CLASS, changeClass);
     }
 
-    setPlayerReady(playerReady : PlayerReady){
-          return this.send(LobbyActions.READY, playerReady);
+    setPlayerReady(playerReady: PlayerReady) {
+        return this.send(LobbyActions.READY, playerReady);
     }
 
     startGame() {
         return this.send(LobbyActions.START, {});
+    }
+
+    updateLobby(lobby: LobbyData) {
+        return this.send(LobbyActions.UPDATE, {
+            mode: lobby.mode,
+            boardSize: lobby.boardSize,
+        });
     }
 }
 

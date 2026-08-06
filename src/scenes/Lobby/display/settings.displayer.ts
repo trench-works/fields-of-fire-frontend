@@ -7,6 +7,9 @@ import {
     Grid,
     UI_LEVELS_OFFSET,
 } from "../../../core";
+import { GameMode } from "../../../Model/Game";
+import { LobbySocket } from "../repositories/lobby.socket";
+import { LobbyStore } from "../stores/lobby.store";
 
 export class SettingsDisplayer extends Phaser.GameObjects.Container {
     private overlay!: Phaser.GameObjects.Rectangle;
@@ -15,7 +18,7 @@ export class SettingsDisplayer extends Phaser.GameObjects.Container {
     private gameModeTitle: DisplayText;
     private boardSizeTitle: DisplayText;
 
-    constructor(scene: BaseScene) {
+    constructor(scene: BaseScene, lobbyStore: LobbyStore, socket: LobbySocket) {
         super(scene, 0, 0);
         const root = new Grid();
         scene.add.existing(this);
@@ -73,13 +76,13 @@ export class SettingsDisplayer extends Phaser.GameObjects.Container {
         this.add(
             new Button(scene, panelGrid.getArea({ x: 3, y: 3, margin: 5 }), {
                 text: "Infinity",
-                onClick: () => console.log("CHANGE GAME MODE TO INFINITY"),
+                onClick: () => (lobbyStore.gameMode = GameMode.INFINITY),
             }).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3),
         );
         this.add(
             new Button(scene, panelGrid.getArea({ x: 4, y: 3, margin: 5 }), {
                 text: "PVP",
-                onClick: () => console.log("CHANGE GAME MODE TO PVP"),
+                onClick: () => (lobbyStore.gameMode = GameMode.PVP),
             }).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3),
         );
 
@@ -93,19 +96,19 @@ export class SettingsDisplayer extends Phaser.GameObjects.Container {
         this.add(
             new Button(scene, panelGrid.getArea({ x: 3, y: 4, margin: 5 }), {
                 text: "10",
-                onClick: () => console.log("CHANGE GAME SIZE TO 10"),
+                onClick: () => (lobbyStore.boardSize = 10),
             }).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3),
         );
         this.add(
             new Button(scene, panelGrid.getArea({ x: 4, y: 4, margin: 5 }), {
                 text: "20",
-                onClick: () => console.log("CHANGE GAME SIZE TO 20"),
+                onClick: () => (lobbyStore.boardSize = 20),
             }).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3),
         );
         this.add(
             new Button(scene, panelGrid.getArea({ x: 5, y: 4, margin: 5 }), {
                 text: "30",
-                onClick: () => console.log("CHANGE GAME SIZE TO 30"),
+                onClick: () => (lobbyStore.boardSize = 30),
             }).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3),
         );
 
@@ -116,7 +119,10 @@ export class SettingsDisplayer extends Phaser.GameObjects.Container {
                 panelGrid.getArea({ x: 6, y: 9, width: 2, margin: 5 }),
                 {
                     text: "Save",
-                    onClick: () => console.log("Save settings"),
+                    onClick: () => {
+                        lobbyStore.applySettings();
+                        socket.updateLobby(lobbyStore.lobby!);
+                    },
                 },
             ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3),
         );
