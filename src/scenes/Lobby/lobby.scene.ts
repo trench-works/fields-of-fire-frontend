@@ -31,6 +31,9 @@ import { LobbyStore } from "./stores/lobby.store";
 import { LobbyData } from "../LobbyList/interfaces/LobbyData";
 import { SoundParam } from "../../core/Utils/SoundLevel";
 import { SettingsDisplayer } from "./display/settings.displayer";
+import { DisplayImage } from "../../core/UI/DisplayImage";
+import { GameMode } from "../../Model/Game";
+import { TEAM_COLORS, TEAM_STRING_COLORS } from "../../Model/Team";
 
 export type LobbySceneInit = {
     lobby: LobbyData;
@@ -444,35 +447,72 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
 
         this.settingsRoot.destroy();
 
-        const players =
-            this.lobbyStore.lobby?.teams?.flatMap((team) => team.players) ?? [];
-        const listGrid = this.settingsArea.getGrid({
-            division: { horizontal: 1, vertical: 4 },
-            padding: 5,
+        let maxTeamNb = 4;
+        if(this.lobbyStore.lobby?.mode === GameMode.INFINITY) {
+            maxTeamNb = 1;
+        }
+
+        const teamsGrid = this.settingsArea.getGrid({
+            division: { horizontal: maxTeamNb, vertical: 6 },
+            padding: 10,
         });
 
-        players.forEach((player, index) => {
-            const rowGrid = listGrid.getSubGrid(
-                { x: 1, y: index + 1, width: 1, height: 1 },
-                { division: { horizontal: 5, vertical: 1 } },
+        for(let i = 0; i < maxTeamNb; i ++) {
+            const teamArea =  teamsGrid.getArea(
+                { x: i + 1, y: 1, width: 1, height: 5 },
             );
+            const team = this.lobby.teams[i];
 
             this.settingsRoot.add(
-                new DisplayContainer(this, rowGrid.getArea({ x: 1, y: 1 }), {
-                    backgroundImage: CharacterCloseupAsset.getAssetKey(
-                        player.classId,
-                    ),
-                    borderWidth: 2,
-                }),
+                new DisplayContainer(this, teamArea, { borderWidth: 2, bgColor: team ? TEAM_STRING_COLORS[team.color] :Color.containerBg }),
+            );
+            
+            const teamGrid = teamArea.getGrid(
+                { division: { horizontal: 1, vertical: 5 } },
             );
 
+            //affichage d'une team
+            for(let j = 0; j < 4; j++) {
+                const player = team?.players?.[j];
+                const rowGrid = teamGrid.getSubGrid(
+                    { x: 1, y: j + 1, },
+                    { division: { horizontal: 1, vertical: 3 }, padding: 5 },
+                );
+
+                if(player) {
+                    this.settingsRoot.add(
+                        new DisplayImage(this, rowGrid.getArea({ x: 1, y: 1, height: 3 }).scaleFromCenter(1, ScaleMode.FIT)).setImage(
+                            CharacterIconAsset.getAssetKey(player.classId))
+                    );
+
+                    this.settingsRoot.add(
+                        new DisplayText(
+                            this,
+                            rowGrid.getArea({ x: 1, y: 1 }).scaleFromCenter(1, ScaleMode.FIT),
+                        ).setText(player.name),
+                    );
+                } else {
+                    this.settingsRoot.add(
+                        new DisplayContainer(this, rowGrid.getArea({ x: 1, y: 1, height: 3 }).scaleFromCenter(1, ScaleMode.FIT), { borderWidth: 2, }),
+                    );
+                }
+            }
+            const joinArea = teamGrid.getArea({ x: 1, y: 5, width: 1, height: 1 });
             this.settingsRoot.add(
-                new DisplayText(
+                new Button(
                     this,
-                    rowGrid.getArea({ x: 2, y: 1, width: 4, height: 1 }),
-                ).setText(player.name ?? player.userId),
+                    joinArea,
+                    {
+                        text: "Join",
+                        borderWidth: 2,
+                        onClick: () => {
+                            console.log(`trying to join team ${team?.color ?? i}`);
+                        },
+                    },
+                ),
             );
-        });
+        }
+        
 
         // 👈 applique la bonne visibilité selon l'onglet actif
         this.settingsRoot.setVisible(this.isPlayerTabActive);

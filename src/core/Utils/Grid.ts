@@ -173,10 +173,10 @@ export class Grid implements Position, Size {
     }
 
     getArea(
-        options: Position &
-            Partial<Size> & {
-                margin?: TwoAxis | FourAxis | number;
-            },
+options: Position &
+    Partial<Size> & {
+        margin?: TwoAxis | FourAxis | number;
+    },
     ): GridArea {
         const margin: FourAxis = options?.margin
             ? AxisUtils.fromTwoOrFourAxis(options.margin)
