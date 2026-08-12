@@ -197,6 +197,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         });
         new DisplayContainer(this, gameModeArea, {
             borderWidth: 2,
+            bgColor: Color.containerBorder,
         });
         this.gameModeTitle = new DisplayText(this, gameModeArea);
         // map size
@@ -208,6 +209,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         });
         new DisplayContainer(this, mapSizeArea, {
             borderWidth: 2,
+            bgColor: Color.containerBorder,
         });
         this.mapSizeTitle = new DisplayText(this, mapSizeArea);
         this.updateSettingsDisplay();
