@@ -58,6 +58,9 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
 
     protected settings!: SettingsDisplayer;
 
+    protected gameModeTitle!: DisplayText;
+    protected mapSizeTitle!: DisplayText;
+
     constructor() {
         super(SceneAssetId.LOBBY, BackgroundAssetId.LOBBY);
         this.classStore = new ClassStore();
@@ -93,6 +96,15 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         MusicAsset.load(this.load, MusicAssetId.MENU);
     }
 
+    updateSettingsDisplay() {
+        this.gameModeTitle.setText(
+            `Game mode : ${this.lobbyStore.lobby?.mode}`,
+        );
+        this.mapSizeTitle.setText(
+            `Map Size : ${this.lobbyStore.lobby?.boardSize}x${this.lobbyStore.lobby?.boardSize}`,
+        );
+    }
+
     create() {
         super.create();
         this.playBackgroundMusic(MusicAssetId.MENU);
@@ -103,7 +115,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             this.buildPlayerList();
             this.buildReadyList();
             this.updateStartButton();
-            //TODO: rerender ton tab réglages -> actuellement ca mettra pas à jour
+            this.updateSettingsDisplay();
         });
         this.lobbySocket.onStart((game) => {
             const player = game.players.find(
@@ -157,15 +169,58 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             );
         }
 
+        const settingsGrid = this.rootGrid.getSubGrid(
+            {
+                x: 1,
+                y: 2,
+                width: 6,
+                height: 1,
+            },
+            {
+                division: {
+                    horizontal: 2,
+                    vertical: 1,
+                },
+                padding: 20,
+            },
+        );
+        new DisplayContainer(this, settingsGrid, {
+            borderWidth: 5,
+            outterRadius: 0,
+        });
+        // game mode
+        const gameModeArea = settingsGrid.getArea({
+            x: 1,
+            y: 1,
+            width: 1,
+            height: 1,
+        });
+        new DisplayContainer(this, gameModeArea, {
+            borderWidth: 2,
+        });
+        this.gameModeTitle = new DisplayText(this, gameModeArea);
+        // map size
+        const mapSizeArea = settingsGrid.getArea({
+            x: 2,
+            y: 1,
+            width: 1,
+            height: 1,
+        });
+        new DisplayContainer(this, mapSizeArea, {
+            borderWidth: 2,
+        });
+        this.mapSizeTitle = new DisplayText(this, mapSizeArea);
+        this.updateSettingsDisplay();
+
         //tab BOX
         const tabManager = new TabManager(
             this,
             this.rootGrid.getSubGrid(
                 {
                     x: 1,
-                    y: 2,
+                    y: 3,
                     width: 6,
-                    height: 8,
+                    height: 7,
                 },
                 {
                     division: {
