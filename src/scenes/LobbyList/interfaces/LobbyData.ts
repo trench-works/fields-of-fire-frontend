@@ -17,7 +17,7 @@ export class LobbyTeam {
 
 export class LobbyData {
     id!: string;
-    name?: string;
+    name!: string;
     creator!: string;
     mode!: GameMode;
     boardSize!: number;

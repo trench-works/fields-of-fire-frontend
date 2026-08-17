@@ -124,8 +124,8 @@ export class ParticleDisplayer extends Displayer<FightScene> {
                 speedX: props.speedX,
 
                 scale: {
-                    start: props.scale.start * cell.scale,
-                    end: props.scale.end * cell.scale,
+                    start: props.scale.start * cell.scale * 0.6,
+                    end: props.scale.end * cell.scale * 0.6,
                 },
                 alpha: { start: 1, end: 0 },
 

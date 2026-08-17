@@ -3,10 +3,12 @@ import {
     BaseScene,
     Button,
     Depth,
+    DisplayInput,
     DisplayText,
     Grid,
     UI_LEVELS_OFFSET,
 } from "../../../core";
+import { translate } from "../../../core/i18n/i18n";
 import { GameMode } from "../../../Model/Game";
 import { LobbySocket } from "../repositories/lobby.socket";
 import { LobbyStore } from "../stores/lobby.store";
@@ -17,6 +19,7 @@ export class SettingsDisplayer extends Phaser.GameObjects.Container {
 
     private gameModeTitle: DisplayText;
     private boardSizeTitle: DisplayText;
+    private lobbyNameTitle: DisplayText;
 
     constructor(scene: BaseScene, lobbyStore: LobbyStore, socket: LobbySocket) {
         super(scene, 0, 0);
@@ -62,7 +65,10 @@ export class SettingsDisplayer extends Phaser.GameObjects.Container {
             new Button(
                 scene,
                 panelGrid.getArea({ x: 6, y: 1, width: 2, margin: 5 }),
-                { text: "Close", onClick: () => this.hide() },
+                {
+                    text: translate("lobby.settingsPopup.close"),
+                    onClick: () => this.hide(),
+                },
             ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3),
         );
 
@@ -71,7 +77,7 @@ export class SettingsDisplayer extends Phaser.GameObjects.Container {
             scene,
             panelGrid.getArea({ x: 1, y: 3, width: 2, margin: 5 }),
         )
-            .setText("Game Mode :")
+            .setText(translate("lobby.gameMode"))
             .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3);
         this.add(
             new Button(scene, panelGrid.getArea({ x: 3, y: 3, margin: 5 }), {
@@ -86,12 +92,12 @@ export class SettingsDisplayer extends Phaser.GameObjects.Container {
             }).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3),
         );
 
-        //Board Size Settings
+        //Board Size Setting
         this.boardSizeTitle = new DisplayText(
             scene,
             panelGrid.getArea({ x: 1, y: 4, width: 2, margin: 5 }),
         )
-            .setText("Board Size :")
+            .setText(translate("lobby.mapSize"))
             .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3);
         this.add(
             new Button(scene, panelGrid.getArea({ x: 3, y: 4, margin: 5 }), {
@@ -112,13 +118,27 @@ export class SettingsDisplayer extends Phaser.GameObjects.Container {
             }).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3),
         );
 
+        // Lobby Name Setting
+        this.lobbyNameTitle = new DisplayText(
+            scene,
+            panelGrid.getArea({ x: 1, y: 5, width: 2, margin: 5 }),
+        )
+            .setText(translate("lobby.lobbyName"))
+            .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3);
+        this.add(
+            new DisplayInput(scene, {
+                area: panelGrid.getArea({ x: 3, y: 5, width: 3, margin: 5 }),
+                depth: Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3,
+            }),
+        );
+
         // Save
         this.add(
             new Button(
                 scene,
                 panelGrid.getArea({ x: 6, y: 9, width: 2, margin: 5 }),
                 {
-                    text: "Save",
+                    text: translate("lobby.settingsPopup.save"),
                     onClick: () => {
                         lobbyStore.applySettings();
                         socket.updateLobby(lobbyStore.lobby!);
@@ -142,6 +162,7 @@ export class SettingsDisplayer extends Phaser.GameObjects.Container {
         super.setVisible(visible);
         this.gameModeTitle.setVisible(visible);
         this.boardSizeTitle.setVisible(visible);
+        this.lobbyNameTitle.setVisible(visible);
         this.overlay.setVisible(visible);
         this.panel.setVisible(visible);
         return this;

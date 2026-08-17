@@ -309,7 +309,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     y: 1,
                     width: 1,
                     height: 3,
-                }),
+                }).scaleFromCenter(1, ScaleMode.FIT),
             )
                 .setImage(CharacterCloseupAsset.getAssetKey(entity.classId))
                 .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2),

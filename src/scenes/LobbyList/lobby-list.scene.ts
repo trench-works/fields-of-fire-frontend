@@ -117,8 +117,8 @@ export class LobbyListScene extends BaseScene {
                     rowArea,
                     {
                         id: lobby.id,
-                        name: lobby.name ?? "NO_NAME",
-                        creator: lobby.creator ?? "NO_NAME",
+                        name: lobby.name,
+                        creator: lobby.creator,
                         playersNum:
                             lobby.teams?.flatMap((team) => team.players)
                                 ?.length ?? 0,

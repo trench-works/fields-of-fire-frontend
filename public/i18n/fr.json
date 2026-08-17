@@ -31,6 +31,22 @@
             }
         }
     },
+    "lobby": {
+        "settings": "Paramètres",
+        "settingsPopup": {
+            "close": "Fermer",
+            "save": "Sauvegarder"
+        },
+        "gameMode": "Mode de Jeu",
+        "mapSize": "Taille de la carte",
+        "lobbyName": "Nom du Lobby",
+        "classes": "Classes",
+        "masters": "Maitrises",
+        "players": "Joueurs",
+        "ready": "Prêt",
+        "start": "Combattre",
+        "joinTeam": "Rejoindre"
+    },
     "fight": {
         "actions": {
             "cost": "Coût",

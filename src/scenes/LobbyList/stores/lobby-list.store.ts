@@ -15,7 +15,7 @@ export class LobbyListStore {
     }
 
     setLobbies(lobbies: LobbyData[]): void {
-        this.lobbies = lobbies;
+        this.lobbies = lobbies.reverse();
     }
 
     setSelectedLobbyId(lobbyId: string | null): void {

@@ -1,3 +1,4 @@
+import { BaseScene } from "../Objects";
 import { Position, Size } from "../Types";
 import { GridArea } from "../Utils";
 import { Displayable } from "./DisplayRoot";
@@ -11,17 +12,27 @@ export type InputProps = {
     isPassword?: boolean;
 };
 
-export class DisplayInput implements Displayable {
+export class DisplayInput
+    extends Phaser.GameObjects.GameObject
+    implements Displayable
+{
+    recalculate(): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
     private inputElement: HTMLInputElement;
 
-    constructor({
-        onEnter,
-        onChange,
-        placeholder,
-        area,
-        depth,
-        isPassword = false,
-    }: InputProps) {
+    constructor(
+        scene: BaseScene,
+        {
+            onEnter,
+            onChange,
+            placeholder,
+            area,
+            depth,
+            isPassword = false,
+        }: InputProps,
+    ) {
+        super(scene, "input");
         this.inputElement = document.createElement("input");
         this.inputElement.type = isPassword ? "password" : "text";
         if (placeholder) {
