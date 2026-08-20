@@ -61,7 +61,7 @@ export class LobbyRow {
                     width: 2,
                     height: 1,
                 }),
-            ).setText(`Lobby : ${lobby.name}`),
+            ).setText(lobby.name),
         );
 
         this.texts.push(

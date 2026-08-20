@@ -45,7 +45,8 @@
         "players": "Joueurs",
         "ready": "Prêt",
         "start": "Combattre",
-        "joinTeam": "Rejoindre"
+        "joinTeam": "Rejoindre",
+        "addTeam": "Ajouter"
     },
     "fight": {
         "actions": {

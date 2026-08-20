@@ -193,7 +193,9 @@ export class Button
             width: this.width,
             height: this.height,
         }).setText(text, {
-            fontSize: options?.fontSize ?? this.height / 3,
+            fontSize:
+                options?.fontSize ??
+                Math.min(this.height / 3, (this.width / text.length) * 1.5),
             color: options?.color ?? "#FFFFFF",
         });
         this.add(this.textDisplay.getObject());

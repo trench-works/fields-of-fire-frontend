@@ -31,10 +31,8 @@ import { LobbyStore } from "./stores/lobby.store";
 import { LobbyData } from "../LobbyList/interfaces/LobbyData";
 import { SoundParam } from "../../core/Utils/SoundLevel";
 import { SettingsDisplayer } from "./display/settings.displayer";
-import { DisplayImage } from "../../core/UI/DisplayImage";
-import { GameMode } from "../../Model/Game";
-import { TEAM_STRING_COLORS } from "../../Model/Team";
 import { translate } from "../../core/i18n/i18n";
+import { PlayerListDisplayer } from "./display/player-list.displayer";
 
 export type LobbySceneInit = {
     lobby: LobbyData;
@@ -48,15 +46,13 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
     private playerClassName!: DisplayContainer;
     public lobbySocket!: LobbySocket;
 
-    protected lobby!: LobbyData;
     protected playerId!: string;
 
     protected classStore: ClassStore;
     protected lobbyStore: LobbyStore;
 
-    protected settingsRoot!: DisplayRoot;
-    protected settingsArea!: GridArea;
-    protected isPlayerTabActive: boolean = false;
+    protected playerTab!: PlayerListDisplayer;
+
     protected readyListContainers: DisplayContainer[] = [];
     protected startButton!: Button;
 
@@ -64,6 +60,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
 
     protected gameModeTitle!: DisplayText;
     protected mapSizeTitle!: DisplayText;
+    protected lobbyNameTitle!: DisplayText;
 
     constructor() {
         super(SceneAssetId.LOBBY, BackgroundAssetId.LOBBY);
@@ -82,13 +79,11 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         super.init(init);
         if (init?.data) {
             const { lobby } = init.data;
-            this.lobby = lobby;
             const player = lobby.teams
                 .flatMap((team) => team.players)
                 .find((player) => player.userId === globalThis.user?.id)!;
             this.playerId = player.playerId!;
             this.lobbyStore.setLobby(lobby);
-            this.buildPlayerList();
             this.selectClassId = player.classId;
         }
     }
@@ -107,16 +102,19 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         this.mapSizeTitle.setText(
             `Map Size : ${this.lobbyStore.lobby?.boardSize}x${this.lobbyStore.lobby?.boardSize}`,
         );
+        this.lobbyNameTitle.setText(
+            this.lobbyStore.lobby?.name ?? "Lobby de NO_NAME",
+        );
     }
 
     create() {
         super.create();
         this.playBackgroundMusic(MusicAssetId.MENU);
-        this.lobbySocket = new LobbySocket(this.lobby.id);
+        this.lobbySocket = new LobbySocket(this.lobbyStore.lobby?.id ?? "");
         this.lobbySocket.onClose(() => MainMenu.start(this));
         this.lobbySocket.onLobbyUpdate((event) => {
             this.lobbyStore.setLobby(event.lobby);
-            this.buildPlayerList();
+            this.playerTab.update();
             this.buildReadyList();
             this.updateStartButton();
             this.updateSettingsDisplay();
@@ -143,7 +141,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             this.lobbySocket,
         );
         //title BOX
-        new DisplayText(
+        this.lobbyNameTitle = new DisplayText(
             this,
             this.rootGrid.getArea({
                 x: 2,
@@ -151,9 +149,9 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 width: 7,
                 height: 1,
             }),
-        ).setText(this.lobby.name);
+        ).setText(this.lobbyStore.lobby?.name ?? "");
 
-        if (this.lobby.creatorId === global.user?.id) {
+        if (this.lobbyStore.lobby?.creatorId === global.user?.id) {
             new Button(
                 this,
                 this.rootGrid.getArea({
@@ -219,6 +217,12 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         this.updateSettingsDisplay();
 
         //tab BOX
+
+        this.playerTab = new PlayerListDisplayer(
+            this,
+            this.lobbyStore,
+            this.lobbySocket,
+        );
         const tabManager = new TabManager(
             this,
             this.rootGrid.getSubGrid(
@@ -256,9 +260,9 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 {
                     label: translate("lobby.players"),
                     build: (root, area) => {
-                        this.settingsRoot = root;
-                        this.settingsArea = area;
-                        this.buildPlayerList();
+                        this.playerTab.settingsRoot = root;
+                        this.playerTab.settingsArea = area;
+                        this.playerTab.update();
                     },
                 },
             ],
@@ -267,7 +271,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         const originalSwitchTo = tabManager.switchTo.bind(tabManager);
         tabManager.switchTo = (index: number) => {
             originalSwitchTo(index);
-            this.isPlayerTabActive = index === 2;
+            this.playerTab.isActive = index === 2;
         };
 
         //Selected character info BOX
@@ -349,11 +353,14 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
 
         this.playerImageContainer = playerImageContainer;
 
-        const isCreator = this.lobby.creatorId === globalThis.user?.id;
+        const isCreator =
+            this.lobbyStore.lobby?.creatorId === globalThis.user?.id;
         const allReady =
-            this.lobby.playerReady.length ===
-            this.lobby.teams.flatMap((team) => team.players).length;
-        const iAmReady = this.lobby.playerReady.includes(this.playerId);
+            this.lobbyStore.lobby?.playerReady.length ===
+            this.lobbyStore.lobby?.teams.flatMap((team) => team.players).length;
+        const iAmReady = this.lobbyStore.lobby?.playerReady.includes(
+            this.playerId,
+        );
 
         this.startButton = new Button(
             this,
@@ -405,8 +412,8 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         const classes = this.classStore.classes.filter(
             (charClass) => charClass.playable,
         );
-        const classesPerRow = 3;
-        const rows = 2;
+        const classesPerRow = 4;
+        const rows = 3;
         const grid = area.getGrid({
             division: { horizontal: classesPerRow, vertical: rows },
             padding: 20,
@@ -431,111 +438,11 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                             charClass.id,
                         ),
                         borderWidth: 7,
-                        onClick: () => {
-                            this.changeClass(charClass.id);
-                        },
+                        onClick: () => this.changeClass(charClass.id),
                     },
                 ),
             );
         });
-    }
-
-    buildPlayerList() {
-        if (!this.settingsRoot || !this.settingsArea) return;
-
-        this.settingsRoot.destroy();
-
-        let maxTeamNb = 4;
-        if (this.lobbyStore.lobby?.mode === GameMode.INFINITY) {
-            maxTeamNb = 1;
-        }
-
-        const teamsGrid = this.settingsArea.getGrid({
-            division: { horizontal: maxTeamNb, vertical: 6 },
-            padding: 10,
-        });
-
-        for (let i = 0; i < maxTeamNb; i++) {
-            const teamArea = teamsGrid.getArea({
-                x: i + 1,
-                y: 1,
-                width: 1,
-                height: 5,
-            });
-            const team = this.lobby.teams[i];
-
-            this.settingsRoot.add(
-                new DisplayContainer(this, teamArea, {
-                    borderWidth: 2,
-                    bgColor: team
-                        ? TEAM_STRING_COLORS[team.color]
-                        : Color.CONTAINER_BACKGROUND,
-                }),
-            );
-
-            const teamGrid = teamArea.getGrid({
-                division: { horizontal: 1, vertical: 5 },
-            });
-
-            //affichage d'une team
-            for (let j = 0; j < 4; j++) {
-                const player = team?.players?.[j];
-                const rowGrid = teamGrid.getSubGrid(
-                    { x: 1, y: j + 1 },
-                    { division: { horizontal: 1, vertical: 3 }, padding: 5 },
-                );
-
-                if (player) {
-                    this.settingsRoot.add(
-                        new DisplayImage(
-                            this,
-                            rowGrid
-                                .getArea({ x: 1, y: 1, height: 3 })
-                                .scaleFromCenter(1, ScaleMode.FIT),
-                        ).setImage(
-                            CharacterIconAsset.getAssetKey(player.classId),
-                        ),
-                    );
-
-                    this.settingsRoot.add(
-                        new DisplayText(
-                            this,
-                            rowGrid
-                                .getArea({ x: 1, y: 1 })
-                                .scaleFromCenter(1, ScaleMode.FIT),
-                        ).setText(player.name),
-                    );
-                } else {
-                    this.settingsRoot.add(
-                        new DisplayContainer(
-                            this,
-                            rowGrid
-                                .getArea({ x: 1, y: 1, height: 3 })
-                                .scaleFromCenter(1, ScaleMode.FIT),
-                            { borderWidth: 2 },
-                        ),
-                    );
-                }
-            }
-            const joinArea = teamGrid.getArea({
-                x: 1,
-                y: 5,
-                width: 1,
-                height: 1,
-            });
-            this.settingsRoot.add(
-                new Button(this, joinArea, {
-                    text: translate("lobby.joinTeam"),
-                    borderWidth: 2,
-                    onClick: () => {
-                        console.log(`trying to join team ${team?.color ?? i}`);
-                    },
-                }),
-            );
-        }
-
-        // 👈 applique la bonne visibilité selon l'onglet actif
-        this.settingsRoot.setVisible(this.isPlayerTabActive);
     }
 
     updatePlayerData(classId: CharacterAssetId) {
@@ -603,7 +510,8 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
     }
 
     updateStartButton() {
-        const isCreator = this.lobby.creatorId === globalThis.user?.id;
+        const isCreator =
+            this.lobbyStore.lobby?.creatorId === globalThis.user?.id;
         const allReady =
             (this.lobbyStore.lobby?.playerReady.length ?? 0) ===
             (this.lobbyStore.lobby?.teams?.flatMap((team) => team.players)

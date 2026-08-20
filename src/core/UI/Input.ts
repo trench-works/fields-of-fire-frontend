@@ -58,7 +58,7 @@ export class DisplayInput
             zIndex: `${depth}`,
         });
         document.body.appendChild(this.inputElement);
-        this.inputElement.addEventListener("keydown", (e) => {
+        this.inputElement.addEventListener("keyup", (e) => {
             onChange?.(this.inputElement.value);
             if (e.key === "Enter") {
                 onEnter?.(this.inputElement.value);
