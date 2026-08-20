@@ -1,3 +1,4 @@
+import { Color } from "../../config/ColorConfig";
 import { BaseScene } from "../Objects";
 import { Position, Size } from "../Types";
 import { GridArea } from "../Utils";
@@ -10,6 +11,7 @@ export type InputProps = {
     area: GridArea;
     depth: number;
     isPassword?: boolean;
+    value?: string;
 };
 
 export class DisplayInput
@@ -30,6 +32,7 @@ export class DisplayInput
             area,
             depth,
             isPassword = false,
+            value = "",
         }: InputProps,
     ) {
         super(scene, "input");
@@ -38,6 +41,7 @@ export class DisplayInput
         if (placeholder) {
             this.inputElement.placeholder = placeholder;
         }
+        this.inputElement.value = value;
         Object.assign(this.inputElement.style, {
             position: "absolute",
             left: `${area.x}px`,
@@ -49,7 +53,7 @@ export class DisplayInput
             borderRadius: "6px",
             border: "1px solid #555",
             background: "#1a1a2e",
-            color: "#ffffff",
+            color: Color.TEXT,
             outline: "none",
             zIndex: `${depth}`,
         });
@@ -74,7 +78,11 @@ export class DisplayInput
     }
 
     setVisible(visible: boolean): void {
-        throw new Error("Method not implemented.");
+        if (visible) {
+            this.inputElement.style.display = "block";
+        } else {
+            this.inputElement.style.display = "none";
+        }
     }
 
     destroy(): void {

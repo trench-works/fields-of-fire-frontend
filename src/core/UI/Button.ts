@@ -39,7 +39,7 @@ export class Button
 
     protected textColor;
 
-    protected color = Color.btnBg;
+    protected color = Color.BUTTON_BACKGROUND;
 
     public blurred: Phaser.FX.Blur | undefined = undefined;
 
@@ -87,7 +87,7 @@ export class Button
             if (borderWidth > 0) {
                 this.background.setStrokeStyle(
                     borderWidth,
-                    Phaser.Display.Color.HexStringToColor(Color.btnBorder)
+                    Phaser.Display.Color.HexStringToColor(Color.BUTTON_BORDER)
                         .color,
                 );
             }
@@ -207,7 +207,8 @@ export class Button
             isActivated ? CLICKABLE_ALPHA : UNCLICKABLE_ALPHA,
         );
         this.background?.setFillStyle(
-            Phaser.Display.Color.HexStringToColor(Color.btnBg).color,
+            Phaser.Display.Color.HexStringToColor(Color.BUTTON_BACKGROUND)
+                .color,
         );
         return this;
     }
@@ -244,7 +245,8 @@ export class Button
 
         this.on("pointerout", () => {
             this.background?.setFillStyle(
-                Phaser.Display.Color.HexStringToColor(Color.btnBg).color,
+                Phaser.Display.Color.HexStringToColor(Color.BUTTON_BACKGROUND)
+                    .color,
             );
             if (this.imageDisplay) {
                 this.imageDisplay.clearTint();

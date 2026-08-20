@@ -32,13 +32,13 @@ export class Tooltip extends Phaser.GameObjects.Container {
         super(scene, 0, 0);
 
         this.cfg = {
-            bgColor: config.bgColor ?? Color.containerBg,
+            bgColor: config.bgColor ?? Color.CONTAINER_BACKGROUND,
             textColor: config.textColor ?? "#FFFFFF",
-            titleColor: config.titleColor ?? Color.btnBg,
+            titleColor: config.titleColor ?? Color.BUTTON_BACKGROUND,
             fontSize: config.fontSize ?? 14,
             titleFontSize: config.titleFontSize ?? 16,
             padding: config.padding ?? 10,
-            borderColor: config.borderColor ?? Color.containerBorder,
+            borderColor: config.borderColor ?? Color.CONTAINER_BORDER,
             borderWidth: config.borderWidth ?? 1,
             offsetX: config.offsetX ?? 12,
             offsetY: config.offsetY ?? -20,

@@ -20,6 +20,7 @@ export class SettingsDisplayer extends Phaser.GameObjects.Container {
     private gameModeTitle: DisplayText;
     private boardSizeTitle: DisplayText;
     private lobbyNameTitle: DisplayText;
+    private lobbyNameInput: DisplayInput;
 
     constructor(scene: BaseScene, lobbyStore: LobbyStore, socket: LobbySocket) {
         super(scene, 0, 0);
@@ -50,7 +51,9 @@ export class SettingsDisplayer extends Phaser.GameObjects.Container {
                 scene.scale.height / 2 + 50,
                 panelArea.width,
                 panelArea.height,
-                Phaser.Display.Color.HexStringToColor(Color.containerBg).color,
+                Phaser.Display.Color.HexStringToColor(
+                    Color.CONTAINER_BACKGROUND,
+                ).color,
             )
             .setScrollFactor(0)
             .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2)
@@ -125,12 +128,12 @@ export class SettingsDisplayer extends Phaser.GameObjects.Container {
         )
             .setText(translate("lobby.lobbyName"))
             .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3);
-        this.add(
-            new DisplayInput(scene, {
-                area: panelGrid.getArea({ x: 3, y: 5, width: 3, margin: 5 }),
-                depth: Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3,
-            }),
-        );
+        this.lobbyNameInput = new DisplayInput(scene, {
+            area: panelGrid.getArea({ x: 3, y: 5, width: 3, margin: 5 }),
+            depth: Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3,
+            onChange: (value) => (lobbyStore.name = value),
+            value: lobbyStore.name,
+        });
 
         // Save
         this.add(
@@ -163,6 +166,7 @@ export class SettingsDisplayer extends Phaser.GameObjects.Container {
         this.gameModeTitle.setVisible(visible);
         this.boardSizeTitle.setVisible(visible);
         this.lobbyNameTitle.setVisible(visible);
+        this.lobbyNameInput.setVisible(visible);
         this.overlay.setVisible(visible);
         this.panel.setVisible(visible);
         return this;

@@ -259,10 +259,10 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.boostId = boostId;
 
         if (this.selectedBoostCard) {
-            this.selectedBoostCard.setBackgroundColor(Color.btnBorder);
+            this.selectedBoostCard.setBackgroundColor(Color.BUTTON_BORDER);
         }
 
-        card.setBackgroundColor(Color.actualTurnBorder);
+        card.setBackgroundColor(Color.CURRENT_TURN_BORDER);
         this.selectedBoostCard = card;
     }
 
@@ -350,7 +350,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             {
                 borderWidth: 3,
                 opacity: 1,
-                bgColor: Color.btnBg,
+                bgColor: Color.BUTTON_BACKGROUND,
                 onClick: () => {
                     this.onBoostClick(boost.id, boostCard);
                     //TODO: FIXME: maybe change logic, first one is for select, second one is sending event to back

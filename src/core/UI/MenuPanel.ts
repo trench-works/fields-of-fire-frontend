@@ -42,7 +42,9 @@ export class MenuPanel extends Phaser.GameObjects.Container {
                 scene.scale.height / 2,
                 600,
                 500,
-                Phaser.Display.Color.HexStringToColor(Color.containerBg).color,
+                Phaser.Display.Color.HexStringToColor(
+                    Color.CONTAINER_BACKGROUND,
+                ).color,
             )
             .setScrollFactor(0)
             .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP_2) + 2)

@@ -89,9 +89,9 @@ export class DisplayContainer
         const { x, y, height, width } = position;
         const {
             title = "",
-            bgColor = Color.containerBg,
+            bgColor = Color.CONTAINER_BACKGROUND,
             borderWidth = 0,
-            borderColor = Color.containerBorder,
+            borderColor = Color.CONTAINER_BORDER,
             backgroundImage,
             opacity = 1,
             alpha,

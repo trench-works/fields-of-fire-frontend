@@ -72,6 +72,7 @@ export class LobbySocket extends Socket<LobbyKey, LobbyActions, LobbyEvents> {
         return this.send(LobbyActions.UPDATE, {
             mode: lobby.mode,
             boardSize: lobby.boardSize,
+            name: lobby.name,
         });
     }
 }

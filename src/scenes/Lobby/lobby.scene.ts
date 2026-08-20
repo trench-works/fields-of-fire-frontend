@@ -201,7 +201,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         });
         new DisplayContainer(this, gameModeArea, {
             borderWidth: 2,
-            bgColor: Color.containerBorder,
+            bgColor: Color.CONTAINER_BORDER,
         });
         this.gameModeTitle = new DisplayText(this, gameModeArea);
         // map size
@@ -213,7 +213,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         });
         new DisplayContainer(this, mapSizeArea, {
             borderWidth: 2,
-            bgColor: Color.containerBorder,
+            bgColor: Color.CONTAINER_BORDER,
         });
         this.mapSizeTitle = new DisplayText(this, mapSizeArea);
         this.updateSettingsDisplay();
@@ -296,7 +296,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             }),
             {
                 title: this.classStore.getClass(this.selectClassId).name,
-                bgColor: Color.containerBorder,
+                bgColor: Color.CONTAINER_BORDER,
                 borderWidth: 5,
                 outterRadius: 0,
             },
@@ -316,7 +316,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         );
         playerTextContainer.setDescription(
             this.classStore.getClass(this.selectClassId).classDescription,
-            { color: Color.btnBorder },
+            { color: Color.BUTTON_BORDER },
         );
         this.playerDescriptionText = playerTextContainer;
 
@@ -469,7 +469,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                     borderWidth: 2,
                     bgColor: team
                         ? TEAM_STRING_COLORS[team.color]
-                        : Color.containerBg,
+                        : Color.CONTAINER_BACKGROUND,
                 }),
             );
 
@@ -552,7 +552,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         //Met à jour la desc
         this.playerDescriptionText.setDescription(
             this.classStore.getClass(this.selectClassId).classDescription,
-            { color: Color.btnBorder },
+            { color: Color.BUTTON_BORDER },
         );
     }
 

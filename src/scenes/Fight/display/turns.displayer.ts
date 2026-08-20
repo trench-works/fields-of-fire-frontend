@@ -100,8 +100,8 @@ export class TurnDisplayer extends FightSceneDisplayer {
                         title: player?.name ?? charClass?.name?.split(" ")[0],
                         borderWidth: isFirstCell ? 5 : 2,
                         borderColor: isFirstCell
-                            ? Color.actualTurnBorder
-                            : Color.otherTurnBorder,
+                            ? Color.CURRENT_TURN_BORDER
+                            : Color.TURN_BORDER,
                         backgroundImage: CharacterCloseupAsset.getAssetKey(
                             entity.classId,
                         ),

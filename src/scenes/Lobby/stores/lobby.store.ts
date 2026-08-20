@@ -3,13 +3,16 @@ import { LobbyData } from "../../LobbyList/interfaces/LobbyData";
 
 export class LobbyStore {
     lobby: LobbyData | undefined;
+
     boardSize: number;
     gameMode: GameMode;
+    name: string;
 
     constructor() {
         this.lobby = undefined;
         this.boardSize = 10;
         this.gameMode = GameMode.INFINITY;
+        this.name = "Partie de NO_NAME";
     }
 
     setLobby(lobby: LobbyData): this {
@@ -22,6 +25,7 @@ export class LobbyStore {
         if (this.lobby) {
             this.lobby.boardSize = this.boardSize;
             this.lobby.mode = this.gameMode;
+            this.lobby.name = this.name;
         }
         return this;
     }
@@ -30,6 +34,7 @@ export class LobbyStore {
         if (this.lobby) {
             this.boardSize = this.lobby.boardSize;
             this.gameMode = this.lobby.mode;
+            this.name = this.lobby.name;
         }
         return this;
     }

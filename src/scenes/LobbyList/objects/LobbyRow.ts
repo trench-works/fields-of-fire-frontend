@@ -16,7 +16,7 @@ type LobbyInfos = {
 };
 export class LobbyRow {
     private container: DisplayContainer;
-    private texts: DisplayText[] = []; 
+    private texts: DisplayText[] = [];
 
     public id: string;
 
@@ -35,7 +35,6 @@ export class LobbyRow {
 
         this.container.setInteractive();
         this.container.on("pointerdown", () => onClick(this));
-        
 
         // Sous-grille locale à la ligne
 
@@ -62,9 +61,9 @@ export class LobbyRow {
                     width: 2,
                     height: 1,
                 }),
-            ).setText(`Lobby : ${lobby.name}`)
+            ).setText(`Lobby : ${lobby.name}`),
         );
-        
+
         this.texts.push(
             new DisplayText(
                 scene,
@@ -74,8 +73,8 @@ export class LobbyRow {
                     width: 1,
                     height: 1,
                 }),
-            ).setText(`${lobby.playersNum}/${lobby.maxPlayers}`)
-        )
+            ).setText(`${lobby.playersNum}/${lobby.maxPlayers}`),
+        );
 
         this.texts.push(
             new DisplayText(
@@ -87,9 +86,10 @@ export class LobbyRow {
                     height: 1,
                 }),
             ).setText(lobby.playersNum < lobby.maxPlayers ? "Open" : "Full", {
-                color: lobby.playersNum < lobby.maxPlayers ? "#4ec64e" : "#c9443d",
-            })
-        )
+                color:
+                    lobby.playersNum < lobby.maxPlayers ? "#4ec64e" : "#c9443d",
+            }),
+        );
 
         this.texts.push(
             new DisplayText(
@@ -100,13 +100,13 @@ export class LobbyRow {
                     width: 2,
                     height: 1,
                 }),
-            ).setText(`Creator : ${lobby.creator}`)
+            ).setText(`Creator : ${lobby.creator}`),
         );
     }
 
     public setSelected(selected: boolean) {
         this.container.setBackgroundColor(
-            selected ? "#cc5316" : Color.containerBg,
+            selected ? "#cc5316" : Color.CONTAINER_BACKGROUND,
             selected ? 0.5 : 0.15,
         );
     }
