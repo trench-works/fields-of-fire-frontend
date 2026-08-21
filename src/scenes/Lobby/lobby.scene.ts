@@ -97,10 +97,10 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
 
     updateSettingsDisplay() {
         this.gameModeTitle.setText(
-            `Game mode : ${this.lobbyStore.lobby?.mode}`,
+            `${translate("lobby.gameMode")} : ${this.lobbyStore.lobby?.mode}`,
         );
         this.mapSizeTitle.setText(
-            `Map Size : ${this.lobbyStore.lobby?.boardSize}x${this.lobbyStore.lobby?.boardSize}`,
+            `${translate("lobby.mapSize")} : ${this.lobbyStore.lobby?.boardSize}x${this.lobbyStore.lobby?.boardSize}`,
         );
         this.lobbyNameTitle.setText(
             this.lobbyStore.lobby?.name ?? "Lobby de NO_NAME",

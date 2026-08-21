@@ -12,6 +12,7 @@ import {
     ScaleMode,
     UI_LEVELS_OFFSET,
 } from "../../../core";
+import { translate } from "../../../core/i18n/i18n";
 import { DisplayImage } from "../../../core/UI/DisplayImage";
 import { Boost } from "../../../Model/Boost";
 import { Entity } from "../../../Model/Entity";
@@ -169,7 +170,8 @@ export class EndFightDisplayer extends FightSceneDisplayer {
 
         if (this.gameStore.game.isStopped) {
             this.show(
-                this.gameStore.game.playerWin,
+                this.gameStore.game.winnerTeamId ===
+                    this.playerStore.player.teamId,
                 this.playerStore.player.randomBoost,
             );
         }
@@ -202,7 +204,11 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.temporaryRoot.destroy();
         this.temporaryRoot = new DisplayRoot();
 
-        this.titleText.setText(playerWin ? "Victoire !" : "Défaite ");
+        this.titleText.setText(
+            playerWin
+                ? `${translate("fight.end.victory")} !`
+                : `${translate("fight.end.defeat")} `,
+        );
         this.showEntityCards();
         this.showButtons(playerWin ? true : false);
         this.root.setVisible(true);
@@ -351,10 +357,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 borderWidth: 3,
                 opacity: 1,
                 bgColor: Color.BUTTON_BACKGROUND,
-                onClick: () => {
-                    this.onBoostClick(boost.id, boostCard);
-                    //TODO: FIXME: maybe change logic, first one is for select, second one is sending event to back
-                },
+                onClick: () => this.onBoostClick(boost.id, boostCard),
             },
         ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1);
         this.boostCards.set(`${boost.id}-${index}`, boostCard);
@@ -514,7 +517,6 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     }),
                     {
                         onClick: () => {
-                            console.log("nextRound");
                             this.temporaryRoot.destroy();
                             const boostListGrid =
                                 this.scene.rootGrid.getSubGrid(
@@ -563,7 +565,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                             this.temporaryRoot.setVisible(true);
                             this.showReadyButton();
                         },
-                        text: "Next Fight",
+                        text: translate("fight.end.nextFight"),
                     },
                 ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 4),
             );
@@ -580,11 +582,10 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 }),
                 {
                     onClick: () => {
-                        console.log("Leave");
                         this.scene.root.controllers.game.disconnect();
                         MainMenu.start(this.scene, { keepMusic: false });
                     },
-                    text: "Retour Menu",
+                    text: translate("fight.end.leave"),
                 },
             ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 4),
         );
@@ -602,11 +603,8 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     height: 1,
                 }),
                 {
-                    onClick: () => {
-                        console.log("ready");
-                        this.onReady();
-                    },
-                    text: "Prêt",
+                    onClick: () => this.onReady(),
+                    text: translate("fight.end.ready"),
                 },
             )
                 .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 4)

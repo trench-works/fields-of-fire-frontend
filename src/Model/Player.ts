@@ -5,8 +5,9 @@ export type Player = {
     userId: string;
     entityId: string;
     gameId: string;
+    teamId: string;
     name: string;
-    invocation: string[],
-    randomBoost: Boost[]
+    invocation: string[];
+    randomBoost: Boost[];
 };
 

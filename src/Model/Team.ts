@@ -20,5 +20,8 @@ export const TEAM_STRING_COLORS = {
 export type Team = {
     id: string;
     color: TeamColor;
+    playerIds: string[];
+    npcIds: string[];
+    entitiesIds: string[];
 };
 

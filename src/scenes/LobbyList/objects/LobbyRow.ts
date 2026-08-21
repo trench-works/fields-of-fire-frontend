@@ -6,6 +6,7 @@ import {
     Grid,
     GridArea,
 } from "../../../core";
+import { translate } from "../../../core/i18n/i18n";
 
 type LobbyInfos = {
     id: string;
@@ -85,10 +86,17 @@ export class LobbyRow {
                     width: 1,
                     height: 1,
                 }),
-            ).setText(lobby.playersNum < lobby.maxPlayers ? "Open" : "Full", {
-                color:
-                    lobby.playersNum < lobby.maxPlayers ? "#4ec64e" : "#c9443d",
-            }),
+            ).setText(
+                lobby.playersNum < lobby.maxPlayers
+                    ? translate("lobbyList.status.open")
+                    : translate("lobbyList.status.full"),
+                {
+                    color:
+                        lobby.playersNum < lobby.maxPlayers
+                            ? "#4ec64e"
+                            : "#c9443d",
+                },
+            ),
         );
 
         this.texts.push(

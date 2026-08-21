@@ -27,8 +27,3 @@ export class LobbyData {
     teams!: LobbyTeam[];
 }
 
-export enum LobbyStatus {
-    IN_GAME = "en jeu",
-    OPEN = "ouvert",
-}
-

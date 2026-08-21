@@ -1,5 +1,6 @@
 {
     "common": {
+        "title": "Fields of Fire",
         "validate": "Valider"
     },
     "loader": {
@@ -48,6 +49,15 @@
         "joinTeam": "Rejoindre",
         "addTeam": "Ajouter"
     },
+    "lobbyList": {
+        "title": "Liste des Lobbies",
+        "create": "Créer un lobby",
+        "join": "Rejoindre un lobby",
+        "status": {
+            "open": "Ouvert",
+            "full": "Complet"
+        }
+    },
     "fight": {
         "actions": {
             "cost": "Coût",
@@ -64,6 +74,13 @@
         },
         "effects": {
             "duration": "durée"
+        },
+        "end": {
+            "leave": "Quitter",
+            "ready": "Prêt",
+            "nextFight": "Continuer",
+            "victory": "Victoire",
+            "defeat": "Défaite"
         }
     },
     "parameter": {

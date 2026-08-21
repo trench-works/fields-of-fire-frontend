@@ -17,6 +17,7 @@ import { SceneAssetId } from "../../assets/ScenesAsset";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { LobbyListStore } from "./stores/lobby-list.store";
 import { MusicAsset, MusicAssetId } from "../../assets";
+import { translate } from "../../core/i18n/i18n";
 
 export class LobbyListScene extends BaseScene {
     public menuSocket!: MenuSocket;
@@ -147,7 +148,7 @@ export class LobbyListScene extends BaseScene {
             width: 9,
             height: 1,
         });
-        new DisplayText(this, titleBox).setText("Liste des Lobby");
+        new DisplayText(this, titleBox).setText(translate("lobbyList.title"));
 
         //lobby list
         const lobbyListArea = this.rootGrid.getArea({
@@ -181,7 +182,7 @@ export class LobbyListScene extends BaseScene {
             this,
             buttonGrid.getArea({ x: 2, y: 2, width: 5, height: 7 }),
             {
-                text: "Créer un Lobby",
+                text: translate("lobbyList.create"),
                 onClick: () => {
                     this.menuSocket.createLobby();
                 },
@@ -192,7 +193,7 @@ export class LobbyListScene extends BaseScene {
             this,
             buttonGrid.getArea({ x: 8, y: 2, width: 5, height: 7 }),
             {
-                text: "Rejoindre un Lobby",
+                text: translate("lobbyList.join"),
                 onClick: () => {
                     if (this.lobbyStore.selectedLobbyId) {
                         this.menuSocket.joinLobby({
