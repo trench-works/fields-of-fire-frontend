@@ -151,7 +151,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             }),
         ).setText(this.lobbyStore.lobby?.name ?? "");
 
-        if (this.lobbyStore.lobby?.creatorId === global.user?.id) {
+        if (this.lobbyStore.lobby?.creatorId === globalThis.user?.id) {
             new Button(
                 this,
                 this.rootGrid.getArea({
@@ -217,7 +217,6 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         this.updateSettingsDisplay();
 
         //tab BOX
-
         this.playerTab = new PlayerListDisplayer(
             this,
             this.lobbyStore,
@@ -242,10 +241,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             [
                 {
                     label: translate("lobby.classes"),
-                    build: (root, area) => {
-                        //container.add(this.add.text(50, 0, "not implemented yet"));
-                        this.buildClassesTab(root, area);
-                    },
+                    build: (root, area) => this.buildClassesTab(root, area),
                 },
                 {
                     label: translate("lobby.masters"),

@@ -119,7 +119,7 @@ export class PlayerListDisplayer {
                 );
             } else if (
                 i === this.lobbyStore.lobby?.teams.length &&
-                global.user?.id === this.lobbyStore.lobby.creatorId
+                globalThis.user?.id === this.lobbyStore.lobby.creatorId
             ) {
                 this.settingsRoot.add(
                     new Button(
