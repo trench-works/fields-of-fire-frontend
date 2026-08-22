@@ -50,6 +50,7 @@ export class TabManager {
                     text: tab.label,
                     borderWidth: 5,
                     borderColor: Color.MILITARY_GREEN,
+                    bgColor: Color.MILITARY_SAND,
                     onClick: () => this.switchTo(index),
                 },
             );
@@ -72,6 +73,7 @@ export class TabManager {
     }
 
     switchTo(index: number) {
+        console.log("switch to ", index);
         if (this.activeTab === index) return;
         // Masquer tous les contenus
         this.contents.forEach((c) => c.setVisible(false));

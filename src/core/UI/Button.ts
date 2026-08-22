@@ -16,9 +16,10 @@ type ButtonConfig = {
     onClick: () => void;
     fontSize?: number;
     textColor?: Color;
+    bgColor?: Color;
     padding?: FourAxis;
     borderWidth?: number;
-    borderColor?: string;
+    borderColor?: Color;
     image?: string;
     depth?: number;
 };
@@ -40,7 +41,8 @@ export class Button
 
     protected textColor: Color | undefined;
 
-    protected color = Color.MILITARY_GREEN;
+    protected color: Color;
+    protected borderColor: Color;
 
     public blurred: Phaser.FX.Blur | undefined = undefined;
 
@@ -53,6 +55,8 @@ export class Button
             image,
             fontSize,
             textColor,
+            bgColor,
+            borderColor,
             borderWidth = 0,
             depth = 1,
         }: ButtonConfig,
@@ -65,6 +69,8 @@ export class Button
         this.onClick = onClick;
         this.isActivated = true;
         this.textColor = textColor;
+        this.color = bgColor ?? Color.MILITARY_GREEN;
+        this.borderColor = borderColor ?? Color.MILITARY_GREEN;
 
         // Créer le texte du bouton
 
@@ -88,7 +94,7 @@ export class Button
             if (borderWidth > 0) {
                 this.background.setStrokeStyle(
                     borderWidth,
-                    ColorUtils.parseColor(Color.MILITARY_GREEN),
+                    ColorUtils.parseColor(this.borderColor),
                 );
             }
 
@@ -212,7 +218,7 @@ export class Button
         this.imageDisplay?.setAlpha(
             isActivated ? CLICKABLE_ALPHA : UNCLICKABLE_ALPHA,
         );
-        this.background?.setFillStyle(parseColor(Color.MILITARY_GREEN));
+        this.background?.setFillStyle(parseColor(this.color));
         return this;
     }
 
@@ -245,9 +251,7 @@ export class Button
         });
 
         this.on("pointerout", () => {
-            this.background?.setFillStyle(
-                ColorUtils.parseColor(Color.MILITARY_GREEN),
-            );
+            this.background?.setFillStyle(ColorUtils.parseColor(this.color));
             if (this.imageDisplay) {
                 this.imageDisplay.clearTint();
             }
