@@ -6,10 +6,10 @@ import { Displayable } from "./DisplayRoot";
 
 type ContainerConfig = {
     title?: string;
-    bgColor?: string;
-    titleColor?: string;
+    bgColor?: Color;
+    titleColor?: Color;
     borderWidth?: number;
-    borderColor?: string;
+    borderColor?: Color;
     backgroundImage?: string;
     opacity?: number;
     fontSize?: number;
@@ -33,7 +33,7 @@ export class DisplayContainer
     private outterBorder?: Phaser.GameObjects.Graphics;
     private titleText?: Phaser.GameObjects.Text;
     public onClick: (() => void) | undefined;
-    private bgColor: string;
+    private bgColor: Color;
     private bgOpacity: number;
     private hoverTint: number | undefined;
 

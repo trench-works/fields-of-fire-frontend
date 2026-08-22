@@ -1,3 +1,5 @@
+import { Color } from "../config/ColorConfig";
+
 export enum TeamColor {
     BLUE = "BLUE",
     RED = "RED",
@@ -11,10 +13,10 @@ export const TEAM_COLORS = {
     [TeamColor.GREEN]: 0x00ff00,
 };
 export const TEAM_STRING_COLORS = {
-    [TeamColor.BLUE]: "#0000ff",
-    [TeamColor.RED]: "#ff0000",
-    [TeamColor.YELLOW]: "#ffff00",
-    [TeamColor.GREEN]: "#00ff00",
+    [TeamColor.BLUE]: Color.BLUE,
+    [TeamColor.RED]: Color.RED,
+    [TeamColor.YELLOW]: Color.YELLOW,
+    [TeamColor.GREEN]: Color.GREEN,
 };
 
 export type Team = {

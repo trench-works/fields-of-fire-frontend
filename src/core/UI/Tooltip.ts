@@ -3,13 +3,13 @@ import { Color } from "../../config/ColorConfig";
 import { ColorUtils, Depth, UI_LEVELS_OFFSET } from "../Utils";
 
 interface TooltipConfig {
-    bgColor?: string;
-    textColor?: string;
-    titleColor?: string;
+    bgColor?: Color;
+    textColor?: Color;
+    titleColor?: Color;
     fontSize?: number;
     titleFontSize?: number;
     padding?: number;
-    borderColor?: string;
+    borderColor?: Color;
     borderWidth?: number;
     offsetX?: number;
     offsetY?: number;
