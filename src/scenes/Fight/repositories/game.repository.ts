@@ -43,7 +43,7 @@ export type PlayerReady = { boostId: string | null };
 
 export type GameUpdateEvent = AnimatedPayload<Game, GameEventAnimation>;
 
-export type GameEndEvent = { boosts: Boost[]; playerWin: boolean };
+export type GameEndEvent = { boosts: Boost[]; winnerTeamId: string };
 
 export type GameRenew = { data: Game };
 

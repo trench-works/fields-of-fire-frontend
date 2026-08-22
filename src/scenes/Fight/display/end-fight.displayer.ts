@@ -16,6 +16,7 @@ import { translate } from "../../../core/i18n/i18n";
 import { DisplayImage } from "../../../core/UI/DisplayImage";
 import { Boost } from "../../../Model/Boost";
 import { Entity } from "../../../Model/Entity";
+import { Player } from "../../../Model/Player";
 import { MainMenu } from "../../MainMenu/main-menu.scene";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/game.store";
@@ -157,6 +158,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                         division: { horizontal: 3, vertical: 3 },
                     },
                 ),
+                this.gameStore.game.players.find(
+                    (player) => player.entityId === entity.id,
+                ),
             );
         });
 
@@ -252,6 +256,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                         division: { horizontal: 3, vertical: 3 },
                     },
                 ),
+                this.gameStore.game.players.find(
+                    (player) => player.entityId === entity.id,
+                ),
             );
         });
     }
@@ -279,7 +286,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    displayEntityCard(entity: Entity, grid: Grid): void {
+    displayEntityCard(entity: Entity, grid: Grid, player?: Player): void {
         // Conteneur de la card
         this.temporaryRoot.add(
             new DisplayContainer(
@@ -329,7 +336,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     height: 1,
                 }),
             )
-                .setText(entity.classId)
+                .setText(player?.name ?? entity.classId)
                 .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 6),
         );
     }

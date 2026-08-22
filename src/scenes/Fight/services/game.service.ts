@@ -84,7 +84,9 @@ export class GameService {
         });
         this.gameRepository.onGameEnd(async (event) => {
             await this.gameUpdateQueue.waitForCompletion();
-            if (event.playerWin) {
+            const iAmWinner =
+                this.playerStore.player.teamId === event.winnerTeamId;
+            if (iAmWinner) {
                 new SoundEffect(
                     this.scene,
                     SoundEffectAsset.getAssetKey(SoundEffectAssetId.VICTORY),
@@ -92,7 +94,7 @@ export class GameService {
             }
             //TODO: DISPLAY POPUP WIasync TH INFO event.playerWin (true|false)
             //this.playBackgroundMusic(MusicAssetId.MENU, true);
-            this.endFight.show(event.playerWin, event.boosts);
+            this.endFight.show(iAmWinner, event.boosts);
         });
 
         this.gameRepository.onGameRenew(async (event) => {
