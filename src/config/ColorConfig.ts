@@ -1,12 +1,21 @@
-export const Color = {
-    BUTTON_BACKGROUND: "#2a4237",
-    BUTTON_BORDER: "#2a4237",
-    CONTAINER_BACKGROUND: "#d4d2b8",
-    CONTAINER_BORDER: "#2a4237",
-    CLASS_BORDER: "#d4d2b8",
-    CURRENT_TURN_BORDER: "#ccd828",
-    TURN_BORDER: "#ac8142",
-    SOUND_BAR: "#7b734a",
-    TEXT: "#ffffff",
-};
+export enum Color {
+    MILITARY_GREEN = "#2a4237",
+    MILITARY_SAND = "#d4d2b8",
+    CURRENT_TURN_BORDER = "#ccd828",
+    TURN_BORDER = "#ac8142",
+    SOUND_BAR = "#7b734a",
+    TEXT = "#ffffff",
+    SELF_TEAM = "#396645",
+    OTHER_TEAM = "#6e3822",
+    BLACK = "#000000",
+    RED = "#FF0000",
+    GREEN = "#00FF00",
+    INPUT_BACKGROUND = "#1a1a2e",
+    INPUT_BORDER = "#555555",
+    HIGHLIGHT = "#27daF5",
+    HIGHTLIGHT_HOVER = "#4a7eb0",
+    OPEN = "#4ec64e",
+    CLOSE = "c9443d",
+    SELECTED_LOBBY = "#cc5316",
+}
 

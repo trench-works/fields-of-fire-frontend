@@ -93,8 +93,8 @@ export class LobbyRow {
                 {
                     color:
                         lobby.playersNum < lobby.maxPlayers
-                            ? "#4ec64e"
-                            : "#c9443d",
+                            ? Color.OPEN
+                            : Color.CLOSE,
                 },
             ),
         );
@@ -114,7 +114,7 @@ export class LobbyRow {
 
     public setSelected(selected: boolean) {
         this.container.setBackgroundColor(
-            selected ? "#cc5316" : Color.CONTAINER_BACKGROUND,
+            selected ? Color.SELECTED_LOBBY : Color.MILITARY_SAND,
             selected ? 0.5 : 0.15,
         );
     }

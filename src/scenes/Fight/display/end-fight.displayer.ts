@@ -103,13 +103,10 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             }).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1),
         );
 
-        this.titleText = new DisplayText(this.scene, titleEndgameArea);
-        this.root.add(this.titleText);
-
-        // --- Depths ---
-        this.titleText.setDepth(
+        this.titleText = new DisplayText(this.scene, titleEndgameArea).setDepth(
             Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2,
         );
+        this.root.add(this.titleText);
 
         this.root.setVisible(false);
 
@@ -143,8 +140,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 padding: 20,
             },
         );
-        this.entityList = new List(this.scene, entityListGrid);
-        //new DisplayContainer(this.scene, entityListGrid.getArea({ x:1,y:1, width : 6, height:8 }), {bgColor:"#a7441c"}).setDepth(9999999999);
+        this.entityList = new List(this.scene, entityListGrid).setDepth(
+            Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3,
+        );
         entities.forEach((entity, index) => {
             this.displayEntityCard(
                 entity,
@@ -161,9 +159,6 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 ),
             );
         });
-        this.entityList.setDepth(
-            Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 3,
-        );
 
         this.root.setVisible(false);
         this.temporaryRoot.setVisible(false);
@@ -265,7 +260,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.boostId = boostId;
 
         if (this.selectedBoostCard) {
-            this.selectedBoostCard.setBackgroundColor(Color.BUTTON_BORDER);
+            this.selectedBoostCard.setBackgroundColor(Color.MILITARY_GREEN);
         }
 
         card.setBackgroundColor(Color.CURRENT_TURN_BORDER);
@@ -284,12 +279,12 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    displayEntityCard(entity: Entity, ObjectListGrid: Grid): void {
+    displayEntityCard(entity: Entity, grid: Grid): void {
         // Conteneur de la card
         this.temporaryRoot.add(
             new DisplayContainer(
                 this.scene,
-                ObjectListGrid.getArea({
+                grid.getArea({
                     x: 1,
                     y: 1,
                     width: 3,
@@ -301,8 +296,8 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     opacity: 1,
                     bgColor:
                         entity.teamId === this.playerStore.playerEntity.teamId
-                            ? "#396645"
-                            : "#6e3822",
+                            ? Color.SELF_TEAM
+                            : Color.OTHER_TEAM,
                 },
             ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1),
         );
@@ -310,12 +305,14 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.temporaryRoot.add(
             new DisplayImage(
                 this.scene,
-                ObjectListGrid.getArea({
-                    x: 2,
-                    y: 1,
-                    width: 1,
-                    height: 3,
-                }).scaleFromCenter(1, ScaleMode.FIT),
+                grid
+                    .getArea({
+                        x: 2,
+                        y: 1,
+                        width: 1,
+                        height: 3,
+                    })
+                    .scaleFromCenter(1, ScaleMode.FIT),
             )
                 .setImage(CharacterCloseupAsset.getAssetKey(entity.classId))
                 .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2),
@@ -325,7 +322,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.temporaryRoot.add(
             new DisplayText(
                 this.scene,
-                ObjectListGrid.getArea({
+                grid.getArea({
                     x: 1,
                     y: 3,
                     width: 3,
@@ -356,7 +353,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             {
                 borderWidth: 3,
                 opacity: 1,
-                bgColor: Color.BUTTON_BACKGROUND,
+                bgColor: Color.MILITARY_GREEN,
                 onClick: () => this.onBoostClick(boost.id, boostCard),
             },
         ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1);

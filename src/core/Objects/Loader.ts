@@ -1,3 +1,4 @@
+import { Color } from "../../config/ColorConfig";
 import { i18n } from "../i18n";
 import { DisplayContainer, DisplayRoot, DisplayText } from "../UI";
 import { Depth, Grid, UI_LEVELS_OFFSET } from "../Utils";
@@ -32,7 +33,7 @@ export class Loader {
                     height: 3,
                 }),
                 {
-                    bgColor: "#000000",
+                    bgColor: Color.BLACK,
                 },
             ).setDepth(Depth.getUIElementDepth(this.offset)),
         );

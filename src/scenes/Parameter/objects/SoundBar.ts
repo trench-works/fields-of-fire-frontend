@@ -50,7 +50,7 @@ export class SoundBar {
 
         //contour de la barre de volume
         new DisplayContainer(this.scene, this.gaugeArea, {
-            bgColor: Color.CONTAINER_BACKGROUND,
+            bgColor: Color.MILITARY_SAND,
             borderWidth: 3,
             opacity: 0,
         });

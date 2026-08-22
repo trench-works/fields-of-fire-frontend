@@ -1,3 +1,4 @@
+import { Color } from "../../config/ColorConfig";
 import { BaseScene } from "../Objects";
 import { Size, Position, PlacementOrigin } from "../Types";
 import { Displayable } from "./DisplayRoot";
@@ -14,7 +15,7 @@ export class DisplayText implements Displayable {
             .text(area.x + area.width / 2, area.y + area.height / 2, "", {
                 fontFamily: "MyFont",
                 fontSize: `${0}px`,
-                color: "#FFFFFF",
+                color: Color.TEXT,
             })
             .setOrigin(0.5);
     }
@@ -38,7 +39,7 @@ export class DisplayText implements Displayable {
 
     setText(
         text: string,
-        options?: { color?: string; fontSize?: number },
+        options?: { color?: Color; fontSize?: number },
     ): this {
         const minSize = Math.min(
             this.area.height / 1.5,
@@ -48,13 +49,13 @@ export class DisplayText implements Displayable {
         const fontSize = Math.max(minSize, 13);
         this.text.setText(text);
         this.text.setFontSize(`${options?.fontSize ?? fontSize}px`);
-        this.text.setColor(options?.color ?? "#FFFFFF");
+        this.text.setColor(options?.color ?? Color.TEXT);
         return this;
     }
 
     setDescription(
         text: string,
-        options?: { color?: string; fontSize?: number },
+        options?: { color?: Color; fontSize?: number },
     ): this {
         this.text.setWordWrapWidth(this.area.width, true);
 
@@ -79,7 +80,7 @@ export class DisplayText implements Displayable {
             this.text.setFontSize(`${fontSize}px`);
         }
 
-        this.text.setColor(options?.color ?? "#FFFFFF");
+        this.text.setColor(options?.color ?? Color.TEXT);
         this.text.setOrigin(0, 0);
         this.text.setPosition(this.area.x, this.area.y);
         this.text.setText(text);

@@ -6,6 +6,7 @@ import { DisplayText } from "./DisplayText";
 import { BaseScene } from "../Objects";
 import { ColorUtils, GridArea } from "../Utils";
 import { DisplayImage } from "./DisplayImage";
+import { parseColor } from "../Utils/Color";
 
 const CLICKABLE_ALPHA = 1;
 const UNCLICKABLE_ALPHA = 0.5;
@@ -14,7 +15,7 @@ type ButtonConfig = {
     text?: string;
     onClick: () => void;
     fontSize?: number;
-    textColor?: string;
+    textColor?: Color;
     padding?: FourAxis;
     borderWidth?: number;
     borderColor?: string;
@@ -37,9 +38,9 @@ export class Button
 
     protected isActivated: boolean;
 
-    protected textColor;
+    protected textColor: Color | undefined;
 
-    protected color = Color.BUTTON_BACKGROUND;
+    protected color = Color.MILITARY_GREEN;
 
     public blurred: Phaser.FX.Blur | undefined = undefined;
 
@@ -80,15 +81,14 @@ export class Button
                 0,
                 this.width,
                 this.height,
-                Phaser.Display.Color.HexStringToColor(this.color).color,
+                ColorUtils.parseColor(this.color),
             );
             this.add(this.background);
 
             if (borderWidth > 0) {
                 this.background.setStrokeStyle(
                     borderWidth,
-                    Phaser.Display.Color.HexStringToColor(Color.BUTTON_BORDER)
-                        .color,
+                    ColorUtils.parseColor(Color.MILITARY_GREEN),
                 );
             }
 
@@ -139,7 +139,11 @@ export class Button
             const width = this.width;
             const height = this.height;
             this.highlighter.clear();
-            this.highlighter.lineStyle(2, ColorUtils.parseColor("#27DAF5"), 1);
+            this.highlighter.lineStyle(
+                2,
+                ColorUtils.parseColor(Color.HIGHLIGHT),
+                1,
+            );
             this.highlighter.strokeRect(-width / 2, -height / 2, width, height);
         } else {
             this.highlighter?.destroy();
@@ -180,7 +184,7 @@ export class Button
 
     displayText(
         text: string | undefined,
-        options?: { color?: string; fontSize?: number },
+        options?: { color?: Color; fontSize?: number },
     ): this {
         this.textDisplay?.destroy?.();
         if (!text) {
@@ -196,7 +200,7 @@ export class Button
             fontSize:
                 options?.fontSize ??
                 Math.min(this.height / 3, (this.width / text.length) * 1.5),
-            color: options?.color ?? "#FFFFFF",
+            color: options?.color ?? Color.TEXT,
         });
         this.add(this.textDisplay.getObject());
         return this;
@@ -208,10 +212,7 @@ export class Button
         this.imageDisplay?.setAlpha(
             isActivated ? CLICKABLE_ALPHA : UNCLICKABLE_ALPHA,
         );
-        this.background?.setFillStyle(
-            Phaser.Display.Color.HexStringToColor(Color.BUTTON_BACKGROUND)
-                .color,
-        );
+        this.background?.setFillStyle(parseColor(Color.MILITARY_GREEN));
         return this;
     }
 
@@ -220,11 +221,9 @@ export class Button
         return this;
     }
 
-    public setBackgroundColor(color: string) {
+    public setBackgroundColor(color: Color) {
         this.color = color;
-        this.background?.setFillStyle(
-            Phaser.Display.Color.HexStringToColor(color).color,
-        );
+        this.background?.setFillStyle(ColorUtils.parseColor(color));
     }
 
     private setupEvents() {
@@ -237,7 +236,7 @@ export class Button
         this.on("pointerover", () => {
             if (this.isActivated) {
                 this.background?.setFillStyle(
-                    Phaser.Display.Color.HexStringToColor("#4a7eb0").color,
+                    ColorUtils.parseColor(Color.HIGHTLIGHT_HOVER),
                 );
                 if (this.imageDisplay) {
                     this.imageDisplay.setTint(0xcccccc);
@@ -247,8 +246,7 @@ export class Button
 
         this.on("pointerout", () => {
             this.background?.setFillStyle(
-                Phaser.Display.Color.HexStringToColor(Color.BUTTON_BACKGROUND)
-                    .color,
+                ColorUtils.parseColor(Color.MILITARY_GREEN),
             );
             if (this.imageDisplay) {
                 this.imageDisplay.clearTint();
@@ -258,7 +256,7 @@ export class Button
 
     setText(
         text: string,
-        options?: { color?: string; fontSize?: number },
+        options?: { color?: Color; fontSize?: number },
     ): this {
         this.displayText(text, options);
         return this;

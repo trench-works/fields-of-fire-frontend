@@ -89,9 +89,9 @@ export class DisplayContainer
         const { x, y, height, width } = position;
         const {
             title = "",
-            bgColor = Color.CONTAINER_BACKGROUND,
+            bgColor = Color.MILITARY_SAND,
             borderWidth = 0,
-            borderColor = Color.CONTAINER_BORDER,
+            borderColor = Color.MILITARY_GREEN,
             backgroundImage,
             opacity = 1,
             alpha,
@@ -157,7 +157,7 @@ export class DisplayContainer
                 .text(0, 0, text, {
                     fontFamily: "MyFont",
                     fontSize: fontSize,
-                    color: "#FFFFFF",
+                    color: Color.TEXT,
                 })
                 .setOrigin(0.5);
             const textPosition = {
@@ -208,7 +208,7 @@ export class DisplayContainer
         }
     }
 
-    public setBackgroundColor(color: string, alpha = 1) {
+    public setBackgroundColor(color: Color, alpha = 1) {
         // Sinon on met à jour le Graphics existant
         if (this.background instanceof Phaser.GameObjects.Graphics) {
             this.background

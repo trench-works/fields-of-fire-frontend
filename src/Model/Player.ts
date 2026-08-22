@@ -1,5 +1,14 @@
 import { Boost } from "./Boost";
 
+export type PlayerStats = {
+    kills: number;
+    heal: number;
+    damages: number;
+    steps: number;
+    sustained: number;
+    shielded: number;
+};
+
 export type Player = {
     id: string;
     userId: string;
@@ -9,5 +18,6 @@ export type Player = {
     name: string;
     invocation: string[];
     randomBoost: Boost[];
+    stats: PlayerStats;
 };
 

@@ -199,7 +199,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         });
         new DisplayContainer(this, gameModeArea, {
             borderWidth: 2,
-            bgColor: Color.CONTAINER_BORDER,
+            bgColor: Color.MILITARY_GREEN,
         });
         this.gameModeTitle = new DisplayText(this, gameModeArea);
         // map size
@@ -211,7 +211,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         });
         new DisplayContainer(this, mapSizeArea, {
             borderWidth: 2,
-            bgColor: Color.CONTAINER_BORDER,
+            bgColor: Color.MILITARY_GREEN,
         });
         this.mapSizeTitle = new DisplayText(this, mapSizeArea);
         this.updateSettingsDisplay();
@@ -296,7 +296,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             }),
             {
                 title: this.classStore.getClass(this.selectClassId).name,
-                bgColor: Color.CONTAINER_BORDER,
+                bgColor: Color.MILITARY_GREEN,
                 borderWidth: 5,
                 outterRadius: 0,
             },
@@ -316,7 +316,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         );
         playerTextContainer.setDescription(
             this.classStore.getClass(this.selectClassId).classDescription,
-            { color: Color.BUTTON_BORDER },
+            { color: Color.MILITARY_GREEN },
         );
         this.playerDescriptionText = playerTextContainer;
 
@@ -372,7 +372,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                         ? translate("lobby.start")
                         : translate("lobby.ready"),
                 borderWidth: 2,
-                borderColor: "#ffffff",
+                borderColor: Color.TEXT,
                 onClick: () => {
                     if (isCreator && allReady) {
                         this.lobbySocket.startGame();
@@ -455,7 +455,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         //Met à jour la desc
         this.playerDescriptionText.setDescription(
             this.classStore.getClass(this.selectClassId).classDescription,
-            { color: Color.BUTTON_BORDER },
+            { color: Color.MILITARY_GREEN },
         );
     }
 

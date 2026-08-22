@@ -4,6 +4,7 @@ import { Color } from "../../config/ColorConfig";
 import { BaseScene } from "../Objects";
 import { Depth, UI_LEVELS_OFFSET } from "../Utils";
 import { i18n } from "../i18n";
+import { parseColor } from "../Utils/Color";
 
 export type MenuPanelButton = {
     title: string;
@@ -42,9 +43,7 @@ export class MenuPanel extends Phaser.GameObjects.Container {
                 scene.scale.height / 2,
                 600,
                 500,
-                Phaser.Display.Color.HexStringToColor(
-                    Color.CONTAINER_BACKGROUND,
-                ).color,
+                parseColor(Color.MILITARY_SAND),
             )
             .setScrollFactor(0)
             .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP_2) + 2)
@@ -60,7 +59,7 @@ export class MenuPanel extends Phaser.GameObjects.Container {
                 {
                     fontFamily: "MyFont",
                     fontSize: "60px",
-                    color: "#FFFFFF",
+                    color: Color.TEXT,
                 },
             )
             .setOrigin(0.5)

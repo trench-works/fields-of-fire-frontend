@@ -9,6 +9,7 @@ import {
     UI_LEVELS_OFFSET,
 } from "../../../core";
 import { translate } from "../../../core/i18n/i18n";
+import { parseColor } from "../../../core/Utils/Color";
 import { GameMode } from "../../../Model/Game";
 import { LobbySocket } from "../repositories/lobby.socket";
 import { LobbyStore } from "../stores/lobby.store";
@@ -51,9 +52,7 @@ export class SettingsDisplayer extends Phaser.GameObjects.Container {
                 scene.scale.height / 2 + 50,
                 panelArea.width,
                 panelArea.height,
-                Phaser.Display.Color.HexStringToColor(
-                    Color.CONTAINER_BACKGROUND,
-                ).color,
+                parseColor(Color.MILITARY_SAND),
             )
             .setScrollFactor(0)
             .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2)

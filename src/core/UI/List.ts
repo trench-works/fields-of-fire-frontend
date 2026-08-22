@@ -1,3 +1,4 @@
+import { Color } from "../../config/ColorConfig";
 import { Position, Size, TwoAxis } from "../Types";
 import { Grid, GridArea } from "../Utils";
 import { DisplayContainer } from "./Container";
@@ -62,7 +63,7 @@ export class List extends DisplayContainer {
         const obj = this.scene.add
             .text(0, 0, value.toString(), {
                 fontSize: "20px",
-                color: "#fff",
+                color: Color.TEXT,
             })
             .setOrigin(0.5);
         obj.setPosition(area.x, area.y);
@@ -87,7 +88,7 @@ export class List extends DisplayContainer {
             obj = this.scene.add
                 .text(0, 0, value.toString(), {
                     fontSize: "20px",
-                    color: "#fff",
+                    color: Color.TEXT,
                 })
                 .setOrigin(0.5);
         } else if (value.icon) {
