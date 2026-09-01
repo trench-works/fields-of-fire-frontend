@@ -268,7 +268,9 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 this.scene.tooltip.attachTo(
                     image.getObject(),
                     statDescriptions[icon] ?? icon,
-                    icon,
+                    icon === "life"
+                        ? `${icon} (Max: ${StatsUtils.fromEntity(this.entity).maxLife})`
+                        : icon,
                 );
             }
 
