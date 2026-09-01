@@ -1,5 +1,6 @@
 {
     "common": {
+        "title": "Fields of Fire",
         "validate": "Valider"
     },
     "loader": {
@@ -31,6 +32,32 @@
             }
         }
     },
+    "lobby": {
+        "settings": "Paramètres",
+        "settingsPopup": {
+            "close": "Fermer",
+            "save": "Sauvegarder"
+        },
+        "gameMode": "Mode de Jeu",
+        "mapSize": "Taille de la carte",
+        "lobbyName": "Nom du Lobby",
+        "classes": "Classes",
+        "masters": "Maitrises",
+        "players": "Joueurs",
+        "ready": "Prêt",
+        "start": "Combattre",
+        "joinTeam": "Rejoindre",
+        "addTeam": "Ajouter"
+    },
+    "lobbyList": {
+        "title": "Liste des Lobbies",
+        "create": "Créer un lobby",
+        "join": "Rejoindre un lobby",
+        "status": {
+            "open": "Ouvert",
+            "full": "Complet"
+        }
+    },
     "fight": {
         "actions": {
             "cost": "Coût",
@@ -47,6 +74,13 @@
         },
         "effects": {
             "duration": "durée"
+        },
+        "end": {
+            "leave": "Quitter",
+            "ready": "Prêt",
+            "nextFight": "Continuer",
+            "victory": "Victoire",
+            "defeat": "Défaite"
         }
     },
     "parameter": {

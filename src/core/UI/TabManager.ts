@@ -1,3 +1,4 @@
+import { Color } from "../../config/ColorConfig";
 import { BaseScene } from "../Objects";
 import { Grid, GridArea } from "../Utils";
 import { Button } from "./Button";
@@ -48,7 +49,8 @@ export class TabManager {
                 {
                     text: tab.label,
                     borderWidth: 5,
-                    borderColor: "#2A4237",
+                    borderColor: Color.MILITARY_GREEN,
+                    bgColor: Color.MILITARY_SAND,
                     onClick: () => this.switchTo(index),
                 },
             );
@@ -71,6 +73,7 @@ export class TabManager {
     }
 
     switchTo(index: number) {
+        console.log("switch to ", index);
         if (this.activeTab === index) return;
         // Masquer tous les contenus
         this.contents.forEach((c) => c.setVisible(false));
@@ -78,7 +81,9 @@ export class TabManager {
         this.contents[index].setVisible(true);
         // Mettre à jour le style visuel
         this.tabs.forEach((tab, i) => {
-            tab.setBackgroundColor(i === index ? "#2A4237" : "#D4D2B8");
+            tab.setBackgroundColor(
+                i === index ? Color.MILITARY_GREEN : Color.MILITARY_SAND,
+            );
         });
         this.activeTab = index;
     }

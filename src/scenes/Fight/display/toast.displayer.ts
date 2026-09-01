@@ -1,3 +1,4 @@
+import { Color } from "../../../config/ColorConfig";
 import {
     Depth,
     DisplayRoot,
@@ -32,7 +33,7 @@ class Toast extends DisplayRoot {
         this.add(this.text);
     }
 
-    setText(text: string, color: string = "#FF0000"): this {
+    setText(text: string, color: Color = Color.RED): this {
         this.text.setText(text, { color: color });
         return this;
     }
@@ -63,7 +64,7 @@ export class ToastDisplayer {
                             hit.damage === 0
                                 ? i18n.translate("fight.actions.dodged")
                                 : `${-hit.damage} ❤️`,
-                            hit.damage === 0 ? "#00FF00" : "#FF0000",
+                            hit.damage === 0 ? Color.GREEN : Color.RED,
                         )
                         .animate(1000);
                 }

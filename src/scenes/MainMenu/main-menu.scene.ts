@@ -15,6 +15,7 @@ import { SceneAssetId } from "../../assets/ScenesAsset";
 import { MiscAsset, MiscAssetId, MusicAsset, MusicAssetId } from "../../assets";
 import { ParameterScene } from "../Parameter/parameter.scene";
 import { SoundParam } from "../../core/Utils/SoundLevel";
+import { translate } from "../../core/i18n/i18n";
 
 export class MainMenu extends BaseScene {
     private playButton!: Button;
@@ -56,7 +57,7 @@ export class MainMenu extends BaseScene {
                 width: 5,
                 height: 1,
             }),
-        ).setText("Fields Of Fire");
+        ).setText(translate("common.title"));
 
         const buttonsGrid = this.rootGrid.getSubGrid(
             {

@@ -29,6 +29,7 @@ import { EffectAsset } from "../../assets/EffectAsset";
 import { BoostAsset } from "../../assets/BoostAsset";
 import { FightSceneRoot } from "./fight-scene.root";
 import { Tile } from "../../core/UI/TileLayer";
+import { Color } from "../../config/ColorConfig";
 
 export type SceneRenderConfig = {
     tileSize: number;
@@ -119,7 +120,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
         });
         super.create();
         this.tooltip = Tooltip.getInstance(this, {
-            textColor: "#000000",
+            textColor: Color.BLACK,
             fontSize: 14,
             delay: 750,
         });

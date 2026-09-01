@@ -3,13 +3,13 @@ import { Color } from "../../config/ColorConfig";
 import { ColorUtils, Depth, UI_LEVELS_OFFSET } from "../Utils";
 
 interface TooltipConfig {
-    bgColor?: string;
-    textColor?: string;
-    titleColor?: string;
+    bgColor?: Color;
+    textColor?: Color;
+    titleColor?: Color;
     fontSize?: number;
     titleFontSize?: number;
     padding?: number;
-    borderColor?: string;
+    borderColor?: Color;
     borderWidth?: number;
     offsetX?: number;
     offsetY?: number;
@@ -32,13 +32,13 @@ export class Tooltip extends Phaser.GameObjects.Container {
         super(scene, 0, 0);
 
         this.cfg = {
-            bgColor: config.bgColor ?? Color.containerBg,
-            textColor: config.textColor ?? "#FFFFFF",
-            titleColor: config.titleColor ?? Color.btnBg,
+            bgColor: config.bgColor ?? Color.MILITARY_SAND,
+            textColor: config.textColor ?? Color.TEXT,
+            titleColor: config.titleColor ?? Color.MILITARY_GREEN,
             fontSize: config.fontSize ?? 14,
             titleFontSize: config.titleFontSize ?? 16,
             padding: config.padding ?? 10,
-            borderColor: config.borderColor ?? Color.containerBorder,
+            borderColor: config.borderColor ?? Color.MILITARY_GREEN,
             borderWidth: config.borderWidth ?? 1,
             offsetX: config.offsetX ?? 12,
             offsetY: config.offsetY ?? -20,

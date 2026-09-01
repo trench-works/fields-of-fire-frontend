@@ -53,11 +53,6 @@ export class GridService {
         });
         window.addEventListener("mousemove", (event) => {
             if (this.groundStore.dragging && this.groundStore.hover) {
-                console.log(
-                    event.clientX,
-                    event.clientY,
-                    this.groundStore.get(this.groundStore.hover)?.position,
-                );
                 const hoveringTile = this.groundStore.get(
                     this.groundStore.hover,
                 );

@@ -129,7 +129,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
             }),
             {
                 borderWidth: 2,
-                bgColor: Color.containerBorder,
+                bgColor: Color.MILITARY_GREEN,
                 outterRadius: { tl: 0, tr: 10, bl: 0, br: 0 },
             },
         ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 1);
@@ -154,7 +154,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
             }),
             {
                 borderWidth: 7,
-                bgColor: Color.containerBorder,
+                bgColor: Color.MILITARY_GREEN,
                 outterRadius: { tl: 0, tr: 0, bl: 0, br: 10 },
             },
         ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER + 1));
@@ -268,7 +268,9 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 this.scene.tooltip.attachTo(
                     image.getObject(),
                     statDescriptions[icon] ?? icon,
-                    icon,
+                    icon === "life"
+                        ? `${icon} (Max: ${StatsUtils.fromEntity(this.entity).maxLife})`
+                        : icon,
                 );
             }
 

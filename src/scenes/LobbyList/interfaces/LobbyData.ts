@@ -1,4 +1,5 @@
 import { CharacterAssetId } from "../../../assets";
+import { GameMode } from "../../../Model/Game";
 import { TeamColor } from "../../../Model/Team";
 
 export class LobbyPlayer {
@@ -16,16 +17,13 @@ export class LobbyTeam {
 
 export class LobbyData {
     id!: string;
-    name?: string;
+    name!: string;
     creator!: string;
+    mode!: GameMode;
+    boardSize!: number;
     maxPlayers!: number;
     creatorId!: string;
     playerReady!: string[];
     teams!: LobbyTeam[];
-}
-
-export enum LobbyStatus {
-    IN_GAME = "en jeu",
-    OPEN = "ouvert",
 }
 

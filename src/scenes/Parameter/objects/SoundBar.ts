@@ -50,7 +50,7 @@ export class SoundBar {
 
         //contour de la barre de volume
         new DisplayContainer(this.scene, this.gaugeArea, {
-            bgColor: Color.containerBg,
+            bgColor: Color.MILITARY_SAND,
             borderWidth: 3,
             opacity: 0,
         });
@@ -64,7 +64,7 @@ export class SoundBar {
         });
 
         this.gaugeContainer = new DisplayContainer(this.scene, this.gaugeArea, {
-            bgColor: Color.soundBar,
+            bgColor: Color.SOUND_BAR,
             opacity: 1,
         });
 
@@ -82,7 +82,7 @@ export class SoundBar {
                 this.scene,
                 this.gaugeArea,
                 {
-                    bgColor: Color.soundBar,
+                    bgColor: Color.SOUND_BAR,
                     opacity: 1,
                 },
             );
@@ -92,7 +92,7 @@ export class SoundBar {
         new Button(
             this.scene,
             rowGrid
-                .getArea({ x: 3.25, y: 1, width: 1, height: 1, margin: 4  })
+                .getArea({ x: 3.25, y: 1, width: 1, height: 1, margin: 4 })
                 .scaleFromCenter(
                     MiscAsset.getAssetScale(MiscAssetId.BUTTON_ROUND),
                     ScaleMode.FIT,
@@ -133,3 +133,4 @@ export class SoundBar {
         );
     }
 }
+

@@ -126,7 +126,7 @@ export class ParameterScene extends BaseScene {
             {
                 borderWidth: 2,
                 opacity: 1,
-                bgColor: Color.btnBorder,
+                bgColor: Color.MILITARY_GREEN,
                 outterRadius: { tr: 10, tl: 10, bl: 0, br: 0 },
             },
         );

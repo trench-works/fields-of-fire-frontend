@@ -11,6 +11,7 @@ import {
     BaseSceneInit,
     SoundLevel,
     i18n,
+    calculateGridDivision,
 } from "../../core";
 import { Color } from "../../config/ColorConfig";
 import { LobbySocket } from "./repositories/lobby.socket";
@@ -30,6 +31,9 @@ import { ClassStore } from "../Fight/stores/class.store";
 import { LobbyStore } from "./stores/lobby.store";
 import { LobbyData } from "../LobbyList/interfaces/LobbyData";
 import { SoundParam } from "../../core/Utils/SoundLevel";
+import { SettingsDisplayer } from "./display/settings.displayer";
+import { translate } from "../../core/i18n/i18n";
+import { PlayerListDisplayer } from "./display/player-list.displayer";
 
 export type LobbySceneInit = {
     lobby: LobbyData;
@@ -43,17 +47,21 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
     private playerClassName!: DisplayContainer;
     public lobbySocket!: LobbySocket;
 
-    protected lobby!: LobbyData;
     protected playerId!: string;
 
     protected classStore: ClassStore;
     protected lobbyStore: LobbyStore;
 
-    protected settingsRoot!: DisplayRoot;
-    protected settingsArea!: GridArea;
-    protected isPlayerTabActive: boolean = false;
+    protected playerTab!: PlayerListDisplayer;
+
     protected readyListContainers: DisplayContainer[] = [];
     protected startButton!: Button;
+
+    protected settings!: SettingsDisplayer;
+
+    protected gameModeTitle!: DisplayText;
+    protected mapSizeTitle!: DisplayText;
+    protected lobbyNameTitle!: DisplayText;
 
     constructor() {
         super(SceneAssetId.LOBBY, BackgroundAssetId.LOBBY);
@@ -72,13 +80,11 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         super.init(init);
         if (init?.data) {
             const { lobby } = init.data;
-            this.lobby = lobby;
             const player = lobby.teams
                 .flatMap((team) => team.players)
                 .find((player) => player.userId === globalThis.user?.id)!;
             this.playerId = player.playerId!;
             this.lobbyStore.setLobby(lobby);
-            this.buildPlayerList();
             this.selectClassId = player.classId;
         }
     }
@@ -90,17 +96,29 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         MusicAsset.load(this.load, MusicAssetId.MENU);
     }
 
+    updateSettingsDisplay() {
+        this.gameModeTitle.setText(
+            `${translate("lobby.gameMode")} : ${this.lobbyStore.lobby?.mode}`,
+        );
+        this.mapSizeTitle.setText(
+            `${translate("lobby.mapSize")} : ${this.lobbyStore.lobby?.boardSize}x${this.lobbyStore.lobby?.boardSize}`,
+        );
+        this.lobbyNameTitle.setText(
+            this.lobbyStore.lobby?.name ?? "Lobby de NO_NAME",
+        );
+    }
+
     create() {
         super.create();
         this.playBackgroundMusic(MusicAssetId.MENU);
-        this.lobbySocket = new LobbySocket(this.lobby.id);
+        this.lobbySocket = new LobbySocket(this.lobbyStore.lobby?.id ?? "");
         this.lobbySocket.onClose(() => MainMenu.start(this));
         this.lobbySocket.onLobbyUpdate((event) => {
             this.lobbyStore.setLobby(event.lobby);
-            this.buildPlayerList();
+            this.playerTab.update();
             this.buildReadyList();
             this.updateStartButton();
-            //TODO: rerender ton tab réglages -> actuellement ca mettra pas à jour
+            this.updateSettingsDisplay();
         });
         this.lobbySocket.onStart((game) => {
             const player = game.players.find(
@@ -118,26 +136,101 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             "musicSound - LOBBY : ",
             SoundLevel.get(SoundParam.BACKGROUND),
         );
+        this.settings = new SettingsDisplayer(
+            this,
+            this.lobbyStore,
+            this.lobbySocket,
+        );
         //title BOX
-        new DisplayText(
+        this.lobbyNameTitle = new DisplayText(
             this,
             this.rootGrid.getArea({
-                x: 1,
+                x: 2,
                 y: 1,
-                width: 9,
+                width: 7,
                 height: 1,
             }),
-        ).setText(this.lobby.name ?? "NO_NAME");
+        ).setText(this.lobbyStore.lobby?.name ?? "");
+
+        if (this.lobbyStore.lobby?.creatorId === globalThis.user?.id) {
+            new Button(
+                this,
+                this.rootGrid.getArea({
+                    x: 1,
+                    y: 1,
+                    width: 1,
+                    height: 1,
+                    margin: { horizontal: 5, vertical: 20 },
+                }),
+                {
+                    text: `${translate("lobby.settings")} ⚙`,
+                    onClick: () => {
+                        this.lobbyStore.resetSettings();
+                        this.settings.show();
+                    },
+                },
+            );
+        }
+
+        const settingsGrid = this.rootGrid.getSubGrid(
+            {
+                x: 1,
+                y: 2,
+                width: 6,
+                height: 1,
+            },
+            {
+                division: {
+                    horizontal: 2,
+                    vertical: 1,
+                },
+                padding: 20,
+            },
+        );
+        new DisplayContainer(this, settingsGrid, {
+            borderWidth: 5,
+            outterRadius: 0,
+        });
+        // game mode
+        const gameModeArea = settingsGrid.getArea({
+            x: 1,
+            y: 1,
+            width: 1,
+            height: 1,
+        });
+        new DisplayContainer(this, gameModeArea, {
+            borderWidth: 2,
+            bgColor: Color.MILITARY_GREEN,
+        });
+        this.gameModeTitle = new DisplayText(this, gameModeArea);
+        // map size
+        const mapSizeArea = settingsGrid.getArea({
+            x: 2,
+            y: 1,
+            width: 1,
+            height: 1,
+        });
+        new DisplayContainer(this, mapSizeArea, {
+            borderWidth: 2,
+            bgColor: Color.MILITARY_GREEN,
+        });
+        this.mapSizeTitle = new DisplayText(this, mapSizeArea);
+        this.updateSettingsDisplay();
 
         //tab BOX
+        this.playerTab = new PlayerListDisplayer(
+            this,
+            this.lobbyStore,
+            this.lobbySocket,
+        );
         const tabManager = new TabManager(
             this,
             this.rootGrid.getSubGrid(
                 {
                     x: 1,
-                    y: 2,
+                    y: 3,
                     width: 6,
-                    height: 8,
+                    height: 7,
                 },
                 {
                     division: {
@@ -148,14 +241,11 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             ),
             [
                 {
-                    label: "Classes",
-                    build: (root, area) => {
-                        //container.add(this.add.text(50, 0, "not implemented yet"));
-                        this.buildClassesTab(root, area);
-                    },
+                    label: translate("lobby.classes"),
+                    build: (root, area) => this.buildClassesTab(root, area),
                 },
                 {
-                    label: "Maitrises",
+                    label: translate("lobby.masters"),
                     build: (root, area) => {
                         root.add(
                             new DisplayText(this, area).setText(
@@ -165,11 +255,11 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                     },
                 },
                 {
-                    label: "Joueurs",
+                    label: translate("lobby.players"),
                     build: (root, area) => {
-                        this.settingsRoot = root;
-                        this.settingsArea = area;
-                        this.buildPlayerList();
+                        this.playerTab.settingsRoot = root;
+                        this.playerTab.settingsArea = area;
+                        this.playerTab.update();
                     },
                 },
             ],
@@ -178,7 +268,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         const originalSwitchTo = tabManager.switchTo.bind(tabManager);
         tabManager.switchTo = (index: number) => {
             originalSwitchTo(index);
-            this.isPlayerTabActive = index === 2;
+            this.playerTab.isActive = index === 2;
         };
 
         //Selected character info BOX
@@ -207,7 +297,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             }),
             {
                 title: this.classStore.getClass(this.selectClassId).name,
-                bgColor: Color.containerBorder,
+                bgColor: Color.MILITARY_GREEN,
                 borderWidth: 5,
                 outterRadius: 0,
             },
@@ -227,7 +317,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         );
         playerTextContainer.setDescription(
             this.classStore.getClass(this.selectClassId).classDescription,
-            { color: Color.btnBorder },
+            { color: Color.MILITARY_GREEN },
         );
         this.playerDescriptionText = playerTextContainer;
 
@@ -260,18 +350,15 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
 
         this.playerImageContainer = playerImageContainer;
 
-        const isCreator = this.lobby.creatorId === globalThis.user?.id;
+        const isCreator =
+            this.lobbyStore.lobby?.creatorId === globalThis.user?.id;
         const allReady =
-            this.lobby.playerReady.length ===
-            this.lobby.teams.flatMap((team) => team.players).length;
-        const iAmReady = this.lobby.playerReady.includes(this.playerId);
-
-        console.log(
-            "creator : ",
-            this.lobby.creatorId,
-            ", me :",
-            globalThis.user?.id,
+            this.lobbyStore.lobby?.playerReady.length ===
+            this.lobbyStore.lobby?.teams.flatMap((team) => team.players).length;
+        const iAmReady = this.lobbyStore.lobby?.playerReady.includes(
+            this.playerId,
         );
+
         this.startButton = new Button(
             this,
             playerGrid.getArea({
@@ -281,9 +368,12 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 height: 1,
             }),
             {
-                text: isCreator && iAmReady ? "Combattre" : "Prêt",
+                text:
+                    isCreator && iAmReady
+                        ? translate("lobby.start")
+                        : translate("lobby.ready"),
                 borderWidth: 2,
-                borderColor: "#ffffff",
+                borderColor: Color.TEXT,
                 onClick: () => {
                     if (isCreator && allReady) {
                         this.lobbySocket.startGame();
@@ -319,10 +409,11 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         const classes = this.classStore.classes.filter(
             (charClass) => charClass.playable,
         );
-        const classesPerRow = 3;
         const rows = 2;
+        const division = calculateGridDivision(area, { vertical: rows }, 1, 10);
+        const classesPerRow = division.horizontal;
         const grid = area.getGrid({
-            division: { horizontal: classesPerRow, vertical: rows },
+            division,
             padding: 20,
         });
 
@@ -345,52 +436,11 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                             charClass.id,
                         ),
                         borderWidth: 7,
-                        onClick: () => {
-                            this.changeClass(charClass.id);
-                        },
+                        onClick: () => this.changeClass(charClass.id),
                     },
                 ),
             );
         });
-    }
-
-    buildPlayerList() {
-        if (!this.settingsRoot || !this.settingsArea) return;
-
-        this.settingsRoot.destroy();
-
-        const players =
-            this.lobbyStore.lobby?.teams?.flatMap((team) => team.players) ?? [];
-        const listGrid = this.settingsArea.getGrid({
-            division: { horizontal: 1, vertical: 4 },
-            padding: 5,
-        });
-
-        players.forEach((player, index) => {
-            const rowGrid = listGrid.getSubGrid(
-                { x: 1, y: index + 1, width: 1, height: 1 },
-                { division: { horizontal: 5, vertical: 1 } },
-            );
-
-            this.settingsRoot.add(
-                new DisplayContainer(this, rowGrid.getArea({ x: 1, y: 1 }), {
-                    backgroundImage: CharacterCloseupAsset.getAssetKey(
-                        player.classId,
-                    ),
-                    borderWidth: 2,
-                }),
-            );
-
-            this.settingsRoot.add(
-                new DisplayText(
-                    this,
-                    rowGrid.getArea({ x: 2, y: 1, width: 4, height: 1 }),
-                ).setText(player.name ?? player.userId),
-            );
-        });
-
-        // 👈 applique la bonne visibilité selon l'onglet actif
-        this.settingsRoot.setVisible(this.isPlayerTabActive);
     }
 
     updatePlayerData(classId: CharacterAssetId) {
@@ -407,7 +457,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         //Met à jour la desc
         this.playerDescriptionText.setDescription(
             this.classStore.getClass(this.selectClassId).classDescription,
-            { color: Color.btnBorder },
+            { color: Color.MILITARY_GREEN },
         );
     }
 
@@ -458,7 +508,8 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
     }
 
     updateStartButton() {
-        const isCreator = this.lobby.creatorId === globalThis.user?.id;
+        const isCreator =
+            this.lobbyStore.lobby?.creatorId === globalThis.user?.id;
         const allReady =
             (this.lobbyStore.lobby?.playerReady.length ?? 0) ===
             (this.lobbyStore.lobby?.teams?.flatMap((team) => team.players)
@@ -466,17 +517,10 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         const iAmReady =
             this.lobbyStore.lobby?.playerReady.includes(this.playerId) ?? false;
 
-        console.log(
-            "Start Button Update",
-            isCreator,
-            allReady,
-            iAmReady,
-            this.lobbyStore.lobby,
-            this.playerId,
-        );
-
         this.startButton.displayText(
-            isCreator && iAmReady ? "Combattre" : "Prêt",
+            isCreator && iAmReady
+                ? translate("lobby.start")
+                : translate("lobby.ready"),
         );
         this.startButton.setIsActivated(
             isCreator ? (iAmReady ? allReady : true) : !iAmReady,

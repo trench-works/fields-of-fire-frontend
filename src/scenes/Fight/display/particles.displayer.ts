@@ -1,6 +1,11 @@
 import { ParticleAsset, ParticleAssetId } from "../../../assets/ParticleAsset";
-import { BACKGROUND_LEVELS_OFFSET, Depth, Displayer } from "../../../core";
-import { FightScene } from "../fight.scene";
+import {
+    BACKGROUND_LEVELS_OFFSET,
+    Depth,
+    Displayer,
+    GRID_LEVELS_OFFSET,
+} from "../../../core";
+import { Cell, FightScene } from "../fight.scene";
 import { ParticleAnimationProps } from "./base/particles.animation";
 
 export enum ParticleDirectionEnum {
@@ -29,45 +34,41 @@ export class ParticleDisplayer extends Displayer<FightScene> {
 
     async animate(
         particleKey: ParticleAssetId,
-        x: number,
-        y: number,
-        depth: number,
+        cell: Cell,
+        offset: GRID_LEVELS_OFFSET,
     ): Promise<this> {
+        const depth = Depth.getFromGridPosition(cell.index, offset);
         console.log("ANIMATE INTIMIDATION");
         switch (particleKey) {
             case ParticleAssetId.BOOST:
-                this.ParticleAnimation(
+                this.gridParticles(
                     ParticleAssetId.BOOST,
                     ParticleDirectionEnum.UP,
-                    x,
-                    y,
+                    cell,
                     { depth },
                 );
                 break;
             case ParticleAssetId.DEBUFF:
-                this.ParticleAnimation(
+                this.gridParticles(
                     ParticleAssetId.DEBUFF,
                     ParticleDirectionEnum.DOWN,
-                    x,
-                    y,
+                    cell,
                     { depth },
                 );
                 break;
             case ParticleAssetId.HEAL:
-                this.ParticleAnimation(
+                this.gridParticles(
                     ParticleAssetId.HEAL,
                     ParticleDirectionEnum.UP,
-                    x,
-                    y,
+                    cell,
                     { depth },
                 );
                 break;
             case ParticleAssetId.SMOKE:
-                this.ParticleAnimation(
+                this.gridParticles(
                     ParticleAssetId.SMOKE,
                     ParticleDirectionEnum.UP,
-                    x,
-                    y,
+                    cell,
                     {
                         speedY: { min: 20, max: 60 },
                         speedX: { min: -30, max: 30 },
@@ -85,13 +86,13 @@ export class ParticleDisplayer extends Displayer<FightScene> {
         return this;
     }
 
-    async ParticleAnimation(
+    async gridParticles(
         particleSpriteKey: ParticleAssetId,
         direction: string,
-        x: number,
-        y: number,
+        cell: Cell,
         props: ParticleAnimationProps,
     ) {
+        const { x, y } = cell.position;
         props.speedY ??= { min: 200, max: 350 };
         props.speedX ??= { min: -30, max: 30 };
         props.scale ??= { start: 2, end: 0.5 };
@@ -104,11 +105,13 @@ export class ParticleDisplayer extends Displayer<FightScene> {
             this.buffEmitter.destroy();
         }
 
+        console.log(cell.scale);
+
         this.buffEmitter = this.scene.add.particles(
             x,
             direction === ParticleDirectionEnum.UP
                 ? y
-                : y - (128 * this.scene.scaleFactor) / 1.5,
+                : y - (128 * cell.scale) / 1.5,
             ParticleAsset.getAssetKey(particleSpriteKey),
             {
                 speedY:
@@ -120,7 +123,10 @@ export class ParticleDisplayer extends Displayer<FightScene> {
                         : { min: props.speedY.min, max: props.speedY.max },
                 speedX: props.speedX,
 
-                scale: props.scale,
+                scale: {
+                    start: props.scale.start * cell.scale * 0.6,
+                    end: props.scale.end * cell.scale * 0.6,
+                },
                 alpha: { start: 1, end: 0 },
 
                 lifespan: props.lifespan,

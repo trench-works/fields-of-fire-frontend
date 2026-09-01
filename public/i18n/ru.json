@@ -1,7 +1,97 @@
 {
+    "common": {
+        "title": "Fields of Fire",
+        "validate": "подтвердить"
+    },
+    "loader": {
+        "assets": "Загрузка ресурсов",
+        "connect": "Ожидание игроков"
+    },
+    "menuPanel": {
+        "title": "Меню",
+        "back": "Возобновить",
+        "options": "Опции",
+        "mainMenu": "Вернуться в меню",
+        "leaveLobby": "Покинуть лобби",
+        "leaveGame": "Покинуть игру"
+    },
     "mainMenu": {
         "play": "играть",
-        "settings": "настройки"
+        "settings": "настройки",
+        "login": "Войти",
+        "register": "Создать аккаунт",
+        "disconnect": "Выйти",
+        "registerPopup": {
+            "username": {
+                "title": "Имя пользователя",
+                "placeholder": "Введите свой псевдоним..."
+            },
+            "password": {
+                "title": "пароль",
+                "placeholder": "Введите пароль..."
+            }
+        }
+    },
+    "lobby": {
+        "settings": "Настройки",
+        "settingsPopup": {
+            "close": "Закрыть",
+            "save": "Сохранить"
+        },
+        "gameMode": "Режим игры",
+        "mapSize": "Размер карты",
+        "lobbyName": "Название лобби",
+        "classes": "Занятия",
+        "masters": "мастерство",
+        "players": "Игроки",
+        "ready": "Готово",
+        "start": "Сражаться",
+        "joinTeam": "Присоединиться",
+        "addTeam": "Добавить"
+    },
+    "lobbyList": {
+        "title": "Список лобби",
+        "create": "Создать лобби",
+        "join": "Присоединиться к лобби",
+        "status": {
+            "open": "Открыто",
+            "full": "Полный комплект"
+        }
+    },
+    "fight": {
+        "actions": {
+            "cost": "Стоимость",
+            "range": "Сфера действия",
+            "type": {
+                "RANGED": "На расстоянии",
+                "MOUVEMENT": "Перемещение",
+                "MELEE": "Схватка",
+                "SUPPORT": "Поддержка",
+                "OTHER": "Другое"
+            },
+            "dodged": "Уклонился",
+            "endTurn": "Конец хода"
+        },
+        "effects": {
+            "duration": "продолжительность"
+        },
+        "end": {
+            "leave": "Выйти",
+            "ready": "Готово",
+            "nextFight": "Продолжить",
+            "victory": "Победа",
+            "defeat": "Поражение"
+        }
+    },
+    "parameter": {
+        "parameter": "Настройки",
+        "return": "Назад",
+        "languageTitle": "Выбор языка",
+        "soundTitle": "Настройки звука",
+        "sound": {
+            "music": "Музыка",
+            "effects": "Звуковые эффекты"
+        }
     }
 }
 

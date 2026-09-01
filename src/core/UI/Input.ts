@@ -1,3 +1,5 @@
+import { Color } from "../../config/ColorConfig";
+import { BaseScene } from "../Objects";
 import { Position, Size } from "../Types";
 import { GridArea } from "../Utils";
 import { Displayable } from "./DisplayRoot";
@@ -9,24 +11,37 @@ export type InputProps = {
     area: GridArea;
     depth: number;
     isPassword?: boolean;
+    value?: string;
 };
 
-export class DisplayInput implements Displayable {
+export class DisplayInput
+    extends Phaser.GameObjects.GameObject
+    implements Displayable
+{
+    recalculate(): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
     private inputElement: HTMLInputElement;
 
-    constructor({
-        onEnter,
-        onChange,
-        placeholder,
-        area,
-        depth,
-        isPassword = false,
-    }: InputProps) {
+    constructor(
+        scene: BaseScene,
+        {
+            onEnter,
+            onChange,
+            placeholder,
+            area,
+            depth,
+            isPassword = false,
+            value = "",
+        }: InputProps,
+    ) {
+        super(scene, "input");
         this.inputElement = document.createElement("input");
         this.inputElement.type = isPassword ? "password" : "text";
         if (placeholder) {
             this.inputElement.placeholder = placeholder;
         }
+        this.inputElement.value = value;
         Object.assign(this.inputElement.style, {
             position: "absolute",
             left: `${area.x}px`,
@@ -36,14 +51,14 @@ export class DisplayInput implements Displayable {
             fontSize: "16px",
             padding: "0 10px",
             borderRadius: "6px",
-            border: "1px solid #555",
-            background: "#1a1a2e",
-            color: "#ffffff",
+            border: `1px solid ${Color.INPUT_BORDER}`,
+            background: Color.INPUT_BACKGROUND,
+            color: Color.TEXT,
             outline: "none",
             zIndex: `${depth}`,
         });
         document.body.appendChild(this.inputElement);
-        this.inputElement.addEventListener("keydown", (e) => {
+        this.inputElement.addEventListener("keyup", (e) => {
             onChange?.(this.inputElement.value);
             if (e.key === "Enter") {
                 onEnter?.(this.inputElement.value);
@@ -63,7 +78,11 @@ export class DisplayInput implements Displayable {
     }
 
     setVisible(visible: boolean): void {
-        throw new Error("Method not implemented.");
+        if (visible) {
+            this.inputElement.style.display = "block";
+        } else {
+            this.inputElement.style.display = "none";
+        }
     }
 
     destroy(): void {
