@@ -16,6 +16,7 @@ import { translate } from "../../../core/i18n/i18n";
 import { DisplayImage } from "../../../core/UI/DisplayImage";
 import { Boost } from "../../../Model/Boost";
 import { Entity } from "../../../Model/Entity";
+import { GameMode } from "../../../Model/Game";
 import { Player } from "../../../Model/Player";
 import { MainMenu } from "../../MainMenu/main-menu.scene";
 import { FightScene } from "../fight.scene";
@@ -509,7 +510,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             },
         );
 
-        if (isVictory) {
+        if (this.gameStore.game.mode === GameMode.INFINITY && isVictory) {
             this.buttonsRoot.add(
                 new Button(
                     this.scene,
@@ -579,7 +580,11 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             new Button(
                 this.scene,
                 this.buttonsGrid.getArea({
-                    x: isVictory ? 6 : 4,
+                    x:
+                        this.gameStore.game.mode === GameMode.INFINITY &&
+                        isVictory
+                            ? 6
+                            : 4,
                     y: 1,
                     width: 3,
                     height: 1,
