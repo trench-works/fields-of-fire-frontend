@@ -11,6 +11,7 @@ import {
     BaseSceneInit,
     SoundLevel,
     i18n,
+    calculateGridDivision,
 } from "../../core";
 import { Color } from "../../config/ColorConfig";
 import { LobbySocket } from "./repositories/lobby.socket";
@@ -408,10 +409,11 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         const classes = this.classStore.classes.filter(
             (charClass) => charClass.playable,
         );
-        const classesPerRow = 4;
-        const rows = 3;
+        const rows = 2;
+        const division = calculateGridDivision(area, { vertical: rows }, 1, 10);
+        const classesPerRow = division.horizontal;
         const grid = area.getGrid({
-            division: { horizontal: classesPerRow, vertical: rows },
+            division,
             padding: 20,
         });
 

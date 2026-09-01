@@ -173,15 +173,63 @@ export class Grid implements Position, Size {
     }
 
     getArea(
-options: Position &
-    Partial<Size> & {
-        margin?: TwoAxis | FourAxis | number;
-    },
+        options: Position &
+            Partial<Size> & {
+                margin?: TwoAxis | FourAxis | number;
+            },
     ): GridArea {
         const margin: FourAxis = options?.margin
             ? AxisUtils.fromTwoOrFourAxis(options.margin)
             : this.padding;
         return GridArea.fromGrid(this, { ...options, margin });
     }
+}
+
+function getNearestDivision(
+    reference: number,
+    size: number,
+    max: number,
+): number {
+    let nearestDivide = size;
+    let division = 1;
+    for (let i = 2; i < max; i++) {
+        const divided = size / i;
+        if (Math.abs(reference - divided) < nearestDivide) {
+            nearestDivide = Math.abs(reference - divided);
+            division = i;
+        } else {
+            break;
+        }
+    }
+    return division;
+}
+
+export type IncompleteDivision =
+    | { horizontal: number; vertical?: never }
+    | { horizontal?: never; vertical: number };
+
+export function calculateGridDivision(
+    area: GridArea,
+    { horizontal, vertical }: IncompleteDivision,
+    ratio: number = 1, // ratio being like reference width / height
+    maxDivisions: number = 10,
+): TwoAxis {
+    if (horizontal) {
+        const calculatedVertical = getNearestDivision(
+            area.width / horizontal / ratio,
+            area.height,
+            maxDivisions,
+        );
+        return { horizontal, vertical: calculatedVertical };
+    }
+    if (vertical) {
+        const calculatedHorizontal = getNearestDivision(
+            (area.height / vertical) * ratio,
+            area.width,
+            maxDivisions,
+        );
+        return { horizontal: calculatedHorizontal, vertical };
+    }
+    return { horizontal: 1, vertical: 1 };
 }
 
