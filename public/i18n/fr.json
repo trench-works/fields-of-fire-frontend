@@ -80,7 +80,15 @@
             "ready": "Prêt",
             "nextFight": "Continuer",
             "victory": "Victoire",
-            "defeat": "Défaite"
+            "defeat": "Défaite",
+            "stats": {
+                "kills": "Tués",
+                "heal": "Soins",
+                "damages": "Dégâts infligés",
+                "steps": "Pas",
+                "sustained": "Dégâts subis",
+                "shielded": "Dégâts réduits"
+            }
         }
     },
     "parameter": {

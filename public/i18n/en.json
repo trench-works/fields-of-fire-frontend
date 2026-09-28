@@ -80,7 +80,15 @@
             "ready": "Ready",
             "nextFight": "Continue",
             "victory": "Victory",
-            "defeat": "Defeat"
+            "defeat": "Defeat",
+            "stats": {
+                "kills": "Kills",
+                "heal": "Heal",
+                "damages": "Damages",
+                "steps": "Steps",
+                "sustained": "Sustained",
+                "shielded": "Shielded"
+            }
         }
     },
     "parameter": {

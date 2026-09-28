@@ -12,7 +12,7 @@ import {
     ScaleMode,
     UI_LEVELS_OFFSET,
 } from "../../../core";
-import { translate } from "../../../core/i18n/i18n";
+import { translate, translateWildcard } from "../../../core/i18n/i18n";
 import { DisplayImage } from "../../../core/UI/DisplayImage";
 import { Boost } from "../../../Model/Boost";
 import { Entity } from "../../../Model/Entity";
@@ -287,36 +287,34 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     }
 
     displayEntityCard(entity: Entity, grid: Grid, player?: Player): void {
+        const cardArea = grid.getArea({
+            x: 1,
+            y: 1,
+            width: 3,
+            height: 4,
+            margin: { top: 50, bottom: 0, right: 0, left: 0 },
+        });
+        const cardGrid = cardArea.getGrid({ padding: 10 });
         // Conteneur de la card
         this.temporaryRoot.add(
-            new DisplayContainer(
-                this.scene,
-                grid.getArea({
-                    x: 1,
-                    y: 1,
-                    width: 3,
-                    height: 4,
-                    margin: { top: 50, bottom: 0, right: 0, left: 0 },
-                }),
-                {
-                    borderWidth: 3,
-                    opacity: 1,
-                    bgColor:
-                        entity.teamId === this.playerStore.playerEntity.teamId
-                            ? Color.SELF_TEAM
-                            : Color.OTHER_TEAM,
-                },
-            ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1),
+            new DisplayContainer(this.scene, cardArea, {
+                borderWidth: 3,
+                opacity: 1,
+                bgColor:
+                    entity.teamId === this.playerStore.playerEntity.teamId
+                        ? Color.SELF_TEAM
+                        : Color.OTHER_TEAM,
+            }).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1),
         );
 
         this.temporaryRoot.add(
             new DisplayImage(
                 this.scene,
-                grid
+                cardGrid
                     .getArea({
-                        x: 2,
+                        x: 4,
                         y: 1,
-                        width: 1,
+                        width: 3,
                         height: 3,
                     })
                     .scaleFromCenter(1, ScaleMode.FIT),
@@ -329,16 +327,42 @@ export class EndFightDisplayer extends FightSceneDisplayer {
         this.temporaryRoot.add(
             new DisplayText(
                 this.scene,
-                grid.getArea({
-                    x: 1,
-                    y: 3,
-                    width: 3,
-                    height: 1,
+                cardGrid.getArea({
+                    x: 3,
+                    y: 4,
+                    width: 5,
+                    height: 2,
                 }),
             )
                 .setText(player?.name ?? entity.classId)
                 .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 6),
         );
+
+        if (player) {
+            let i = 0;
+            for (const [name, value] of Object.entries(player.stats)) {
+                const x = i % 2;
+                const y = Math.floor(i / 2);
+                this.temporaryRoot.add(
+                    new DisplayText(
+                        this.scene,
+                        cardGrid.getArea({
+                            x: 2 + x * 4,
+                            y: 6 + y,
+                            width: 3,
+                            height: 1,
+                        }),
+                    )
+                        .setText(
+                            `${translateWildcard(`fight.end.stats.${name}`)} : ${value}`,
+                        )
+                        .setDepth(
+                            Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 6,
+                        ),
+                );
+                i++;
+            }
+        }
     }
 
     displayBoostCard(boost: Boost, entityListGrid: Grid, index: number) {
