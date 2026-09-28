@@ -31,6 +31,7 @@ import { InspectCharacterService } from "./services/inspect-character.service";
 import { RangeService } from "./services/range.service";
 import { ActionsStore } from "./stores/actions.store";
 import { ClassStore } from "./stores/class.store";
+import { EndFightStore } from "./stores/end-fight.store";
 import { GameStore } from "./stores/game.store";
 import { GridStore } from "./stores/grid.store";
 import { PlayerStore } from "./stores/player.store";
@@ -53,6 +54,7 @@ export class FightSceneRoot {
         const gameStore = new GameStore();
         const gridStore = new GridStore();
         const playerStore = new PlayerStore(classStore, gameStore);
+        const endFightStore = new EndFightStore();
 
         /**
          * Displayers
@@ -67,6 +69,7 @@ export class FightSceneRoot {
             scene,
             gameStore,
             playerStore,
+            actionsStore,
         );
         const playerStatsDisplayer = new StatsDisplayer(scene, gameStore, {
             x: 1,
@@ -93,6 +96,7 @@ export class FightSceneRoot {
             scene,
             gameStore,
             playerStore,
+            endFightStore,
         );
         const particleDisplayer = new ParticleDisplayer(scene);
         const toaster = new ToastDisplayer(scene, gridStore);

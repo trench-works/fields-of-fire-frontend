@@ -22,6 +22,7 @@ import { Entity } from "../../../Model/Entity";
 import { Stats, StatsUtils } from "../../../Model/Stats";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/game.store";
+import { StatsStore } from "../stores/stats.store";
 import { FightSceneDisplayer } from "./base/fight-scene.displayer";
 
 const statDescriptions: Record<string, string> = {
@@ -53,21 +54,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
         { text: DisplayText; image: DisplayImage }
     >;
 
-    /**
-     * Data
-     */
-    private entity: Entity | undefined;
-    private characterClass: CharacterClass | undefined;
-    private name: string | undefined;
-    private show: boolean;
-
-    get entityId() {
-        return this.entity?.id;
-    }
-
-    get isShow() {
-        return this.show;
-    }
+    public statsStore: StatsStore;
 
     constructor(
         scene: FightScene,
@@ -76,21 +63,21 @@ export class StatsDisplayer extends FightSceneDisplayer {
     ) {
         super(scene, gameStore);
         this.statTexts = new Map();
-        this.show = true;
+        this.statsStore = new StatsStore();
     }
 
     setEntity(entity: Entity): this {
-        this.entity = entity;
+        this.statsStore.entity = entity;
         return this;
     }
 
     setCharacterClass(characterClass: CharacterClass): this {
-        this.characterClass = characterClass;
+        this.statsStore.characterClass = characterClass;
         return this;
     }
 
     setName(name: string): this {
-        this.name = name;
+        this.statsStore.name = name;
         return this;
     }
 
@@ -264,13 +251,13 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 .setDepth(
                     Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER + 1),
                 );
-            if (image && this.entity) {
+            if (image && this.statsStore.entity) {
                 image.setInteractive(true);
                 this.scene.tooltip.attachTo(
                     image.getObject(),
                     statDescriptions[icon] ?? icon,
                     icon === "life"
-                        ? `${icon} (Max: ${StatsUtils.fromEntity(this.entity).maxLife})`
+                        ? `${icon} (Max: ${StatsUtils.fromEntity(this.statsStore.entity).maxLife})`
                         : icon,
                 );
             }
@@ -296,10 +283,10 @@ export class StatsDisplayer extends FightSceneDisplayer {
     }
 
     update(): this {
-        if (this.entity) {
-            const stats = StatsUtils.fromEntity(this.entity);
+        if (this.statsStore.entity) {
+            const stats = StatsUtils.fromEntity(this.statsStore.entity);
 
-            if (this.entity.dead) {
+            if (this.statsStore.entity.dead) {
                 this.blurOut();
             } else {
                 this.unblur();
@@ -314,14 +301,16 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 text.setText(String(value), { fontSize: 20 });
             });
 
-            this.playerNameText.setText(this.name ?? "N/A");
-            if (this.characterClass) {
+            this.playerNameText.setText(this.statsStore.name ?? "N/A");
+            if (this.statsStore.characterClass) {
                 this.statsClassNameText.setText(
-                    this.characterClass.name ?? "N/A",
+                    this.statsStore.characterClass.name ?? "N/A",
                 );
             }
             this.statsImage.setBackgroundImage(
-                CharacterCloseupAsset.getAssetKey(this.entity.classId),
+                CharacterCloseupAsset.getAssetKey(
+                    this.statsStore.entity.classId,
+                ),
             );
             this.displayEffects();
         }
@@ -330,7 +319,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
 
     setIsShow(isShow: boolean): this {
         console.log("IS SHOW CALLED WITH", isShow);
-        this.show = isShow;
+        this.statsStore.show = isShow;
 
         this.statsPanel.setVisible(isShow);
         this.statsImage.setVisible(isShow);
@@ -356,12 +345,15 @@ export class StatsDisplayer extends FightSceneDisplayer {
         this.effectImages.forEach((img) => img.destroy());
         this.effectImages = [];
 
-        if (this.entity) {
-            const groupedEffects = this.entity.effects.reduce((acc, effect) => {
-                if (!acc.has(effect.id)) acc.set(effect.id, []);
-                acc.get(effect.id)!.push(effect);
-                return acc;
-            }, new Map<EffectAssetId, Effect[]>());
+        if (this.statsStore.entity) {
+            const groupedEffects = this.statsStore.entity.effects.reduce(
+                (acc, effect) => {
+                    if (!acc.has(effect.id)) acc.set(effect.id, []);
+                    acc.get(effect.id)!.push(effect);
+                    return acc;
+                },
+                new Map<EffectAssetId, Effect[]>(),
+            );
 
             Array.from(groupedEffects.entries()).forEach(
                 ([id, effects], index) => {
@@ -384,7 +376,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                                 UI_LEVELS_OFFSET.CONTAINER + 2,
                             ),
                         );
-                    if (this.entity?.dead) {
+                    if (this.statsStore.entity?.dead) {
                         //image.blur();
                     }
 

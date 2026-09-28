@@ -20,9 +20,9 @@ export class GameController {
         this.inspectService.inspectCharacter(entityId);
     };
 
-    create() {
+    create = () => {
         this.gameService.create();
-    }
+    };
 
     disconnect = () => {
         this.gameService.disconnect();

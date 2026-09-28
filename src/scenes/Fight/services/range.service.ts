@@ -8,7 +8,7 @@ import { GameStore } from "../stores/game.store";
 import { GridStore } from "../stores/grid.store";
 
 export class RangeService {
-    private cellsInRange: Cell[] = [];
+    private cellsInRange: Cell[] = []; //TODO: bouger ca dans un store
 
     constructor(
         private readonly scene: FightScene,

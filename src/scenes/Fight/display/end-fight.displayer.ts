@@ -20,6 +20,7 @@ import { GameMode } from "../../../Model/Game";
 import { Player } from "../../../Model/Player";
 import { MainMenu } from "../../MainMenu/main-menu.scene";
 import { FightScene } from "../fight.scene";
+import { EndFightStore } from "../stores/end-fight.store";
 import { GameStore } from "../stores/game.store";
 import { PlayerStore } from "../stores/player.store";
 import { FightSceneDisplayer } from "./base/fight-scene.displayer";
@@ -37,21 +38,17 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     protected selectedBoostCard?: DisplayContainer;
     protected boostCards: Map<string, DisplayContainer> = new Map();
 
-    protected boostId: string | null = null;
-    protected boosts!: Boost[];
-
     protected root: DisplayRoot;
     protected temporaryRoot: DisplayRoot;
     protected buttonsRoot: DisplayRoot;
 
     protected titleText!: DisplayText;
 
-    protected isReady: boolean = false;
-
     constructor(
         scene: FightScene,
         gameStore: GameStore,
         private readonly playerStore: PlayerStore,
+        private readonly endFightStore: EndFightStore,
     ) {
         super(scene, gameStore);
         this.root = new DisplayRoot();
@@ -193,8 +190,8 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     }
 
     show(playerWin: boolean, boosts: Boost[]) {
-        this.boosts = boosts;
-        this.isReady = this.gameStore.game.readyPlayers.includes(
+        this.endFightStore.boosts = boosts;
+        this.endFightStore.isReady = this.gameStore.game.readyPlayers.includes(
             this.playerStore.player.id,
         );
 
@@ -265,7 +262,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     }
 
     onBoostClick(boostId: string, card: DisplayContainer) {
-        this.boostId = boostId;
+        this.endFightStore.boostId = boostId;
 
         if (this.selectedBoostCard) {
             this.selectedBoostCard.setBackgroundColor(Color.MILITARY_GREEN);
@@ -276,9 +273,11 @@ export class EndFightDisplayer extends FightSceneDisplayer {
     }
 
     onReady() {
-        if (!this.isReady) {
-            this.isReady = true;
-            this.scene.root.controllers.game.readyForNewGame(this.boostId);
+        if (!this.endFightStore.isReady) {
+            this.endFightStore.isReady = true;
+            this.scene.root.controllers.game.readyForNewGame(
+                this.endFightStore.boostId,
+            );
         }
         this.temporaryRoot.destroy();
     }
@@ -528,7 +527,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                                     { x: 2, y: 2, width: 7, height: 5 },
                                     {
                                         division: {
-                                            horizontal: this.boosts.length,
+                                            horizontal:
+                                                this.endFightStore.boosts
+                                                    .length,
                                             vertical: 4,
                                         },
                                         margin: {
@@ -540,32 +541,34 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                                     },
                                 );
 
-                            this.boosts.forEach((boost, index) => {
-                                this.displayBoostCard(
-                                    boost,
-                                    boostListGrid.getSubGrid(
-                                        {
-                                            x: index + 1,
-                                            y: 1,
-                                            width: 1,
-                                            height: 4,
-                                            margin: {
-                                                top: 40,
-                                                bottom: 0,
-                                                left: 30,
-                                                right: 30,
+                            this.endFightStore.boosts.forEach(
+                                (boost, index) => {
+                                    this.displayBoostCard(
+                                        boost,
+                                        boostListGrid.getSubGrid(
+                                            {
+                                                x: index + 1,
+                                                y: 1,
+                                                width: 1,
+                                                height: 4,
+                                                margin: {
+                                                    top: 40,
+                                                    bottom: 0,
+                                                    left: 30,
+                                                    right: 30,
+                                                },
                                             },
-                                        },
-                                        {
-                                            division: {
-                                                horizontal: 5,
-                                                vertical: 4,
+                                            {
+                                                division: {
+                                                    horizontal: 5,
+                                                    vertical: 4,
+                                                },
                                             },
-                                        },
-                                    ),
-                                    index,
-                                );
-                            });
+                                        ),
+                                        index,
+                                    );
+                                },
+                            );
 
                             this.temporaryRoot.setVisible(true);
                             this.showReadyButton();
@@ -617,7 +620,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 },
             )
                 .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 4)
-                .setIsActivated(!this.isReady),
+                .setIsActivated(!this.endFightStore.isReady),
         );
     }
 }

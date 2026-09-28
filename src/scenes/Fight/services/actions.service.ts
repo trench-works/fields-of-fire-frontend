@@ -106,7 +106,7 @@ export class ActionsService {
     }
 
     handleActionKey(index: number) {
-        const action = this.actions.orderedActions[index];
+        const action = this.actionStore.orderedActions[index];
         if (action && !this.actionStore.lockLevel) {
             this.handleActionSelection(action);
         } else {

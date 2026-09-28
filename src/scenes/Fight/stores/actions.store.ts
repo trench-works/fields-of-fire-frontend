@@ -5,9 +5,12 @@ export class ActionsStore {
 
     lockLevel: number;
 
+    public orderedActions: Action[];
+
     constructor() {
         this.selectedAction = null;
         this.lockLevel = 0;
+        this.orderedActions = [];
     }
 }
 

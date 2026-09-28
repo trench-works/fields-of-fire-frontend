@@ -47,7 +47,8 @@ export class GameUpdateService {
                     break;
                 case "death":
                     if (
-                        animation.data.entityId === this.inspectStats.entityId
+                        animation.data.entityId ===
+                        this.inspectStats.statsStore.entityId
                     ) {
                         this.inspectStats.setIsShow(false);
                     }
@@ -80,10 +81,10 @@ export class GameUpdateService {
             .setCharacterClass(this.playerStore.playerClass)
             .setName(user?.username ?? "NO_NAME")
             .update();
-        if (this.inspectStats.isShow) {
-            if (this.inspectStats.entityId) {
+        if (this.inspectStats.statsStore.isShow) {
+            if (this.inspectStats.statsStore.entityId) {
                 this.inspectService.inspectCharacter(
-                    this.inspectStats.entityId,
+                    this.inspectStats.statsStore.entityId,
                 );
             } else {
                 this.inspectStats.setIsShow(false);

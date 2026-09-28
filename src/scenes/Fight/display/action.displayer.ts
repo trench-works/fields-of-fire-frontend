@@ -12,36 +12,32 @@ import {
     UI_LEVELS_OFFSET,
     i18n,
 } from "../../../core";
-import { Action } from "../../../Model/Action";
 import { StatsUtils } from "../../../Model/Stats";
 import { FightScene } from "../fight.scene";
+import { ActionsStore } from "../stores/actions.store";
 import { GameStore } from "../stores/game.store";
 import { PlayerStore } from "../stores/player.store";
 import { FightSceneDisplayer } from "./base/fight-scene.displayer";
 
 export class ActionDisplayer extends FightSceneDisplayer {
+    public root: DisplayRoot;
     protected actionArea!: GridArea;
     /**
      * Displayed Elements
      */
     protected actionPanel!: DisplayContainer;
     public actionElements: Map<string, Button> = new Map();
-    public orderedActions: Action[] = [];
     public endTurnButton!: Button;
     protected actionsList!: List;
-
-    protected selectedAction: ActionAssetId | null;
-
-    public root!: DisplayRoot;
 
     constructor(
         scene: FightScene,
         gameStore: GameStore,
         private readonly playerStore: PlayerStore,
+        private readonly actionStore: ActionsStore,
     ) {
         super(scene, gameStore);
         this.root = new DisplayRoot();
-        this.selectedAction = null;
     }
 
     public clearCurrentAction() {
@@ -117,9 +113,9 @@ export class ActionDisplayer extends FightSceneDisplayer {
     }
 
     render(): this {
-        this.orderedActions = [];
+        this.actionStore.orderedActions = [];
         this.playerStore.playerClass.actionList.forEach((action, index) => {
-            this.orderedActions.push(action);
+            this.actionStore.orderedActions.push(action);
             const iconObj = this.actionsList.placeElement(
                 { x: index, y: 0 },
                 (area) => {
