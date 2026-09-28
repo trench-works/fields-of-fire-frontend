@@ -117,6 +117,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
     }
 
     render(): this {
+        this.orderedActions = [];
         this.playerStore.playerClass.actionList.forEach((action, index) => {
             this.orderedActions.push(action);
             const iconObj = this.actionsList.placeElement(

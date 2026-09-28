@@ -81,7 +81,13 @@ export class GameUpdateService {
             .setName(user?.username ?? "NO_NAME")
             .update();
         if (this.inspectStats.isShow) {
-            this.inspectService.inspectCharacter(this.inspectStats.entityId);
+            if (this.inspectStats.entityId) {
+                this.inspectService.inspectCharacter(
+                    this.inspectStats.entityId,
+                );
+            } else {
+                this.inspectStats.setIsShow(false);
+            }
         }
 
         this.actionsService.unlock();
