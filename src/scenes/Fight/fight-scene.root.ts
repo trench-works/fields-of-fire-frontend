@@ -171,7 +171,6 @@ export class FightSceneRoot {
             playerStore,
             gameUpdateQueue,
             actionService,
-            inspectStatsService,
             connectingRepository,
             gameRepository,
             actionRepository,

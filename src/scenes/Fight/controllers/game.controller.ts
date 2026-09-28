@@ -1,4 +1,3 @@
-import { Game } from "../../../Model/Game";
 import { FightSceneInit } from "../fight.scene";
 import { GameService } from "../services/game.service";
 import { InspectCharacterService } from "../services/inspect-character.service";
@@ -15,10 +14,6 @@ export class GameController {
 
     init = (data: FightSceneInit) => {
         this.gameService.init(data);
-    };
-
-    reset = async (game: Game) => {
-        this.gameService.reset(game);
     };
 
     inspectCharacter = (entityId: string) => {

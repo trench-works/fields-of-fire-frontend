@@ -22,7 +22,6 @@ import { GamePlayerSocket } from "../repositories/player.socket";
 import { ActionsService } from "../services/actions.service";
 import { GameStore } from "../stores/game.store";
 import { PlayerStore } from "../stores/player.store";
-import { InspectCharacterService } from "./inspect-character.service";
 
 export class GameService {
     constructor(
@@ -34,7 +33,6 @@ export class GameService {
         // Services
         private readonly gameUpdateQueue: EventQueue<GameUpdateEvent>,
         private readonly actionsService: ActionsService,
-        private readonly inspectStatsService: InspectCharacterService,
         // Repositories
         private readonly connectingRepository: ConnectingRepository,
         private readonly gameRepository: GameRepository,
@@ -67,7 +65,7 @@ export class GameService {
         this.turns.preRender();
         this.character.preRender();
         this.playerStats.preRender();
-        this.inspectStats.preRender();
+        this.inspectStats.preRender().setIsShow(false);
         this.endFight.preRender();
 
         this.root.playerSocket = new GamePlayerSocket(game.id, playerId);
@@ -97,7 +95,7 @@ export class GameService {
             this.endFight.show(iAmWinner, event.boosts);
         });
 
-        this.gameRepository.onGameRenew(async (event) => {
+        this.gameRepository.onGameRenew((event) => {
             this.reset(event.data);
             this.endFight.reset();
         });
@@ -121,11 +119,7 @@ export class GameService {
             .setCharacterClass(this.playerStore.playerClass)
             .setName(user?.username ?? "NO_NAME")
             .update();
-        if (this.inspectStats.isShow) {
-            this.inspectStatsService.inspectCharacter(
-                this.inspectStats.entityId,
-            );
-        }
+        this.inspectStats.setIsShow(false);
 
         await Timeout(1000);
         this.actionsService.unlock();

@@ -56,10 +56,10 @@ export class StatsDisplayer extends FightSceneDisplayer {
     /**
      * Data
      */
-    private entity!: Entity;
-    private characterClass!: CharacterClass;
-    private name!: string;
-    private show!: boolean;
+    private entity: Entity | undefined;
+    private characterClass: CharacterClass | undefined;
+    private name: string | undefined;
+    private show: boolean;
 
     get entityId() {
         return this.entity?.id;
@@ -76,6 +76,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
     ) {
         super(scene, gameStore);
         this.statTexts = new Map();
+        this.show = true;
     }
 
     setEntity(entity: Entity): this {
@@ -263,7 +264,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 .setDepth(
                     Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER + 1),
                 );
-            if (image) {
+            if (image && this.entity) {
                 image.setInteractive(true);
                 this.scene.tooltip.attachTo(
                     image.getObject(),
@@ -295,33 +296,40 @@ export class StatsDisplayer extends FightSceneDisplayer {
     }
 
     update(): this {
-        const stats = StatsUtils.fromEntity(this.entity);
+        if (this.entity) {
+            const stats = StatsUtils.fromEntity(this.entity);
 
-        if (this.entity.dead) {
-            this.blurOut();
-        } else {
-            this.unblur();
-        }
-
-        this.statTexts.forEach(({ text }, key) => {
-            let value = stats[key];
-            if (["life", "mouvement", "energy"].includes(key)) {
-                value = Math.max(value, 0);
+            if (this.entity.dead) {
+                this.blurOut();
+            } else {
+                this.unblur();
             }
 
-            text.setText(String(value), { fontSize: 20 });
-        });
+            this.statTexts.forEach(({ text }, key) => {
+                let value = stats[key];
+                if (["life", "mouvement", "energy"].includes(key)) {
+                    value = Math.max(value, 0);
+                }
 
-        this.playerNameText.setText(this.name ?? "N/A");
-        this.statsClassNameText.setText(this.characterClass.name ?? "N/A");
-        this.statsImage.setBackgroundImage(
-            CharacterCloseupAsset.getAssetKey(this.entity.classId),
-        );
-        this.displayEffects();
+                text.setText(String(value), { fontSize: 20 });
+            });
+
+            this.playerNameText.setText(this.name ?? "N/A");
+            if (this.characterClass) {
+                this.statsClassNameText.setText(
+                    this.characterClass.name ?? "N/A",
+                );
+            }
+            this.statsImage.setBackgroundImage(
+                CharacterCloseupAsset.getAssetKey(this.entity.classId),
+            );
+            this.displayEffects();
+        }
         return this;
     }
 
     setIsShow(isShow: boolean): this {
+        console.log("IS SHOW CALLED WITH", isShow);
         this.show = isShow;
 
         this.statsPanel.setVisible(isShow);
@@ -348,58 +356,67 @@ export class StatsDisplayer extends FightSceneDisplayer {
         this.effectImages.forEach((img) => img.destroy());
         this.effectImages = [];
 
-        const groupedEffects = this.entity.effects.reduce((acc, effect) => {
-            if (!acc.has(effect.id)) acc.set(effect.id, []);
-            acc.get(effect.id)!.push(effect);
-            return acc;
-        }, new Map<EffectAssetId, Effect[]>());
+        if (this.entity) {
+            const groupedEffects = this.entity.effects.reduce((acc, effect) => {
+                if (!acc.has(effect.id)) acc.set(effect.id, []);
+                acc.get(effect.id)!.push(effect);
+                return acc;
+            }, new Map<EffectAssetId, Effect[]>());
 
-        Array.from(groupedEffects.entries()).forEach(([id, effects], index) => {
-            const col = (index % 3) + 1;
-            const row = Math.floor(index / 3) + 1;
+            Array.from(groupedEffects.entries()).forEach(
+                ([id, effects], index) => {
+                    const col = (index % 3) + 1;
+                    const row = Math.floor(index / 3) + 1;
 
-            const area = this.effectListGrid.getArea({ x: col, y: row });
+                    const area = this.effectListGrid.getArea({
+                        x: col,
+                        y: row,
+                    });
 
-            const image = new DisplayImage(
-                this.scene,
-                area.scaleFromCenter(1, ScaleMode.FIT),
-            )
-                .setImage(EffectAsset.getAssetKey(id), { scale: 1.2 })
-                .setInteractive(true)
-                .setDepth(
-                    Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER + 2),
-                );
-            if (this.entity.dead) {
-                //image.blur();
-            }
-
-            const body = effects
-                .map((effect) => {
-                    const modified = Object.fromEntries(
-                        Object.entries(effect.modifier).filter(
-                            ([, value]) => value !== 0,
-                        ),
-                    );
-                    if (Object.keys(modified).length === 0) {
-                        return `${effect.author ? effect.author + ", " : ""}${i18n.translate("fight.effects.duration")} : ${effect.duration ?? "∞"}`;
+                    const image = new DisplayImage(
+                        this.scene,
+                        area.scaleFromCenter(1, ScaleMode.FIT),
+                    )
+                        .setImage(EffectAsset.getAssetKey(id), { scale: 1.2 })
+                        .setInteractive(true)
+                        .setDepth(
+                            Depth.getUIElementDepth(
+                                UI_LEVELS_OFFSET.CONTAINER + 2,
+                            ),
+                        );
+                    if (this.entity?.dead) {
+                        //image.blur();
                     }
-                    const modifierLines = Object.entries(modified)
-                        .map(
-                            ([key, value]) =>
-                                `${key}: ${value > 0 ? "+" : ""}${value}`,
-                        )
-                        .join("\n");
-                    return `--------\n${modifierLines}\n${effect.author ? effect.author + ", " : ""}${i18n.translate("fight.effects.duration")} : ${effect.duration ?? "∞"}`;
-                })
-                .join("\n");
 
-            this.scene.tooltip.attachTo(
-                image.getObject(),
-                body,
-                effects[0].name ?? id,
+                    const body = effects
+                        .map((effect) => {
+                            const modified = Object.fromEntries(
+                                Object.entries(effect.modifier).filter(
+                                    ([, value]) => value !== 0,
+                                ),
+                            );
+                            if (Object.keys(modified).length === 0) {
+                                return `${effect.author ? effect.author + ", " : ""}${i18n.translate("fight.effects.duration")} : ${effect.duration ?? "∞"}`;
+                            }
+                            const modifierLines = Object.entries(modified)
+                                .map(
+                                    ([key, value]) =>
+                                        `${key}: ${value > 0 ? "+" : ""}${value}`,
+                                )
+                                .join("\n");
+                            return `--------\n${modifierLines}\n${effect.author ? effect.author + ", " : ""}${i18n.translate("fight.effects.duration")} : ${effect.duration ?? "∞"}`;
+                        })
+                        .join("\n");
+
+                    this.scene.tooltip.attachTo(
+                        image.getObject(),
+                        body,
+                        effects[0].name ?? id,
+                    );
+                    this.effectImages.push(image);
+                },
             );
-            this.effectImages.push(image);
-        });
+        }
     }
 
     async animate(): Promise<this> {
