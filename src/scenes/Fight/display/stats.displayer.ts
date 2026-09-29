@@ -318,7 +318,6 @@ export class StatsDisplayer extends FightSceneDisplayer {
     }
 
     setIsShow(isShow: boolean): this {
-        console.log("IS SHOW CALLED WITH", isShow);
         this.statsStore.show = isShow;
 
         this.statsPanel.setVisible(isShow);

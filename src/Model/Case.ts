@@ -15,13 +15,11 @@ export function applyFovToRange(
     board: Case[][],
 ): Cell[] {
     const inFovCells: Cell[] = [];
-    console.log(board);
     computeFov(
         origin,
         ({ x, y }) => {
             const checkCell = board[x]?.[y];
             if (!checkCell) {
-                console.log("NOT CHECK CELL", { x, y });
                 return true;
             }
             const blocked = Boolean(checkCell.isWall || checkCell.entityId);

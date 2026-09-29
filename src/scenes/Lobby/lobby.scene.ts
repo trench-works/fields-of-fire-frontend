@@ -9,7 +9,6 @@ import {
     DisplayText,
     ScaleMode,
     BaseSceneInit,
-    SoundLevel,
     i18n,
     calculateGridDivision,
 } from "../../core";
@@ -30,7 +29,6 @@ import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { ClassStore } from "../Fight/stores/class.store";
 import { LobbyStore } from "./stores/lobby.store";
 import { LobbyData } from "../LobbyList/interfaces/LobbyData";
-import { SoundParam } from "../../core/Utils/SoundLevel";
 import { SettingsDisplayer } from "./display/settings.displayer";
 import { translate } from "../../core/i18n/i18n";
 import { PlayerListDisplayer } from "./display/player-list.displayer";
@@ -132,10 +130,6 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 config: { keepMusic: false },
             });
         });
-        console.log(
-            "musicSound - LOBBY : ",
-            SoundLevel.get(SoundParam.BACKGROUND),
-        );
         this.settings = new SettingsDisplayer(
             this,
             this.lobbyStore,

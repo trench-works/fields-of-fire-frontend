@@ -16,7 +16,6 @@ export class ConnectingRepository implements ConnectionListener {
         this.root.playerSocket?.on<{ progress: number }>(
             GamePlayerEvents.CONNECTION_UPDATE,
             ({ progress }) => {
-                console.log("progress", progress);
                 if (progress === 1) {
                     listener();
                 }
@@ -25,7 +24,6 @@ export class ConnectingRepository implements ConnectionListener {
     }
 
     removeConnectionListener() {
-        console.log("WILL REMOVE LISTENERS NOW");
         this.root.playerSocket?.removeListeners(
             GamePlayerEvents.CONNECTION_UPDATE,
         );

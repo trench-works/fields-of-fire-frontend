@@ -117,8 +117,6 @@ export class RangeService {
         const result: Cell[] = [];
         const board = this.gameStore.game.plateau;
 
-        console.log("typeof actionRange is ", action.rangeType);
-
         this.gridStore.forEach(({ index: { x, y } }) => {
             let isInRange = false;
             const cell = this.gameStore.getCell({ x, y });

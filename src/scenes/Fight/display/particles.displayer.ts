@@ -38,7 +38,6 @@ export class ParticleDisplayer extends Displayer<FightScene> {
         offset: GRID_LEVELS_OFFSET,
     ): Promise<this> {
         const depth = Depth.getFromGridPosition(cell.index, offset);
-        console.log("ANIMATE INTIMIDATION");
         switch (particleKey) {
             case ParticleAssetId.BOOST:
                 this.gridParticles(
@@ -104,8 +103,6 @@ export class ParticleDisplayer extends Displayer<FightScene> {
             this.buffEmitter.stop();
             this.buffEmitter.destroy();
         }
-
-        console.log(cell.scale);
 
         this.buffEmitter = this.scene.add.particles(
             x,

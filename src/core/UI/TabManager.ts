@@ -73,7 +73,6 @@ export class TabManager {
     }
 
     switchTo(index: number) {
-        console.log("switch to ", index);
         if (this.activeTab === index) return;
         // Masquer tous les contenus
         this.contents.forEach((c) => c.setVisible(false));

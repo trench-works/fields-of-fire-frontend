@@ -4,7 +4,6 @@ import {
     DisplayText,
     i18n,
     ScaleMode,
-    SoundLevel,
     StartSceneConfig,
 } from "../../core";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
@@ -14,7 +13,6 @@ import { UserRepository } from "./repositories/user.repository";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { MiscAsset, MiscAssetId, MusicAsset, MusicAssetId } from "../../assets";
 import { ParameterScene } from "../Parameter/parameter.scene";
-import { SoundParam } from "../../core/Utils/SoundLevel";
 import { translate } from "../../core/i18n/i18n";
 
 export class MainMenu extends BaseScene {
@@ -223,11 +221,6 @@ export class MainMenu extends BaseScene {
                 },
             },
         ).setIsActivated(true);
-
-        console.log(
-            "musicSound - MENU : ",
-            SoundLevel.get(SoundParam.BACKGROUND),
-        );
     }
 
     updateLoginButtons() {

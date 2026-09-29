@@ -51,7 +51,6 @@ export class GameRepository {
     constructor(private readonly root: FightSceneRoot) {}
 
     readyForNewGame(boostId: string | null) {
-        console.log("rdyFrNewGame called");
         return this.root.playerSocket?.send<PlayerReady>(
             GamePlayerActions.READY,
             { boostId },
