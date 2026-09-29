@@ -9,6 +9,8 @@ export enum StatsAssetId {
     LIFE = "life",
     PRECISION = "precision",
     STRENGTH = "strength",
+    INTELLIGENCE = "intelligence",
+    CRITICAL = "critical"
 }
 
 class StatsIconAssetManager extends ImageAssetManager<StatsAssetId, string> {
@@ -32,6 +34,9 @@ class StatsIconAssetManager extends ImageAssetManager<StatsAssetId, string> {
                 [StatsAssetId.MOUVEMENT]: StatsAssetId.MOUVEMENT,
                 [StatsAssetId.PRECISION]: StatsAssetId.PRECISION,
                 [StatsAssetId.STRENGTH]: StatsAssetId.STRENGTH,
+                //new stat
+                [StatsAssetId.INTELLIGENCE]: StatsAssetId.INTELLIGENCE,
+                [StatsAssetId.CRITICAL]: StatsAssetId.CRITICAL,
             },
             {
                 [StatsAssetId.ARMOR]: { width: 1, height: 1 },
@@ -42,6 +47,8 @@ class StatsIconAssetManager extends ImageAssetManager<StatsAssetId, string> {
                 [StatsAssetId.MOUVEMENT]: { width: 1, height: 1 },
                 [StatsAssetId.PRECISION]: { width: 1, height: 1 },
                 [StatsAssetId.STRENGTH]: { width: 1, height: 1 },
+                [StatsAssetId.INTELLIGENCE]: { width: 1, height: 1 },
+                [StatsAssetId.CRITICAL]: { width: 1, height: 1 },
             },
         );
     }
