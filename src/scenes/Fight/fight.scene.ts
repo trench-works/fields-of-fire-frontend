@@ -119,6 +119,7 @@ export class FightScene extends BaseScene<FightSceneInit> {
             ],
         });
         super.create();
+        this.playBackgroundMusic(MusicAssetId.FIGHT);
         this.tooltip = Tooltip.getInstance(this, {
             textColor: Color.BLACK,
             fontSize: 14,
