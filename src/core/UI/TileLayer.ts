@@ -162,9 +162,18 @@ export class TileLayer<T extends Tile> {
         }
     }
 
-    move(position: Position) {
-        this.position = PositionUtils.add(this.position, position);
-        this.tiles.flat().forEach((tile) => tile.move(position));
+    move(move: Position) {
+        const oldPosition: Position = { ...this.position };
+        this.position = PositionUtils.bound(
+            PositionUtils.add(this.position, move),
+            { x: -window.innerWidth / 2, y: -window.innerHeight / 2 },
+            { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+        );
+        const correctedMove = PositionUtils.subtract(
+            this.position,
+            oldPosition,
+        );
+        this.tiles.flat().forEach((tile) => tile.move(correctedMove));
     }
 
     getTile({ x, y }: Position): T | undefined {

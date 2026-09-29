@@ -10,6 +10,7 @@ import { EndFightDisplayer } from "../display/end-fight.displayer";
 import { ParticleDisplayer } from "../display/particles.displayer";
 import { StatsDisplayer } from "../display/stats.displayer";
 import { TurnDisplayer } from "../display/turns.displayer";
+import { UIDisplayer } from "../display/ui.displayer";
 import { FightSceneRoot } from "../fight-scene.root";
 import { FightScene, FightSceneInit } from "../fight.scene";
 import { ActionRepository } from "../repositories/action.repository";
@@ -46,6 +47,7 @@ export class GameService {
         private readonly inspectStats: StatsDisplayer,
         private readonly endFight: EndFightDisplayer,
         private readonly particleDisplayer: ParticleDisplayer,
+        private readonly uiDisplayer: UIDisplayer,
     ) {}
 
     readyForNewGame(boostId: string | null) {
@@ -67,6 +69,7 @@ export class GameService {
         this.playerStats.preRender();
         this.inspectStats.preRender().setIsShow(false);
         this.endFight.preRender();
+        this.uiDisplayer.preRender();
 
         this.root.playerSocket = new GamePlayerSocket(game.id, playerId);
         new ConnectionLoader(this.scene, this.connectingRepository);
@@ -114,6 +117,7 @@ export class GameService {
         this.actions.destroy().preRender().render().update();
         this.turns.update();
         this.character.render().update();
+        this.uiDisplayer.render();
         this.playerStats
             .setEntity(this.playerStore.playerEntity)
             .setCharacterClass(this.playerStore.playerClass)

@@ -13,6 +13,7 @@ import { ParticleDisplayer } from "./display/particles.displayer";
 import { StatsDisplayer } from "./display/stats.displayer";
 import { ToastDisplayer } from "./display/toast.displayer";
 import { TurnDisplayer } from "./display/turns.displayer";
+import { UIDisplayer } from "./display/ui.displayer";
 import { WallDisplayer } from "./display/wall.displayer";
 import { FightScene } from "./fight.scene";
 import { ActionRepository } from "./repositories/action.repository";
@@ -59,6 +60,7 @@ export class FightSceneRoot {
         /**
          * Displayers
          */
+        const uiDisplayer = new UIDisplayer(scene);
         const characterDisplayer = new CharactersDisplayer(
             scene,
             gameStore,
@@ -186,6 +188,7 @@ export class FightSceneRoot {
             inspectStatsDisplayer,
             endFightDisplayer,
             particleDisplayer,
+            uiDisplayer,
         );
 
         /**

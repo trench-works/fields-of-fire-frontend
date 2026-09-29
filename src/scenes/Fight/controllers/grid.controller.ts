@@ -4,6 +4,10 @@ import { GridService } from "../services/grid.service";
 export class GridController {
     constructor(private readonly gridService: GridService) {}
 
+    resetGrid = () => {
+        this.gridService.reset();
+    };
+
     cellClick = (position: Position) => {
         this.gridService.cellClick(position);
     };

@@ -38,6 +38,17 @@ export class PositionUtils {
     static equals(a: Position, b: Position): boolean {
         return a.x === b.x && a.y === b.y;
     }
+
+    static bound(
+        position: Position,
+        lowBound: Position,
+        highBound: Position,
+    ): Position {
+        return {
+            x: Math.min(highBound.x, Math.max(lowBound.x, position.x)),
+            y: Math.min(highBound.y, Math.max(lowBound.y, position.y)),
+        };
+    }
 }
 
 export class AxisUtils {

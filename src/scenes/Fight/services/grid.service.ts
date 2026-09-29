@@ -1,4 +1,5 @@
 import { Position } from "../../../core";
+import { TILE_SIZE } from "../../../core/UI/TileLayer";
 import { PositionUtils } from "../../../core/Utils/Sizing";
 import { StatsUtils } from "../../../Model/Stats";
 import { BoardDisplayer } from "../display/board.displayer";
@@ -59,7 +60,10 @@ export class GridService {
                 if (hoveringTile) {
                     this.groundStore.groundLayer?.move(
                         PositionUtils.subtract(
-                            { x: event.clientX, y: event.clientY },
+                            {
+                                x: event.clientX,
+                                y: event.clientY,
+                            },
                             hoveringTile.position,
                         ),
                     );
@@ -68,6 +72,31 @@ export class GridService {
                 }
             }
         });
+    }
+
+    reset() {
+        if (this.groundStore.groundLayer) {
+            this.groundStore.groundLayer.zoom = 1;
+            this.groundStore.groundLayer.position = { x: 0, y: 0 };
+
+            const scale = this.scene.scaleFactor;
+            this.groundStore.groundLayer.tiles.flat().forEach((tile) => {
+                if (this.groundStore.groundLayer) {
+                    tile.setScale(scale, 1, {
+                        x: window.innerWidth / 2,
+                        y:
+                            window.innerHeight / 2 -
+                            (this.groundStore.groundLayer.height *
+                                TILE_SIZE.height *
+                                scale *
+                                1) /
+                                4,
+                    });
+                }
+            });
+        }
+        this.characterDisplayer.scale();
+        this.boardDisplayer.scale();
     }
 
     cellClick({ x, y }: Position) {
