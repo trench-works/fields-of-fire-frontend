@@ -17,11 +17,6 @@ export class SoundEffect {
             //     y,
             // },
         });
-        console.log(
-            "SoundEffect constructor: ",
-            SoundLevel.get(SoundParam.EFFECT),
-            this.sound,
-        );
         this.sound.setVolume(SoundLevel.get(SoundParam.EFFECT));
     }
 
