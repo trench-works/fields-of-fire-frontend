@@ -93,8 +93,6 @@ export class GameService {
                     SoundEffectAsset.getAssetKey(SoundEffectAssetId.VICTORY),
                 ).play();
             }
-            //TODO: DISPLAY POPUP WIasync TH INFO event.playerWin (true|false)
-            //this.playBackgroundMusic(MusicAssetId.MENU, true);
             this.endFight.show(iAmWinner, event.boosts);
         });
 

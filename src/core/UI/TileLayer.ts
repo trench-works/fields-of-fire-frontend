@@ -71,9 +71,9 @@ export class Tile {
         return this.position;
     }
 
-    setScale(scale: number, zoom: number, offset: Position): this {
+    setScale(scale: number, offset: Position): this {
         this.offset = offset;
-        this.scale = scale * zoom;
+        this.scale = scale;
         this.position = this.getFullPosition();
         this.image?.place(
             new GridArea(
@@ -122,6 +122,7 @@ export class TileLayer<T extends Tile> {
     tiles: T[][];
 
     zoom: number = 1;
+    scale: number = 1;
 
     width: number;
     height: number;
@@ -135,6 +136,7 @@ export class TileLayer<T extends Tile> {
     ) {
         this.width = width;
         this.height = height;
+        this.scale = scale;
         this.position = { x: 0, y: 0 };
         const offset = {
             x: window.innerWidth / 2,
@@ -181,11 +183,11 @@ export class TileLayer<T extends Tile> {
     }
 
     zoomIn(scale: number, position: Position | undefined) {
-        this.scale(scale, 0.1, position);
+        this.setScale(scale, 0.1, position);
     }
 
     zoomOut(scale: number, position: Position | undefined) {
-        this.scale(scale, -0.1, position);
+        this.setScale(scale, -0.1, position);
     }
 
     private getOffset(
@@ -208,9 +210,12 @@ export class TileLayer<T extends Tile> {
         return PositionUtils.subtract(oldPosition, newPosition);
     }
 
-    private scale(scale: number, zoom: number, position: Position | undefined) {
+    public setScale(scale: number, zoom?: number, position?: Position) {
         const oldZoom = this.zoom;
-        this.zoom = Math.min(2, Math.max(0.5, this.zoom + zoom));
+        if (zoom) {
+            this.zoom = Math.min(2, Math.max(0.5, this.zoom + zoom));
+        }
+        this.scale = scale * this.zoom;
 
         if (position) {
             const offset = this.getOffset(position, scale, oldZoom);
@@ -219,14 +224,12 @@ export class TileLayer<T extends Tile> {
 
         this.tiles.flat().forEach((tile) =>
             tile.setScale(
-                scale,
-                this.zoom,
+                this.scale,
                 PositionUtils.add(this.position, {
                     x: window.innerWidth / 2,
                     y:
                         window.innerHeight / 2 -
-                        (this.height * TILE_SIZE.height * scale * this.zoom) /
-                            4,
+                        (this.height * TILE_SIZE.height * this.scale) / 4,
                 }),
             ),
         );

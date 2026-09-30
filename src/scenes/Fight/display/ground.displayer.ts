@@ -3,6 +3,7 @@ import { Depth, GRID_LEVELS_OFFSET } from "../../../core";
 import { Diamond } from "../../../core/Objects/Diamond";
 import { Tile, TILE_SIZE, TileLayer } from "../../../core/UI/TileLayer";
 import { scaleAndCenter } from "../../../core/Utils/Scale";
+import { PositionUtils } from "../../../core/Utils/Sizing";
 import { Entity } from "../../../Model/Entity";
 import { TEAM_COLORS } from "../../../Model/Team";
 import { Cell, FightScene } from "../fight.scene";
@@ -265,6 +266,10 @@ export class GroundDisplayer extends FightSceneDisplayer {
         tile.zone = zone;
         zone.on("pointerdown", () => {
             this.gridStore.dragging = true;
+            this.gridStore.dragOffset = PositionUtils.subtract(
+                this.gridStore.mousePosition,
+                tile.getPosition(),
+            );
         });
         zone.on("pointerup", () => {
             if (interactive) {

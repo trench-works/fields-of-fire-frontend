@@ -14,6 +14,7 @@ import {
     Position,
     SoundEffect,
 } from "../../../core";
+import { TILE_SIZE } from "../../../core/UI/TileLayer";
 import { Game } from "../../../Model/Game";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/game.store";
@@ -43,11 +44,18 @@ export class AttackDisplayer {
         ).animate(
             {
                 x: cell.position.x,
-                y: cell.position.y,
+                y:
+                    cell.position.y -
+                    (TILE_SIZE.height *
+                        (this.gridStore.groundLayer?.scale ?? 1)) /
+                        4,
             },
             {
                 depth: Depth.getFromGridPosition(pos) + depth,
-                scale: this.scene.scaleFactor / 1.5,
+                scale:
+                    (this.scene.scaleFactor *
+                        (this.gridStore.groundLayer?.zoom ?? 1)) /
+                    1.5,
                 origin,
             },
         );

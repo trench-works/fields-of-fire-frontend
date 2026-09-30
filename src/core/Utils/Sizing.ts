@@ -14,11 +14,20 @@ export class PositionUtils {
         return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
     }
 
-    static subtract(a: Position, b: Partial<Position>): Position {
-        return {
-            x: b.x ? a.x - b.x : a.x,
-            y: b.y ? a.y - b.y : a.y,
-        };
+    static subtract(
+        a: Position,
+        ...bs: (Partial<Position> | undefined)[]
+    ): Position {
+        let subtracted = { ...a };
+        for (const b of bs) {
+            if (b) {
+                subtracted = {
+                    x: b.x ? subtracted.x - b.x : subtracted.x,
+                    y: b.y ? subtracted.y - b.y : subtracted.y,
+                };
+            }
+        }
+        return subtracted;
     }
 
     static multiply({ x, y }: Position, multiplier: number): Position {

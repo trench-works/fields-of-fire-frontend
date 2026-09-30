@@ -1,5 +1,4 @@
 import { Position } from "../../../core";
-import { TILE_SIZE } from "../../../core/UI/TileLayer";
 import { PositionUtils } from "../../../core/Utils/Sizing";
 import { StatsUtils } from "../../../Model/Stats";
 import { BoardDisplayer } from "../display/board.displayer";
@@ -53,6 +52,10 @@ export class GridService {
             this.groundStore.dragging = false;
         });
         window.addEventListener("mousemove", (event) => {
+            this.groundStore.mousePosition = {
+                x: event.clientX,
+                y: event.clientY,
+            };
             if (this.groundStore.dragging && this.groundStore.hover) {
                 const hoveringTile = this.groundStore.get(
                     this.groundStore.hover,
@@ -64,6 +67,7 @@ export class GridService {
                                 x: event.clientX,
                                 y: event.clientY,
                             },
+                            this.groundStore.dragOffset,
                             hoveringTile.position,
                         ),
                     );
@@ -79,21 +83,7 @@ export class GridService {
             this.groundStore.groundLayer.zoom = 1;
             this.groundStore.groundLayer.position = { x: 0, y: 0 };
 
-            const scale = this.scene.scaleFactor;
-            this.groundStore.groundLayer.tiles.flat().forEach((tile) => {
-                if (this.groundStore.groundLayer) {
-                    tile.setScale(scale, 1, {
-                        x: window.innerWidth / 2,
-                        y:
-                            window.innerHeight / 2 -
-                            (this.groundStore.groundLayer.height *
-                                TILE_SIZE.height *
-                                scale *
-                                1) /
-                                4,
-                    });
-                }
-            });
+            this.groundStore.groundLayer.setScale(this.scene.scaleFactor);
         }
         this.characterDisplayer.scale();
         this.boardDisplayer.scale();

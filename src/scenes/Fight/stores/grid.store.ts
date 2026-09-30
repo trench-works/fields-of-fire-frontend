@@ -6,11 +6,15 @@ export class GridStore {
     public groundLayer: TileLayer<Cell> | undefined;
     public hover: Position | undefined;
     public dragging: boolean;
+    public dragOffset: Position | undefined;
+    public mousePosition: Position;
 
     constructor() {
         this.groundLayer = undefined;
         this.hover = undefined;
         this.dragging = false;
+        this.dragOffset = undefined;
+        this.mousePosition = { x: 0, y: 0 };
     }
 
     setHover(position: Position | undefined) {

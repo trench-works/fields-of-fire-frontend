@@ -8,7 +8,7 @@ import { GameStore } from "../stores/game.store";
 import { GridStore } from "../stores/grid.store";
 
 export class RangeService {
-    private cellsInRange: Cell[] = []; //TODO: bouger ca dans un store
+    private cellsInRange: Cell[] = []; //TODO: bouger ca dans un displayer
 
     constructor(
         private readonly scene: FightScene,
@@ -20,17 +20,17 @@ export class RangeService {
         cell: Cell,
         color: number = 0x00aaff,
     ): Phaser.GameObjects.Graphics {
-        const g = this.scene.add.graphics();
-        g.fillStyle(color, 0.6);
-        g.fillPoints(new Diamond(cell, cell.scale).points, true);
-        g.setPosition(cell.position.x, cell.position.y);
-        g.setDepth(
+        const highlight = this.scene.add.graphics();
+        highlight.fillStyle(color, 0.6);
+        highlight.fillPoints(new Diamond(cell, cell.scale).points, true);
+        highlight.setPosition(cell.position.x, cell.position.y);
+        highlight.setDepth(
             Depth.getFromGridPosition(
                 cell.index,
                 GRID_LEVELS_OFFSET.HIGHTLIGHT_3,
             ),
         );
-        return g;
+        return highlight;
     }
 
     showRange(): this {
