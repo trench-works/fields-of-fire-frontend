@@ -38,65 +38,6 @@ export class ActionDisplayer extends FightSceneDisplayer {
     ) {
         super(scene, gameStore);
         this.root = new DisplayRoot();
-
-        window.addEventListener("keydown", (event) =>
-            this.handleKeyClick(event),
-        );
-    }
-
-    handleKeyClick(event: KeyboardEvent) {
-        const binds = this.scene.keyBinds;
-        switch (event.code) {
-            case binds[KeyBind.ONE]:
-                event.preventDefault();
-                this.selectAction(0);
-                break;
-            case binds[KeyBind.TWO]:
-                event.preventDefault();
-                this.selectAction(1);
-                break;
-            case binds[KeyBind.THREE]:
-                event.preventDefault();
-                this.selectAction(2);
-                break;
-            case binds[KeyBind.FOUR]:
-                event.preventDefault();
-                this.selectAction(3);
-                break;
-            case binds[KeyBind.FIVE]:
-                event.preventDefault();
-                this.selectAction(4);
-                break;
-            case binds[KeyBind.SIX]:
-                event.preventDefault();
-                this.selectAction(5);
-                break;
-            case binds[KeyBind.SEVEN]:
-                event.preventDefault();
-                this.selectAction(6);
-                break;
-            case binds[KeyBind.EIGHT]:
-                event.preventDefault();
-                this.selectAction(7);
-                break;
-            case binds[KeyBind.NINE]:
-                event.preventDefault();
-                this.selectAction(8);
-                break;
-            case binds[KeyBind.ZERO]:
-                event.preventDefault();
-                this.selectAction(9);
-                break;
-        }
-    }
-
-    selectAction(index: number) {
-        const action = this.orderedActions[index];
-        if (action) {
-            this.handleActionSelection(action);
-        } else {
-            this.clearAction();
-        }
     }
 
     public clearCurrentAction() {

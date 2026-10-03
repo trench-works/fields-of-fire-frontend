@@ -46,8 +46,6 @@ export class Button
 
     public blurred: Phaser.FX.Blur | undefined = undefined;
 
-    public blurred: Phaser.FX.Blur | undefined = undefined;
-
     constructor(
         scene: BaseScene,
         protected readonly area: Position & Size,
