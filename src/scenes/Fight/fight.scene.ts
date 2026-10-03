@@ -119,6 +119,10 @@ export class FightScene extends BaseScene<FightSceneInit> {
             ],
         });
         super.create();
+        console.log(
+            "musicSound - FIGHT : ",
+            SoundLevel.get(SoundParam.BACKGROUND),
+        );
         this.playBackgroundMusic(MusicAssetId.FIGHT);
         this.tooltip = Tooltip.getInstance(this, {
             textColor: Color.BLACK,

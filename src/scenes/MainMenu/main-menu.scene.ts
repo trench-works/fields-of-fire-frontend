@@ -4,6 +4,7 @@ import {
     DisplayText,
     i18n,
     ScaleMode,
+    SoundLevel,
     StartSceneConfig,
 } from "../../core";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
@@ -148,6 +149,10 @@ export class MainMenu extends BaseScene {
                             if (globalThis.user) {
                                 this.playButton.alpha = 1;
                                 this.registerButton.setIsActivated(false);
+                                console.log(
+                                    "register globo : ",
+                                    globalThis.user.username,
+                                );
                                 this.registerButton.displayText(
                                     globalThis.user.username,
                                 );
@@ -221,6 +226,11 @@ export class MainMenu extends BaseScene {
                 },
             },
         ).setIsActivated(true);
+
+        console.log(
+            "musicSound - MENU : ",
+            SoundLevel.get(SoundParam.BACKGROUND),
+        );
     }
 
     updateLoginButtons() {
