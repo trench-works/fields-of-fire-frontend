@@ -1,51 +1,40 @@
-import { SceneRenderConfig } from "../../scenes/Fight/fight.scene";
 import { FourAxis, Position, TwoAxis } from "../Types/Sizing";
 
-export function getPixelsFromPosition(
-    position: Position,
-    renderConfig?: SceneRenderConfig,
-): Position {
-    const tileSize = renderConfig?.tileSize ?? 64;
-    if (renderConfig?.renderType === "ISOMETRIC") {
-        return {
-            x: position.x * tileSize + renderConfig.offset.x,
-            y: position.y * (tileSize / 2) + renderConfig.offset.y,
-        };
-    }
-    return {
-        x: position.x * tileSize + (renderConfig?.offset.x ?? 0),
-        y: position.y * tileSize + (renderConfig?.offset.y ?? 0),
-    };
-}
-
-export function getTilePositionFromScreenPosition(
-    _position: Position,
-    _renderConfig: SceneRenderConfig,
-) {
-    return { x: 0, y: 0 };
-}
-
 export class PositionUtils {
-    static add(a: Position, b: Position): Position {
-        return {
-            x: a.x + b.x,
-            y: a.y + b.y,
-        };
+    static add(a: Position, ...other: Position[]): Position {
+        const pos: Position = { ...a };
+        for (const some of other) {
+            pos.x += some.x;
+            pos.y += some.y;
+        }
+        return pos;
     }
 
     static distance(a: Position, b: Position): number {
         return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
     }
 
-    static subtract(a: Position, b: Position): Position {
-        return {
-            x: a.x - b.x,
-            y: a.y - b.y,
-        };
+    static subtract(
+        a: Position,
+        ...bs: (Partial<Position> | undefined)[]
+    ): Position {
+        let subtracted = { ...a };
+        for (const b of bs) {
+            if (b) {
+                subtracted = {
+                    x: b.x ? subtracted.x - b.x : subtracted.x,
+                    y: b.y ? subtracted.y - b.y : subtracted.y,
+                };
+            }
+        }
+        return subtracted;
     }
 
-    static getMapOffset(_renderConfig: SceneRenderConfig): Position {
-        return { x: 0, y: 0 };
+    static multiply({ x, y }: Position, multiplier: number): Position {
+        return {
+            x: x * multiplier,
+            y: y * multiplier,
+        };
     }
 
     static divide({ x, y }: Position, divider: number): Position {
@@ -56,7 +45,18 @@ export class PositionUtils {
     }
 
     static equals(a: Position, b: Position): boolean {
-        return a.x === b.y && a.y === b.y;
+        return a.x === b.x && a.y === b.y;
+    }
+
+    static bound(
+        position: Position,
+        lowBound: Position,
+        highBound: Position,
+    ): Position {
+        return {
+            x: Math.min(highBound.x, Math.max(lowBound.x, position.x)),
+            y: Math.min(highBound.y, Math.max(lowBound.y, position.y)),
+        };
     }
 }
 

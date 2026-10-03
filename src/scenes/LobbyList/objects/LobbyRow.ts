@@ -6,6 +6,7 @@ import {
     Grid,
     GridArea,
 } from "../../../core";
+import { translate } from "../../../core/i18n/i18n";
 
 type LobbyInfos = {
     id: string;
@@ -16,7 +17,7 @@ type LobbyInfos = {
 };
 export class LobbyRow {
     private container: DisplayContainer;
-    private texts: DisplayText[] = []; 
+    private texts: DisplayText[] = [];
 
     public id: string;
 
@@ -35,7 +36,6 @@ export class LobbyRow {
 
         this.container.setInteractive();
         this.container.on("pointerdown", () => onClick(this));
-        
 
         // Sous-grille locale à la ligne
 
@@ -62,9 +62,9 @@ export class LobbyRow {
                     width: 2,
                     height: 1,
                 }),
-            ).setText(`Lobby : ${lobby.name}`)
+            ).setText(lobby.name),
         );
-        
+
         this.texts.push(
             new DisplayText(
                 scene,
@@ -74,8 +74,8 @@ export class LobbyRow {
                     width: 1,
                     height: 1,
                 }),
-            ).setText(`${lobby.playersNum}/${lobby.maxPlayers}`)
-        )
+            ).setText(`${lobby.playersNum}/${lobby.maxPlayers}`),
+        );
 
         this.texts.push(
             new DisplayText(
@@ -86,10 +86,18 @@ export class LobbyRow {
                     width: 1,
                     height: 1,
                 }),
-            ).setText(lobby.playersNum < lobby.maxPlayers ? "Open" : "Full", {
-                color: lobby.playersNum < lobby.maxPlayers ? "#4ec64e" : "#c9443d",
-            })
-        )
+            ).setText(
+                lobby.playersNum < lobby.maxPlayers
+                    ? translate("lobbyList.status.open")
+                    : translate("lobbyList.status.full"),
+                {
+                    color:
+                        lobby.playersNum < lobby.maxPlayers
+                            ? Color.OPEN
+                            : Color.CLOSE,
+                },
+            ),
+        );
 
         this.texts.push(
             new DisplayText(
@@ -100,13 +108,13 @@ export class LobbyRow {
                     width: 2,
                     height: 1,
                 }),
-            ).setText(`Creator : ${lobby.creator}`)
+            ).setText(`Creator : ${lobby.creator}`),
         );
     }
 
     public setSelected(selected: boolean) {
         this.container.setBackgroundColor(
-            selected ? "#cc5316" : Color.containerBg,
+            selected ? Color.SELECTED_LOBBY : Color.MILITARY_SAND,
             selected ? 0.5 : 0.15,
         );
     }

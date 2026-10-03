@@ -1,4 +1,7 @@
-import { ImageAssetManager, SpriteAssetManager } from "../core/Assets/Asset";
+import {
+    ImageAssetManager,
+    SpriteSheetAssetManager,
+} from "../core/Assets/Asset";
 
 export enum CharacterAssetId {
     ENTENTE_FANTASSIN = "entente_fantassin",
@@ -71,7 +74,27 @@ class CharacterCloseupAssetManager extends ImageAssetManager<
 
 export const CharacterCloseupAsset = new CharacterCloseupAssetManager();
 
-class CharacterSpriteAssetManager extends SpriteAssetManager<
+export enum CharacterAnimation {
+    IDLE = "IDLE",
+    SCOPE = "SCOPE",
+}
+
+const defaultIdleAnimations = {
+    "IDLE-DR": { frames: [0, 1], duration: [500, 500] },
+    "IDLE-DL": { frames: [2, 3], duration: [500, 500] },
+    "IDLE-UL": { frames: [4, 5], duration: [500, 500] },
+    "IDLE-UR": { frames: [6, 7], duration: [500, 500] },
+};
+
+const defaultAnimations = {
+    ...defaultIdleAnimations,
+    "SCOPE-DR": { frames: [8], duration: [1000] },
+    "SCOPE-DL": { frames: [9], duration: [1000] },
+    "SCOPE-UL": { frames: [10], duration: [1000] },
+    "SCOPE-UR": { frames: [11], duration: [1000] },
+};
+
+class CharacterSpriteAssetManager extends SpriteSheetAssetManager<
     CharacterAssetId,
     string
 > {
@@ -84,48 +107,68 @@ class CharacterSpriteAssetManager extends SpriteAssetManager<
     }
 
     constructor() {
-        super("characters_sprite", CharacterAssetEntries, {
-            [CharacterAssetId.ENTENTE_FANTASSIN]: {
-                frameWidth: 96,
-                frameHeight: 128,
-                frameTime: [],
+        super(
+            "characters_sprite",
+            CharacterAssetEntries,
+            {
+                [CharacterAssetId.ENTENTE_FANTASSIN]: {
+                    frameWidth: 96,
+                    frameHeight: 128,
+                    frameTime: [],
+                },
+                [CharacterAssetId.ENTENTE_MEDIC]: {
+                    frameWidth: 96,
+                    frameHeight: 128,
+                    frameTime: [],
+                },
+                [CharacterAssetId.ENTENTE_CAPORAL]: {
+                    frameWidth: 96,
+                    frameHeight: 128,
+                    frameTime: [],
+                },
+                [CharacterAssetId.ENTENTE_BRISE_BARRICADE]: {
+                    frameWidth: 96,
+                    frameHeight: 140,
+                    frameTime: [],
+                },
+                [CharacterAssetId.ALLIANCE_FANTASSIN]: {
+                    frameWidth: 96,
+                    frameHeight: 128,
+                    frameTime: [],
+                },
+                [CharacterAssetId.ALLIANCE_MEDIC]: {
+                    frameWidth: 96,
+                    frameHeight: 128,
+                    frameTime: [],
+                },
+                [CharacterAssetId.ALLIANCE_CAPORAL]: {
+                    frameWidth: 96,
+                    frameHeight: 128,
+                    frameTime: [],
+                },
+                [CharacterAssetId.BARRICADE]: {
+                    frameWidth: 64,
+                    frameHeight: 64,
+                    frameTime: [],
+                },
             },
-            [CharacterAssetId.ENTENTE_MEDIC]: {
-                frameWidth: 96,
-                frameHeight: 128,
-                frameTime: [],
+            {
+                [CharacterAssetId.ENTENTE_FANTASSIN]: defaultAnimations,
+                [CharacterAssetId.ENTENTE_MEDIC]: defaultAnimations,
+                [CharacterAssetId.ENTENTE_CAPORAL]: defaultAnimations,
+                [CharacterAssetId.ENTENTE_BRISE_BARRICADE]: {
+                    ...defaultIdleAnimations,
+                    "SCOPE-DR": { frames: [8, 9], duration: [500, 500] },
+                    "SCOPE-DL": { frames: [10, 11], duration: [500, 500] },
+                    "SCOPE-UL": { frames: [12, 13], duration: [500, 500] },
+                    "SCOPE-UR": { frames: [14, 15], duration: [500, 500] },
+                },
+                [CharacterAssetId.ALLIANCE_FANTASSIN]: defaultAnimations,
+                [CharacterAssetId.ALLIANCE_MEDIC]: defaultAnimations,
+                [CharacterAssetId.ALLIANCE_CAPORAL]: defaultAnimations,
+                [CharacterAssetId.BARRICADE]: defaultAnimations,
             },
-            [CharacterAssetId.ENTENTE_CAPORAL]: {
-                frameWidth: 96,
-                frameHeight: 128,
-                frameTime: [],
-            },
-            [CharacterAssetId.ENTENTE_BRISE_BARRICADE]: {
-                frameWidth: 96,
-                frameHeight: 140,
-                frameTime: [],
-            },
-            [CharacterAssetId.ALLIANCE_FANTASSIN]: {
-                frameWidth: 96,
-                frameHeight: 128,
-                frameTime: [],
-            },
-            [CharacterAssetId.ALLIANCE_MEDIC]: {
-                frameWidth: 96,
-                frameHeight: 128,
-                frameTime: [],
-            },
-            [CharacterAssetId.ALLIANCE_CAPORAL]: {
-                frameWidth: 96,
-                frameHeight: 128,
-                frameTime: [],
-            },
-            [CharacterAssetId.BARRICADE]: {
-                frameWidth: 64,
-                frameHeight: 64,
-                frameTime: [],
-            },
-        });
+        );
     }
 }
 

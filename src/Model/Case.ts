@@ -1,10 +1,12 @@
 import { computeFov, Position } from "../core";
+import { PositionUtils } from "../core/Utils/Sizing";
 import { Cell } from "../scenes/Fight/fight.scene";
 
 export type Case = {
     isWall: boolean;
     isHole: boolean;
     entityId: string;
+    position: Position;
 };
 
 export function applyFovToRange(
@@ -24,20 +26,17 @@ export function applyFovToRange(
             if (blocked) {
                 return true;
             }
-            const notInRange = !inRange.some(
-                ({ gridPosition }) =>
-                    gridPosition.x === x && gridPosition.y === y,
+            const notInRange = !inRange.some(({ index }) =>
+                PositionUtils.equals(index, { x, y }),
             );
             return notInRange;
         },
-        ({ x, y }) => {
-            const cell = inRange.find(
-                ({ gridPosition }) =>
-                    gridPosition.x === x && gridPosition.y === y,
+        (pos) => {
+            const cell = inRange.find(({ index }) =>
+                PositionUtils.equals(index, pos),
             );
-            const inFovCell = inFovCells.find(
-                ({ gridPosition }) =>
-                    gridPosition.x === x && gridPosition.y === y,
+            const inFovCell = inFovCells.find(({ index }) =>
+                PositionUtils.equals(index, pos),
             );
             if (cell && !inFovCell) {
                 inFovCells.push(cell);

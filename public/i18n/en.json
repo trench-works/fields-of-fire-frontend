@@ -1,6 +1,19 @@
 {
     "common": {
+        "title": "Fields of Fire",
         "validate": "Validate"
+    },
+    "loader": {
+        "assets": "Loading assets",
+        "connect": "Waiting for players"
+    },
+    "menuPanel": {
+        "title": "Menu",
+        "back": "Resume",
+        "options": "Options",
+        "mainMenu": "Back to Main Menu",
+        "leaveLobby": "Leave Lobby",
+        "leaveGame": "Leave Game"
     },
     "mainMenu": {
         "play": "Play",
@@ -19,16 +32,64 @@
             }
         }
     },
+    "lobby": {
+        "settings": "Settings",
+        "settingsPopup": {
+            "close": "Close",
+            "save": "Save"
+        },
+        "gameMode": "Game Mode",
+        "mapSize": "Map Size",
+        "lobbyName": "Lobby Name",
+        "classes": "Classes",
+        "masters": "Masters",
+        "players": "Players",
+        "ready": "Ready",
+        "start": "Fight",
+        "joinTeam": "Join",
+        "addTeam": "Add"
+    },
+    "lobbyList": {
+        "title": "Lobbies List",
+        "create": "Create Lobby",
+        "join": "Join a Lobby",
+        "status": {
+            "open": "Open",
+            "full": "Full"
+        }
+    },
     "fight": {
         "actions": {
             "cost": "Cost",
             "range": "Range",
             "type": {
                 "RANGED": "Ranged",
+                "MOUVEMENT": "Movement",
                 "MELEE": "Melee",
+                "SUPPORT": "Support",
                 "OTHER": "Other"
             },
-            "dodged": "Dodged"
+            "dodged": "Dodged",
+            "endTurn": "Finish Turn"
+        },
+        "ui": { "reset": "Reset Board" },
+        "effects": {
+            "duration": "Duration"
+        },
+        "end": {
+            "leave": "Leave",
+            "ready": "Ready",
+            "nextFight": "Continue",
+            "victory": "Victory",
+            "defeat": "Defeat",
+            "stats": {
+                "kills": "Kills",
+                "heal": "Heal",
+                "damages": "Damages",
+                "steps": "Steps",
+                "sustained": "Sustained",
+                "shielded": "Shielded"
+            }
         }
     },
     "parameter": {

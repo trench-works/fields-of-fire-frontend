@@ -1,3 +1,4 @@
+import { BaseScene } from "../Objects";
 import { Size } from "../Types";
 
 export abstract class AssetManager<AssetId extends string, AssetType> {
@@ -35,7 +36,7 @@ export abstract class AssetManager<AssetId extends string, AssetType> {
         this.loader(load, id, asset);
     }
 
-    abstract loader(
+    protected abstract loader(
         load: Phaser.Loader.LoaderPlugin,
         id: string,
         asset: Record<AssetId, AssetType>[AssetId],
@@ -50,6 +51,11 @@ export abstract class AssetManager<AssetId extends string, AssetType> {
     }
 }
 
+export type FrameConfiguration = {
+    frameWidth: number;
+    frameHeight: number;
+};
+
 export abstract class ImageAssetManager<
     AssetId extends string,
     AssetType,
@@ -58,19 +64,32 @@ export abstract class ImageAssetManager<
         assetKey: string,
         assets: Partial<Record<AssetId, AssetType>>,
         protected readonly assetScale: Record<AssetId, Size>,
+        protected readonly frameConfigs?: Partial<
+            Record<AssetId, FrameConfiguration>
+        >,
     ) {
         super(assetKey, assets);
     }
 
-    loader(
+    protected loader(
         load: Phaser.Loader.LoaderPlugin,
         id: AssetId,
         asset: Record<AssetId, AssetType>[AssetId],
     ) {
-        load.image(
-            this.getAssetKey(id),
-            this.getAssetFileLink(this.assetKey, asset),
-        );
+        const frameConfig = this.frameConfigs?.[id];
+        if (frameConfig) {
+            load.spritesheet(
+                this.getAssetKey(id),
+                this.getAssetFileLink(this.assetKey, asset),
+                frameConfig,
+            );
+        } else {
+            load.image({
+                key: this.getAssetKey(id),
+                url: this.getAssetFileLink(this.assetKey, asset),
+                frameConfig: this.frameConfigs?.[id],
+            });
+        }
     }
 
     getAssetScale(id: string): number {
@@ -95,7 +114,7 @@ export abstract class SoundAssetManager<
         return this.level[assetId] ?? 1;
     }
 
-    loader(
+    protected loader(
         load: Phaser.Loader.LoaderPlugin,
         id: AssetId,
         asset: Record<AssetId, AssetType>[AssetId],
@@ -134,7 +153,7 @@ export abstract class SpriteAssetManager<
         return this.frameConfigs[assetId]!;
     }
 
-    loader(
+    protected loader(
         load: Phaser.Loader.LoaderPlugin,
         id: AssetId,
         asset: Record<AssetId, AssetType>[AssetId],
@@ -144,6 +163,66 @@ export abstract class SpriteAssetManager<
             this.getAssetFileLink(this.assetKey, asset),
             this.frameConfigs[id],
         );
+    }
+}
+
+export type AnimationSheetConfiguration = {
+    frames: number[];
+    duration: number[];
+};
+
+export abstract class SpriteSheetAssetManager<
+    AssetId extends string,
+    AssetType,
+> extends SpriteAssetManager<AssetId, AssetType> {
+    constructor(
+        assetKey: string,
+        assets: Partial<Record<AssetId, AssetType>>,
+        frameConfigs: Partial<Record<AssetId, AnimationConfiguration>>,
+        private readonly animations: Record<
+            AssetId,
+            Record<string, AnimationSheetConfiguration>
+        >,
+    ) {
+        super(assetKey, assets, frameConfigs);
+    }
+
+    loadAllAnimations(scene: BaseScene) {
+        for (const assetId of Object.keys(this.animations)) {
+            this.loadAssetAnimations(scene, assetId as AssetId);
+        }
+    }
+
+    loadAssetAnimations(scene: BaseScene, assetId: AssetId) {
+        for (const [key, { frames }] of Object.entries(
+            this.animations[assetId],
+        )) {
+            this.loadAnimation(
+                scene,
+                assetId,
+                `${this.getAssetKey(assetId)}-${key}`,
+                frames,
+            );
+        }
+    }
+
+    loadAnimation(
+        scene: BaseScene,
+        assetId: AssetId,
+        animationName: string,
+        frames: number[],
+    ) {
+        if (!scene.anims.exists(animationName)) {
+            scene.anims.create({
+                key: animationName,
+                frames: scene.anims
+                    .generateFrameNumbers(this.getAssetKey(assetId), {
+                        frames,
+                    })
+                    .map((animation) => ({ ...animation, duration: 500 })),
+                repeat: -1,
+            });
+        }
     }
 }
 

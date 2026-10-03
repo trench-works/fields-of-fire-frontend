@@ -90,7 +90,7 @@ export class PopupInput {
             .setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 2);
 
         // --- INPUT HTML ---
-        this.usernameInput = new DisplayInput({
+        this.usernameInput = new DisplayInput(scene, {
             onChange: (value) => {
                 this.username = value;
             },
@@ -100,7 +100,7 @@ export class PopupInput {
                 "mainMenu.registerPopup.username.placeholder",
             ),
         }).focus();
-        this.passwordInput = new DisplayInput({
+        this.passwordInput = new DisplayInput(scene, {
             onChange: (value) => {
                 this.password = value;
             },

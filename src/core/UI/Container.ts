@@ -6,10 +6,10 @@ import { Displayable } from "./DisplayRoot";
 
 type ContainerConfig = {
     title?: string;
-    bgColor?: string;
-    titleColor?: string;
+    bgColor?: Color;
+    titleColor?: Color;
     borderWidth?: number;
-    borderColor?: string;
+    borderColor?: Color;
     backgroundImage?: string;
     opacity?: number;
     fontSize?: number;
@@ -33,7 +33,7 @@ export class DisplayContainer
     private outterBorder?: Phaser.GameObjects.Graphics;
     private titleText?: Phaser.GameObjects.Text;
     public onClick: (() => void) | undefined;
-    private bgColor: string;
+    private bgColor: Color;
     private bgOpacity: number;
     private hoverTint: number | undefined;
 
@@ -48,6 +48,15 @@ export class DisplayContainer
     protected innerRadius?:
         | Phaser.Types.GameObjects.Graphics.RoundedRectRadius
         | number;
+
+    setDepth(value: number): this {
+        super.setDepth(value);
+        this.background?.setDepth(value);
+        this.border?.setDepth(value);
+        this.outterBorder?.setDepth(value);
+        this.titleText?.setDepth(value);
+        return this;
+    }
 
     blur() {
         if (!this.blurred) {
@@ -66,7 +75,7 @@ export class DisplayContainer
         throw new Error("Method not implemented.");
     }
 
-    place({ x, y }: Position, { width, height }: Size): void {
+    place({ x, y, width, height }: Size & Position): void {
         this.setSize(width, height);
         this.setX(x + width / 2);
         this.setY(y + height / 2);
@@ -80,9 +89,9 @@ export class DisplayContainer
         const { x, y, height, width } = position;
         const {
             title = "",
-            bgColor = Color.containerBg,
+            bgColor = Color.MILITARY_SAND,
             borderWidth = 0,
-            borderColor = Color.containerBorder,
+            borderColor = Color.MILITARY_GREEN,
             backgroundImage,
             opacity = 1,
             alpha,
@@ -96,7 +105,7 @@ export class DisplayContainer
 
         super(scene, x, y);
 
-        this.place({ x, y }, { width, height });
+        this.place({ x, y, width, height });
 
         this.bgColor = bgColor; // <--- IMPORTANT
         this.bgOpacity = opacity;
@@ -148,7 +157,7 @@ export class DisplayContainer
                 .text(0, 0, text, {
                     fontFamily: "MyFont",
                     fontSize: fontSize,
-                    color: "#FFFFFF",
+                    color: Color.TEXT,
                 })
                 .setOrigin(0.5);
             const textPosition = {
@@ -199,7 +208,7 @@ export class DisplayContainer
         }
     }
 
-    public setBackgroundColor(color: string, alpha = 1) {
+    public setBackgroundColor(color: Color, alpha = 1) {
         // Sinon on met à jour le Graphics existant
         if (this.background instanceof Phaser.GameObjects.Graphics) {
             this.background

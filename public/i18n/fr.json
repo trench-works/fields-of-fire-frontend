@@ -1,5 +1,6 @@
 {
     "common": {
+        "title": "Fields of Fire",
         "validate": "Valider"
     },
     "loader": {
@@ -10,7 +11,9 @@
         "title": "Menu",
         "back": "Reprendre",
         "options": "Options",
-        "mainMenu": "Retour au Menu"
+        "mainMenu": "Retour au Menu",
+        "leaveLobby": "Quitter le Lobby",
+        "leaveGame": "Quitter la partie"
     },
     "mainMenu": {
         "play": "Jouer",
@@ -29,6 +32,32 @@
             }
         }
     },
+    "lobby": {
+        "settings": "Paramètres",
+        "settingsPopup": {
+            "close": "Fermer",
+            "save": "Sauvegarder"
+        },
+        "gameMode": "Mode de Jeu",
+        "mapSize": "Taille de la carte",
+        "lobbyName": "Nom du Lobby",
+        "classes": "Classes",
+        "masters": "Maitrises",
+        "players": "Joueurs",
+        "ready": "Prêt",
+        "start": "Combattre",
+        "joinTeam": "Rejoindre",
+        "addTeam": "Ajouter"
+    },
+    "lobbyList": {
+        "title": "Liste des Lobbies",
+        "create": "Créer un lobby",
+        "join": "Rejoindre un lobby",
+        "status": {
+            "open": "Ouvert",
+            "full": "Complet"
+        }
+    },
     "fight": {
         "actions": {
             "cost": "Coût",
@@ -43,8 +72,24 @@
             "dodged": "Esquivé",
             "endTurn": "Fin du tour"
         },
+        "ui": { "reset": "Réinitialiser le plateau" },
         "effects": {
             "duration": "durée"
+        },
+        "end": {
+            "leave": "Quitter",
+            "ready": "Prêt",
+            "nextFight": "Continuer",
+            "victory": "Victoire",
+            "defeat": "Défaite",
+            "stats": {
+                "kills": "Tués",
+                "heal": "Soins",
+                "damages": "Dégâts infligés",
+                "steps": "Pas",
+                "sustained": "Dégâts subis",
+                "shielded": "Dégâts réduits"
+            }
         }
     },
     "parameter": {

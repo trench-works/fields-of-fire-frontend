@@ -21,6 +21,8 @@ export class Socket<
     private onCloseListeners: (() => void)[];
     private onSubscribedListeners: (() => void)[];
 
+    private pingTimeout: NodeJS.Timeout | undefined;
+
     constructor(private readonly topic: string) {
         this.isError = false;
         this.onCloseListeners = [];
@@ -43,6 +45,19 @@ export class Socket<
         this.socket.addEventListener("message", this.handleMessage.bind(this));
         this.socket.addEventListener("close", this.handleClose.bind(this));
         this.socket.addEventListener("error", this.handleError.bind(this));
+        this.refreshPingTimeout();
+    }
+
+    private refreshPingTimeout() {
+        if (this.pingTimeout) {
+            clearTimeout(this.pingTimeout);
+        }
+        this.pingTimeout = setTimeout(() => this.ping(), 30000);
+    }
+
+    private ping() {
+        this.send("ping" as InputActions);
+        this.refreshPingTimeout();
     }
 
     private handleError() {
@@ -73,12 +88,12 @@ export class Socket<
         action: InputActions,
         payload?: PayloadType,
     ): Promise<Error | void> {
+        this.refreshPingTimeout();
         return new Promise<void>((resolve) => {
             if (this.socket?.readyState !== WebSocket.OPEN) {
                 console.error("Socket is not connected yet...");
                 return new Error("Socket is not connected yet...");
             }
-            console.log("CALL SERVER WITH MESSAGE", this.key, action, payload);
             this.socket.send(
                 JSON.stringify({ actionId: action, payload: payload ?? {} }),
             );

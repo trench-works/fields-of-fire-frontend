@@ -58,7 +58,14 @@ export function getCurrentLanguage(): string {
     return language ?? DEFAULT_LANGUAGE;
 }
 
-export function translate(key: TranslationKey, language?: string): string {
+/**
+ * REDUCE THIS FUNCTION USE AS MUCH AS POSSIBLE AS ITS TYPING DOES NOT GARANTY THE EXISTENCE OF TRANSLATION
+ * Prefer using translate() function instead
+ * @param key
+ * @param language
+ * @returns
+ */
+export function translateWildcard(key: string, language?: string): string {
     language ??= localStorage.getItem("language") ?? undefined;
     let tradFile = localStorage.getItem(`i18n-${language ?? DEFAULT_LANGUAGE}`);
     if (!tradFile) {
@@ -73,9 +80,13 @@ export function translate(key: TranslationKey, language?: string): string {
     return (
         value ??
         (language !== DEFAULT_LANGUAGE
-            ? translate(key, DEFAULT_LANGUAGE)
+            ? translateWildcard(key, DEFAULT_LANGUAGE)
             : "NO_TRANSLATION")
     );
+}
+
+export function translate(key: TranslationKey, language?: string): string {
+    return translateWildcard(key, language);
 }
 
 interface Translation {

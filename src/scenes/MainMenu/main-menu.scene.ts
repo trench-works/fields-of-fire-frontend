@@ -14,7 +14,7 @@ import { UserRepository } from "./repositories/user.repository";
 import { SceneAssetId } from "../../assets/ScenesAsset";
 import { MiscAsset, MiscAssetId, MusicAsset, MusicAssetId } from "../../assets";
 import { ParameterScene } from "../Parameter/parameter.scene";
-import { SoundParam } from "../../core/Utils/SoundLevel";
+import { translate } from "../../core/i18n/i18n";
 
 export class MainMenu extends BaseScene {
     private playButton!: Button;
@@ -56,7 +56,7 @@ export class MainMenu extends BaseScene {
                 width: 5,
                 height: 1,
             }),
-        ).setText("Fields Of Fire");
+        ).setText(translate("common.title"));
 
         const buttonsGrid = this.rootGrid.getSubGrid(
             {
@@ -111,7 +111,6 @@ export class MainMenu extends BaseScene {
                 text: i18n.translate("mainMenu.settings"),
                 image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
                 onClick: () => {
-                    console.log("Paramètres - À implémenter");
                     ParameterScene.start(this);
                 },
             },
@@ -210,10 +209,6 @@ export class MainMenu extends BaseScene {
                                     this.playButton.alpha = 1;
                                     this.registerButton.setIsActivated(false);
                                     this.registerButton.displayText(
-                                        globalThis.user.username,
-                                    );
-                                    console.log(
-                                        " authent globo : ",
                                         globalThis.user.username,
                                     );
                                     localStorage.setItem(

@@ -1,3 +1,29 @@
+import { Color } from "../config/ColorConfig";
+
+export enum TeamColor {
+    BLUE = "BLUE",
+    RED = "RED",
+    YELLOW = "YELLOW",
+    GREEN = "GREEN",
+}
+export const TEAM_COLORS = {
+    [TeamColor.BLUE]: 0x0000ff,
+    [TeamColor.RED]: 0xff0000,
+    [TeamColor.YELLOW]: 0xffff00,
+    [TeamColor.GREEN]: 0x00ff00,
+};
+export const TEAM_STRING_COLORS = {
+    [TeamColor.BLUE]: Color.BLUE,
+    [TeamColor.RED]: Color.RED,
+    [TeamColor.YELLOW]: Color.YELLOW,
+    [TeamColor.GREEN]: Color.GREEN,
+};
+
 export type Team = {
     id: string;
+    color: TeamColor;
+    playerIds: string[];
+    npcIds: string[];
+    entitiesIds: string[];
 };
+

@@ -14,7 +14,7 @@ type JoinedLobby = {
 
 type Reconnect = {
     game: Game;
-    player: { playerId: string; classId: string };
+    player: { id: string; classId: string };
 };
 
 type Update = {

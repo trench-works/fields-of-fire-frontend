@@ -1,10 +1,11 @@
-import { PlacementOrigin, Position, Size } from "../Types";
+import { PlacementOrigin } from "../Types";
+import { GridArea } from "../Utils";
 
 export interface Displayable {
     setVisible(visible: boolean): void;
     destroy(): void;
     getObject(): Phaser.GameObjects.GameObject;
-    place(position: Position, size: Size, origin: PlacementOrigin): void;
+    place(area: GridArea, origin?: PlacementOrigin): void;
     setDepth(depth: number): this;
     blur(): this;
     unblur(): this;
@@ -20,6 +21,10 @@ export class DisplayRoot implements Omit<
         this.displayables = [];
     }
 
+    forEach(each: (displayable: Displayable) => void) {
+        this.displayables.forEach(each);
+    }
+
     add(displayable: Displayable): void {
         this.displayables.push(displayable);
     }
@@ -31,12 +36,12 @@ export class DisplayRoot implements Omit<
     }
 
     blur(): this {
-        this.displayables.forEach((displayable) => displayable.blur());
+        //this.displayables.forEach((displayable) => displayable.blur());
         return this;
     }
 
     unblur(): this {
-        this.displayables.forEach((displayable) => displayable.unblur());
+        //this.displayables.forEach((displayable) => displayable.unblur());
         return this;
     }
 

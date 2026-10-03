@@ -52,7 +52,6 @@ export class BaseScene<InitData = any> extends Scene {
         if (data.config?.keepMusic ?? true) {
             data.config ??= {};
             data.config.backgroundMusic = scene.backgroundSound;
-            console.log(scene.backgroundSound);
         }
         scene.close(data.config?.keepMusic);
         scene.scene.start(id, data);
@@ -83,30 +82,15 @@ export class BaseScene<InitData = any> extends Scene {
         bg.setDisplaySize(this.scale.width, this.scale.height);
     }
 
-    playBackgroundMusic(id: MusicAssetId, force: boolean = false) {
+    playBackgroundMusic(id: MusicAssetId) {
         if (this.isOpen) {
-            if (
-                force ||
-                !this.backgroundSound ||
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                !(this.backgroundSound as any)?.["currentConfig"] //FIXME: ptn de magie noire pour détecter si l'objet musique est corrompu à la réception
-            ) {
-                this.sound.stopAll();
-                this.backgroundSound?.destroy();
-                this.backgroundSound = this.sound.add(
-                    MusicAsset.getAssetKey(id),
-                );
-                this.backgroundSound.setLoop(true);
-                console.log("VOLUME ", this.backgroundSound.volume);
-                this.backgroundSound.setVolume(
-                    SoundLevel.get(SoundParam.BACKGROUND) *
-                        MusicAsset.getBaseSoundLevel(id),
-                );
-            }
-            console.log(
-                "Play background music: ",
-                id,
-                this.backgroundSound.volume,
+            this.sound.stopAll();
+            this.backgroundSound?.destroy();
+            this.backgroundSound = this.sound.add(MusicAsset.getAssetKey(id));
+            this.backgroundSound.setLoop(true);
+            this.backgroundSound.setVolume(
+                SoundLevel.get(SoundParam.BACKGROUND) *
+                    MusicAsset.getBaseSoundLevel(id),
             );
             if (!this.backgroundSound.isPlaying) {
                 this.sound.stopAll();

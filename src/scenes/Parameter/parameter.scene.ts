@@ -49,7 +49,6 @@ export class ParameterScene extends BaseScene {
 
     create() {
         super.create();
-        console.log("Start Current language: ", this.currentLanguage);
         //Title
         this.sceneTitle = new DisplayText(
             this,
@@ -127,7 +126,7 @@ export class ParameterScene extends BaseScene {
             {
                 borderWidth: 2,
                 opacity: 1,
-                bgColor: Color.btnBorder,
+                bgColor: Color.MILITARY_GREEN,
                 outterRadius: { tr: 10, tl: 10, bl: 0, br: 0 },
             },
         );
@@ -186,7 +185,6 @@ export class ParameterScene extends BaseScene {
     }
 
     soundParameter() {
-        console.log("soundParameter called");
         const soundGrid = this.subParameterContainer(4, 2);
 
         this.soundTitle = new DisplayText(
@@ -207,11 +205,9 @@ export class ParameterScene extends BaseScene {
             SoundLevel.get(SoundParam.BACKGROUND) * 10,
             (volume: number) => {
                 SoundLevel.set(SoundParam.BACKGROUND, volume);
-                console.log("MusicSoundBar volume changed to: ", volume);
                 this.sound.setVolume(volume);
             },
         );
-        console.log("MusicSoundBar created with volume: ", this.sound.volume);
         this.SFXSoundBar = new SoundBar(
             this,
             soundGrid,
@@ -225,7 +221,6 @@ export class ParameterScene extends BaseScene {
     }
 
     updateLanguageButtons() {
-        console.log("Button List: ", this.languageButtons);
         this.languageButtons.forEach((button, lang) => {
             button.setImage(
                 lang === this.currentLanguage
