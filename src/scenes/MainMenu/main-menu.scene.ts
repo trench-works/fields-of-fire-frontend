@@ -15,6 +15,7 @@ import { SceneAssetId } from "../../assets/ScenesAsset";
 import { MiscAsset, MiscAssetId, MusicAsset, MusicAssetId } from "../../assets";
 import { ParameterScene } from "../Parameter/parameter.scene";
 import { translate } from "../../core/i18n/i18n";
+import { SoundParam } from "../../core/Utils/SoundLevel";
 
 export class MainMenu extends BaseScene {
     private playButton!: Button;

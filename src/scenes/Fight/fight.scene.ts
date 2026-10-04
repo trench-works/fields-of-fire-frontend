@@ -4,6 +4,7 @@ import {
     BaseScene,
     BaseSceneInit,
     i18n,
+    SoundLevel,
 } from "../../core";
 import { Tooltip } from "../../core/UI/Tooltip";
 import { Game } from "../../Model/Game";
@@ -30,6 +31,7 @@ import { BoostAsset } from "../../assets/BoostAsset";
 import { FightSceneRoot } from "./fight-scene.root";
 import { Tile } from "../../core/UI/TileLayer";
 import { Color } from "../../config/ColorConfig";
+import { SoundParam } from "../../core/Utils/SoundLevel";
 
 export type SceneRenderConfig = {
     tileSize: number;
