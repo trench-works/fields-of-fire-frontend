@@ -13,6 +13,7 @@ export function applyFovToRange(
     origin: Position,
     inRange: Cell[],
     board: Case[][],
+    range: number
 ): Cell[] {
     const inFovCells: Cell[] = [];
 
@@ -37,6 +38,7 @@ export function applyFovToRange(
                 inFovCells.push(cell);
             }
         },
+        range
     );
 
     return inFovCells;
