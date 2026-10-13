@@ -9,6 +9,8 @@ export type Stats = {
     armor: number;
     initiative: number;
     dodging: number;
+    intelligence: number;
+    critical: number;
     energy: number;
     mouvement: number;
     totalMouvement: number;
