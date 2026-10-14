@@ -92,11 +92,13 @@ export class GridService {
     cellClick({ x, y }: Position) {
         this.characterDisplayer.changeDirection({ x, y });
         if (this.actionStore.selectedAction) {
-            if (
-                this.rangeService.isInRange({ x, y }) &&
-                this.playerStore.playerEntity.id ===
+            if (this.rangeService.isInRange({ x, y })) {
+                if (
+                    this.playerStore.playerEntity.id !==
                     this.gameStore.game.playerTurns[0]
-            ) {
+                ) {
+                    return; // CANCEL LAUNCH ACTION AND CLEAR RANGE IF ITS NOT MY TURN
+                }
                 this.actionService.launchAction({ x, y });
             }
         } else {

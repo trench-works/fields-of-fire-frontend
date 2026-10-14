@@ -115,8 +115,14 @@ export class ActionsService {
     }
 
     async launchAction(pos: Position) {
-        this.lock();
         const action = this.actionStore.selectedAction;
+        if (!action) {
+            return;
+        }
+        if (!this.isActionPossible(action)) {
+            return;
+        }
+        this.lock();
         this.clearAction();
         await this.actionRepository.action({
             actionId: action?.id ?? "",
@@ -164,7 +170,7 @@ export class ActionsService {
 
             //Crit Logik
             const critRoll = Ran.int(100);
-            const critChanceBuff = attackerStats.critical
+            const critChanceBuff = attackerStats.critical;
             const critDammageBuff = attacker.effects.filter(
                 (e) => e.action === EffectAction.CRIT_DAMMAGE,
             ).length;
@@ -225,15 +231,32 @@ export class ActionsService {
         this.rangeService.clearZonePreview();
     }
 
+    isActionPossible(action: Action): boolean {
+        const stats = StatsUtils.fromEntity(this.playerStore.playerEntity);
+        switch (action.id) {
+            case ActionAssetId.WALK:
+                if (!stats.mouvement) {
+                    return false;
+                }
+                break;
+            default:
+                if (stats.energy < action.cost) {
+                    return false;
+                }
+                break;
+        }
+        return true;
+    }
+
     handleActionSelection(action: Action) {
         const stats = StatsUtils.fromEntity(this.playerStore.playerEntity);
         this.clearAction();
         this.actionStore.selectedAction = action;
+        if (!this.isActionPossible(action)) {
+            return;
+        }
         switch (action.id) {
             case ActionAssetId.WALK:
-                if (!stats.mouvement) {
-                    return;
-                }
                 this.rangeService.calculateCellsInMoveRange(
                     this.playerStore.playerEntity.position,
                     stats.mouvement,
@@ -241,9 +264,6 @@ export class ActionsService {
                 );
                 break;
             default:
-                if (stats.energy < action.cost) {
-                    return;
-                }
                 this.rangeService.calculateCellsInAttackRange(
                     this.playerStore.playerEntity.position,
                     action,
