@@ -92,7 +92,11 @@ export class GridService {
     cellClick({ x, y }: Position) {
         this.characterDisplayer.changeDirection({ x, y });
         if (this.actionStore.selectedAction) {
-            if (this.rangeService.isInRange({ x, y })) {
+            if (
+                this.rangeService.isInRange({ x, y }) &&
+                this.playerStore.playerEntity.id ===
+                    this.gameStore.game.playerTurns[0]
+            ) {
                 this.actionService.launchAction({ x, y });
             }
         } else {
