@@ -173,7 +173,7 @@ export class RangeService {
         });
 
         if (action.level === ActionLevel.GROUND) {
-            this.cellsInRange = applyFovToRange(start, result, board);
+            this.cellsInRange = applyFovToRange(start, result, board, action.range.max);
             return this;
         }
         this.cellsInRange = result;

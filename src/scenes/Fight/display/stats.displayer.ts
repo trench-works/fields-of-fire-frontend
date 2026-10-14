@@ -35,6 +35,8 @@ const statDescriptions: Record<string, string> = {
     armor: "Réduit les dégâts subis.",
     initiative: "Détermine l'ordre de passage dans le tour.",
     dodging: "Chance d'esquiver les attaques ennemies.",
+    intelligence: "Augmente l'efficacité des capacités de soin",
+    critical: "Augmente les chances de coups critiques",
     energy: "Points d'énergie nécessaires pour utiliser des actions.",
     mouvement: "Nombre de cases que vous pouvez parcourir par tour.",
 };
@@ -175,7 +177,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
             {
                 division: {
                     horizontal: 2,
-                    vertical: 4,
+                    vertical: 5,
                 },
             },
         );
