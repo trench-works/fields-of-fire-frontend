@@ -1,3 +1,4 @@
+import { StatsAssetId, StatsIconAsset } from "../../../assets";
 import { ActionAsset, ActionAssetId } from "../../../assets/ActionAsset";
 import { Color } from "../../../config/ColorConfig";
 import {
@@ -12,6 +13,7 @@ import {
     UI_LEVELS_OFFSET,
     i18n,
 } from "../../../core";
+import { DisplayImage } from "../../../core/UI/DisplayImage";
 import { StatsUtils } from "../../../Model/Stats";
 import { FightScene } from "../fight.scene";
 import { ActionsStore } from "../stores/actions.store";
@@ -132,13 +134,33 @@ export class ActionDisplayer extends FightSceneDisplayer {
                     }).setDepth(
                         Depth.getUIElementDepth(UI_LEVELS_OFFSET.BUTTON),
                     );
+                    const buttonGrid = buttonArea.getGrid({
+                        division: { vertical: 3, horizontal: 3 },
+                    });
+                    const keyBackground = new DisplayContainer(
+                        this.scene,
+                        buttonGrid.getArea({ x: 0.7, y: 0.7, margin: 2 }),
+                        { alpha: 0.85 },
+                    ).setDepth(
+                        Depth.getUIElementDepth(UI_LEVELS_OFFSET.BUTTON) + 1,
+                    );
+                    this.root.add(keyBackground);
+                    const keyText = new DisplayText(
+                        this.scene,
+                        buttonGrid.getArea({ x: 0.7, y: 0.7 }),
+                    )
+                        .setText(`${index + 1}`, {
+                            color: Color.MILITARY_GREEN,
+                        })
+                        .setDepth(
+                            Depth.getUIElementDepth(UI_LEVELS_OFFSET.BUTTON) +
+                                2,
+                        );
+                    this.root.add(keyText);
                     if (action.cost > 0) {
-                        const buttonGrid = buttonArea.getGrid({
-                            division: { vertical: 3, horizontal: 3 },
-                        });
-                        const text = new DisplayText(
+                        const costText = new DisplayText(
                             this.scene,
-                            buttonGrid.getArea({ x: 3, y: 1 }),
+                            buttonGrid.getArea({ x: 2.4, y: 3 }),
                         )
                             .setText(`${action.cost}`)
                             .setDepth(
@@ -146,7 +168,20 @@ export class ActionDisplayer extends FightSceneDisplayer {
                                     UI_LEVELS_OFFSET.BUTTON,
                                 ) + 1,
                             );
-                        this.root.add(text);
+                        this.root.add(costText);
+                        const costImage = new DisplayImage(
+                            this.scene,
+                            buttonGrid.getArea({ x: 3, y: 3, margin: 2 }),
+                        )
+                            .setImage(
+                                StatsIconAsset.getAssetKey(StatsAssetId.ENERGY),
+                            )
+                            .setDepth(
+                                Depth.getUIElementDepth(
+                                    UI_LEVELS_OFFSET.BUTTON,
+                                ) + 1,
+                            );
+                        this.root.add(costImage);
                     }
                     this.root.add(button);
                     return button;

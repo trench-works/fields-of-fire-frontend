@@ -72,7 +72,7 @@
             "dodged": "Dodged",
             "endTurn": "Finish Turn"
         },
-        "ui": { "reset": "Reset Board" },
+        "ui": { "reset": "Reset Board", "round": "Round" },
         "effects": {
             "duration": "Duration"
         },

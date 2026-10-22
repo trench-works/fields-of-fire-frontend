@@ -72,7 +72,7 @@
             "dodged": "Esquivé",
             "endTurn": "Fin du tour"
         },
-        "ui": { "reset": "Réinitialiser le plateau" },
+        "ui": { "reset": "Réinitialiser le plateau", "round": "Manche" },
         "effects": {
             "duration": "durée"
         },

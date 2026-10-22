@@ -148,7 +148,7 @@ export class DisplayContainer
         scene.add.existing(this);
     }
 
-    public setText(text: string, options?: { fontSize?: number }) {
+    public setText(text: string, options?: { fontSize?: number }): this {
         const fontSize =
             options?.fontSize ??
             Math.min(this.height / 2, (this.width / text.length) * 1.5);
@@ -169,6 +169,7 @@ export class DisplayContainer
         } else {
             this.titleText.setText(text);
         }
+        return this;
     }
 
     public manageBorder(borderColor: number, borderWidth: number) {
