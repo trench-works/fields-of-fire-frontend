@@ -9,3 +9,5 @@ export * from "./LineOfSight";
 export * from "./ShadowCast";
 export * as SoundLevel from "./SoundLevel";
 export * from "./Value";
+export * from "./Math";
+

@@ -178,16 +178,18 @@ export class DisplayContainer
         }
         const width = this.width;
         const height = this.height;
-        this.border
-            .clear()
-            .lineStyle(borderWidth, borderColor, 1)
-            .strokeRoundedRect(
+        this.border.clear().lineStyle(borderWidth, borderColor, 1);
+        if ((this.innerRadius ?? this.radius) === 0) {
+            this.border.strokeRect(-width / 2, -height / 2, width, height);
+        } else {
+            this.border.strokeRoundedRect(
                 -width / 2,
                 -height / 2,
                 width,
                 height,
-                this.innerRadius ?? this.radius,
+                this.outterRadius,
             );
+        }
         if (this.outterRadius !== undefined) {
             if (!this.outterBorder) {
                 this.outterBorder = this.scene.make.graphics({}, false);
@@ -195,16 +197,23 @@ export class DisplayContainer
             }
             const width = this.width;
             const height = this.height;
-            this.outterBorder
-                .clear()
-                .lineStyle(borderWidth, borderColor, 1)
-                .strokeRoundedRect(
+            this.outterBorder.clear().lineStyle(borderWidth, borderColor, 1);
+            if (this.outterRadius === 0) {
+                this.outterBorder.strokeRect(
+                    -width / 2,
+                    -height / 2,
+                    width,
+                    height,
+                );
+            } else {
+                this.outterBorder.strokeRoundedRect(
                     -width / 2,
                     -height / 2,
                     width,
                     height,
                     this.outterRadius,
                 );
+            }
         }
     }
 

@@ -40,6 +40,7 @@ export class UIDisplayer extends Displayer<FightScene> {
                 text: i18n.translate("fight.ui.reset"),
                 borderColor: Color.MILITARY_GREEN,
                 borderWidth: 2,
+                outterRadius: 0,
                 onClick: () => {
                     this.scene.root.controllers.grid.resetGrid();
                 },

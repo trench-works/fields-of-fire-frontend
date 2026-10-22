@@ -6,7 +6,6 @@ import { DisplayText } from "./DisplayText";
 import { BaseScene } from "../Objects";
 import { ColorUtils, GridArea } from "../Utils";
 import { DisplayImage } from "./DisplayImage";
-import { parseColor } from "../Utils/Color";
 
 const CLICKABLE_ALPHA = 1;
 const UNCLICKABLE_ALPHA = 0.5;
@@ -22,6 +21,9 @@ type ButtonConfig = {
     borderColor?: Color;
     image?: string;
     depth?: number;
+    radius?: Phaser.Types.GameObjects.Graphics.RoundedRectRadius | number;
+    outterRadius?: Phaser.Types.GameObjects.Graphics.RoundedRectRadius | number;
+    innerRadius?: Phaser.Types.GameObjects.Graphics.RoundedRectRadius | number;
 };
 
 export class Button
@@ -31,7 +33,9 @@ export class Button
     declare scene: BaseScene;
     protected textDisplay?: DisplayText;
     protected imageDisplay?: DisplayImage;
-    protected background?: Phaser.GameObjects.Rectangle;
+    protected background?: Phaser.GameObjects.Graphics;
+    private border?: Phaser.GameObjects.Graphics;
+    private outterBorder?: Phaser.GameObjects.Graphics;
 
     private highlighter?: Phaser.GameObjects.Graphics;
 
@@ -46,6 +50,16 @@ export class Button
 
     public blurred: Phaser.FX.Blur | undefined = undefined;
 
+    protected radius:
+        | Phaser.Types.GameObjects.Graphics.RoundedRectRadius
+        | number;
+    public outterRadius?:
+        | Phaser.Types.GameObjects.Graphics.RoundedRectRadius
+        | number;
+    protected innerRadius?:
+        | Phaser.Types.GameObjects.Graphics.RoundedRectRadius
+        | number;
+
     constructor(
         scene: BaseScene,
         protected readonly area: Position & Size,
@@ -59,6 +73,9 @@ export class Button
             borderColor,
             borderWidth = 0,
             depth = 1,
+            radius = 0,
+            outterRadius,
+            innerRadius,
         }: ButtonConfig,
     ) {
         super(scene, area.x + area.width / 2, area.y + area.height / 2);
@@ -66,11 +83,24 @@ export class Button
         this.setSize(area.width, area.height);
         this.setDepth(depth);
 
+        // Radius
+        this.radius = radius;
+        this.outterRadius = outterRadius;
+        this.innerRadius = innerRadius;
+
         this.onClick = onClick;
         this.isActivated = true;
         this.textColor = textColor;
         this.color = bgColor ?? Color.MILITARY_GREEN;
         this.borderColor = borderColor ?? Color.MILITARY_GREEN;
+
+        // --- BORDURE ---
+        if (borderWidth > 0) {
+            this.manageBorder(
+                ColorUtils.parseColor(this.borderColor),
+                borderWidth,
+            );
+        }
 
         // Créer le texte du bouton
 
@@ -82,24 +112,13 @@ export class Button
         if (image) {
             this.displayImage(image);
         } else {
-            this.background = scene.add.rectangle(
-                0,
-                0,
-                this.width,
-                this.height,
-                ColorUtils.parseColor(this.color),
-            );
+            this.background = this.scene.make.graphics({}, false);
             this.add(this.background);
-
-            if (borderWidth > 0) {
-                this.background.setStrokeStyle(
-                    borderWidth,
-                    ColorUtils.parseColor(this.borderColor),
-                );
+            this.setBackgroundColor();
+            this.bringToTop(this.background);
+            if (this.textDisplay) {
+                this.bringToTop(this.textDisplay.getObject());
             }
-
-            this.background.setOrigin(0.5);
-            this.sendToBack(this.background);
         }
 
         // Défini la hitbox interactive (le "clicable")
@@ -112,10 +131,57 @@ export class Button
         // Ajoute le bouton à la scène
         scene.add.existing(this);
     }
+    public manageBorder(borderColor: number, borderWidth: number) {
+        if (!this.border) {
+            this.border = this.scene.make.graphics({}, false);
+            this.add(this.border);
+        }
+        const width = this.width;
+        const height = this.height;
+        this.border.clear().lineStyle(borderWidth, borderColor, 1);
+        if ((this.innerRadius ?? this.radius) === 0) {
+            this.border.strokeRect(-width / 2, -height / 2, width, height);
+        } else {
+            this.border.strokeRoundedRect(
+                -width / 2,
+                -height / 2,
+                width,
+                height,
+                this.outterRadius,
+            );
+        }
+        if (this.outterRadius !== undefined) {
+            if (!this.outterBorder) {
+                this.outterBorder = this.scene.make.graphics({}, false);
+                this.add(this.outterBorder);
+            }
+            const width = this.width;
+            const height = this.height;
+            this.outterBorder.clear().lineStyle(borderWidth, borderColor, 1);
+            if (this.outterRadius === 0) {
+                this.outterBorder.strokeRect(
+                    -width / 2,
+                    -height / 2,
+                    width,
+                    height,
+                );
+            } else {
+                this.outterBorder.strokeRoundedRect(
+                    -width / 2,
+                    -height / 2,
+                    width,
+                    height,
+                    this.outterRadius,
+                );
+            }
+        }
+    }
 
     setDepth(value: number): this {
         super.setDepth(value);
         this.imageDisplay?.setDepth(value);
+        this.border?.setDepth(value);
+        this.outterBorder?.setDepth(value);
         this.textDisplay?.setDepth(value);
         this.background?.setDepth(value);
         return this;
@@ -218,7 +284,7 @@ export class Button
         this.imageDisplay?.setAlpha(
             isActivated ? CLICKABLE_ALPHA : UNCLICKABLE_ALPHA,
         );
-        this.background?.setFillStyle(parseColor(this.color));
+        this.setBackgroundColor();
         return this;
     }
 
@@ -227,9 +293,21 @@ export class Button
         return this;
     }
 
-    public setBackgroundColor(color: Color) {
-        this.color = color;
-        this.background?.setFillStyle(ColorUtils.parseColor(color));
+    public setBackgroundColor(
+        color?: Color,
+        options?: { isTemporary?: boolean },
+    ) {
+        if (!options?.isTemporary && color) {
+            this.color = color;
+        }
+        this.background?.fillStyle(ColorUtils.parseColor(color ?? this.color));
+        this.background?.fillRoundedRect(
+            -this.width / 2,
+            -this.height / 2,
+            this.width,
+            this.height,
+            this.outterRadius ?? this.radius,
+        );
     }
 
     private setupEvents() {
@@ -241,9 +319,9 @@ export class Button
 
         this.on("pointerover", () => {
             if (this.isActivated) {
-                this.background?.setFillStyle(
-                    ColorUtils.parseColor(Color.HIGHTLIGHT_HOVER),
-                );
+                this.setBackgroundColor(Color.HIGHTLIGHT_HOVER, {
+                    isTemporary: true,
+                });
                 if (this.imageDisplay) {
                     this.imageDisplay.setTint(0xcccccc);
                 }
@@ -251,7 +329,7 @@ export class Button
         });
 
         this.on("pointerout", () => {
-            this.background?.setFillStyle(ColorUtils.parseColor(this.color));
+            this.setBackgroundColor();
             if (this.imageDisplay) {
                 this.imageDisplay.clearTint();
             }

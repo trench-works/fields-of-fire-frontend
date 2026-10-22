@@ -3,6 +3,7 @@ import {
     StatsIconAsset,
     StatsAssetId,
 } from "../../../assets";
+import { BoostAsset, BoostAssetId } from "../../../assets/BoostAsset";
 import { EffectAsset, EffectAssetId } from "../../../assets/EffectAsset";
 import { Color } from "../../../config/ColorConfig";
 import {
@@ -14,15 +15,18 @@ import {
     i18n,
     Depth,
     UI_LEVELS_OFFSET,
+    Button,
+    MyMath,
 } from "../../../core";
 import { DisplayImage } from "../../../core/UI/DisplayImage";
+import { Boost } from "../../../Model/Boost";
 import { CharacterClass } from "../../../Model/CharacterClass";
 import { Effect } from "../../../Model/Effect";
 import { Entity } from "../../../Model/Entity";
 import { Stats, StatsUtils } from "../../../Model/Stats";
 import { FightScene } from "../fight.scene";
 import { GameStore } from "../stores/game.store";
-import { StatsStore } from "../stores/stats.store";
+import { EffectPanel, StatsStore } from "../stores/stats.store";
 import { FightSceneDisplayer } from "./base/fight-scene.displayer";
 
 const statDescriptions: Record<string, string> = {
@@ -50,6 +54,10 @@ export class StatsDisplayer extends FightSceneDisplayer {
     private statsValuesGrid!: Grid;
     private playerNameText!: DisplayText;
     private statsClassNameText!: DisplayText;
+
+    private effectsPanel!: DisplayContainer;
+    private effectsButton!: Button;
+    private boostsButton!: Button;
 
     protected statTexts: Map<
         keyof Stats,
@@ -145,7 +153,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
             {
                 borderWidth: 7,
                 bgColor: Color.MILITARY_GREEN,
-                outterRadius: { tl: 0, tr: 0, bl: 0, br: 10 },
+                outterRadius: 0,
             },
         ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER + 1));
 
@@ -180,18 +188,64 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 x: 1,
                 y: 6,
                 width: 3,
-                height: 4,
+                height: 3,
             },
             {
                 division: {
                     horizontal: 3,
                     vertical: 4,
                 },
-                padding: { left: 0, top: 10, bottom: 0, right: 0 },
+                margin: { top: 3, bottom: 0, right: 0, left: 3 },
             },
         );
 
+        this.effectsPanel = new DisplayContainer(
+            this.scene,
+            this.effectListGrid.getArea({ x: 1, y: 1, width: 3, height: 1 }),
+            {
+                borderWidth: 7,
+                borderColor: Color.MILITARY_GREEN,
+                outterRadius: 0,
+            },
+        ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER + 1));
+
+        this.effectsButton = new Button(
+            this.scene,
+            this.effectListGrid.getArea({ x: 1, y: 1, width: 1.5, height: 1 }),
+            {
+                text: EffectPanel.EFFECTS,
+                fontSize: 11,
+                onClick: () => this.setEffectPanel(EffectPanel.EFFECTS),
+                borderWidth: 0,
+            },
+        ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 2);
+
+        this.boostsButton = new Button(
+            this.scene,
+            this.effectListGrid.getArea({
+                x: 2.5,
+                y: 1,
+                width: 1.5,
+                height: 1,
+            }),
+            {
+                text: EffectPanel.BOOSTS,
+                fontSize: 11,
+                onClick: () => this.setEffectPanel(EffectPanel.BOOSTS),
+                borderWidth: 0,
+            },
+        ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER) + 2);
+
         return this;
+    }
+
+    private setEffectPanel(effectPanel: EffectPanel) {
+        this.statsStore.effectPanel = effectPanel;
+        if (effectPanel === EffectPanel.EFFECTS) {
+            this.displayEffects();
+        } else {
+            this.displayBoosts();
+        }
     }
 
     blurOut(): this {
@@ -314,7 +368,11 @@ export class StatsDisplayer extends FightSceneDisplayer {
                     this.statsStore.entity.classId,
                 ),
             );
-            this.displayEffects();
+            if (this.statsStore.effectPanel === EffectPanel.EFFECTS) {
+                this.displayEffects();
+            } else {
+                this.displayBoosts();
+            }
         }
         return this;
     }
@@ -338,10 +396,83 @@ export class StatsDisplayer extends FightSceneDisplayer {
             image.setVisible(isShow);
         });
 
+        this.effectsPanel.setVisible(isShow);
+        this.effectsButton.setVisible(isShow);
+        this.boostsButton.setVisible(isShow);
+
         return this;
     }
 
-    displayEffects() {
+    private displayBoosts() {
+        // Détruit les anciennes images
+        this.effectImages.forEach((img) => img.destroy());
+        this.effectImages = [];
+
+        if (this.statsStore.entity) {
+            const groundedBoosts = this.statsStore.entity.boosts.reduce(
+                (acc, boost) => {
+                    if (!acc.has(boost.id)) acc.set(boost.id, []);
+                    acc.get(boost.id)!.push(boost);
+                    return acc;
+                },
+                new Map<BoostAssetId, Boost[]>(),
+            );
+
+            Array.from(groundedBoosts.entries()).forEach(
+                ([id, boosts], index) => {
+                    const col = (index % 3) + 1;
+                    const row = Math.floor(index / 3) + 2.5;
+
+                    const area = this.effectListGrid.getArea({
+                        x: col,
+                        y: row,
+                    });
+
+                    const image = new DisplayImage(
+                        this.scene,
+                        area.scaleFromCenter(1, ScaleMode.FIT),
+                    )
+                        .setImage(BoostAsset.getAssetKey(id), { scale: 1.2 })
+                        .setInteractive(true)
+                        .setDepth(
+                            Depth.getUIElementDepth(
+                                UI_LEVELS_OFFSET.CONTAINER + 2,
+                            ),
+                        );
+                    if (this.statsStore.entity?.dead) {
+                        //image.blur();
+                    }
+
+                    const boost = boosts[0];
+                    const descriptions: string[] = [];
+                    if (boost.effects?.length) {
+                        descriptions.push(
+                            `Effects :\n${boost.effects.join("\n")}`,
+                        );
+                    }
+                    if (boost.boosts?.length) {
+                        descriptions.push(
+                            `Stat Boosts :\n${boost.boosts.map((boost) => Object.entries(boost).map(([key, value]) => `${MyMath.getSign(value)}${value} ${key}`))}`,
+                        );
+                    }
+                    const description = descriptions.join("-----\n");
+
+                    this.scene.tooltip.attachTo(
+                        image.getObject(),
+                        description,
+                        boost.name
+                            ? boosts.length > 1
+                                ? `${boost.name} x${boosts.length}`
+                                : boost.name
+                            : id,
+                    );
+                    this.effectImages.push(image);
+                },
+            );
+        }
+    }
+
+    private displayEffects() {
         // Détruit les anciennes images
         this.effectImages.forEach((img) => img.destroy());
         this.effectImages = [];
@@ -359,7 +490,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
             Array.from(groupedEffects.entries()).forEach(
                 ([id, effects], index) => {
                     const col = (index % 3) + 1;
-                    const row = Math.floor(index / 3) + 1;
+                    const row = Math.floor(index / 3) + 2.5;
 
                     const area = this.effectListGrid.getArea({
                         x: col,
@@ -381,30 +512,30 @@ export class StatsDisplayer extends FightSceneDisplayer {
                         //image.blur();
                     }
 
-                    const body = effects
-                        .map((effect) => {
-                            const modified = Object.fromEntries(
-                                Object.entries(effect.modifier).filter(
-                                    ([, value]) => value !== 0,
-                                ),
-                            );
-                            if (Object.keys(modified).length === 0) {
-                                return `${effect.author ? effect.author + ", " : ""}${i18n.translate("fight.effects.duration")} : ${effect.duration ?? "∞"}`;
-                            }
-                            const modifierLines = Object.entries(modified)
+                    const effect = effects[0];
+                    const descriptions: string[] = [
+                        `${effect.author}, ${i18n.translate("fight.effects.duration")} : ${effect.duration ?? "∞"}\n`,
+                    ];
+                    if (Object.keys(effect.modifier).length) {
+                        descriptions.push(
+                            Object.entries(effect.modifier)
                                 .map(
                                     ([key, value]) =>
-                                        `${key}: ${value > 0 ? "+" : ""}${value}`,
+                                        `${key}: ${MyMath.getSign(value)}${value} (${MyMath.getSign(value)}${value * effects.length})`,
                                 )
-                                .join("\n");
-                            return `--------\n${modifierLines}\n${effect.author ? effect.author + ", " : ""}${i18n.translate("fight.effects.duration")} : ${effect.duration ?? "∞"}`;
-                        })
-                        .join("\n");
+                                .join("\n"),
+                        );
+                    }
+                    const description = descriptions.join("-----\n");
 
                     this.scene.tooltip.attachTo(
                         image.getObject(),
-                        body,
-                        effects[0].name ?? id,
+                        description,
+                        effect.name
+                            ? effects.length > 1
+                                ? `${effect.name} x${effects.length}`
+                                : effect.name
+                            : id,
                     );
                     this.effectImages.push(image);
                 },
