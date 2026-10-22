@@ -192,8 +192,8 @@ export class StatsDisplayer extends FightSceneDisplayer {
             },
             {
                 division: {
-                    horizontal: 4,
-                    vertical: 5,
+                    horizontal: 3,
+                    vertical: 4,
                 },
                 margin: { top: 3, bottom: 0, right: 0, left: 3 },
             },
@@ -201,7 +201,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
 
         this.effectsPanel = new DisplayContainer(
             this.scene,
-            this.effectListGrid.getArea({ x: 1, y: 1, width: 4, height: 1 }),
+            this.effectListGrid.getArea({ x: 1, y: 1, width: 3, height: 1 }),
             {
                 borderWidth: 7,
                 borderColor: Color.MILITARY_GREEN,
@@ -211,7 +211,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
 
         this.effectsButton = new Button(
             this.scene,
-            this.effectListGrid.getArea({ x: 1, y: 1, width: 2, height: 1 }),
+            this.effectListGrid.getArea({ x: 1, y: 1, width: 1.5, height: 1 }),
             {
                 text: EffectPanel.EFFECTS,
                 fontSize: 11,
@@ -222,7 +222,12 @@ export class StatsDisplayer extends FightSceneDisplayer {
 
         this.boostsButton = new Button(
             this.scene,
-            this.effectListGrid.getArea({ x: 3, y: 1, width: 2, height: 1 }),
+            this.effectListGrid.getArea({
+                x: 2.5,
+                y: 1,
+                width: 1.5,
+                height: 1,
+            }),
             {
                 text: EffectPanel.BOOSTS,
                 fontSize: 11,
