@@ -10,5 +10,8 @@ export class MyMath {
                 return "";
         }
     }
+    public static getSigned(value: number): string {
+        return `${MyMath.getSign(value)}${Math.abs(value)}`;
+    }
 }
 

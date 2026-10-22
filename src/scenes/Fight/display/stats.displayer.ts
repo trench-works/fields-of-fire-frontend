@@ -452,7 +452,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
                     }
                     if (boost.boosts?.length) {
                         descriptions.push(
-                            `Stat Boosts :\n${boost.boosts.map((boost) => Object.entries(boost).map(([key, value]) => `${MyMath.getSign(value)}${value} ${key}`))}`,
+                            `Stat Boosts :\n${boost.boosts.map((boost) => Object.entries(boost).map(([key, value]) => `${MyMath.getSigned(value)} ${key}`))}`,
                         );
                     }
                     const description = descriptions.join("-----\n");
@@ -514,14 +514,18 @@ export class StatsDisplayer extends FightSceneDisplayer {
 
                     const effect = effects[0];
                     const descriptions: string[] = [
-                        `${effect.author}, ${i18n.translate("fight.effects.duration")} : ${effect.duration ?? "∞"}\n`,
+                        (effect.author ? `${effect.author}, ` : "") +
+                            `${i18n.translate("fight.effects.duration")} : ${effect.duration ?? "∞"}\n`,
                     ];
                     if (Object.keys(effect.modifier).length) {
                         descriptions.push(
                             Object.entries(effect.modifier)
                                 .map(
                                     ([key, value]) =>
-                                        `${key}: ${MyMath.getSign(value)}${value} (${MyMath.getSign(value)}${value * effects.length})`,
+                                        `${key}: ${MyMath.getSigned(value)}` +
+                                        (effects.length > 1
+                                            ? ` (${MyMath.getSigned(value * effects.length)})`
+                                            : ""),
                                 )
                                 .join("\n"),
                         );
