@@ -33,9 +33,7 @@ export class GroundDisplayer extends FightSceneDisplayer {
         this.tileHighlights.forEach((highlight) => highlight.destroy());
         this.teamColorHighlights.forEach((highlight) => highlight.destroy());
         this.gridStore.groundLayer?.tiles.flat().forEach((cell) => {
-            cell.rangeHighlight?.destroy();
-            cell.hoverGraphics?.destroy();
-            cell.zone?.destroy();
+            cell.destoy();
         });
         return this;
     }
@@ -59,6 +57,10 @@ export class GroundDisplayer extends FightSceneDisplayer {
         });
 
         this.scene.scaleFactor = centerMap.scaleFactor * 2;
+
+        if (this.gridStore.groundLayer){
+            this.gridStore.groundLayer.clear();
+        };
 
         this.gridStore.setGroundLayer(
             new TileLayer(

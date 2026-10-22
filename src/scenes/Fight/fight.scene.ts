@@ -47,6 +47,15 @@ export class Cell extends Tile {
     rangeHighlight?: Phaser.GameObjects.Graphics;
     teamColor?: Phaser.GameObjects.Graphics;
     spellHighlight?: Phaser.GameObjects.Graphics;
+
+    destoy(): this {
+        this.rangeHighlight?.destroy();
+        this.hoverGraphics?.destroy();
+        this.zone?.destroy();
+        this.spellHighlight?.destroy();
+        this.teamColor?.destroy();
+        return this;
+    }
 }
 
 export interface Displayable {
