@@ -164,7 +164,7 @@ export class ActionsService {
 
             //Crit Logik
             const critRoll = Ran.int(100);
-            const critChanceBuff = attackerStats.critical
+            const critChanceBuff = attackerStats.critical;
             const critDammageBuff = attacker.effects.filter(
                 (e) => e.action === EffectAction.CRIT_DAMMAGE,
             ).length;

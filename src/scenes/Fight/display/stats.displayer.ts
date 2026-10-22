@@ -16,6 +16,7 @@ import {
     Depth,
     UI_LEVELS_OFFSET,
     Button,
+    MyMath,
 } from "../../../core";
 import { DisplayImage } from "../../../core/UI/DisplayImage";
 import { Boost } from "../../../Model/Boost";
@@ -397,7 +398,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
         return this;
     }
 
-    private displayEffects() {
+    private displayBoosts() {
         // Détruit les anciennes images
         this.effectImages.forEach((img) => img.destroy());
         this.effectImages = [];
@@ -415,7 +416,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
             Array.from(groundedBoosts.entries()).forEach(
                 ([id, boosts], index) => {
                     const col = (index % 3) + 1;
-                    const row = Math.floor(index / 3) + 1;
+                    const row = Math.floor(index / 3) + 2.5;
 
                     const area = this.effectListGrid.getArea({
                         x: col,
@@ -437,12 +438,28 @@ export class StatsDisplayer extends FightSceneDisplayer {
                         //image.blur();
                     }
 
-                    const body = boosts.join("\n");
+                    const boost = boosts[0];
+                    const descriptions: string[] = [];
+                    if (boost.effects?.length) {
+                        descriptions.push(
+                            `Effects :\n${boost.effects.join("\n")}`,
+                        );
+                    }
+                    if (boost.boosts?.length) {
+                        descriptions.push(
+                            `Stat Boosts :\n${boost.boosts.map((boost) => Object.entries(boost).map(([key, value]) => `${MyMath.getSign(value)}${value} ${key}`))}`,
+                        );
+                    }
+                    const description = descriptions.join("-----\n");
 
                     this.scene.tooltip.attachTo(
                         image.getObject(),
-                        body,
-                        boosts[0].name ?? id,
+                        description,
+                        boost.name
+                            ? boosts.length > 1
+                                ? `${boost.name} x${boosts.length}`
+                                : boost.name
+                            : id,
                     );
                     this.effectImages.push(image);
                 },
@@ -450,7 +467,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
         }
     }
 
-    private displayBoosts() {
+    private displayEffects() {
         // Détruit les anciennes images
         this.effectImages.forEach((img) => img.destroy());
         this.effectImages = [];
@@ -468,7 +485,7 @@ export class StatsDisplayer extends FightSceneDisplayer {
             Array.from(groupedEffects.entries()).forEach(
                 ([id, effects], index) => {
                     const col = (index % 3) + 1;
-                    const row = Math.floor(index / 3) + 1;
+                    const row = Math.floor(index / 3) + 2.5;
 
                     const area = this.effectListGrid.getArea({
                         x: col,
@@ -490,30 +507,30 @@ export class StatsDisplayer extends FightSceneDisplayer {
                         //image.blur();
                     }
 
-                    const body = effects
-                        .map((effect) => {
-                            const modified = Object.fromEntries(
-                                Object.entries(effect.modifier).filter(
-                                    ([, value]) => value !== 0,
-                                ),
-                            );
-                            if (Object.keys(modified).length === 0) {
-                                return `${effect.author ? effect.author + ", " : ""}${i18n.translate("fight.effects.duration")} : ${effect.duration ?? "∞"}`;
-                            }
-                            const modifierLines = Object.entries(modified)
+                    const effect = effects[0];
+                    const descriptions: string[] = [
+                        `${effect.author}, ${i18n.translate("fight.effects.duration")} : ${effect.duration ?? "∞"}\n`,
+                    ];
+                    if (Object.keys(effect.modifier).length) {
+                        descriptions.push(
+                            Object.entries(effect.modifier)
                                 .map(
                                     ([key, value]) =>
-                                        `${key}: ${value > 0 ? "+" : ""}${value}`,
+                                        `${key}: ${MyMath.getSign(value)}${value} (${MyMath.getSign(value)}${value * effects.length})`,
                                 )
-                                .join("\n");
-                            return `--------\n${modifierLines}\n${effect.author ? effect.author + ", " : ""}${i18n.translate("fight.effects.duration")} : ${effect.duration ?? "∞"}`;
-                        })
-                        .join("\n");
+                                .join("\n"),
+                        );
+                    }
+                    const description = descriptions.join("-----\n");
 
                     this.scene.tooltip.attachTo(
                         image.getObject(),
-                        body,
-                        effects[0].name ?? id,
+                        description,
+                        effect.name
+                            ? effects.length > 1
+                                ? `${effect.name} x${effects.length}`
+                                : effect.name
+                            : id,
                     );
                     this.effectImages.push(image);
                 },
