@@ -50,6 +50,8 @@ export class GameListDisplayer extends Displayer<PlayMenuScene> {
         new DisplayContainer(this.scene, lobbyListArea, {
             opacity: 0.25,
             borderWidth: 2,
+            radius: 10,
+            outterRadius: 10,
         });
         //buttons
 
@@ -111,6 +113,7 @@ export class GameListDisplayer extends Displayer<PlayMenuScene> {
                 y: i + 1,
                 width: 9,
                 height: 1,
+                margin: { right: 5, left: 5, top: 5, bottom: 0 },
             });
             this.gameRows.push(
                 new LobbyRow(

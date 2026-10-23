@@ -32,6 +32,8 @@ export class LobbyRow {
         this.container = new DisplayContainer(scene, area, {
             opacity: 0.15,
             borderWidth: 1,
+            radius: 10,
+            outterRadius: 10,
         });
 
         this.container.setInteractive();
