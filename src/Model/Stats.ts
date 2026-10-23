@@ -18,7 +18,7 @@ export type Stats = {
 };
 
 export class StatsUtils {
-    static add(baseStats: Stats, ...stats: Stats[]): Stats {
+    static add(baseStats: Stats, ...stats: Partial<Stats>[]): Stats {
         const addedStats = { ...baseStats };
         for (const stat of stats) {
             for (const [key, value] of Object.entries(stat)) {

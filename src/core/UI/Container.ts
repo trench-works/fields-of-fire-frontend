@@ -4,6 +4,45 @@ import { ColorUtils, GridArea } from "../Utils";
 import { Position, Size } from "../Types";
 import { Displayable } from "./DisplayRoot";
 
+function isNumber(nombre: unknown | number): nombre is number {
+    return !Number.isNaN(nombre);
+}
+
+function transformNumberRadius(
+    radius: number | undefined,
+    size: number,
+): number | undefined {
+    if (!radius) {
+        return undefined;
+    }
+    if (radius < 1) {
+        return radius * size;
+    }
+    return radius;
+}
+
+function transformRadius(
+    radius:
+        | Phaser.Types.GameObjects.Graphics.RoundedRectRadius
+        | number
+        | undefined,
+    size: number,
+): Phaser.Types.GameObjects.Graphics.RoundedRectRadius | number | undefined {
+    if (!radius) {
+        return undefined;
+    }
+    if (isNumber(radius)) {
+        return transformNumberRadius(radius, size);
+    } else {
+        return {
+            bl: transformNumberRadius(radius.bl, size),
+            br: transformNumberRadius(radius.br, size),
+            tl: transformNumberRadius(radius.tl, size),
+            tr: transformNumberRadius(radius.tr, size),
+        };
+    }
+}
+
 type ContainerConfig = {
     title?: string;
     bgColor?: Color;
@@ -188,7 +227,7 @@ export class DisplayContainer
                 -height / 2,
                 width,
                 height,
-                this.outterRadius,
+                transformRadius(this.outterRadius, Math.min(width, height)),
             );
         }
         if (this.outterRadius !== undefined) {
@@ -212,7 +251,7 @@ export class DisplayContainer
                     -height / 2,
                     width,
                     height,
-                    this.outterRadius,
+                    transformRadius(this.outterRadius, Math.min(width, height)),
                 );
             }
         }
@@ -242,7 +281,10 @@ export class DisplayContainer
                 -height / 2,
                 width,
                 height,
-                this.outterRadius ?? this.radius,
+                transformRadius(
+                    this.outterRadius ?? this.radius,
+                    Math.min(width, height),
+                ),
             );
         }
     }

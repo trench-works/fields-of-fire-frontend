@@ -140,7 +140,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
                     const keyBackground = new DisplayContainer(
                         this.scene,
                         buttonGrid.getArea({ x: 0.7, y: 0.7, margin: 2 }),
-                        { alpha: 0.85 },
+                        { alpha: 0.85, radius: 0.5 },
                     ).setDepth(
                         Depth.getUIElementDepth(UI_LEVELS_OFFSET.BUTTON) + 1,
                     );
