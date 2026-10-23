@@ -17,7 +17,7 @@ type Reconnect = {
     player: { id: string; classId: string };
 };
 
-type Update = {
+export type Update = {
     lobbies: LobbyData[];
 };
 

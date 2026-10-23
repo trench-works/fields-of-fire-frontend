@@ -49,6 +49,10 @@
         "joinTeam": "Rejoindre",
         "addTeam": "Ajouter"
     },
+    "gamesList": {
+        "title": "Parties en cours",
+        "join": "Reprendre la partie"
+    },
     "lobbyList": {
         "title": "Liste des Lobbies",
         "create": "Créer un lobby",

@@ -49,6 +49,10 @@
         "joinTeam": "Join",
         "addTeam": "Add"
     },
+    "gamesList": {
+        "title": "Game List",
+        "join": "Resume game"
+    },
     "lobbyList": {
         "title": "Lobbies List",
         "create": "Create Lobby",
