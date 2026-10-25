@@ -144,6 +144,12 @@ export class GameService {
     }
 
     disconnect() {
+        MainMenu.start(this.scene, { keepMusic: false });
+        this.root.playerSocket?.close();
+    }
+
+    leave() {
+        MainMenu.start(this.scene, { keepMusic: false });
         this.gameRepository.disconnect();
     }
 }

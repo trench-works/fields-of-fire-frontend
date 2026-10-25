@@ -1,5 +1,5 @@
 import { GameMode } from "../../../Model/Game";
-import { LobbyData } from "../../LobbyList/interfaces/LobbyData";
+import { LobbyData } from "../../PlayMenu/interfaces/LobbyData";
 
 export class LobbyStore {
     lobby: LobbyData | undefined;

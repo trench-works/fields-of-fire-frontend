@@ -7,7 +7,7 @@ import {
     StartSceneConfig,
 } from "../../core";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
-import { LobbyListScene } from "../LobbyList/lobby-list.scene";
+import { PlayMenuScene } from "../PlayMenu/play-menu.scene";
 import { PopupInput } from "./objects/LoginPopup";
 import { UserRepository } from "./repositories/user.repository";
 import { SceneAssetId } from "../../assets/ScenesAsset";
@@ -87,7 +87,7 @@ export class MainMenu extends BaseScene {
                 text: i18n.translate("mainMenu.play"),
                 image: MiscAsset.getAssetKey(MiscAssetId.BUTTON),
                 onClick: () => {
-                    LobbyListScene.start(this);
+                    PlayMenuScene.start(this);
                 },
             },
         ).setIsActivated(Boolean(globalThis.user));

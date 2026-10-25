@@ -58,6 +58,9 @@ export class BaseScene<InitData = any> extends Scene {
     }
 
     init(init: BaseSceneInit<InitData>) {
+        document.addEventListener("contextmenu", (event) => {
+            event.preventDefault();
+        });
         this.isOpen = true;
         this.startConfig = init?.config ?? {};
         if (init?.config?.backgroundMusic) {

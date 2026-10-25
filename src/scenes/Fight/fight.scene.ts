@@ -7,7 +7,6 @@ import {
 } from "../../core";
 import { Tooltip } from "../../core/UI/Tooltip";
 import { Game } from "../../Model/Game";
-import { MainMenu } from "../MainMenu/main-menu.scene";
 import {
     ActionAnimationAsset,
     ActionAsset,
@@ -119,10 +118,15 @@ export class FightScene extends BaseScene<FightSceneInit> {
                     close: true,
                 },
                 {
-                    title: i18n.translate("menuPanel.leaveGame"),
+                    title: i18n.translate("menuPanel.mainMenu"),
                     onClick: () => {
                         this.root.controllers.game.disconnect();
-                        MainMenu.start(this, { keepMusic: false });
+                    },
+                },
+                {
+                    title: i18n.translate("menuPanel.leaveGame"),
+                    onClick: () => {
+                        this.root.controllers.game.leave();
                     },
                 },
             ],
