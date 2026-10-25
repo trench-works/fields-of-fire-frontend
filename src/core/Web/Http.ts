@@ -76,7 +76,10 @@ export class Http {
         const rep = await fetch(url, {
             method,
             body: payload?.body ? JSON.stringify(payload?.body) : undefined,
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                uuid: String(globalThis.user?.id),
+            },
         });
         const data: Response = await rep.json();
         return data;

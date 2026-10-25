@@ -122,6 +122,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             const player = game.players.find(
                 (player) => player.userId === globalThis.user?.id,
             )!;
+            this.lobbySocket.close();
             FightScene.start(this, {
                 data: {
                     game,

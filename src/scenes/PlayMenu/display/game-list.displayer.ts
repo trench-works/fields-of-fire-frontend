@@ -6,13 +6,13 @@ import {
     Grid,
 } from "../../../core";
 import { translate } from "../../../core/i18n/i18n";
-import { LobbyRow } from "../objects/LobbyRow";
+import { GameRow } from "../objects/GameRow";
 import { PlayMenuScene } from "../play-menu.scene";
 import { GameListStore } from "../stores/game-list.store";
 
 export class GameListDisplayer extends Displayer<PlayMenuScene> {
     private joinButton!: Button;
-    private gameRows: LobbyRow[] = [];
+    private gameRows: GameRow[] = [];
 
     private rootGrid: Grid;
 
@@ -76,7 +76,7 @@ export class GameListDisplayer extends Displayer<PlayMenuScene> {
             {
                 text: translate("gamesList.join"),
                 onClick: () => {
-                    this.scene.root.controllers.play.joinLobby();
+                    this.scene.root.controllers.play.joinGame();
                 },
             },
         ).setIsActivated(false);
@@ -116,15 +116,13 @@ export class GameListDisplayer extends Displayer<PlayMenuScene> {
                 margin: { right: 5, left: 5, top: 5, bottom: 0 },
             });
             this.gameRows.push(
-                new LobbyRow(
+                new GameRow(
                     this.scene,
                     rowArea,
                     {
                         id: game.id,
-                        name: game.name,
-                        creator: "UNKNOWN CREATOR",
-                        playersNum: -1,
-                        maxPlayers: -1,
+                        name: game.name ?? "",
+                        playersNum: game.size,
                     },
                     () => {
                         this.joinButton.setIsActivated(true);

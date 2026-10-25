@@ -97,9 +97,7 @@ export class PlayMenuService {
 
     joinGame() {
         if (this.gameStore.selectedGameId) {
-            // this.root.menuSocket?.joinGame({
-            //     gameId: this.gameStore.selectedGameId,
-            // });
+            this.root.menuSocket?.reconnect(this.gameStore.selectedGameId);
         }
     }
 

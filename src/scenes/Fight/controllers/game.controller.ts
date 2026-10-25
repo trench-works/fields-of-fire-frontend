@@ -27,5 +27,9 @@ export class GameController {
     disconnect = () => {
         this.gameService.disconnect();
     };
+
+    leave = () => {
+        this.gameService.leave();
+    };
 }
 

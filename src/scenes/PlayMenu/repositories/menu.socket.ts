@@ -24,6 +24,7 @@ export type Update = {
 enum LobbyActions {
     CREATE = "create",
     JOIN = "join",
+    RECONNECT = "reconnect",
 }
 
 enum LobbyEvents {
@@ -47,6 +48,10 @@ export class MenuSocket extends Socket<object, LobbyActions, LobbyEvents> {
 
     onUpdate(listener: SocketListener<Update>) {
         this.on(LobbyEvents.UPDATE, listener);
+    }
+
+    reconnect(gameId: string) {
+        return this.send(LobbyActions.RECONNECT, { gameId });
     }
 
     onReconnect(listener: SocketListener<Reconnect>) {

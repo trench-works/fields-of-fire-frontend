@@ -49,6 +49,7 @@ export class LobbyRow {
                     vertical: 1,
                     horizontal: 10,
                 },
+                margin: 5,
             }),
         );
         this.setSelected(isSelected);
