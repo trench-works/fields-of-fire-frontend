@@ -14,6 +14,7 @@ declare global {
         | {
               id: string;
               username: string;
+              token: string;
           }
         | undefined;
     var effectsVolume: number;

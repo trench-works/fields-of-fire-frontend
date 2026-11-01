@@ -1,9 +1,19 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type InputAction<Actions> = { actionId: Actions; payload: any };
+type InputAction<Actions> = { actionId: Actions; payload: any; token?: string };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type SocketListener<PayloadType = any> = (payload: PayloadType) => void;
 
+export type SocketError = {
+    code: string;
+    message?: string;
+};
+
+function isSocketError<OutputActions>(
+    data: SocketError | InputAction<OutputActions>,
+): data is SocketError {
+    return (data as SocketError)["code"] !== undefined;
+}
 export class Socket<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     RessourceKey extends { [key: string]: any } = any,
@@ -15,7 +25,6 @@ export class Socket<
     private socket: WebSocket | undefined = undefined;
     private listeners: Map<OutputActions, SocketListener[]> = new Map();
 
-    private userId: string | undefined;
     private key: RessourceKey | undefined;
 
     private onCloseListeners: (() => void)[];
@@ -30,7 +39,6 @@ export class Socket<
     }
 
     protected open(key: RessourceKey) {
-        this.userId = globalThis.user?.id;
         this.key = key;
         this.createSocket();
     }
@@ -78,7 +86,6 @@ export class Socket<
     private handleOpen() {
         this.isError = false;
         this.send("subscribe" as InputActions, {
-            user: { id: this.userId },
             key: this.key,
         });
     }
@@ -95,15 +102,26 @@ export class Socket<
                 return new Error("Socket is not connected yet...");
             }
             this.socket.send(
-                JSON.stringify({ actionId: action, payload: payload ?? {} }),
+                JSON.stringify({
+                    actionId: action,
+                    token: globalThis.user?.token,
+                    payload: payload ?? {},
+                }),
             );
             resolve();
         });
     }
 
     private handleMessage({ data }: MessageEvent) {
-        const { payload, actionId }: InputAction<OutputActions> =
+        const parsedData: InputAction<OutputActions> | SocketError =
             JSON.parse(data);
+        if (isSocketError(parsedData)) {
+            return;
+        }
+        const { payload, actionId, token } = parsedData;
+        if (token && globalThis.user) {
+            globalThis.user.token = token;
+        }
         if (actionId === "subscribed") {
             this.onSubscribedListeners.forEach((listener) => listener());
         } else {

@@ -78,7 +78,7 @@ export class Http {
             body: payload?.body ? JSON.stringify(payload?.body) : undefined,
             headers: {
                 "Content-Type": "application/json",
-                uuid: String(globalThis.user?.id),
+                token: String(globalThis.user?.token),
             },
         });
         const data: Response = await rep.json();
