@@ -185,7 +185,7 @@ export class ActionsService {
                 1 +
                 (PositionUtils.distance(attacker.position, defenser.position) -
                     1) *
-                    0.1;
+                    0.15;
         }
 
         // Vampire : vol de vie par stack
