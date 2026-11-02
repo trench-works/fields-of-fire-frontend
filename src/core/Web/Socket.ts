@@ -118,10 +118,7 @@ export class Socket<
         if (isSocketError(parsedData)) {
             return;
         }
-        const { payload, actionId, token } = parsedData;
-        if (token && globalThis.user) {
-            globalThis.user.token = token;
-        }
+        const { payload, actionId } = parsedData;
         if (actionId === "subscribed") {
             this.onSubscribedListeners.forEach((listener) => listener());
         } else {
