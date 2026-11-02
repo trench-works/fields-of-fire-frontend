@@ -2,6 +2,18 @@
     "mainMenu": {
         "play": "玩",
         "settings": "设置"
+    },
+    "fight": {
+        "actions": {
+            "cost": "消耗",
+            "range": "攻击范围",
+            "type": {
+                "RANGED": "远程",
+                "MELEE": "近战",
+                "OTHER": "其他"
+            },
+            "dodged": "闪避"
+        }
     }
 }
 
