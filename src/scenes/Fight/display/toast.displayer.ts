@@ -60,14 +60,14 @@ export class ToastDisplayer {
                 const cell = this.gridStore.get(hit);
                 if(!cell) return;
                 console.log(hit.isCritical);
-                
+
                 const toast = new Toast(this.scene, cell.position, 1);
 
                 if (hit.damage === 0) {
                     toast.setText(i18n.translate("fight.actions.dodged"), Color.GREEN);
                 } else if (hit.isCritical) {
                     toast.setText(
-                        `${-hit.damage} 💥`,
+                        `${-hit.damage} ! 💥`,
                         Color.RED,
                     );
                 } else {
