@@ -23,7 +23,9 @@ export class PlayMenuScene extends BaseScene {
 
     constructor() {
         super(SceneAssetId.LOBBY_LIST, BackgroundAssetId.LOBBY, {
-            division: { vertical: 1, horizontal: 2 },
+            grid: {
+                division: { vertical: 1, horizontal: 2 },
+            },
         });
         this.root = new PlayMenuRoot(this);
     }

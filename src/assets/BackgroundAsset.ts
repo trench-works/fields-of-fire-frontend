@@ -27,7 +27,7 @@ class BackgroundAssetManager extends ImageAssetManager<
                 [BackgroundAssetId.FIGHT]: "red_bg",
             },
             {
-                [BackgroundAssetId.MAIN_MENU]: { width: 1, height: 1 },
+                [BackgroundAssetId.MAIN_MENU]: { width: 1930, height: 815 },
                 [BackgroundAssetId.LOBBY]: { width: 1, height: 1 },
                 [BackgroundAssetId.FIGHT]: { width: 1, height: 1 },
             },

@@ -92,6 +92,10 @@ export abstract class ImageAssetManager<
         }
     }
 
+    getAssetSize(id: string): Size {
+        return this.assetScale[id as AssetId];
+    }
+
     getAssetScale(id: string): number {
         const size = this.assetScale[id as AssetId];
         return size.width / size.height;

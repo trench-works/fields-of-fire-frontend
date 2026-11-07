@@ -24,7 +24,9 @@ export class MainMenu extends BaseScene {
 
     constructor() {
         super(SceneAssetId.MENU, BackgroundAssetId.MAIN_MENU, {
-            division: { vertical: 7, horizontal: 5 },
+            grid: {
+                division: { vertical: 7, horizontal: 5 },
+            },
         });
         const user = localStorage.getItem("user");
         if (user) {
