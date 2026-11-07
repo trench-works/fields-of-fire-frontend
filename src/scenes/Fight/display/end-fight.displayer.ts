@@ -302,10 +302,9 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             new DisplayContainer(this.scene, cardArea, {
                 borderWidth: 3,
                 opacity: 1,
-                bgColor:
-                    entity.teamId === this.playerStore.playerEntity.teamId
-                        ? Color.SELF_TEAM
-                        : Color.OTHER_TEAM,
+                bgColor: this.endFightStore.boosts.length
+                    ? Color.POSITIVE
+                    : Color.NEGATIVE,
             }).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.POPUP) + 1),
         );
 
@@ -464,7 +463,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     "initiative: +15",
                     "esquive: +2",
                     "armor: +5",
-                    "critchance: +2" 
+                    "critchance: +2",
                 ].join("\n");
                 break;
             case BoostAssetId.CRIT_CHANCE:
@@ -473,7 +472,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
             case BoostAssetId.CRIT_DAMMAGE:
                 statLine = [
                     "dégats de critique : +25%",
-                    "chance de critique : +3%"
+                    "chance de critique : +3%",
                 ].join("\n");
                 break;
             default:
