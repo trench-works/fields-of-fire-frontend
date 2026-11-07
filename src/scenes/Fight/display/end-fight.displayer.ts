@@ -464,13 +464,17 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                     "initiative: +15",
                     "esquive: +2",
                     "armor: +5",
+                    "critchance: +2" 
                 ].join("\n");
                 break;
             case BoostAssetId.CRIT_CHANCE:
-                statLine = "chance de critique : +3%";
+                statLine = "chance de critique : +10%";
                 break;
             case BoostAssetId.CRIT_DAMMAGE:
-                statLine = "dégats de critique : +25%";
+                statLine = [
+                    "dégats de critique : +25%",
+                    "chance de critique : +3%"
+                ].join("\n");
                 break;
             default:
                 statLine = boost.boosts
