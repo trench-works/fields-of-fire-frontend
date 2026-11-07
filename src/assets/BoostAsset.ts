@@ -19,6 +19,8 @@ export enum BoostAssetId {
     MASOCHISTIC = "masochistic",
     CRIT_DAMMAGE = "crit_dammage",
     CRIT_CHANCE = "crit_chance",
+    ANATOMIC_KNOWLEDGE = "anatomic_knowledge",
+    PEACEFUL = "peaceful"
 }
 
 class BoostAssetManager extends ImageAssetManager<BoostAssetId, string> {
@@ -50,6 +52,8 @@ class BoostAssetManager extends ImageAssetManager<BoostAssetId, string> {
             [BoostAssetId.MASOCHISTIC]: "masochistic",
             [BoostAssetId.CRIT_DAMMAGE]: "crit_dammage",
             [BoostAssetId.CRIT_CHANCE]: "crit_chance",
+            [BoostAssetId.ANATOMIC_KNOWLEDGE]: "anatomic_knowledge",
+            [BoostAssetId.PEACEFUL]: "peaceful",
         },
         {
             [BoostAssetId.HEAL]: { width: 512, height: 512 },
@@ -70,6 +74,8 @@ class BoostAssetManager extends ImageAssetManager<BoostAssetId, string> {
             [BoostAssetId.MASOCHISTIC]: { width: 512, height: 512 },
             [BoostAssetId.CRIT_DAMMAGE]: { width: 512, height: 512 },
             [BoostAssetId.CRIT_CHANCE]: { width: 512, height: 512 },
+            [BoostAssetId.ANATOMIC_KNOWLEDGE]: { width: 512, height: 512 },
+            [BoostAssetId.PEACEFUL]: { width: 512, height: 512 },
         }
         );
     }

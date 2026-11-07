@@ -160,13 +160,18 @@ export class ActionsService {
 
         let brutTotal: number;
         if (damage < 0) {
-            brutTotal = damage - attackerStats.intelligence;
+            brutTotal = damage - attackerStats.intelligence/10;
             defenserDamage = brutTotal;
             if (defenserStats.life - defenserDamage > defenserStats.maxLife) {
                 defenserDamage = -(defenserStats.maxLife - defenserStats.life);
             }
         } else {
-            brutTotal = damage + statBonus;
+            if (action.damage && action.damage.max > 0){
+                brutTotal = Math.max(damage + statBonus, 1);
+            }
+            else{
+                brutTotal = damage + statBonus
+            }
             defenserDamage = brutTotal * (100 / (100 + defenserStats.armor));
         }
 

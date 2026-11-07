@@ -202,7 +202,7 @@ export class GridService {
 
             if (isHeal) {
                 pushMyTooltip(
-                    `🩹 ${-minDamage.defenserDamage}-${-maxDamage.defenserDamage}`,
+                    `🩹 ${-maxDamage.defenserDamage}-${-minDamage.defenserDamage}`,
                 );
             } else {
                 pushMyTooltip(
