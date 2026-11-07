@@ -1,6 +1,7 @@
 import { EventQueue } from "../../core";
 import { ClassesRepository } from "../Lobby/repositories/classes.repository";
 import { ActionsController } from "./controllers/actions.controller";
+import { DisplayController } from "./controllers/display.controller";
 import { GameController } from "./controllers/game.controller";
 import { GridController } from "./controllers/grid.controller";
 import { ActionDisplayer } from "./display/action.displayer";
@@ -42,6 +43,7 @@ export class FightSceneRoot {
         game: GameController;
         actions: ActionsController;
         grid: GridController;
+        display: DisplayController;
     };
 
     public playerSocket: GamePlayerSocket | null;
@@ -119,8 +121,15 @@ export class FightSceneRoot {
         /**
          * Services
          */
-        const rangeService = new RangeService(scene, gameStore, gridStore);
+        const rangeService = new RangeService(
+            scene,
+            gameStore,
+            gridStore,
+            playerStore,
+            actionsStore,
+        );
         const actionService = new ActionsService(
+            this,
             playerStore,
             actionsStore,
             actionRepository,
@@ -161,6 +170,7 @@ export class FightSceneRoot {
             inspectStatsService,
             animationService,
             gridService,
+            rangeService,
             boardDisplayer,
             actionDisplayer,
             turnsDisplayer,
@@ -199,6 +209,7 @@ export class FightSceneRoot {
             game: new GameController(gameService, inspectStatsService),
             actions: new ActionsController(actionService),
             grid: new GridController(gridService),
+            display: new DisplayController(gridService),
         };
 
         /**

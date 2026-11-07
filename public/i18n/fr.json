@@ -74,7 +74,8 @@
                 "OTHER": "Autre"
             },
             "dodged": "Esquivé",
-            "endTurn": "Fin du tour"
+            "endTurn": "Fin du tour",
+            "maxReached": "Nombre d'utilisations maximum\natteint sur cette cible"
         },
         "ui": { "reset": "Réinitialiser le plateau", "round": "Manche" },
         "effects": {

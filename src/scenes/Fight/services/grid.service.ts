@@ -1,9 +1,11 @@
 import { Position } from "../../../core";
+import { translate } from "../../../core/i18n/i18n";
 import { PositionUtils } from "../../../core/Utils/Sizing";
+import { Entity } from "../../../Model/Entity";
 import { StatsUtils } from "../../../Model/Stats";
 import { BoardDisplayer } from "../display/board.displayer";
 import { CharactersDisplayer } from "../display/characters.displayer";
-import { FightScene } from "../fight.scene";
+import { Cell, FightScene } from "../fight.scene";
 import { ActionsService } from "../services/actions.service";
 import { RangeService } from "../services/range.service";
 import { ActionsStore } from "../stores/actions.store";
@@ -14,7 +16,7 @@ import { PlayerStore } from "../stores/player.store";
 import { InspectCharacterService } from "./inspect-character.service";
 
 export class GridService {
-    private hoveredPos: Position | null = null
+    private hoveredPos: Position | null = null;
     constructor(
         // Scene
         private readonly scene: FightScene,
@@ -114,8 +116,7 @@ export class GridService {
 
     cellHover(pos: Position) {
         this.hoveredPos = pos;
-        const boardCell = this.gameStore.getCell(pos);
-        this.refreshEntityTooltip(pos);
+        this.refreshHover();
     }
 
     cellHoverOut(pos: Position) {
@@ -151,12 +152,38 @@ export class GridService {
             position: { x: number; y: number };
         }[] = [];
 
-        zoneCells.forEach((cell) => {
+        const pushToolTip = (
+            cell: Cell,
+            targetEntity: Entity,
+            text: string,
+        ) => {
+            tooltipItems.push({
+                text,
+                title: this.classStore.getClass(targetEntity.classId).name,
+                position: {
+                    x: cell.position.x,
+                    y: cell.position.y - 130 * cell.scale,
+                },
+            });
+        };
+
+        for (const cell of zoneCells) {
             const entityId = this.gameStore.getCell(cell.index)?.entityId;
             if (!entityId) return;
 
             const targetEntity = this.gameStore.getEntity(entityId);
             if (!targetEntity) return;
+            const pushMyTooltip = (text: string) =>
+                pushToolTip(cell, targetEntity, text);
+
+            const used =
+                this.playerStore.playerEntity.actionUses?.[action.id]?.[
+                    entityId
+                ] ?? 0;
+            if (used >= action.maxUsePerTarget) {
+                pushMyTooltip(translate("fight.actions.maxReached"));
+                continue;
+            }
 
             const minDamage = this.actionService.calculateFinalDamage(
                 action.damage?.min ?? 0,
@@ -173,15 +200,16 @@ export class GridService {
 
             const isHeal = (action.damage?.max ?? 0) <= 0;
 
-            tooltipItems.push({
-                text: `${isHeal ? "🩹" : "⚔️"} ${isHeal ? -minDamage.defenserDamage : minDamage.defenserDamage}-${isHeal ? -maxDamage.defenserDamage : maxDamage.defenserDamage}`,
-                title: this.classStore.getClass(targetEntity.classId).name,
-                position: {
-                    x: cell.position.x,
-                    y: cell.position.y - 130 * cell.scale,
-                },
-            });
-        });
+            if (isHeal) {
+                pushMyTooltip(
+                    `🩹 ${-minDamage.defenserDamage}-${-maxDamage.defenserDamage}`,
+                );
+            } else {
+                pushMyTooltip(
+                    `⚔️ ${minDamage.defenserDamage}-${maxDamage.defenserDamage}`,
+                );
+            }
+        }
 
         this.scene.tooltip.showFightingTooltip(tooltipItems);
     }
@@ -206,6 +234,7 @@ export class GridService {
                 }
             }
             if (this.actionStore.selectedAction) {
+                this.scene.tooltip.hide();
                 this.manageToolTip(pos.x, pos.y);
             }
         }

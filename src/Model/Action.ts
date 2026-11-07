@@ -24,6 +24,7 @@ export class Action {
     cost!: number;
     isWalkAction?: boolean;
     level!: ActionLevel;
+    maxUsePerTarget!: number;
 }
 
 export enum ActionType {

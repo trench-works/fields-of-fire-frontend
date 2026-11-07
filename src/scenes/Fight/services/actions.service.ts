@@ -1,7 +1,6 @@
 import { KeyBindUtils, Position } from "../../../core";
 import { Action, ActionType } from "../../../Model/Action";
 import { Entity } from "../../../Model/Entity";
-import { Ran } from "../../../core/Types/Ran";
 import { EffectAction } from "../../../Model/Effect";
 import { PositionUtils } from "../../../core/Utils/Sizing";
 import { StatsUtils } from "../../../Model/Stats";
@@ -12,11 +11,13 @@ import { RangeService } from "./range.service";
 import { ActionRepository } from "../repositories/action.repository";
 import { KeyBind, KeyBinds } from "../../../core/keybinds/keybinds";
 import { ActionDisplayer } from "../display/action.displayer";
+import { FightSceneRoot } from "../fight-scene.root";
 
 export class ActionsService {
     public keyBinds: KeyBinds;
 
     constructor(
+        private readonly root: FightSceneRoot,
         // Stores
         private readonly playerStore: PlayerStore,
         private readonly actionStore: ActionsStore,
@@ -262,6 +263,7 @@ export class ActionsService {
 
         this.rangeService.showRange();
         this.actions.actionElements.get(action.id)?.hightlight(true);
+        this.root.controllers.display.refreshTooltip();
     }
 }
 

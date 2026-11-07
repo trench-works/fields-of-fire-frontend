@@ -74,7 +74,8 @@
                 "OTHER": "Other"
             },
             "dodged": "Dodged",
-            "endTurn": "Finish Turn"
+            "endTurn": "Finish Turn",
+            "maxReached": "Maximum uses reached\non this target"
         },
         "ui": { "reset": "Reset Board", "round": "Round" },
         "effects": {
