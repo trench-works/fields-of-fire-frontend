@@ -160,6 +160,7 @@ export class FightSceneRoot {
             actionService,
             inspectStatsService,
             animationService,
+            gridService,
             boardDisplayer,
             actionDisplayer,
             turnsDisplayer,

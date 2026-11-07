@@ -14,6 +14,7 @@ import { PlayerStore } from "../stores/player.store";
 import { InspectCharacterService } from "./inspect-character.service";
 
 export class GridService {
+    private hoveredPos: Position | null = null
     constructor(
         // Scene
         private readonly scene: FightScene,
@@ -112,35 +113,21 @@ export class GridService {
     }
 
     cellHover(pos: Position) {
-        const cell = this.groundStore.get(pos);
+        this.hoveredPos = pos;
         const boardCell = this.gameStore.getCell(pos);
-        if (cell && boardCell) {
-            cell.hoverGraphics?.setVisible(true);
-            if (boardCell.entityId) {
-                const entity = this.gameStore.getEntity(boardCell.entityId);
-
-                if (!this.actionStore.selectedAction) {
-                    this.scene.tooltip.showNow(
-                        this.classStore.getClass(entity.classId).name,
-                        `❤️ ${StatsUtils.fromEntity(entity).life} PV`,
-                        {
-                            x: cell.position.x,
-                            y: cell.position.y - 140 * this.scene.scaleFactor,
-                        },
-                    );
-                }
-            }
-            if (this.actionStore.selectedAction) {
-                this.manageToolTip(pos.x, pos.y);
-            }
-        }
+        this.refreshEntityTooltip(pos);
     }
 
     cellHoverOut(pos: Position) {
         const cell = this.groundStore.get(pos);
+        this.hoveredPos = null;
         cell?.hoverGraphics?.setVisible(false);
         this.scene.tooltip.hide();
         this.rangeService.clearZonePreview();
+    }
+
+    refreshHover() {
+        if (this.hoveredPos) this.refreshEntityTooltip(this.hoveredPos);
     }
 
     clearHover() {
@@ -197,6 +184,34 @@ export class GridService {
         });
 
         this.scene.tooltip.showFightingTooltip(tooltipItems);
+    }
+
+    private refreshEntityTooltip(pos: Position) {
+        const cell = this.groundStore.get(pos);
+        const boardCell = this.gameStore.getCell(pos);
+        if (cell && boardCell) {
+            cell.hoverGraphics?.setVisible(true);
+            if (boardCell.entityId) {
+                const entity = this.gameStore.getEntity(boardCell.entityId);
+
+                if (!this.actionStore.selectedAction) {
+                    this.scene.tooltip.showNow(
+                        this.classStore.getClass(entity.classId).name,
+                        `❤️ ${StatsUtils.fromEntity(entity).life} PV`,
+                        {
+                            x: cell.position.x,
+                            y: cell.position.y - 140 * this.scene.scaleFactor,
+                        },
+                    );
+                }
+            }
+            if (this.actionStore.selectedAction) {
+                this.manageToolTip(pos.x, pos.y);
+            }
+        }
+        if (!boardCell?.entityId && !this.actionStore.selectedAction) {
+            this.scene.tooltip.hide();
+        }
     }
 }
 
