@@ -4,8 +4,8 @@ import {
     BackgroundAsset,
     BackgroundAssetId,
 } from "../../assets/BackgroundAsset";
-import { Grid, SoundLevel } from "../Utils";
-import { TwoAxis } from "../Types";
+import { Grid, ScaleMode, SoundLevel } from "../Utils";
+import { Size, TwoAxis } from "../Types";
 import { MusicAsset, MusicAssetId } from "../../assets";
 import { Sound } from "../Types/Sound";
 import { AssetLoader } from "./Loader";
@@ -32,16 +32,22 @@ export class BaseScene<InitData = any> extends Scene {
 
     protected startConfig: StartSceneConfig;
 
+    protected bgScaleMode: ScaleMode.FIT | ScaleMode.FILL;
+
     constructor(
         public readonly key: SceneAssetId,
         protected readonly background: BackgroundAssetId,
-        rootGridOptions?: { division: TwoAxis },
+        options?: {
+            scale?: ScaleMode.FIT | ScaleMode.FILL;
+            grid?: { division: TwoAxis };
+        },
     ) {
         super({ key });
         i18n.loadBase();
         this.isOpen = false;
-        this.rootGrid = new Grid(rootGridOptions);
+        this.rootGrid = new Grid(options?.grid);
         this.startConfig = {};
+        this.bgScaleMode = options?.scale ?? ScaleMode.FIT;
     }
 
     get isCurrentScene(): boolean {
@@ -86,23 +92,42 @@ export class BaseScene<InitData = any> extends Scene {
     }
 
     create() {
-        const bg = this.add
-            .image(0, 0, BackgroundAsset.getAssetKey(this.background))
-            .setOrigin(0, 0)
-            .setDepth(-1);
-        bg.setDisplaySize(this.scale.width, this.scale.height);
+        const scale: Size = {
+            width: this.scale.width,
+            height: this.scale.height,
+        };
+        const imageScale = BackgroundAsset.getAssetSize(this.background);
+        const ratio: Size = {
+            width: scale.width / imageScale.width,
+            height: scale.height / imageScale.height,
+        };
+        if (ratio.height > ratio.width) {
+            scale.width = imageScale.width * ratio.height;
+        } else {
+            scale.height = imageScale.height * ratio.width;
+        }
+        this.add
+            .image(
+                this.scale.width / 2,
+                this.scale.height / 2,
+                BackgroundAsset.getAssetKey(this.background),
+            )
+            .setOrigin(0.5, 0.5)
+            .setDepth(-1)
+            .setDisplaySize(scale.width, scale.height);
     }
 
     playBackgroundMusic(id: MusicAssetId) {
         if (this.isOpen) {
             this.sound.stopAll();
             this.backgroundSound?.destroy();
-            this.backgroundSound = this.sound.add(MusicAsset.getAssetKey(id));
-            this.backgroundSound.setLoop(true);
-            this.backgroundSound.setVolume(
-                SoundLevel.get(SoundParam.BACKGROUND) *
-                    MusicAsset.getBaseSoundLevel(id),
-            );
+            this.backgroundSound = this.sound
+                .add(MusicAsset.getAssetKey(id))
+                .setLoop(true)
+                .setVolume(
+                    SoundLevel.get(SoundParam.BACKGROUND) *
+                        MusicAsset.getBaseSoundLevel(id),
+                );
             if (!this.backgroundSound.isPlaying) {
                 this.sound.stopAll();
                 this.backgroundSound.play();
@@ -112,9 +137,7 @@ export class BaseScene<InitData = any> extends Scene {
     }
 
     stopBackgroundMusic() {
-        if (this.backgroundSound) {
-            this.backgroundSound.stop();
-        }
+        this.backgroundSound?.stop();
     }
 
     close(keepMusic: boolean = true) {
