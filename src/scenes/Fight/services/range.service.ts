@@ -1,11 +1,20 @@
-import { Depth, GRID_LEVELS_OFFSET, isDefined, Position } from "../../../core";
+import { Color } from "../../../config/ColorConfig";
+import {
+    ColorUtils,
+    Depth,
+    GRID_LEVELS_OFFSET,
+    isDefined,
+    Position,
+} from "../../../core";
 import { Diamond } from "../../../core/Objects/Diamond";
 import { PositionUtils } from "../../../core/Utils/Sizing";
 import { applyFovToRange, Case } from "../../../Model";
 import { Action, ActionLevel, ActionZoneType } from "../../../Model/Action";
 import { Cell, FightScene } from "../fight.scene";
+import { ActionsStore } from "../stores/actions.store";
 import { GameStore } from "../stores/game.store";
 import { GridStore } from "../stores/grid.store";
+import { PlayerStore } from "../stores/player.store";
 
 export class RangeService {
     private cellsInRange: Cell[] = []; //TODO: bouger ca dans un displayer
@@ -14,14 +23,16 @@ export class RangeService {
         private readonly scene: FightScene,
         private readonly gameStore: GameStore,
         private readonly gridStore: GridStore,
+        private readonly playerStore: PlayerStore,
+        private readonly actionStore: ActionsStore,
     ) {}
 
     private highlightCell(
         cell: Cell,
-        color: number = 0x00aaff,
+        color: Color = Color.CLEAR_BLUE,
     ): Phaser.GameObjects.Graphics {
         const highlight = this.scene.add.graphics();
-        highlight.fillStyle(color, 0.6);
+        highlight.fillStyle(ColorUtils.parseColor(color), 0.6);
         highlight.fillPoints(new Diamond(cell, cell.scale).points, true);
         highlight.setPosition(cell.position.x, cell.position.y);
         highlight.setDepth(
@@ -34,16 +45,39 @@ export class RangeService {
     }
 
     showRange(): this {
-        this.clearRange();
-        this.cellsInRange.forEach((cell) => {
-            if (cell) {
-                cell.rangeHighlight = this.highlightCell(cell);
+        this.cleanRange();
+        for (const cell of this.cellsInRange) {
+            if (!cell) continue;
+            let actionBlocked = false;
+            const selectedAction = this.actionStore.selectedAction;
+            if (selectedAction) {
+                const tile = this.gameStore.getCell(cell.index);
+                if (tile) {
+                    const used =
+                        this.playerStore.playerEntity.actionUses?.[
+                            selectedAction.id
+                        ]?.[tile.entityId] ?? 0;
+                    if (used >= selectedAction.maxUsePerTarget) {
+                        actionBlocked = true;
+                    }
+                }
             }
-        });
+            cell.rangeHighlight = this.highlightCell(
+                cell,
+                actionBlocked ? Color.CLEAR_ORANGE : Color.CLEAR_BLUE,
+            );
+        }
         return this;
     }
 
     clearRange(): this {
+        this.cleanRange();
+        this.cellsInRange = [];
+        return this;
+    }
+
+    cleanRange(): this {
+        console.log("CLEAR RANGE");
         this.clearZonePreview();
         for (const cell of this.cellsInRange) {
             if (cell?.rangeHighlight) {
@@ -173,7 +207,12 @@ export class RangeService {
         });
 
         if (action.level === ActionLevel.GROUND) {
-            this.cellsInRange = applyFovToRange(start, result, board);
+            this.cellsInRange = applyFovToRange(
+                start,
+                result,
+                board,
+                action.range.max,
+            );
             return this;
         }
         this.cellsInRange = result;
@@ -194,7 +233,7 @@ export class RangeService {
     }
 
     setZoneHighlight(cell: Cell) {
-        cell.spellHighlight = this.highlightCell(cell, 0x42a97b);
+        cell.spellHighlight = this.highlightCell(cell, Color.CLEAR_GREEN);
     }
 
     getSpellZonePreview(action: Action, target: Position) {

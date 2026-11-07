@@ -1,13 +1,13 @@
 {
     "common": {
-        "validate": "検証"
+        "validate": "確認"
     },
     "mainMenu": {
         "play": "プレイ",
         "settings": "設定",
         "login": "ログイン",
-        "register": "登録",
-        "disconnect": "切断",
+        "register": "新規登録",
+        "disconnect": "ログアウト",
         "registerPopup": {
             "username": {
                 "title": "ユーザー名",
@@ -21,7 +21,7 @@
     },
     "fight": {
         "actions": {
-            "cost": "コスト",
+            "cost": "消費",
             "range": "射程",
             "type": {
                 "RANGED": "遠距離",

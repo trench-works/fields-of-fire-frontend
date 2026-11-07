@@ -13,36 +13,33 @@ export function applyFovToRange(
     origin: Position,
     inRange: Cell[],
     board: Case[][],
+    range: number
 ): Cell[] {
     const inFovCells: Cell[] = [];
+
+    // Index par coordonnées : évite les find/some linéaires à chaque appel
+    const key = (p: Position) => `${p.x},${p.y}`;
+    const inRangeByKey = new Map(inRange.map((c) => [key(c.index), c]));
+    const alreadyVisible = new Set<string>();
+
     computeFov(
         origin,
         ({ x, y }) => {
             const checkCell = board[x]?.[y];
-            if (!checkCell) {
-                return true;
-            }
-            const blocked = Boolean(checkCell.isWall || checkCell.entityId);
-            if (blocked) {
-                return true;
-            }
-            const notInRange = !inRange.some(({ index }) =>
-                PositionUtils.equals(index, { x, y }),
-            );
-            return notInRange;
+            if (!checkCell) return true; // hors plateau : bloquant
+            // mur ou entité bloquent, le trou ne bloque PAS la vue
+            return Boolean(checkCell.isWall || checkCell.entityId);
         },
         (pos) => {
-            const cell = inRange.find(({ index }) =>
-                PositionUtils.equals(index, pos),
-            );
-            const inFovCell = inFovCells.find(({ index }) =>
-                PositionUtils.equals(index, pos),
-            );
-            if (cell && !inFovCell) {
+            const k = key(pos);
+            const cell = inRangeByKey.get(k);
+            if (cell && !alreadyVisible.has(k)) {
+                alreadyVisible.add(k);
                 inFovCells.push(cell);
             }
         },
+        range
     );
+
     return inFovCells;
 }
-

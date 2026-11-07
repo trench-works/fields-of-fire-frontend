@@ -19,5 +19,8 @@ export enum Color {
     OPEN = "#4ec64e",
     CLOSE = "c9443d",
     SELECTED_LOBBY = "#cc5316",
+    CLEAR_BLUE = "#00aaff",
+    CLEAR_GREEN = "#42a97b",
+    CLEAR_ORANGE = "#d96e00",
 }
 

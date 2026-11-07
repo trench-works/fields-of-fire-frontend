@@ -49,6 +49,10 @@
         "joinTeam": "Rejoindre",
         "addTeam": "Ajouter"
     },
+    "gamesList": {
+        "title": "Parties en cours",
+        "join": "Reprendre la partie"
+    },
     "lobbyList": {
         "title": "Liste des Lobbies",
         "create": "Créer un lobby",
@@ -70,9 +74,10 @@
                 "OTHER": "Autre"
             },
             "dodged": "Esquivé",
-            "endTurn": "Fin du tour"
+            "endTurn": "Fin du tour",
+            "maxReached": "Nombre d'utilisations maximum\natteint sur cette cible"
         },
-        "ui": { "reset": "Réinitialiser le plateau" },
+        "ui": { "reset": "Réinitialiser le plateau", "round": "Manche" },
         "effects": {
             "duration": "durée"
         },

@@ -214,9 +214,11 @@ export class EndFightDisplayer extends FightSceneDisplayer {
 
     showEntityCards(): void {
         const entities = this.gameStore.game.entities.filter(
-            (entity) => !entity.isInvocation,
+            (entity) =>
+                !entity.isInvocation &&
+                entity.teamId === this.playerStore.playerEntity.teamId,
         );
-        const rowCount = entities.length;
+        const rowCount = Math.max(entities.length, 3);
 
         const entityListGrid = this.scene.rootGrid.getSubGrid(
             {
@@ -245,7 +247,7 @@ export class EndFightDisplayer extends FightSceneDisplayer {
                 entity,
                 entityListGrid.getSubGrid(
                     {
-                        x: index + 1,
+                        x: entities.length > 1 ? index + 1 : 2,
                         y: 1,
                         width: 1,
                         height: 5,

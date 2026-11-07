@@ -28,7 +28,7 @@ import { SceneAssetId } from "../../assets/ScenesAsset";
 import { BackgroundAssetId } from "../../assets/BackgroundAsset";
 import { ClassStore } from "../Fight/stores/class.store";
 import { LobbyStore } from "./stores/lobby.store";
-import { LobbyData } from "../LobbyList/interfaces/LobbyData";
+import { LobbyData } from "../PlayMenu/interfaces/LobbyData";
 import { SettingsDisplayer } from "./display/settings.displayer";
 import { translate } from "../../core/i18n/i18n";
 import { PlayerListDisplayer } from "./display/player-list.displayer";
@@ -122,6 +122,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             const player = game.players.find(
                 (player) => player.userId === globalThis.user?.id,
             )!;
+            this.lobbySocket.close();
             FightScene.start(this, {
                 data: {
                     game,

@@ -15,7 +15,7 @@ export class Http {
     >(
         endpoint: string,
         payload?: HttpPayload<Param, Query, never>,
-    ): Promise<Response> {
+    ): Promise<{ data: Response; headers: Headers }> {
         return Http.fetch<Response, Param, Query>("GET", endpoint, payload);
     }
 
@@ -26,7 +26,7 @@ export class Http {
     >(
         endpoint: string,
         payload?: HttpPayload<Param, never, Body>,
-    ): Promise<Response> {
+    ): Promise<{ data: Response; headers: Headers }> {
         return Http.fetch<Response, Param, never, Body>(
             "POST",
             endpoint,
@@ -43,7 +43,7 @@ export class Http {
         method: string,
         endpoint: string,
         payload: HttpPayload<Param, Query, Body> | undefined,
-    ): Promise<Response> {
+    ): Promise<{ data: Response; headers: Headers }> {
         if (!globalThis.config) {
             await new AppConfigLoader().loadConfig().then((appConfig) => {
                 globalThis.config = appConfig.getConfig();
@@ -76,10 +76,13 @@ export class Http {
         const rep = await fetch(url, {
             method,
             body: payload?.body ? JSON.stringify(payload?.body) : undefined,
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                token: String(globalThis.user?.token),
+            },
         });
         const data: Response = await rep.json();
-        return data;
+        return { data, headers: rep.headers };
     }
 }
 

@@ -109,6 +109,11 @@ export class Tile {
         this.image?.setVisible(visible);
         return this;
     }
+
+    public destroy(): void {
+        this.image?.destroy();
+        this.image = null;
+    }
 }
 
 export type TileLayerConfig = {
@@ -234,6 +239,14 @@ export class TileLayer<T extends Tile> {
             ),
         );
     }
+
+    public clear(): void {
+    this.tiles.flat().forEach((tile) => {
+        tile.destroy();
+    });
+
+    this.tiles = [];
+}
 }
 
 function getTilePosition(index: Position): Position {

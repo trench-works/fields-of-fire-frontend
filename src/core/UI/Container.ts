@@ -4,6 +4,45 @@ import { ColorUtils, GridArea } from "../Utils";
 import { Position, Size } from "../Types";
 import { Displayable } from "./DisplayRoot";
 
+function isNumber(nombre: unknown | number): nombre is number {
+    return !Number.isNaN(nombre);
+}
+
+function transformNumberRadius(
+    radius: number | undefined,
+    size: number,
+): number | undefined {
+    if (!radius) {
+        return undefined;
+    }
+    if (radius < 1) {
+        return radius * size;
+    }
+    return radius;
+}
+
+function transformRadius(
+    radius:
+        | Phaser.Types.GameObjects.Graphics.RoundedRectRadius
+        | number
+        | undefined,
+    size: number,
+): Phaser.Types.GameObjects.Graphics.RoundedRectRadius | number | undefined {
+    if (!radius) {
+        return undefined;
+    }
+    if (isNumber(radius)) {
+        return transformNumberRadius(radius, size);
+    } else {
+        return {
+            bl: transformNumberRadius(radius.bl, size),
+            br: transformNumberRadius(radius.br, size),
+            tl: transformNumberRadius(radius.tl, size),
+            tr: transformNumberRadius(radius.tr, size),
+        };
+    }
+}
+
 type ContainerConfig = {
     title?: string;
     bgColor?: Color;
@@ -148,7 +187,7 @@ export class DisplayContainer
         scene.add.existing(this);
     }
 
-    public setText(text: string, options?: { fontSize?: number }) {
+    public setText(text: string, options?: { fontSize?: number }): this {
         const fontSize =
             options?.fontSize ??
             Math.min(this.height / 2, (this.width / text.length) * 1.5);
@@ -169,6 +208,7 @@ export class DisplayContainer
         } else {
             this.titleText.setText(text);
         }
+        return this;
     }
 
     public manageBorder(borderColor: number, borderWidth: number) {
@@ -178,16 +218,18 @@ export class DisplayContainer
         }
         const width = this.width;
         const height = this.height;
-        this.border
-            .clear()
-            .lineStyle(borderWidth, borderColor, 1)
-            .strokeRoundedRect(
+        this.border.clear().lineStyle(borderWidth, borderColor, 1);
+        if ((this.innerRadius ?? this.radius) === 0) {
+            this.border.strokeRect(-width / 2, -height / 2, width, height);
+        } else {
+            this.border.strokeRoundedRect(
                 -width / 2,
                 -height / 2,
                 width,
                 height,
-                this.innerRadius ?? this.radius,
+                transformRadius(this.outterRadius, Math.min(width, height)),
             );
+        }
         if (this.outterRadius !== undefined) {
             if (!this.outterBorder) {
                 this.outterBorder = this.scene.make.graphics({}, false);
@@ -195,16 +237,23 @@ export class DisplayContainer
             }
             const width = this.width;
             const height = this.height;
-            this.outterBorder
-                .clear()
-                .lineStyle(borderWidth, borderColor, 1)
-                .strokeRoundedRect(
+            this.outterBorder.clear().lineStyle(borderWidth, borderColor, 1);
+            if (this.outterRadius === 0) {
+                this.outterBorder.strokeRect(
                     -width / 2,
                     -height / 2,
                     width,
                     height,
-                    this.outterRadius,
                 );
+            } else {
+                this.outterBorder.strokeRoundedRect(
+                    -width / 2,
+                    -height / 2,
+                    width,
+                    height,
+                    transformRadius(this.outterRadius, Math.min(width, height)),
+                );
+            }
         }
     }
 
@@ -232,7 +281,10 @@ export class DisplayContainer
                 -height / 2,
                 width,
                 height,
-                this.outterRadius ?? this.radius,
+                transformRadius(
+                    this.outterRadius ?? this.radius,
+                    Math.min(width, height),
+                ),
             );
         }
     }

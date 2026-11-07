@@ -1,5 +1,6 @@
 import { CharacterAssetId } from "../assets";
 import { Position } from "../core";
+import { Boost } from "./Boost";
 import { Effect } from "./Effect";
 import { Stats } from "./Stats";
 
@@ -16,8 +17,10 @@ export type Entity = {
     type: EntityType;
     stats: Stats;
     effects: Effect[];
+    boosts: Boost[];
     dead: boolean;
     isInvocation: boolean;
     isPlaying: boolean;
+    actionUses: Record<string, Record<string, number>>;
 };
 

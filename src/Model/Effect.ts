@@ -22,7 +22,7 @@ export type Effect = {
     name: string;
     type: EffectType;
     duration: number | null;
-    modifier: Stats;
+    modifier: Partial<Stats>;
     author?: string;
     description?: string;
     action: EffectAction;

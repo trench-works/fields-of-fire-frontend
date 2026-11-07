@@ -1,7 +1,6 @@
 import { KeyBindUtils, Position } from "../../../core";
 import { Action, ActionType } from "../../../Model/Action";
 import { Entity } from "../../../Model/Entity";
-import { Ran } from "../../../core/Types/Ran";
 import { EffectAction } from "../../../Model/Effect";
 import { PositionUtils } from "../../../core/Utils/Sizing";
 import { StatsUtils } from "../../../Model/Stats";
@@ -12,11 +11,13 @@ import { RangeService } from "./range.service";
 import { ActionRepository } from "../repositories/action.repository";
 import { KeyBind, KeyBinds } from "../../../core/keybinds/keybinds";
 import { ActionDisplayer } from "../display/action.displayer";
+import { FightSceneRoot } from "../fight-scene.root";
 
 export class ActionsService {
     public keyBinds: KeyBinds;
 
     constructor(
+        private readonly root: FightSceneRoot,
         // Stores
         private readonly playerStore: PlayerStore,
         private readonly actionStore: ActionsStore,
@@ -115,8 +116,14 @@ export class ActionsService {
     }
 
     async launchAction(pos: Position) {
-        this.lock();
         const action = this.actionStore.selectedAction;
+        if (!action) {
+            return;
+        }
+        if (!this.isActionPossible(action)) {
+            return;
+        }
+        this.lock();
         this.clearAction();
         await this.actionRepository.action({
             actionId: action?.id ?? "",
@@ -153,7 +160,7 @@ export class ActionsService {
 
         let brutTotal: number;
         if (damage < 0) {
-            brutTotal = damage - statBonus;
+            brutTotal = damage - attackerStats.intelligence;
             defenserDamage = brutTotal;
             if (defenserStats.life - defenserDamage > defenserStats.maxLife) {
                 defenserDamage = -(defenserStats.maxLife - defenserStats.life);
@@ -161,19 +168,6 @@ export class ActionsService {
         } else {
             brutTotal = damage + statBonus;
             defenserDamage = brutTotal * (100 / (100 + defenserStats.armor));
-
-            //Crit Logik
-            const critRoll = Ran.int(100);
-            const critChanceBuff = attacker.effects.filter(
-                (e) => e.action === EffectAction.CRIT_CHANCE,
-            ).length;
-            const critDammageBuff = attacker.effects.filter(
-                (e) => e.action === EffectAction.CRIT_DAMMAGE,
-            ).length;
-            const critChance = 1 + critChanceBuff * 3;
-            if (critRoll < critChance) {
-                defenserDamage = defenserDamage * (2 + 0.25 * critDammageBuff);
-            }
         }
 
         if (action.id === "shield_rush") {
@@ -181,7 +175,7 @@ export class ActionsService {
                 1 +
                 (PositionUtils.distance(attacker.position, defenser.position) -
                     1) *
-                    0.1;
+                    0.15;
         }
 
         // Vampire : vol de vie par stack
@@ -227,15 +221,32 @@ export class ActionsService {
         this.rangeService.clearZonePreview();
     }
 
+    isActionPossible(action: Action): boolean {
+        const stats = StatsUtils.fromEntity(this.playerStore.playerEntity);
+        switch (action.id) {
+            case ActionAssetId.WALK:
+                if (!stats.mouvement) {
+                    return false;
+                }
+                break;
+            default:
+                if (stats.energy < action.cost) {
+                    return false;
+                }
+                break;
+        }
+        return true;
+    }
+
     handleActionSelection(action: Action) {
         const stats = StatsUtils.fromEntity(this.playerStore.playerEntity);
         this.clearAction();
         this.actionStore.selectedAction = action;
+        if (!this.isActionPossible(action)) {
+            return;
+        }
         switch (action.id) {
             case ActionAssetId.WALK:
-                if (!stats.mouvement) {
-                    return;
-                }
                 this.rangeService.calculateCellsInMoveRange(
                     this.playerStore.playerEntity.position,
                     stats.mouvement,
@@ -243,9 +254,6 @@ export class ActionsService {
                 );
                 break;
             default:
-                if (stats.energy < action.cost) {
-                    return;
-                }
                 this.rangeService.calculateCellsInAttackRange(
                     this.playerStore.playerEntity.position,
                     action,
@@ -255,6 +263,7 @@ export class ActionsService {
 
         this.rangeService.showRange();
         this.actions.actionElements.get(action.id)?.hightlight(true);
+        this.root.controllers.display.refreshTooltip();
     }
 }
 

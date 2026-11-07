@@ -1,6 +1,6 @@
 import { Socket, SocketListener } from "../../../core";
 import { Game } from "../../../Model/Game";
-import { LobbyData } from "../../LobbyList/interfaces/LobbyData";
+import { LobbyData } from "../../PlayMenu/interfaces/LobbyData";
 
 const LOBBY_TOPIC = "lobby";
 

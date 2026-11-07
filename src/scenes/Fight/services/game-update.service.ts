@@ -11,6 +11,8 @@ import { InspectCharacterService } from "./inspect-character.service";
 import { AnimationService } from "./animation.service";
 import { Timeout } from "../../../core";
 import { ActionDisplayer } from "../display/action.displayer";
+import { GridService } from "./grid.service";
+import { RangeService } from "./range.service";
 
 export class GameUpdateService {
     constructor(
@@ -21,6 +23,8 @@ export class GameUpdateService {
         private readonly actionsService: ActionsService,
         private readonly inspectService: InspectCharacterService,
         private readonly animationService: AnimationService,
+        private readonly gridService: GridService,
+        private readonly rangeService: RangeService,
         // Displayers
         private readonly board: BoardDisplayer,
         private readonly actions: ActionDisplayer,
@@ -91,8 +95,10 @@ export class GameUpdateService {
             }
         }
 
-        this.actionsService.unlock();
+        this.rangeService.showRange();
+        this.gridService.refreshHover();
         await Timeout(1000);
+        this.actionsService.unlock();
     }
 }
 

@@ -6,6 +6,7 @@ import {
     ScaleMode,
     UI_LEVELS_OFFSET,
 } from "../../../core";
+import { translate } from "../../../core/i18n/i18n";
 import { FightScene } from "../fight.scene";
 import { ClassStore } from "../stores/class.store";
 import { GameStore } from "../stores/game.store";
@@ -13,6 +14,7 @@ import { FightSceneDisplayer } from "./base/fight-scene.displayer";
 
 export class TurnDisplayer extends FightSceneDisplayer {
     private turnPanel!: DisplayContainer;
+    private roundPanel!: DisplayContainer;
 
     private icons: DisplayContainer[] = [];
 
@@ -37,11 +39,20 @@ export class TurnDisplayer extends FightSceneDisplayer {
                 opacity: 0.25,
                 outterRadius: { tr: 0, bl: 0, tl: 0, br: 10 },
             },
-        );
-
-        this.turnPanel.setDepth(
-            Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER),
-        );
+        ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER));
+        this.roundPanel = new DisplayContainer(
+            this.scene,
+            this.scene.rootGrid.getArea({
+                x: 1,
+                y: 2,
+                width: 1,
+                height: 0.4,
+            }),
+            {
+                opacity: 0.25,
+                outterRadius: { tr: 0, bl: 0, tl: 0, br: 10 },
+            },
+        ).setDepth(Depth.getUIElementDepth(UI_LEVELS_OFFSET.CONTAINER));
 
         return this;
     }
@@ -117,6 +128,10 @@ export class TurnDisplayer extends FightSceneDisplayer {
                 ),
             );
         });
+
+        this.roundPanel.setText(
+            `${translate("fight.ui.round")} : ${this.gameStore.game.round}`,
+        );
         return this;
     }
 

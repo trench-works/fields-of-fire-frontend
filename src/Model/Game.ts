@@ -24,6 +24,7 @@ export type Game = {
 
     //things relative to rounds
     isStopped: boolean;
+    round: number;
     winnerTeamId: string | undefined;
 };
 

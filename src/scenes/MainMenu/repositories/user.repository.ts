@@ -4,7 +4,7 @@ import { User } from "../interfaces/User";
 
 export class UserRepository {
     async authenticate(username: string, password: string): Promise<void> {
-        const user = await Http.post<User, never, Authenticate>(
+        const { data: user } = await Http.post<User, never, Authenticate>(
             "/authenticate",
             { body: { username, password } },
         );
@@ -14,9 +14,12 @@ export class UserRepository {
     }
 
     async register(username: string, password: string): Promise<void> {
-        const user = await Http.post<User, never, Authenticate>("/register", {
-            body: { username, password },
-        });
+        const { data: user } = await Http.post<User, never, Authenticate>(
+            "/register",
+            {
+                body: { username, password },
+            },
+        );
         if (user) {
             globalThis.user = user;
         }
