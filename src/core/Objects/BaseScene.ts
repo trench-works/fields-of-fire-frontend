@@ -33,7 +33,7 @@ export class BaseScene<InitData = any> extends Scene {
     protected startConfig: StartSceneConfig;
 
     constructor(
-        key: SceneAssetId,
+        public readonly key: SceneAssetId,
         protected readonly background: BackgroundAssetId,
         rootGridOptions?: { division: TwoAxis },
     ) {
@@ -44,17 +44,24 @@ export class BaseScene<InitData = any> extends Scene {
         this.startConfig = {};
     }
 
+    get isCurrentScene(): boolean {
+        return this.key === globalThis.currentScene;
+    }
+
     static startScene<InitData = never>(
         scene: BaseScene,
         id: SceneAssetId,
         data: BaseSceneInit<InitData>,
     ) {
-        if (data.config?.keepMusic ?? true) {
-            data.config ??= {};
-            data.config.backgroundMusic = scene.backgroundSound;
+        if (scene.isCurrentScene) {
+            if (data.config?.keepMusic ?? true) {
+                data.config ??= {};
+                data.config.backgroundMusic = scene.backgroundSound;
+            }
+            scene.close(data.config?.keepMusic);
+            globalThis.currentScene = id;
+            scene.scene.start(id, data);
         }
-        scene.close(data.config?.keepMusic);
-        scene.scene.start(id, data);
     }
 
     init(init: BaseSceneInit<InitData>) {
@@ -70,6 +77,7 @@ export class BaseScene<InitData = any> extends Scene {
             }
             this.backgroundSound = init?.config?.backgroundMusic;
         }
+        globalThis.currentScene = this.key;
     }
 
     preload() {

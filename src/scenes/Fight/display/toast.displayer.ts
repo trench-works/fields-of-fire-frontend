@@ -58,22 +58,21 @@ export class ToastDisplayer {
         await Promise.all(
             hits.map((hit) => {
                 const cell = this.gridStore.get(hit);
-                if(!cell) return;
-                console.log(hit.isCritical);
+                if (!cell) return;
 
                 const toast = new Toast(this.scene, cell.position, 1);
 
                 if (hit.damage === 0) {
-                    toast.setText(i18n.translate("fight.actions.dodged"), Color.GREEN);
-                } else if (hit.isCritical) {
                     toast.setText(
-                        `${-hit.damage} ! 💥`,
-                        Color.RED,
+                        i18n.translate("fight.actions.dodged"),
+                        Color.GREEN,
                     );
+                } else if (hit.isCritical) {
+                    toast.setText(`${-hit.damage} ! 💥`, Color.RED);
                 } else {
                     toast.setText(`${-hit.damage} ❤️`, Color.RED);
                 }
-                return toast.animate(1000)
+                return toast.animate(1000);
             }),
         );
     }

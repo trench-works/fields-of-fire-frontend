@@ -15,7 +15,6 @@ export class GameListStore {
     }
 
     setGames(games: Game[]): void {
-        console.log(games);
         this.games = games.reverse();
     }
 

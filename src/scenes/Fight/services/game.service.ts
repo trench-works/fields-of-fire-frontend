@@ -73,9 +73,9 @@ export class GameService {
 
         this.root.playerSocket = new GamePlayerSocket(game.id, playerId);
         new ConnectionLoader(this.scene, this.connectingRepository);
-        this.root.playerSocket.onClose(() =>
-            MainMenu.start(this.scene, { keepMusic: false }),
-        );
+        this.root.playerSocket.onClose(() => {
+            MainMenu.start(this.scene, { keepMusic: false });
+        });
         this.gameRepository.onUpdate((event) =>
             this.gameUpdateQueue.add(event),
         );

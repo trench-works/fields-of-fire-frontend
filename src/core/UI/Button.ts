@@ -312,7 +312,7 @@ export class Button
 
     private setupEvents() {
         this.on("pointerdown", () => {
-            if (this.isActivated) {
+            if (this.isActivated && this.scene.isCurrentScene) {
                 this.onClick();
             }
         });
