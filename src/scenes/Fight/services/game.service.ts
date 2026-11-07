@@ -1,6 +1,7 @@
 import { SoundEffectAsset, SoundEffectAssetId } from "../../../assets";
-import { EventQueue, SoundEffect } from "../../../core";
+import { EventQueue, SoundEffect, Timeout } from "../../../core";
 import { ConnectionLoader } from "../../../core/Objects/Loader";
+import { Game } from "../../../Model/Game";
 import { MainMenu } from "../../MainMenu/main-menu.scene";
 import { ActionDisplayer } from "../display/action.displayer";
 import { BoardDisplayer } from "../display/board.displayer";
@@ -96,9 +97,34 @@ export class GameService {
         });
 
         this.gameRepository.onGameRenew((event) => {
-            this.gameUpdateQueue.add({ data: event.data, animations: [] });
+            this.reset(event.data);
             this.endFight.reset();
         });
+    }
+
+    async reset(game: Game) {
+        /**
+         * Update Store
+         */
+        this.gameStore.setGame(game);
+        this.playerStore.update();
+        /**
+         * Update Displayers
+         */
+        this.board.reset();
+        this.actions.destroy().preRender().render().update();
+        this.turns.update();
+        this.character.render().update();
+        this.uiDisplayer.render();
+        this.playerStats
+            .setEntity(this.playerStore.playerEntity)
+            .setCharacterClass(this.playerStore.playerClass)
+            .setName(this.playerStore.player.name)
+            .update();
+        this.inspectStats.setIsShow(false);
+
+        await Timeout(1000);
+        this.actionsService.unlock();
     }
 
     create() {

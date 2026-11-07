@@ -11,12 +11,16 @@ export class InspectCharacterService {
 
     public inspectCharacter(entityId: string) {
         const entity = this.gameStore.getEntity(entityId);
+        const player = this.gameStore.game.players.find(
+            (player) => player.entityId === entityId,
+        );
         const charClass = this.classStore.getClass(entity.classId);
         this.inspectStats
             .setEntity(entity)
             .setCharacterClass(charClass)
-            .setName(charClass.name.split(" ")[0])
+            .setName(player?.name ?? charClass.name.split(" ")[0])
             .update()
             .setIsShow(true);
     }
 }
+
