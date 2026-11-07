@@ -167,17 +167,6 @@ export class ActionsService {
         } else {
             brutTotal = damage + statBonus;
             defenserDamage = brutTotal * (100 / (100 + defenserStats.armor));
-
-            //Crit Logik
-            const critRoll = Ran.int(100);
-            const critChanceBuff = attackerStats.critical;
-            const critDammageBuff = attacker.effects.filter(
-                (e) => e.action === EffectAction.CRIT_DAMMAGE,
-            ).length;
-            const critChance = 1 + critChanceBuff * 3;
-            if (critRoll < critChance) {
-                defenserDamage = defenserDamage * (2 + 0.25 * critDammageBuff);
-            }
         }
 
         if (action.id === "shield_rush") {
