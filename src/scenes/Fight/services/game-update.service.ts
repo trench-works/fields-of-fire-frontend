@@ -97,8 +97,8 @@ export class GameUpdateService {
 
         this.rangeService.showRange();
         this.gridService.refreshHover();
-        this.actionsService.unlock();
         await Timeout(1000);
+        this.actionsService.unlock();
     }
 }
 
