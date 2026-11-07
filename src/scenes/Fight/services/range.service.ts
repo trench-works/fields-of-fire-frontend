@@ -45,7 +45,7 @@ export class RangeService {
     }
 
     showRange(): this {
-        this.clearRange();
+        this.cleanRange();
         for (const cell of this.cellsInRange) {
             if (!cell) continue;
             let actionBlocked = false;
@@ -71,6 +71,13 @@ export class RangeService {
     }
 
     clearRange(): this {
+        this.cleanRange();
+        this.cellsInRange = [];
+        return this;
+    }
+
+    cleanRange(): this {
+        console.log("CLEAR RANGE");
         this.clearZonePreview();
         for (const cell of this.cellsInRange) {
             if (cell?.rangeHighlight) {
