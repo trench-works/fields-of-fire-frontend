@@ -13,18 +13,37 @@ export class Action {
     name!: string;
     description?: string;
     damage?: { min: number; max: number };
-    actionType!: ActionType;
-    effectList?: Effect[];
-    range!: { min: number; max: number };
+    effectList?: ManagedEffect[];
     rangeType!: ActionZoneType;
+    range!: { min: number; max: number };
+    actionType!: ActionType;
     zoneType?: ActionZoneType;
     zoneSize?: number;
-    mooveToTarget?: Position;
-    pushValue?: number;
+    //mooveToTarget?: Position;
+    //pushValue?: number;
     cost!: number;
-    isWalkAction?: boolean;
-    level!: ActionLevel;
+    //isWalkAction?: boolean;
+    targetRequired?: boolean;
+    invocateClass?: string;
     maxUsePerTarget!: number;
+    maxUsePerRound!: number
+    level!: ActionLevel;
+}
+export class ManagedEffect {
+    effect!: Effect;
+    chanceToApply?: number;
+    target!: EffectTarget;
+    onHit?: boolean;
+}
+
+export enum EffectTarget {
+    SELF = "SELF",
+    TARGET = "TARGET",
+    RANDOM_ALLY = "RANDOM_ALLY",
+    RANDOM_FOE = "RANDOM_FOE",
+    ALL_ALLY = "ALL_ALLY",
+    ALL_FOE = "ALL_FOE",
+    ALL = "ALL"
 }
 
 export enum ActionType {
@@ -40,5 +59,6 @@ export enum ActionZoneType {
     CIRCLE = "CIRCLE",
     PLUS = "PLUS",
     XCROSS = "XCROSS",
+    CONE = "CONE"
 }
 

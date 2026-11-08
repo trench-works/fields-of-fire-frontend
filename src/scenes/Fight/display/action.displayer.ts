@@ -14,6 +14,7 @@ import {
     i18n,
 } from "../../../core";
 import { DisplayImage } from "../../../core/UI/DisplayImage";
+import { getEntityActions } from "../../../Model/AcionUtils";
 import { StatsUtils } from "../../../Model/Stats";
 import { FightScene } from "../fight.scene";
 import { ActionsStore } from "../stores/actions.store";
@@ -116,7 +117,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
 
     render(): this {
         this.actionStore.orderedActions = [];
-        this.playerStore.playerClass.actionList.forEach((action, index) => {
+        this.getPlayerActions().forEach((action, index) => {
             this.actionStore.orderedActions.push(action);
             const iconObj = this.actionsList.placeElement(
                 { x: index, y: 0 },
@@ -241,7 +242,7 @@ export class ActionDisplayer extends FightSceneDisplayer {
 
         const stats = StatsUtils.fromEntity(this.playerStore.playerEntity);
 
-        this.playerStore.playerClass.actionList.forEach((action) => {
+        this.getPlayerActions().forEach((action) => {
             const actionObject = this.actionElements.get(action.id)!;
             switch (action.id) {
                 case ActionAssetId.WALK:
@@ -266,6 +267,13 @@ export class ActionDisplayer extends FightSceneDisplayer {
 
     async animate(): Promise<this> {
         return this;
+    }
+
+    private getPlayerActions() {
+        return getEntityActions(
+            this.playerStore.playerEntity,
+            this.playerStore.playerClass.actionList,
+        );
     }
 }
 

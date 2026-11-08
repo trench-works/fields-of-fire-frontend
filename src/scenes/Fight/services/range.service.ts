@@ -242,9 +242,9 @@ export class RangeService {
 
         if (!this.isInRange(target)) return;
         if (!action.zoneType?.length) return;
+        if (!action.zoneSize) return;
         switch (action.zoneType[0]) {
             case ActionZoneType.DIAMOND: {
-                if (!action.zoneSize) return;
                 const zoneSize = action.zoneSize - 1;
                 for (
                     let x = target.x - zoneSize;
@@ -276,9 +276,45 @@ export class RangeService {
                 }
                 break;
             }
+            case ActionZoneType.CONE: {
+                const origin = this.playerStore.playerEntity.position;
+                this.gridStore.forEach(({ index }) => {
+                    if (!this.isInCone(origin, target, index, action.zoneSize!)) return;
+                    const cell = this.gridStore.get(index);
+                    const boardCell = this.gameStore.getCell(index);
+                    if (cell && !boardCell?.isHole && !boardCell?.isWall) {
+                        this.setZoneHighlight(cell);
+                        zoneCells.push(cell);
+                    }
+                });
+                break;
+            }
         }
 
         return zoneCells;
+    }
+
+    isInCone(
+        origin: Position,
+        target: Position,
+        position: Position,
+        size: number,
+    ): boolean {
+        const dx = target.x - origin.x;
+        const dy = target.y - origin.y;
+        if (dx === 0 && dy === 0) return false;
+
+        const horizontal = Math.abs(dx) >= Math.abs(dy);
+        const sign = horizontal ? Math.sign(dx) : Math.sign(dy);
+
+        const depth = horizontal
+            ? (position.x - target.x) * sign
+            : (position.y - target.y) * sign;
+        const lateral = horizontal
+            ? Math.abs(position.y - target.y)
+            : Math.abs(position.x - target.x);
+
+        return depth >= 0 && depth <= size - 1 && lateral <= depth;
     }
 }
 

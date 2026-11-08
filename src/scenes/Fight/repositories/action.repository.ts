@@ -8,7 +8,7 @@ type ActionPlayer = {
 };
 
 export type PlayerCancelAction = {
-    reason: "energy" | "mouvement" | "occupied" | "target-visible" | "max-use-per-target";
+    reason: "energy" | "mouvement" | "occupied" | "target-visible" | "max-use-per-target" | "max-use-per-round";
 };
 
 export class ActionRepository {
