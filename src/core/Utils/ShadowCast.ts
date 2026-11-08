@@ -37,10 +37,6 @@ function hasLineOfSight(
         const d = (1 + 2 * ix) * ny - (1 + 2 * iy) * nx;
 
         if (d === 0) {
-            // le segment passe pile par un coin : on ne bloque que si les deux côtés bloquent
-            if (isBlocking({ x: x + sx, y }) && isBlocking({ x, y: y + sy })) {
-                return false;
-            }
             x += sx; y += sy; ix++; iy++;
         } else if (d < 0) {
             x += sx; ix++;
