@@ -13,6 +13,7 @@ const UNCLICKABLE_ALPHA = 0.5;
 type ButtonConfig = {
     text?: string;
     onClick: () => void;
+    onRightClick?: () => void;
     fontSize?: number;
     textColor?: Color;
     bgColor?: Color;
@@ -40,6 +41,7 @@ export class Button
     private highlighter?: Phaser.GameObjects.Graphics;
 
     protected onClick: () => void;
+    protected onRightClick?: () => void;
 
     protected isActivated: boolean;
 
@@ -66,6 +68,7 @@ export class Button
         {
             text,
             onClick,
+            onRightClick,
             image,
             fontSize,
             textColor,
@@ -89,6 +92,7 @@ export class Button
         this.innerRadius = innerRadius;
 
         this.onClick = onClick;
+        this.onRightClick = onRightClick;
         this.isActivated = true;
         this.textColor = textColor;
         this.color = bgColor ?? Color.MILITARY_GREEN;
@@ -311,8 +315,11 @@ export class Button
     }
 
     private setupEvents() {
-        this.on("pointerdown", () => {
-            if (this.isActivated && this.scene.isCurrentScene) {
+        this.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+            if (!this.isActivated || !this.scene.isCurrentScene) return;
+            if (pointer.rightButtonDown() && this.onRightClick) {
+                this.onRightClick();
+            } else {
                 this.onClick();
             }
         });
@@ -336,6 +343,11 @@ export class Button
         });
     }
 
+    setOnRightClick(onRightClick: () => void): this {
+        this.onRightClick = onRightClick;
+        return this;
+    }
+
     setText(
         text: string,
         options?: { color?: Color; fontSize?: number },
@@ -347,6 +359,11 @@ export class Button
     setImage(imageKey: string): this {
         this.imageDisplay?.setImage(imageKey);
         return this;
+    }
+
+    destroy(fromScene?: boolean): void {
+        this.imageDisplay?.destroy();
+        super.destroy(fromScene);
     }
 }
 

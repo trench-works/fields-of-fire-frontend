@@ -32,6 +32,10 @@ import { LobbyData } from "../PlayMenu/interfaces/LobbyData";
 import { SettingsDisplayer } from "./display/settings.displayer";
 import { translate } from "../../core/i18n/i18n";
 import { PlayerListDisplayer } from "./display/player-list.displayer";
+import { MasteryStore } from "./stores/mastery.store";
+import { MasteryTreeDisplayer } from "./display/mastery-tree.displayer";
+import { MasteriesRepository } from "./repositories/masteries.repository";
+import { MasteryAsset } from "../../assets/MasteryAsset";
 
 export type LobbySceneInit = {
     lobby: LobbyData;
@@ -49,6 +53,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
 
     protected classStore: ClassStore;
     protected lobbyStore: LobbyStore;
+    protected masteryStore: MasteryStore;
 
     protected playerTab!: PlayerListDisplayer;
 
@@ -61,12 +66,20 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
     protected mapSizeTitle!: DisplayText;
     protected lobbyNameTitle!: DisplayText;
 
+    
+    protected masteryTab!: MasteryTreeDisplayer;
+
     constructor() {
         super(SceneAssetId.LOBBY, BackgroundAssetId.LOBBY);
         this.classStore = new ClassStore();
         this.lobbyStore = new LobbyStore();
+        this.masteryStore = new MasteryStore();
         new ClassesRepository().getClasses().then((data) => {
             this.classStore.setClasses(data);
+        });
+        new MasteriesRepository().getMasteries().then((data) => {
+            this.masteryStore.setTrees(data);
+            this.masteryTab?.onTreesLoaded();
         });
     }
 
@@ -83,6 +96,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 .find((player) => player.userId === globalThis.user?.id)!;
             this.playerId = player.playerId!;
             this.lobbyStore.setLobby(lobby);
+            this.masteryStore.setClass(player.classId);
             this.selectClassId = player.classId;
         }
     }
@@ -91,6 +105,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         super.preload();
         CharacterIconAsset.loadAll(this.load);
         CharacterCloseupAsset.loadAll(this.load);
+        MasteryAsset.loadAll(this.load);
         MusicAsset.load(this.load, MusicAssetId.MENU);
     }
 
@@ -212,6 +227,12 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         this.mapSizeTitle = new DisplayText(this, mapSizeArea);
         this.updateSettingsDisplay();
 
+        //MasteryTree creation 
+
+        this.masteryTab = new MasteryTreeDisplayer(this, this.masteryStore, (masteries) =>
+            this.lobbySocket.setMasteries({ masteries }),
+        );
+
         //tab BOX
         this.playerTab = new PlayerListDisplayer(
             this,
@@ -241,13 +262,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
                 },
                 {
                     label: translate("lobby.masters"),
-                    build: (root, area) => {
-                        root.add(
-                            new DisplayText(this, area).setText(
-                                "not implemented yet",
-                            ),
-                        );
-                    },
+                    build: (root, area) => this.masteryTab.build(root, area),
                 },
                 {
                     label: translate("lobby.players"),
@@ -264,6 +279,7 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
         tabManager.switchTo = (index: number) => {
             originalSwitchTo(index);
             this.playerTab.isActive = index === 2;
+            this.masteryTab.setActive(index === 1);
         };
 
         //Selected character info BOX
@@ -534,6 +550,8 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
             classId,
         });
         this.updatePlayerData(classId);
+        this.masteryStore.setClass(classId);
+        this.masteryTab.onClassChanged();
     }
 
     setPlayerReady(playerId: string) {

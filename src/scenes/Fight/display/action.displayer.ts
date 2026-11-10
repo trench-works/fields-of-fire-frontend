@@ -14,7 +14,7 @@ import {
     i18n,
 } from "../../../core";
 import { DisplayImage } from "../../../core/UI/DisplayImage";
-import { getEntityActions } from "../../../Model/AcionUtils";
+import { getEntityActions } from "../../../Model/ActionUtils";
 import { StatsUtils } from "../../../Model/Stats";
 import { FightScene } from "../fight.scene";
 import { ActionsStore } from "../stores/actions.store";

@@ -1,5 +1,6 @@
 import { Socket, SocketListener } from "../../../core";
 import { Game } from "../../../Model/Game";
+import { MasterySelection } from "../../../Model/Mastery";
 import { LobbyData } from "../../PlayMenu/interfaces/LobbyData";
 
 const LOBBY_TOPIC = "lobby";
@@ -11,6 +12,10 @@ type LobbyKey = {
 type ChangeClass = {
     classId: string;
 };
+
+type selectedMasteries = {
+    masteries: MasterySelection;
+}
 
 type PlayerReady = {
     playerId: string;
@@ -30,6 +35,7 @@ enum LobbyActions {
     READY = "ready",
     ADD_TEAM = "add-team",
     JOIN_TEAM = "join-team",
+    SET_MASTERIES = "set-masteries"
 }
 
 enum LobbyEvents {
@@ -78,6 +84,10 @@ export class LobbySocket extends Socket<LobbyKey, LobbyActions, LobbyEvents> {
 
     addTeam() {
         return this.send(LobbyActions.ADD_TEAM);
+    }
+
+    setMasteries(selectedMasteries : selectedMasteries){
+        return this.send(LobbyActions.SET_MASTERIES, selectedMasteries);
     }
 
     updateLobby(lobby: LobbyData) {
