@@ -124,6 +124,15 @@ export class MasteryTreeModel {
         };
 
         const branchWidth = 1 / Math.max(1, this.tree.masteries.length);
+        const perRow = new Map<string, number>();
+        for (const branch of this.tree.masteries) {
+            for (const sub of branch.subMasteries ?? []) {
+                const key = `${branch.id}:${rankOf(sub)}`;
+                perRow.set(key, (perRow.get(key) ?? 0) + 1);
+            }
+        }
+        const maxCols = Math.max(1, ...perRow.values());
+        const gap = branchWidth / maxCols;
         const xOf = new Map<string, number>();
         if (rootId) xOf.set(rootId, 0.5);
 
@@ -133,30 +142,39 @@ export class MasteryTreeModel {
 
         this.tree.masteries.forEach((branch, i) => {
             const start = i * branchWidth;
+            const lo = start + gap / 2;
+            const hi = start + branchWidth - gap / 2;
+            const center = start + branchWidth / 2;
+            
+            const desiredOf = (m: Mastery): number => {
+                const xs = requirementIds(m.masteryRequirements)
+                    .filter((id) => id !== rootId)
+                    .map((id) => xOf.get(id))
+                    .filter((x): x is number => x !== undefined);
+                return xs.length ? xs.reduce((s, x) => s + x, 0) / xs.length : center;
+            };
+
             branches.push({ branch, x: start + branchWidth / 2, width: branchWidth });
 
             const rows = new Map<number, Mastery[]>();
             for (const sub of branch.subMasteries ?? []) {
                 const r = rankOf(sub);
                 rows.set(r, [...(rows.get(r) ?? []), sub]);
+                
             }
-
+            
             for (const rank of [...rows.keys()].sort((a, b) => a - b)) {
                 maxRank = Math.max(maxRank, rank);
-                const key = (m: Mastery) => {
-                    const xs = requirementIds(m.masteryRequirements)
-                        .map((id) => xOf.get(id))
-                        .filter((x): x is number => x !== undefined);
-                    return xs.length ? xs.reduce((s, x) => s + x, 0) / xs.length : start + branchWidth / 2;
-                };
-                const sorted = rows
+
+                const items = rows
                     .get(rank)!
-                    .map((m, index) => ({ m, index, k: key(m) }))
-                    .sort((a, b) => a.k - b.k || a.index - b.index);
-                sorted.forEach(({ m }, j) => {
-                    const x = start + (branchWidth * (j + 0.5)) / sorted.length;
-                    xOf.set(m.id, x);
-                    nodes.push({ mastery: m, branchId: branch.id, rank, x });
+                    .map((m, index) => ({ m, index, d: desiredOf(m) }))
+                    .sort((a, b) => a.d - b.d || a.index - b.index);
+
+                const xs = this.packRow(items.map((i) => i.d), gap, lo, hi);
+                items.forEach(({ m }, j) => {
+                    xOf.set(m.id, xs[j]);
+                    nodes.push({ mastery: m, branchId: branch.id, rank, x: xs[j] });
                 });
             }
         });
@@ -172,6 +190,8 @@ export class MasteryTreeModel {
             }
         }
 
+        
+
         return {
             root: this.tree.rootMastery ? { mastery: this.tree.rootMastery, x: 0.5 } : undefined,
             nodes,
@@ -180,4 +200,33 @@ export class MasteryTreeModel {
             rankCount: maxRank + 1,
         };
     }
+
+    /** place les nœuds d'un rang au plus près de leurs positions souhaitées, avec un écart minimal et des bornes */
+    packRow(desired: number[], gap: number, lo: number, hi: number): number[] {
+        const n = desired.length;
+        // moindres carrés sous contrainte d'ordre et d'écart : on retire i*gap,
+        // on régularise (pool adjacent violators), puis on remet i*gap
+        const blocks: { sum: number; count: number }[] = [];
+        desired.forEach((d, i) => {
+            blocks.push({ sum: d - i * gap, count: 1 });
+            while (blocks.length > 1) {
+                const b = blocks[blocks.length - 1];
+                const a = blocks[blocks.length - 2];
+                if (a.sum / a.count <= b.sum / b.count) break;
+                a.sum += b.sum;
+                a.count += b.count;
+                blocks.pop();
+            }
+        });
+
+        const minY = lo;
+        const maxY = Math.max(minY, hi - (n - 1) * gap);
+        const xs: number[] = [];
+        for (const b of blocks) {
+            const y = Math.min(Math.max(b.sum / b.count, minY), maxY);
+            for (let k = 0; k < b.count; k++) xs.push(y + xs.length * gap);
+        }
+        return xs;
+    }
+    
 }
