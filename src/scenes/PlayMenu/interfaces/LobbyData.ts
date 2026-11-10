@@ -1,5 +1,6 @@
 import { CharacterAssetId } from "../../../assets";
 import { GameMode } from "../../../Model/Game";
+import { MasterySelection } from "../../../Model/Mastery";
 import { TeamColor } from "../../../Model/Team";
 
 export class LobbyPlayer {
@@ -7,6 +8,7 @@ export class LobbyPlayer {
     playerId!: string;
     classId!: CharacterAssetId;
     name!: string;
+    masteries?: MasterySelection;
 }
 
 export class LobbyTeam {

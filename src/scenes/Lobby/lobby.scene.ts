@@ -66,7 +66,6 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
     protected mapSizeTitle!: DisplayText;
     protected lobbyNameTitle!: DisplayText;
 
-    
     protected masteryTab!: MasteryTreeDisplayer;
 
     constructor() {
@@ -229,8 +228,9 @@ export class LobbyScene extends BaseScene<LobbySceneInit> {
 
         //MasteryTree creation 
 
-        this.masteryTab = new MasteryTreeDisplayer(this, this.masteryStore, (masteries) =>
-            this.lobbySocket.setMasteries({ masteries }),
+        this.masteryTab = new MasteryTreeDisplayer(this, this.masteryStore, (masteries) => {
+            this.lobbySocket.setMasteries({ masteries })
+            }
         );
 
         //tab BOX

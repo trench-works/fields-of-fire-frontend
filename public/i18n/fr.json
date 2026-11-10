@@ -62,6 +62,33 @@
             "full": "Complet"
         }
     },
+    "mastery": {
+        "points": "Points",
+        "none": "Aucune maîtrise pour cette classe",
+        "unlocks": "Débloque",
+        "help": {
+            "title": "Maîtrises",
+            "body": "Clic gauche : ajouter un point.\nClic droit : retirer un point.\nUne maîtrise est grisée tant que ses prérequis ne sont pas remplis ou que les points restant sont à 0.\nUn passif de branche se débloque quand la branche contient assez de points.\n✔ valide ta sélection,\n↺ la remet à zéro."
+        },
+        "INDOCTRINATION": {
+            "name": "Endoctrinement",
+            "description": ""
+        }
+    },
+    "passive": {
+        "ENDURING": {
+            "name": "Endurant",
+            "description" : "Lors de la fin du tour, rend 4 PV par ennemis au corps à corps "
+        },
+        "REFLEX_SHOT": {
+            "name": "Tir réflexe",
+            "description" : "Lors de la fin du tour, effectue un tir faisant 50% des dommage du tir classique au premiers ennemis alignés et en ligne de vue"
+        },
+        "REVENGEFULL": {
+            "name": "Revanchard",
+            "description": "Donne +20 force et +20 précision pour 1 tour à chaque fois que vous subissez des dommages"
+        }
+    },
     "fight": {
         "actions": {
             "cost": "Coût",
@@ -106,6 +133,16 @@
             "music": "Musique",
             "effects": "Effets Sonores"
         }
+    },
+    "stats": {
+        "strength": "Force",
+        "precision": "Précision",
+        "life": "Vie",
+        "maxLife": "Vie max",
+        "armor": "Armure",
+        "mouvement": "Mouvement",
+        "critical": " % Critique"
     }
+
 }
 

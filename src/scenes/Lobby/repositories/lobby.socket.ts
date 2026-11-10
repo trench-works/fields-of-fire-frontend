@@ -87,6 +87,7 @@ export class LobbySocket extends Socket<LobbyKey, LobbyActions, LobbyEvents> {
     }
 
     setMasteries(selectedMasteries : selectedMasteries){
+        console.log("[front] socket setMasteries", selectedMasteries);
         return this.send(LobbyActions.SET_MASTERIES, selectedMasteries);
     }
 

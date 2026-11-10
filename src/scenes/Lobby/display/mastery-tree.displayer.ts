@@ -30,7 +30,7 @@ type TranslationKey = Parameters<typeof i18n.translate>[0];
 const tr = (key: string, fallback = key): string => {
     try {
         const value = i18n.translate(key as TranslationKey);
-        return value && value !== key ? value : fallback;
+        return !value || value.includes("NO_TRANSLATION") ? fallback : value;
     } catch {
         return fallback;
     }
@@ -53,7 +53,8 @@ export class MasteryTreeDisplayer {
     private lines?: Phaser.GameObjects.Graphics;
     private counter?: DisplayText;
     private popup?: Overlay;
-    private help?: Overlay;
+    private help?: { destroy(): void }[];
+    private hovered?: () => { title: string; body: string; anchor: GridArea };
 
     constructor(
         private readonly scene: BaseScene,
@@ -157,7 +158,11 @@ export class MasteryTreeDisplayer {
             onRightClick: () => this.change(m.id, -1),
         }).setDepth(NODE_DEPTH);
         button.on("pointerover", () =>
-            this.showPopup(tr(`mastery.${m.id}.name`, m.name), this.describe(m), nodeArea),
+            this.showPopup(() => ({
+                title: tr(`mastery.${m.id}.name`, m.name),
+                body: this.describe(m),
+                anchor: nodeArea,
+            })),
         );
         button.on("pointerout", () => this.hidePopup());
 
@@ -186,11 +191,11 @@ export class MasteryTreeDisplayer {
             .setDepth(NODE_DEPTH)
             .setInteractive(true);
         image.getObject().on("pointerover", () =>
-            this.showPopup(
-                tr(`passive.${branch.passive}.name`, branch.passive!),
-                this.describePassive(branch),
-                passiveArea,
-            ),
+        this.showPopup(() => ({
+                title: tr(`passive.${branch.passive}.name`, branch.passive!),
+                body: this.describePassive(branch),
+                anchor: passiveArea,
+            })),
         );
         image.getObject().on("pointerout", () => this.hidePopup());
 
@@ -248,6 +253,7 @@ export class MasteryTreeDisplayer {
         if (!model || !this.layout) return;
         const sel = this.store.selection;
         const available = this.store.availablePoints;
+        if (this.hovered) this.drawPopup();
 
         for (const [id, view] of this.nodes) {
             const m = model.byId.get(id)!;
@@ -305,10 +311,13 @@ export class MasteryTreeDisplayer {
     // ---------- popups ----------
 
     private describe(m: Mastery): string {
+        const level = this.store.selection[m.id] ?? 0;
         const lines = [tr(`mastery.${m.id}.description`, "")];
         for (const [stat, value] of Object.entries(m.statsPerLevel ?? {})) {
             if (!value) continue;
-            lines.push(`${value > 0 ? "+" : ""}${value} ${tr(`stats.${stat}`, stat)} / niv.`);
+            lines.push(
+                `${value > 0 ? "+" : ""}${value} ${tr(`stats.${stat}`, stat)} (${value * level})`,
+            );
         }
         for (const action of m.newActions ?? []) {
             lines.push(`${tr("mastery.unlocks", "Débloque")} : ${action.name}`);
@@ -341,8 +350,15 @@ export class MasteryTreeDisplayer {
     }
 
     /** coin haut gauche du popup = coin haut droit de la maîtrise (retourné à gauche si ça déborde) */
-    private showPopup(title: string, body: string, anchor: GridArea): void {
-        this.hidePopup();
+    private showPopup(build: () => { title: string; body: string; anchor: GridArea }): void {
+        this.hovered = build;
+        this.drawPopup();
+    }
+
+    private drawPopup(): void {
+        this.destroyPopup();
+        if (!this.hovered) return;
+        const { title, body, anchor } = this.hovered();
         const a = this.area!;
         const w = Math.min(a.width * 0.35, 320);
         const h = Math.min(a.height * 0.3, 200);
@@ -352,10 +368,15 @@ export class MasteryTreeDisplayer {
         this.popup = this.makeOverlay(new GridArea(x, y, w, h), title, body, POPUP_DEPTH);
     }
 
-    private hidePopup(): void {
+    private destroyPopup(): void {
         this.popup?.container.destroy();
         this.popup?.text.destroy();
         this.popup = undefined;
+    }
+
+    private hidePopup(): void {
+        this.hovered = undefined;
+        this.destroyPopup();
     }
 
     private toggleHelp(): void {
@@ -364,18 +385,49 @@ export class MasteryTreeDisplayer {
             return;
         }
         this.hidePopup();
-        this.help = this.makeOverlay(
-            this.area!,
-            tr("mastery.help.title", "Maîtrises"),
-            tr("mastery.help.body", ""),
-            HELP_DEPTH,
-            () => this.hideHelp(),
-        );
+
+        const a = this.area!;
+        const header = this.rowHeight * 0.8;
+
+        // onClick vide : rend le fond interactif pour bloquer les clics et survols des maîtrises dessous
+        const container = new DisplayContainer(this.scene, a, {
+            borderWidth: 3,
+            onClick: () => {},
+        }).setDepth(HELP_DEPTH);
+
+        const title = new DisplayText(
+            this.scene,
+            new GridArea(a.x + 12, a.y + 6, a.width - header - 30, header),
+        )
+            .setText(tr("mastery.help.title", "Maîtrises"), {
+                color: Color.MILITARY_GREEN,
+                fontSize: Math.round(header * 0.55),
+            })
+            .setDepth(HELP_DEPTH + 1);
+
+        const body = new DisplayText(
+            this.scene,
+            new GridArea(a.x + 16, a.y + header + 16, a.width - 32, a.height - header - 32),
+        )
+            .setDescription(tr("mastery.help.body", ""), { color: Color.MILITARY_GREEN })
+            .setDepth(HELP_DEPTH + 1);
+
+        const close = new Button(
+            this.scene,
+            new GridArea(a.x + a.width - header - 6, a.y + 6, header, header),
+            {
+                text: "X",
+                onClick: () => this.hideHelp(),
+                borderWidth: 2,
+                borderColor: Color.TEXT,
+            },
+        ).setDepth(HELP_DEPTH + 2);
+
+        this.help = [container, title, body, close];
     }
 
     private hideHelp(): void {
-        this.help?.container.destroy();
-        this.help?.text.destroy();
+        this.help?.forEach((o) => o.destroy());
         this.help = undefined;
     }
 }

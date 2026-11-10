@@ -60,6 +60,9 @@ type ContainerConfig = {
     innerRadius?: Phaser.Types.GameObjects.Graphics.RoundedRectRadius | number;
 };
 
+const TITLE_MAX_FONT = 22;
+const TITLE_MIN_FONT = 10;
+const TITLE_PADDING = 10;
 export class DisplayContainer
     extends Phaser.GameObjects.Container
     implements Displayable
@@ -187,10 +190,14 @@ export class DisplayContainer
         scene.add.existing(this);
     }
 
+    private computeTitleFontSize(text: string): number {
+        const cap = Math.min(this.height / 2, TITLE_MAX_FONT);
+        const fit = (this.width * 0.92) / Math.max(1, text.length * 0.55);
+        return Math.max(TITLE_MIN_FONT, Math.min(cap, fit));
+    }
+
     public setText(text: string, options?: { fontSize?: number }): this {
-        const fontSize =
-            options?.fontSize ??
-            Math.min(this.height / 2, (this.width / text.length) * 1.5);
+        const fontSize = options?.fontSize ?? this.computeTitleFontSize(text);
         if (!this.titleText) {
             this.titleText = this.scene.add
                 .text(0, 0, text, {
@@ -199,15 +206,13 @@ export class DisplayContainer
                     color: Color.TEXT,
                 })
                 .setOrigin(0.5);
-            const textPosition = {
-                x: 0,
-                y: -this.height / 2 + 22,
-            };
-            this.titleText.setPosition(textPosition.x, textPosition.y);
             this.add(this.titleText);
         } else {
             this.titleText.setText(text);
+            this.titleText.setFontSize(fontSize);
         }
+        // le titre reste sous le bord haut quelle que soit sa taille
+        this.titleText.setPosition(0, -this.height / 2 + TITLE_PADDING + fontSize / 2);
         return this;
     }
 
