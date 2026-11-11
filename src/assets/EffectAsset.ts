@@ -15,7 +15,7 @@ export enum EffectAssetId {
     CRIT_CHANCE = "crit_chance",
     WEAKNESS = "weakness",
     BURNED = "burned",
-    REVENGEFULL = "revengefull",
+    REVENGE = "revenge",
 }
 
 class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
@@ -43,7 +43,7 @@ class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
             [EffectAssetId.CRIT_CHANCE] : "crit_chance",
             [EffectAssetId.WEAKNESS] : "weakness",
             [EffectAssetId.BURNED] : "burned",
-            [EffectAssetId.REVENGEFULL] : "revengefull",
+            [EffectAssetId.REVENGE] : "revenge",
         },
         {
             [EffectAssetId.AMPUTATED]: { width: 512, height: 512 },
@@ -60,7 +60,7 @@ class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
             [EffectAssetId.CRIT_CHANCE] : { width: 512, height: 512 },
             [EffectAssetId.WEAKNESS] : { width: 512, height: 512 },
             [EffectAssetId.BURNED] : { width: 512, height: 512 },
-            [EffectAssetId.REVENGEFULL] : { width: 447, height: 447 },
+            [EffectAssetId.REVENGE] : { width: 447, height: 447 },
         }
         );
     }

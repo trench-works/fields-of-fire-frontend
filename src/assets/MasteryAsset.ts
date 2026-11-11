@@ -2,6 +2,7 @@ import { ImageAssetManager } from "../core/Assets/Asset";
 
 export enum MasteryAssetId {
     UNKNOWN = "unknown",
+    //fantassin
     INDOCTRINATION = "indoctrination",
     //fantassin branche 1
     CANNON_FODDER = "cannon_fodder",
@@ -27,6 +28,8 @@ export enum MasteryAssetId {
     DETERRENT = "deterrent",
     FLAME_GRENADE = "flame_grenade",
     REVENGEFULL = "revengefull",
+    //medic
+    EDUCATED = "educated"
 }
 
 const MasteryAssetEntries = Object.fromEntries(

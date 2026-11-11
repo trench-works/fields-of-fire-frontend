@@ -63,7 +63,7 @@
         }
     },
     "mastery": {
-        "points": "Points",
+        "points": "Points à répartir",
         "none": "Aucune maîtrise pour cette classe",
         "unlocks": "Débloque",
         "help": {
@@ -71,22 +71,88 @@
             "body": "Clic gauche : ajouter un point.\nClic droit : retirer un point.\nUne maîtrise est grisée tant que ses prérequis ne sont pas remplis ou que les points restant sont à 0.\nUn passif de branche se débloque quand la branche contient assez de points.\n✔ valide ta sélection,\n↺ la remet à zéro."
         },
         "INDOCTRINATION": {
-            "name": "Endoctrinement",
-            "description": ""
+            "name": "Endoctrinement"
+        },
+        "CANNON_FODDER": {
+            "name": "Chair à Canon"
+        },
+        "INNATE_STRENGTH": {
+            "name": "Force innée"
+        },
+        "BAYONET_FIXED": {
+            "name": "Baïonnette au canon",
+            "description" : "Augmente de 1(par points) les dommages de l'action Baïonnette"
+        },
+        "TRENCH_BRUTE": {
+            "name": "Brute des tranchées",
+            "description" : "Brutaliser : inflige 2(+2 par points) à 5(+1 par points) dommages de force.coût: 2 energies/portée: 1/50% chance d'appliquer faiblesse à la cible/25% de chance d'appliquer énervement au lanceur"
+        },
+        "STRAIGHT_TOWARD_DEATH": {
+            "name": "Droit vers la mort"
+        },
+        "WELL_MAINTAINED_GUN": {
+            "name": "Fusil entretenu"
+        },
+        "HEAVY_GUNNER": {
+            "name": "Tireur lourd"
+        },
+        "DEADLY_SHOOTER": {
+            "name": "Tireur mortel",
+            "description" : "Augmente de 1(par points) les dégats de l'action Tir."
+        },
+        "ACCURATE_SHOOTER": {
+            "name": "Tireur précis",
+            "description" : "Augmente de 1(par points) la portée maximale de l'action Tir."
+        },
+        "IMPOSSIBLE_SHOT": {
+            "name": "Tir impossible",
+            "description": "Tir impossible : inflige 3 à 6 dommages de précision sans ligne de vue.\ncoût: 3 energies\nportée: 3 à 6."
+        },
+        "HEAVY_FIRE": {
+            "name": "Feu nourri",
+            "description": "Modifie l'action Tir: le coût passe de 2 à 1 energies mais l'utilisation est dorénavant limitée à 3 par cible."
+        },
+        "BULLET_PROOF_VEST": {
+            "name": "Gilet pare-balles"
+        },
+        "BUCKSHOT": {
+            "name": "Chevrotine",
+            "description": "L'action 'Tir' devient 'Chevrotine': les dommages max de base passe de 7 à 5. Les dégats se font désormais dans une zone en cone de taile 1. Le mode de portée devient: en ligne uniquement. La portée max passe de 3 à 2."
+        },
+        "SAWED_OFF_GUN": {
+            "name": "Canon scié",
+            "description": "Modifie l'action 'Chevrotine': les dommages sont augmentés de 2(par points)."
+        },
+        "GRENADE": {
+            "name": "Suréquipé",
+            "description": "'Grenade' : utilisable 0(+1 par points) fois par round. Inflige 3 à 6 dommages dans un zone en croix de taille 1."
+        },
+        "FLAME_GRENADE": {
+            "name": "Grenade incendiaire",
+            "description": "'Grenade incendiaire' : utilisable 0(+1 par points) fois par round. Inflige 3 à 6 dommages dans un zone en croix de taille 1.\n 75% de chance d'appliqué 'brulé' à la cible"
+        },
+        "VAPORIZER": {
+            "name": "Vaporiseur",
+            "description": "L'action 'Chevrotine' devient 'Vaporiseur': la range passe à 1 et les dégats sont dorénavant augmentés par la force.\nDe plus les dégats de base minimum augmente de 2 tandis que les dégats de base maximum augmente de 1."
+        },
+        "DETERRENT": {
+            "name": "Dissuadeur",
+            "description": "L'action 'Chevrotine' devient 'Dissuadeur': la portée max augmente de 1 et les dégats de base augmente de 1."
         }
+        
     },
     "passive": {
         "ENDURING": {
             "name": "Endurant",
-            "description" : "Lors de la fin du tour, rend 4 PV par ennemis au corps à corps "
+            "description" : "Lors de la fin du tour, rend 4 PV par ennemis au corps à corps."
         },
         "REFLEX_SHOT": {
             "name": "Tir réflexe",
-            "description" : "Lors de la fin du tour, effectue un tir faisant 50% des dommage du tir classique au premiers ennemis alignés et en ligne de vue"
+            "description" : "Lors de la fin du tour, si aucun ennemis n'est au corp à corps, effectue un tir faisant 50% des dommage du tir classique au premiers ennemis alignés et en ligne de vue."
         },
         "REVENGEFULL": {
             "name": "Revanchard",
-            "description": "Donne +20 force et +20 précision pour 1 tour à chaque fois que vous subissez des dommages"
+            "description": "Donne +20 force et +20 précision pour 1 tour à chaque fois que vous subissez des dommages."
         }
     },
     "fight": {
