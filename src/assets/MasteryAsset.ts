@@ -29,7 +29,28 @@ export enum MasteryAssetId {
     FLAME_GRENADE = "flame_grenade",
     REVENGEFULL = "revengefull",
     //medic
-    EDUCATED = "educated"
+    EDUCATED = "educated",
+    //medic branche 1
+    STRONG_CONSTITUTION = "strong_constitution",
+    MEAT_CLEAVER = "meat_cleaver",
+    MUSCULAR_INTELLIGENCE = "muscular_intelligence",
+    SOILED_CLEAVER = "soiled_cleaver",
+    SHARP_CLEAVER = "sharp_cleaver",
+    BRUTAL_TREATMENT = "brutal_treatment",
+    BLOODTHIRSTY =  "bloodthirsty",
+    //medic branche 2
+    BETWEEN_BULLET = "between_bullet",
+    FIRST_AID = "first_aid",
+    RESCUE_SPRINT = "rescue_sprint",
+    ACT_FAST = "act_fast",
+    EMERGENCY_DEPLOYMENT = "emergency_deployment",
+    //medic branche 3
+    UPGRADED_KIT = "upgraded_kit",
+    DOPING = "doping",
+    DRUGS = "drugs",
+    PHARMACOLOGIST = "pharmacologist",
+    HIPPOCRATE_TREASON = "hippocrate_treason",
+    EMERGENCY_DOSE = "emergency_dose",
 }
 
 const MasteryAssetEntries = Object.fromEntries(

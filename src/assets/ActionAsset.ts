@@ -20,7 +20,9 @@ export enum ActionAssetId {
     GRENADE = "grenade",
     FLAME_GRENADE = "flame_grenade",
     IMPOSSIBLE_SHOT = "impossible_shot",
-    BRUTALIZE = "brutalize"
+    BRUTALIZE = "brutalize",
+    DRUGS = "drugs",
+    MEAT_CLEAVER = "meat_cleaver",
 }
 
 const ActionAssetEntries = Object.fromEntries(
@@ -58,6 +60,8 @@ class ActionAssetManager extends ImageAssetManager<ActionAssetId, string> {
             [ActionAssetId.FLAME_GRENADE]: {width:1, height:1},
             [ActionAssetId.IMPOSSIBLE_SHOT]: { width: 1, height: 1 },
             [ActionAssetId.BRUTALIZE]: { width: 1, height: 1 },
+            [ActionAssetId.DRUGS]: { width: 1, height: 1 },
+            [ActionAssetId.MEAT_CLEAVER]: { width: 1, height: 1 },
         });
     }
 }

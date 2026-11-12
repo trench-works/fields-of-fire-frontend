@@ -42,6 +42,7 @@ export class AnimationService {
         }
         switch (actionId) {
             case ActionAssetId.SHOOT:
+            case ActionAssetId.IMPOSSIBLE_SHOT:
                 {
                     this.character.changeDirection(target, entityId);
                     this.character.scope(entityId, 700);
@@ -63,6 +64,8 @@ export class AnimationService {
                 }
                 break;
             case ActionAssetId.BAYONET:
+            case ActionAssetId.BRUTALIZE:
+            case ActionAssetId.MEAT_CLEAVER:
                 {
                     this.character.changeDirection(target, entityId);
                     this.character.scope(entityId, 700);
