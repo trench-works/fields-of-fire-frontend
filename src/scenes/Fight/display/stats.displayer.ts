@@ -353,8 +353,12 @@ export class StatsDisplayer extends FightSceneDisplayer {
                 if (["life", "mouvement", "energy"].includes(key)) {
                     value = Math.max(value, 0);
                 }
+                const label =
+                    key === "life"
+                        ? `${value} / ${Math.max(stats.maxLife, 0)}`
+                        : String(value);
 
-                text.setText(String(value), { fontSize: 20 });
+                text.setText(label, { fontSize: key === "life" ? 18 : 20 });
             });
 
             this.playerNameText.setText(this.statsStore.name ?? "N/A");
