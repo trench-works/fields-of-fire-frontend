@@ -44,6 +44,7 @@ export enum MasteryAssetId {
     RESCUE_SPRINT = "rescue_sprint",
     ACT_FAST = "act_fast",
     EMERGENCY_DEPLOYMENT = "emergency_deployment",
+    TRENCH_SURGEON = "trench_surgeon",
     //medic branche 3
     UPGRADED_KIT = "upgraded_kit",
     DOPING = "doping",

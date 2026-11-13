@@ -16,6 +16,10 @@ export enum EffectAssetId {
     WEAKNESS = "weakness",
     BURNED = "burned",
     REVENGE = "revenge",
+    BLEEDING = "bleeding",
+    INFECTED = "infected",
+    DIFFICULT_RECOVERY = "difficult_recovery",
+    UNTREATABLE = "untreatable",
 }
 
 class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
@@ -44,6 +48,10 @@ class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
             [EffectAssetId.WEAKNESS] : "weakness",
             [EffectAssetId.BURNED] : "burned",
             [EffectAssetId.REVENGE] : "revenge",
+            [EffectAssetId.BLEEDING] : "bleeding",
+            [EffectAssetId.INFECTED] : "infected",
+            [EffectAssetId.DIFFICULT_RECOVERY] : "infected",
+            [EffectAssetId.UNTREATABLE] : "untreatable",
         },
         {
             [EffectAssetId.AMPUTATED]: { width: 512, height: 512 },
@@ -61,6 +69,10 @@ class EffectAssetManager extends ImageAssetManager<EffectAssetId, string> {
             [EffectAssetId.WEAKNESS] : { width: 512, height: 512 },
             [EffectAssetId.BURNED] : { width: 512, height: 512 },
             [EffectAssetId.REVENGE] : { width: 447, height: 447 },
+            [EffectAssetId.BLEEDING] : { width: 512, height: 512 },
+            [EffectAssetId.INFECTED] : { width: 512, height: 512 },
+            [EffectAssetId.DIFFICULT_RECOVERY] : { width: 512, height: 512 },
+            [EffectAssetId.UNTREATABLE] : { width: 512, height: 512 },
         }
         );
     }

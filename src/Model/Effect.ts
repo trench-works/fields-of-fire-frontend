@@ -23,6 +23,7 @@ export type Effect = {
     type: EffectType;
     duration: number | null;
     modifier: Partial<Stats>;
+    maxStacks?: number;
     author?: string;
     description?: string;
     action: EffectAction;
