@@ -33,6 +33,13 @@ jobs:
             - name: Build Phaser project
               run: npm run build
 
+            - name: Upload dist artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: frontend-dist
+                  path: dist
+                  retention-days: 1
+
             - name: Login to GHCR
               uses: docker/login-action@v3
               with:
@@ -66,4 +73,52 @@ jobs:
                   platforms: linux/amd64
                   tags: ${{ steps.meta.outputs.tags }}
                   labels: ${{ steps.meta.outputs.labels }}
+    publish-npm:
+        runs-on: ubuntu-latest
+        needs: build-and-publish
+        env:
+            PKG_MAJOR_MINOR: "1.0"
+            PKG_NAME: "@trench-works/fields-of-fire-frontend"
+
+        steps:
+            - name: Download dist artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: frontend-dist
+                  path: package/dist
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  registry-url: https://npm.pkg.github.com
+                  scope: "@trench-works"
+
+            - name: Generate package.json
+              working-directory: package
+              env:
+                  PKG_VERSION: ${{ format('{0}.{1}', env.PKG_MAJOR_MINOR, github.run_number) }}
+              run: |
+                  node -e '
+                  const fs = require("fs");
+                  const pkg = {
+                    name: process.env.PKG_NAME,
+                    version: process.env.PKG_VERSION,
+                    description: "Built Phaser frontend of Fields of Fire",
+                    repository: {
+                      type: "git",
+                      url: "git+https://github.com/" + process.env.GITHUB_REPOSITORY + ".git"
+                    },
+                    files: ["dist"],
+                    publishConfig: { registry: "https://npm.pkg.github.com" }
+                  };
+                  fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2));
+                  '
+                  cat package.json
+
+            - name: Publish package
+              working-directory: package
+              run: npm publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
